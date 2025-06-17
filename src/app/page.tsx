@@ -1,17 +1,27 @@
-import Header from '@/app/components/Header';
 import Footer from './components/Footer';
-import BannerCarousel from './components/BannerCarousel';
 import CategoryCards from './components/CategoryCards';
 
 export default function Home() {
   return (
-    <>
-      <Header />
-
-      {/* 메인 배너 캐러셀 */}
-      <BannerCarousel />
-
-      {/* 메인 콘텐츠 */}
+    <main>
+      <div className='relative mx-10 h-96 overflow-hidden rounded-xl sm:h-screen'>
+        <video
+          src='/videos/main-banner-pc.mp4'
+          autoPlay
+          loop
+          muted
+          playsInline
+          className='hidden h-full w-full object-cover sm:block'
+        />
+        <video
+          src='/videos/main-banner-mobile.mp4'
+          autoPlay
+          loop
+          muted
+          playsInline
+          className='block h-full w-full object-cover sm:hidden'
+        />
+      </div>
       <div className='bg-gray-50'>
         <div className='max-w-container mx-auto px-3 py-8 sm:px-6 sm:py-12'>
           <section>
@@ -28,6 +38,6 @@ export default function Home() {
       </div>
 
       <Footer />
-    </>
+    </main>
   );
 }
