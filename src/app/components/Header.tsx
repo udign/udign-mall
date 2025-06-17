@@ -15,7 +15,7 @@ const menuItems = [
 export default function Header() {
   return (
     <header className='sticky top-0 z-50 bg-white'>
-      <div className='space-y-5 px-10 py-5'>
+      <div className='space-y-5 px-6 py-5 sm:px-10'>
         <div className='flex items-center gap-3'>
           <div className='non-login'>
             <Link href='/' className='flex items-center'>
