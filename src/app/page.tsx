@@ -22,7 +22,7 @@ export default function Home() {
           className='block h-full w-full object-cover sm:hidden'
         />
       </div>
-      <section className='mx-auto px-6 py-14 sm:px-10 sm:py-20'>
+      <section className='mx-auto mb-10 px-6 py-14 sm:px-10 sm:py-20'>
         <div className='flex flex-col items-center gap-y-14 sm:gap-y-20'>
           <Link
             href='/upload'

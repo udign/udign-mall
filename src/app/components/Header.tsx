@@ -20,7 +20,7 @@ export default function Header() {
           <div className='non-login'>
             <Link href='/' className='flex items-center'>
               <Image
-                src='/images/Udign.png'
+                src='/images/udign-header.png'
                 alt='UDIGN'
                 width={100}
                 height={40}
