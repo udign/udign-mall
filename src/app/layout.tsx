@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: '유다인',
-  description: 'Udign Application',
+  description: '오직 당신만을 위한 디자인을 선택하세요. 최고의 선물이 완성됩니다.',
 };
 
 export default function RootLayout({
@@ -13,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko'>
-      <body>{children}</body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
