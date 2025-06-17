@@ -1,1 +1,20 @@
 @import 'tailwindcss';
+
+/* 
+  Tailwind CSS Default Breakpoints
+  sm: 640px  @media (min-width: 640px)
+  md: 768px  @media (min-width: 768px)
+  lg: 1024px @media (min-width: 1024px)
+  xl: 1280px @media (min-width: 1280px)
+  2xl: 1536px @media (min-width: 1536px)
+*/
+
+@theme {
+  --color-primary: #e0a645;
+  --color-primary-hover: #d4962d;
+  --color-gray-light: #6c757d;
+  --color-gray-medium: #999999;
+  --color-gray-dark: #333333;
+  --color-dark: #212529;
+  --color-dark-secondary: #2c3e50;
+}
