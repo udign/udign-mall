@@ -4,6 +4,7 @@ import './globals.css';
 
 import LayoutContent from '@/components/LayoutContent';
 import Footer from '@/components/Footer';
+import ScrollToTop from '@/components/ScrollToTop';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -24,6 +25,7 @@ export default function RootLayout({
         <AuthProvider>
           <LayoutContent>{children}</LayoutContent>
           <Footer />
+          <ScrollToTop />
         </AuthProvider>
       </body>
     </html>
