@@ -5,22 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product, ProductListResponse } from '@/types/product';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-} from '@/components/ui/pagination';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { usePagination } from '@/hooks/usePagination';
-
-const PAGINATION_CONFIG = {
-  ITEMS_PER_PAGE: 12, // 페이지당 상품 수
-  VISIBLE_PAGE_COUNT: 5, // 페이지네이션에서 보여줄 페이지 개수
-  DEFAULT_CATEGORY_ID: '10', // 기본 카테고리 ID (패션)
-} as const;
+import CommonPagination from '@/components/CommonPagination';
+import { PAGINATION_CONFIG } from '@/config/pagination';
 
 export default function FashionPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -35,18 +21,6 @@ export default function FashionPage() {
   const categoryId = searchParams.get('ca_id') || PAGINATION_CONFIG.DEFAULT_CATEGORY_ID;
   const currentPage = parseInt(searchParams.get('page') || '1');
 
-  const {
-    visiblePageNumbers,
-    showPreviousEllipsis,
-    showNextEllipsis,
-    showPreviousPageButton,
-    showNextPageButton,
-  } = usePagination({
-    currentPageNumber: currentPage,
-    totalPageCount: totalPages,
-    visiblePageCount: PAGINATION_CONFIG.VISIBLE_PAGE_COUNT,
-  });
-
   const fetchProducts = async (
     pageNum: number = 1,
     catId: string = PAGINATION_CONFIG.DEFAULT_CATEGORY_ID,
@@ -54,17 +28,15 @@ export default function FashionPage() {
     try {
       setLoading(true);
 
-      // 🔄 데이터 소스 전환: 아래 중 하나의 라인만 활성화하세요
-
       // 📊 실제 데이터 사용 (데이터베이스에서 가져오기)
-      const response = await fetch(
-        `/api/products?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
-      );
+      // const response = await fetch(
+      //   `/api/products?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
+      // );
 
       // 🎭 더미 데이터 사용 (테스트용 가짜 데이터)
-      // const response = await fetch(
-      //   `/api/products/dummy?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
-      // );
+      const response = await fetch(
+        `/api/products/dummy?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
+      );
 
       if (!response.ok) {
         throw new Error('상품을 불러오는데 실패했습니다.');
@@ -97,17 +69,6 @@ export default function FashionPage() {
       fetchProducts(currentPage, categoryId);
     }
   }, [currentPage, categoryId, searchParams, router]);
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      // URL 업데이트
-      const params = new URLSearchParams();
-      params.set('ca_id', categoryId);
-      params.set('page', newPage.toString());
-      router.push(`/fashion?${params.toString()}`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ko-KR').format(price);
@@ -225,95 +186,13 @@ export default function FashionPage() {
                 ))}
               </div>
 
-              {/* 페이지네이션 */}
-              {totalPages > 1 && (
-                <Pagination>
-                  <PaginationContent>
-                    {/* 이전 페이지 버튼 */}
-                    {showPreviousPageButton && (
-                      <PaginationItem>
-                        <button
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          className={cn(
-                            buttonVariants({ variant: 'ghost', size: 'default' }),
-                            'gap-1 px-2.5 sm:pl-2.5',
-                          )}
-                        >
-                          <ChevronLeftIcon className='h-4 w-4' />
-                          <span className='hidden sm:block'>이전</span>
-                        </button>
-                      </PaginationItem>
-                    )}
-
-                    {/* 첫 페이지와 이전 생략 표시 */}
-                    {showPreviousEllipsis && (
-                      <>
-                        <PaginationItem>
-                          <button
-                            onClick={() => handlePageChange(1)}
-                            className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }))}
-                          >
-                            1
-                          </button>
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      </>
-                    )}
-
-                    {/* 보이는 페이지 번호들 */}
-                    {visiblePageNumbers.map((pageNum) => (
-                      <PaginationItem key={pageNum}>
-                        <button
-                          onClick={() => handlePageChange(pageNum)}
-                          className={cn(
-                            buttonVariants({
-                              variant: currentPage === pageNum ? 'outline' : 'ghost',
-                              size: 'icon',
-                            }),
-                          )}
-                        >
-                          {pageNum}
-                        </button>
-                      </PaginationItem>
-                    ))}
-
-                    {/* 다음 생략 표시와 마지막 페이지 */}
-                    {showNextEllipsis && (
-                      <>
-                        <PaginationItem>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                        <PaginationItem>
-                          <button
-                            onClick={() => handlePageChange(totalPages)}
-                            className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }))}
-                          >
-                            {totalPages}
-                          </button>
-                        </PaginationItem>
-                      </>
-                    )}
-
-                    {/* 다음 페이지 버튼 */}
-                    {showNextPageButton && (
-                      <PaginationItem>
-                        <button
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          className={cn(
-                            buttonVariants({ variant: 'ghost', size: 'default' }),
-                            'gap-1 px-2.5 sm:pr-2.5',
-                          )}
-                        >
-                          <span className='hidden sm:block'>다음</span>
-                          <ChevronRightIcon className='h-4 w-4' />
-                        </button>
-                      </PaginationItem>
-                    )}
-                  </PaginationContent>
-                </Pagination>
-              )}
+              {/* 공통 페이지네이션 컴포넌트 사용 */}
+              <CommonPagination
+                currentPageNumber={currentPage}
+                totalPageCount={totalPages}
+                baseUrl='/fashion'
+                queryParams={{ ca_id: categoryId }}
+              />
             </>
           )}
         </div>
