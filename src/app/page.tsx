@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaPlus } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { ROUTES } from '@/lib/routes';
 import {
   Dialog,
   DialogContent,
@@ -16,11 +17,9 @@ import {
 } from '@/components/ui/dialog';
 
 export default function Home() {
-  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
-
-  const router = useRouter();
-
   const { user, isLoading } = useAuth();
+  const router = useRouter();
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const handleUploadClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,13 +31,13 @@ export default function Home() {
     if (!user) {
       setShowLoginDialog(true);
     } else {
-      router.push('/upload');
+      router.push(ROUTES.UPLOAD);
     }
   };
 
   const handleLoginConfirm = () => {
     setShowLoginDialog(false);
-    router.push('/login');
+    router.push(ROUTES.LOGIN);
   };
 
   return (
@@ -68,7 +67,7 @@ export default function Home() {
             <button
               onClick={handleUploadClick}
               disabled={isLoading}
-              className='bg-primary hover:bg-primary-hover flex w-full max-w-xs cursor-pointer items-center justify-center gap-2 rounded-2xl px-6 py-2.5 text-lg text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-md sm:gap-3 sm:rounded-3xl sm:px-8 sm:py-3.5 sm:text-2xl'
+              className='bg-primary hover:bg-primary-hover flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl px-6 py-2.5 text-lg text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-md sm:gap-3 sm:rounded-3xl sm:px-8 sm:py-3.5 sm:text-2xl'
             >
               <FaPlus className='text-primary rounded-full bg-white p-1 text-lg sm:text-2xl' />
               {isLoading ? '로딩 중...' : '내 디자인 업로드하기'}
@@ -77,13 +76,13 @@ export default function Home() {
               오직 당신만을 위한 디자인을 선택하세요. 최고의 선물이 완성됩니다.
             </p>
             <div className='grid grid-cols-1 gap-8 sm:gap-12 lg:grid-cols-2 xl:grid-cols-3'>
-              <Link href='/'>
+              <Link href={ROUTES.FASHION}>
                 <Image src='/images/fashion.png' alt='패션 카테고리' width={440} height={330} />
               </Link>
-              <Link href='/'>
+              <Link href={ROUTES.SHOES}>
                 <Image src='/images/shoes.png' alt='신발 카테고리' width={440} height={330} />
               </Link>
-              <Link href='/'>
+              <Link href={ROUTES.OTHERS}>
                 <Image src='/images/others.png' alt='기타 카테고리' width={440} height={330} />
               </Link>
             </div>
@@ -100,13 +99,13 @@ export default function Home() {
           <DialogFooter className='flex-col gap-2 sm:flex-row sm:gap-2'>
             <button
               onClick={() => setShowLoginDialog(false)}
-              className='focus:ring-primary w-full cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
+              className='focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
             >
               취소
             </button>
             <button
               onClick={handleLoginConfirm}
-              className='bg-primary hover:bg-primary-hover focus:ring-primary w-full cursor-pointer rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
+              className='bg-primary hover:bg-primary-hover focus:ring-primary w-full rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
             >
               확인
             </button>

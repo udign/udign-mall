@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/accordion';
 import { Switch } from '@/components/ui/switch';
 import { termsOfService, privacyPolicy } from '@/lib/terms-content';
+import { ROUTES } from '@/lib/routes';
 
 interface Agreements {
   all: boolean;
@@ -53,7 +54,7 @@ export default function TermsPage() {
 
   const handleSubmit = (): void => {
     if (agreements.terms && agreements.privacy) {
-      router.push('/register');
+      router.push(ROUTES.REGISTER);
     } else {
       alert('필수 약관에 동의해주세요.');
     }
@@ -72,7 +73,7 @@ export default function TermsPage() {
       <div className='relative z-10'>
         <div className='px-6 py-5 sm:px-10'>
           <div className='flex items-center'>
-            <Link href='/' className='flex items-center'>
+            <Link href={ROUTES.HOME} className='flex items-center'>
               <Image
                 src='/images/udign-white.png'
                 alt='UDIGN'
@@ -150,7 +151,7 @@ export default function TermsPage() {
 
             <div className='mt-8 flex space-x-4'>
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push(ROUTES.HOME)}
                 className='flex-1 cursor-pointer rounded bg-gray-600 px-4 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-500'
               >
                 취소

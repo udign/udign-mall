@@ -9,6 +9,7 @@ import { FiBox } from 'react-icons/fi';
 import { FaRegUserCircle } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAuth } from '@/contexts/AuthContext';
+import { ROUTES } from '@/lib/routes';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,11 +25,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const menuItems = [
-  { href: '/fashion', label: 'fashion' },
-  { href: '/shoes', label: 'shoes' },
-  { href: '/others', label: 'others' },
-  { href: '/upload', label: '디자인 업로드', requiresAuth: true },
+interface NavMenuItem {
+  href: string;
+  label: string;
+  requiresAuth?: boolean;
+}
+
+const NAV_MENU_ITEMS: NavMenuItem[] = [
+  { href: ROUTES.FASHION, label: 'fashion' },
+  { href: ROUTES.SHOES, label: 'shoes' },
+  { href: ROUTES.OTHERS, label: 'others' },
+  { href: ROUTES.UPLOAD, label: '디자인 업로드', requiresAuth: true },
 ];
 
 export default function Header() {
@@ -58,7 +65,7 @@ export default function Header() {
 
   const handleLoginConfirm = () => {
     setShowLoginDialog(false);
-    router.push('/login');
+    router.push(ROUTES.LOGIN);
   };
 
   return (
@@ -67,7 +74,7 @@ export default function Header() {
         <div className='space-y-5 px-6 py-5 sm:px-10'>
           <div className='flex items-center gap-3'>
             <div className='non-login'>
-              <Link href='/' className='flex items-center'>
+              <Link href={ROUTES.HOME} className='flex items-center'>
                 <Image
                   src='/images/udign-header.png'
                   alt='UDIGN'
@@ -78,7 +85,7 @@ export default function Header() {
               </Link>
             </div>
             <div className='text-gray-dark ml-auto flex items-center gap-4'>
-              <Link href='/' className='hover:text-primary-hover transition-colors'>
+              <Link href={ROUTES.HOME} className='hover:text-primary-hover transition-colors'>
                 <FaRegUserCircle className='text-xl' />
               </Link>
               <button className='hover:text-primary-hover cursor-pointer transition-colors'>
@@ -104,7 +111,7 @@ export default function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link href='/login' className='hover:text-primary-hover transition-colors'>
+                <Link href={ROUTES.LOGIN} className='hover:text-primary-hover transition-colors'>
                   로그인
                 </Link>
               )}
@@ -116,7 +123,7 @@ export default function Header() {
           </div>
           <nav className='hidden sm:flex sm:items-center sm:justify-between'>
             <ul className='flex gap-5'>
-              {menuItems.map((item) => (
+              {NAV_MENU_ITEMS.map((item) => (
                 <li key={item.href}>
                   {item.requiresAuth ? (
                     <button
@@ -139,7 +146,7 @@ export default function Header() {
               ))}
             </ul>
             <button
-              onClick={(e) => handleAuthRequiredClick(e, '/my-udign')}
+              onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
               className='text-gray-medium hover:text-primary-hover cursor-pointer text-lg font-semibold transition-colors'
             >
               My UDIGN

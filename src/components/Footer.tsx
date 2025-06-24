@@ -1,12 +1,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 
-const navigationLinks = [
-  { href: '/about', label: 'about UDIGN' },
-  { href: '/guide', label: '이용안내' },
-  { href: '/terms', label: '이용약관' },
-  { href: '/privacy', label: '개인정보처리방침' },
-  { href: '/band', label: '벤더페이지' },
+interface FooterNavLink {
+  href: string;
+  label: string;
+}
+
+const FOOTER_NAV_LINKS: FooterNavLink[] = [
+  { href: ROUTES.ABOUT, label: 'about UDIGN' },
+  { href: ROUTES.GUIDE, label: '이용안내' },
+  { href: ROUTES.TERMS, label: '이용약관' },
+  { href: ROUTES.PRIVACY, label: '개인정보처리방침' },
+  { href: ROUTES.BAND, label: '벤더페이지' },
 ];
 
 export default function Footer() {
@@ -35,12 +41,12 @@ export default function Footer() {
       </div>
       <div>
         <div className='text-gray-dark flex flex-wrap items-center justify-center gap-4 text-sm'>
-          {navigationLinks.map((link, index) => (
+          {FOOTER_NAV_LINKS.map((link, index) => (
             <div key={link.href} className='flex items-center gap-4'>
               <Link href={link.href} className='hover:text-primary-hover transition-colors'>
                 {link.label}
               </Link>
-              {index < navigationLinks.length - 1 && <div className='h-4 w-px bg-gray-400' />}
+              {index < FOOTER_NAV_LINKS.length - 1 && <div className='h-4 w-px bg-gray-400' />}
             </div>
           ))}
         </div>

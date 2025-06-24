@@ -4,11 +4,12 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import LoginForm from '@/components/LoginForm';
+import { ROUTES } from '@/lib/routes';
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const handleAuthSuccess = () => router.push('/');
+  const handleAuthSuccess = () => router.push(ROUTES.HOME);
 
   return (
     <div
@@ -21,7 +22,7 @@ export default function LoginPage() {
       <div className='relative z-10'>
         <div className='px-6 py-5 sm:px-10'>
           <div className='flex items-center'>
-            <Link href='/' className='flex items-center'>
+            <Link href={ROUTES.HOME} className='flex items-center'>
               <Image
                 src='/images/udign-white.png'
                 alt='UDIGN'
@@ -38,7 +39,7 @@ export default function LoginPage() {
         <div className='w-full max-w-lg'>
           <LoginForm
             onSuccess={handleAuthSuccess}
-            onSwitchToRegister={() => router.push('/terms')}
+            onSwitchToRegister={() => router.push(ROUTES.TERMS)}
           />
         </div>
       </div>
