@@ -1,3 +1,3 @@
-# Udign
+# UDIGN Next.js
 
-Udign Next.js 애플리케이션입니다.
+유다인 웹사이트의 Next.js 버전입니다.
