@@ -54,7 +54,6 @@ export default function Header() {
               <HiOutlineSearch className='text-xl' />
             </button>
 
-            {/* 인증 상태에 따른 조건부 렌더링 */}
             {isLoading ? (
               <span className='text-gray-500'>로딩 중...</span>
             ) : user ? (
@@ -71,7 +70,7 @@ export default function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href='/auth' className='hover:text-primary-hover transition-colors'>
+              <Link href='/login' className='hover:text-primary-hover transition-colors'>
                 로그인
               </Link>
             )}
