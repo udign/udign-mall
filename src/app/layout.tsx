@@ -4,6 +4,7 @@ import './globals.css';
 
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
+import { AuthProvider } from '../contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,9 +21,11 @@ export default function RootLayout({
   return (
     <html lang='ko'>
       <body className={`${inter.className} mx-auto max-w-[1840px]`}>
-        <Header />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <Header />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
