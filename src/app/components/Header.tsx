@@ -7,6 +7,12 @@ import { FiBox } from 'react-icons/fi';
 import { FaRegUserCircle } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const menuItems = [
   { href: '/fashion', label: 'fashion' },
@@ -52,15 +58,18 @@ export default function Header() {
             {isLoading ? (
               <span className='text-gray-500'>로딩 중...</span>
             ) : user ? (
-              <div className='flex items-center gap-2'>
-                <span className='text-sm text-gray-600'>{user.mb_nick}님</span>
-                <button
-                  onClick={handleLogout}
-                  className='hover:text-primary-hover text-sm transition-colors'
-                >
-                  로그아웃
-                </button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className='hover:text-primary-hover flex cursor-pointer items-center gap-1 text-base text-gray-600 transition-colors'>
+                    <span>{user.mb_nick} 님</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-36 p-0'>
+                  <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
+                    로그아웃
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link href='/auth' className='hover:text-primary-hover transition-colors'>
                 로그인
