@@ -5,22 +5,24 @@ import { FaPlus } from 'react-icons/fa';
 export default function Home() {
   return (
     <main>
-      <div className='relative mx-6 h-96 overflow-hidden rounded-xl sm:mx-10 sm:h-screen'>
-        <video
-          src='/videos/main-banner-pc.mp4'
-          autoPlay
-          loop
-          muted
-          className='hidden h-full w-full object-cover sm:block'
-        />
-        <video
-          src='/videos/main-banner-mobile.mp4'
-          autoPlay
-          loop
-          muted
-          playsInline
-          className='block h-full w-full object-cover sm:hidden'
-        />
+      <div className='relative mx-4 overflow-hidden rounded-xl sm:mx-6 md:mx-8 lg:mx-10'>
+        <div className='aspect-video'>
+          <video
+            src='/videos/main-banner-pc.mp4'
+            autoPlay
+            loop
+            muted
+            className='hidden h-full w-full object-cover sm:block'
+          />
+          <video
+            src='/videos/main-banner-mobile.mp4'
+            autoPlay
+            loop
+            muted
+            playsInline
+            className='block h-full w-full object-cover sm:hidden'
+          />
+        </div>
       </div>
       <section className='mx-auto mb-10 px-6 py-14 sm:px-10 sm:py-20'>
         <div className='flex flex-col items-center gap-y-14 sm:gap-y-20'>

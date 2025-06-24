@@ -1,8 +1,6 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
-/* 
-  ---break---
-*/
+@import 'tw-animate-css';
+
 @custom-variant dark (&:is(.dark *));
 
 /* 
@@ -12,20 +10,6 @@
   lg: 1024px @media (min-width: 1024px)
   xl: 1280px @media (min-width: 1280px)
   2xl: 1536px @media (min-width: 1536px)
-*/
-
-@theme {
-  --color-primary: #e0a645;
-  --color-primary-hover: #d4962d;
-  --color-gray-light: #6c757d;
-  --color-gray-medium: #999999;
-  --color-gray-dark: #333333;
-  --color-dark: #212529;
-  --color-dark-secondary: #2c3e50;
-}
-
-/* 
-  ---break---
 */
 
 @theme inline {
@@ -41,6 +25,12 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-gray-light: var(--gray-light);
+  --color-gray-medium: var(--gray-medium);
+  --color-gray-dark: var(--gray-dark);
+  --color-dark: var(--dark);
+  --color-dark-secondary: var(--dark-secondary);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -78,8 +68,14 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.672 0.157 85.65);
   --primary-foreground: oklch(0.985 0 0);
+  --primary-hover: oklch(0.632 0.157 85.65);
+  --gray-light: oklch(0.525 0.014 258.34);
+  --gray-medium: oklch(0.646 0 0);
+  --gray-dark: oklch(0.278 0 0);
+  --dark: oklch(0.193 0.014 258.34);
+  --dark-secondary: oklch(0.244 0.015 196.38);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -104,10 +100,6 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
-
-/* 
-  ---break---
-*/
 
 .dark {
   --background: oklch(0.145 0 0);
@@ -142,10 +134,6 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
-
-/* 
-  ---break---
-*/
 
 @layer base {
   * {
