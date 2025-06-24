@@ -107,7 +107,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_id'>
-              아이디
+              아이디 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
@@ -123,7 +123,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='password'>
-              비밀번호
+              비밀번호 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Switch } from '@/components/ui/switch';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -17,6 +18,13 @@ interface RegisterFormData {
   mb_hp: string;
 }
 
+interface AgreementData {
+  allAgree: boolean;
+  ageAgree: boolean;
+  termsAgree: boolean;
+  marketingAgree: boolean;
+}
+
 export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) {
   const [formData, setFormData] = useState<RegisterFormData>({
     mb_id: '',
@@ -26,6 +34,14 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     mb_email: '',
     mb_hp: '',
   });
+
+  const [agreements, setAgreements] = useState<AgreementData>({
+    allAgree: false,
+    ageAgree: false,
+    termsAgree: false,
+    marketingAgree: false,
+  });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -42,9 +58,14 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     );
   }, [formData]);
 
-  const buttonClass = isAllFieldsFilled
-    ? 'bg-primary hover:bg-primary-hover'
-    : 'bg-gray-light hover:bg-gray-medium';
+  const isRequiredAgreementsFilled = useMemo(() => {
+    return agreements.ageAgree && agreements.termsAgree;
+  }, [agreements]);
+
+  const buttonClass =
+    isAllFieldsFilled && isRequiredAgreementsFilled
+      ? 'bg-primary hover:bg-primary-hover'
+      : 'bg-gray-light hover:bg-gray-medium';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -54,10 +75,48 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     setError('');
   };
 
+  const handleAgreementChange = (key: keyof AgreementData, value: boolean) => {
+    if (key === 'allAgree') {
+      // 전체 동의 토글
+      setAgreements({
+        allAgree: value,
+        ageAgree: value,
+        termsAgree: value,
+        marketingAgree: value,
+      });
+    } else {
+      const newAgreements = {
+        ...agreements,
+        [key]: value,
+      };
+
+      // 전체 동의 상태 업데이트
+      const allChecked =
+        newAgreements.ageAgree && newAgreements.termsAgree && newAgreements.marketingAgree;
+      newAgreements.allAgree = allChecked;
+
+      setAgreements(newAgreements);
+    }
+    setError('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+
+    // 필수 동의 항목 체크
+    if (!agreements.ageAgree) {
+      setError('만 14세 이상 동의는 필수입니다.');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!agreements.termsAgree) {
+      setError('이용약관 및 개인정보 수집 동의는 필수입니다.');
+      setIsLoading(false);
+      return;
+    }
 
     if (formData.mb_password !== formData.mb_password_confirm) {
       setError('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
@@ -114,7 +173,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_id'>
-              아이디 *
+              아이디 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
@@ -130,7 +189,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_password'>
-              비밀번호 *
+              비밀번호 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
@@ -146,7 +205,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_password_confirm'>
-              비밀번호 확인 *
+              비밀번호 확인 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
@@ -162,7 +221,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_name'>
-              이름 *
+              이름 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
@@ -178,7 +237,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_hp'>
-              휴대폰번호 *
+              휴대폰번호 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
@@ -194,7 +253,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_email'>
-              이메일 *
+              이메일 <span className='text-red-400'>*</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
@@ -208,10 +267,59 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             />
           </div>
 
+          <div className='space-y-4 border-t border-gray-600 pt-6'>
+            <div className='flex items-center justify-between rounded-lg bg-gray-800/50 p-4'>
+              <label className='flex-1 cursor-pointer text-sm font-medium text-white'>
+                모든 항목에 동의
+              </label>
+              <Switch
+                checked={agreements.allAgree}
+                onCheckedChange={(checked) => handleAgreementChange('allAgree', checked)}
+              />
+            </div>
+
+            <div className='space-y-3 px-4'>
+              <div className='flex items-center justify-between'>
+                <label className='flex-1 cursor-pointer text-sm text-gray-300'>
+                  만 14세 이상입니다. <span className='text-red-400'>*</span>
+                </label>
+                <Switch
+                  checked={agreements.ageAgree}
+                  onCheckedChange={(checked) => handleAgreementChange('ageAgree', checked)}
+                />
+              </div>
+
+              <div className='flex items-center justify-between'>
+                <label className='flex-1 cursor-pointer text-sm text-gray-300'>
+                  이용약관 및 필수 개인정보 수집에 대한 동의 <span className='text-red-400'>*</span>
+                </label>
+                <Switch
+                  checked={agreements.termsAgree}
+                  onCheckedChange={(checked) => handleAgreementChange('termsAgree', checked)}
+                />
+              </div>
+
+              <div className='flex items-center justify-between'>
+                <div className='flex-1'>
+                  <label className='cursor-pointer text-sm text-gray-300'>
+                    광고성 정보 수신에 대한 동의
+                  </label>
+                  <p className='mt-1 text-xs text-gray-400'>
+                    (미 동의시 서비스 이용에 제한이 있을 수도 있습니다.)
+                  </p>
+                </div>
+                <Switch
+                  checked={agreements.marketingAgree}
+                  onCheckedChange={(checked) => handleAgreementChange('marketingAgree', checked)}
+                />
+              </div>
+            </div>
+          </div>
+
           <button
             className={`${buttonClass} mt-2 w-full cursor-pointer rounded px-4 py-3 font-medium text-white transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50`}
             type='submit'
-            disabled={isLoading}
+            disabled={isLoading || !isAllFieldsFilled || !isRequiredAgreementsFilled}
           >
             {isLoading ? '가입 중...' : '회원가입'}
           </button>
