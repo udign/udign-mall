@@ -59,7 +59,6 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     setIsLoading(true);
     setError('');
 
-    // 비밀번호 확인
     if (formData.mb_password !== formData.mb_password_confirm) {
       setError('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
       setIsLoading(false);

@@ -38,7 +38,7 @@ export default function LoginPage() {
         <div className='w-full max-w-lg'>
           <LoginForm
             onSuccess={handleAuthSuccess}
-            onSwitchToRegister={() => router.push('/register')}
+            onSwitchToRegister={() => router.push('/terms')}
           />
         </div>
       </div>
