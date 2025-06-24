@@ -34,14 +34,12 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     mb_email: '',
     mb_hp: '',
   });
-
   const [agreements, setAgreements] = useState<AgreementData>({
     allAgree: false,
     ageAgree: false,
     termsAgree: false,
     marketingAgree: false,
   });
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -77,7 +75,6 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
   const handleAgreementChange = (key: keyof AgreementData, value: boolean) => {
     if (key === 'allAgree') {
-      // 전체 동의 토글
       setAgreements({
         allAgree: value,
         ageAgree: value,

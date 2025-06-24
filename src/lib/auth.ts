@@ -6,13 +6,13 @@ import { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/user'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-/** 비밀번호를 bcrypt로 해시화하여 안전하게 저장할 수 있도록 변환 */
+// 비밀번호를 bcrypt로 해시화하여 안전하게 저장할 수 있도록 변환
 export const hashPassword = async (password: string): Promise<string> => {
   const saltRounds = 10;
   return await bcrypt.hash(password, saltRounds);
 };
 
-/** 입력된 비밀번호와 해시된 비밀번호를 비교하여 일치 여부 확인 */
+// 입력된 비밀번호와 해시된 비밀번호를 비교하여 일치 여부 확인
 export const verifyPassword = async (
   password: string,
   hashedPassword: string,

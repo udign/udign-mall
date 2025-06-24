@@ -17,9 +17,11 @@ import {
 } from '@/components/ui/dialog';
 
 export default function Home() {
-  const { user, isLoading } = useAuth();
+  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+
   const router = useRouter();
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+  const { user, isLoading } = useAuth();
 
   const handleUploadClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -69,8 +71,8 @@ export default function Home() {
               disabled={isLoading}
               className='bg-primary hover:bg-primary-hover flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl px-6 py-2.5 text-lg text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-md sm:gap-3 sm:rounded-3xl sm:px-8 sm:py-3.5 sm:text-2xl'
             >
-              <FaPlus className='text-primary rounded-full bg-white p-1 text-lg sm:text-2xl' />
-              {isLoading ? '로딩 중...' : '내 디자인 업로드하기'}
+              <FaPlus className='text-primary rounded-full bg-white p-1 text-lg sm:text-2xl' />내
+              디자인 업로드하기
             </button>
             <p className='text-gray-dark text-center text-xl font-bold tracking-tight sm:text-3xl'>
               오직 당신만을 위한 디자인을 선택하세요. 최고의 선물이 완성됩니다.
