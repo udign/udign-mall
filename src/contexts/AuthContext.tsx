@@ -6,7 +6,11 @@ import { User } from '@/types/user';
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (mb_id: string, password: string) => Promise<{ success: boolean; message: string }>;
+  login: (
+    mb_id: string,
+    password: string,
+    auto_login?: boolean,
+  ) => Promise<{ success: boolean; message: string }>;
   register: (userData: {
     mb_id: string;
     mb_password: string;
@@ -16,6 +20,7 @@ interface AuthContextType {
     mb_hp?: string;
   }) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<void>;
+  checkAutoLogin: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,15 +29,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // 페이지 로드 시 사용자 정보 확인
+  // 페이지 로드 시 사용자 정보 확인 및 자동 로그인 체크
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
+        // 먼저 현재 세션 확인
         const response = await fetch('/api/auth/me');
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
             setUser(data.user);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        // 세션이 없으면 자동 로그인 쿠키 확인
+        const autoLoginResponse = await fetch('/api/auth/auto-login', {
+          method: 'POST',
+        });
+
+        if (autoLoginResponse.ok) {
+          const autoLoginData = await autoLoginResponse.json();
+          if (autoLoginData.success) {
+            setUser(autoLoginData.user);
           }
         }
       } catch (error) {
@@ -44,14 +64,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuthStatus();
   }, []);
 
-  const login = async (mb_id: string, password: string) => {
+  const login = async (mb_id: string, password: string, auto_login?: boolean) => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ mb_id, password }),
+        body: JSON.stringify({ mb_id, password, auto_login }),
       });
 
       const data = await response.json();
@@ -106,6 +126,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const checkAutoLogin = async () => {
+    try {
+      const response = await fetch('/api/auth/auto-login', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setUser(data.user);
+        }
+      }
+    } catch (error) {
+      console.error('Auto login check error:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -114,6 +151,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         register,
         logout,
+        checkAutoLogin,
       }}
     >
       {children}

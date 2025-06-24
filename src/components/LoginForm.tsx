@@ -2,6 +2,17 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Switch } from '@/components/ui/switch';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -21,6 +32,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [autoLogin, setAutoLogin] = useState<boolean>(false);
+  const [showAutoLoginDialog, setShowAutoLoginDialog] = useState<boolean>(false);
 
   const { login } = useAuth();
 
@@ -40,13 +52,31 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
     setError('');
   };
 
+  const handleAutoLoginToggle = (checked: boolean) => {
+    if (checked) {
+      setShowAutoLoginDialog(true);
+    } else {
+      setAutoLogin(false);
+    }
+  };
+
+  const handleAutoLoginConfirm = () => {
+    setAutoLogin(true);
+    setShowAutoLoginDialog(false);
+  };
+
+  const handleAutoLoginCancel = () => {
+    setAutoLogin(false);
+    setShowAutoLoginDialog(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      const result = await login(formData.mb_id, formData.password);
+      const result = await login(formData.mb_id, formData.password, autoLogin);
 
       if (result.success) {
         onSuccess?.();
@@ -116,15 +146,14 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
           </button>
 
           <div className='flex items-center justify-between text-sm'>
-            <label className='flex cursor-pointer items-center text-gray-300'>
-              <input
-                type='checkbox'
+            <div className='flex cursor-pointer items-center text-gray-300'>
+              <Switch
                 checked={autoLogin}
-                onChange={(e) => setAutoLogin(e.target.checked)}
-                className='text-primary focus:ring-primary mr-2 h-4 w-4 rounded border-gray-600 bg-gray-700 focus:ring-2'
+                onCheckedChange={handleAutoLoginToggle}
+                className='mr-2'
               />
-              자동로그인
-            </label>
+              <span>자동로그인</span>
+            </div>
             <div className='text-gray-300'>
               <span className='cursor-pointer hover:text-white'>아이디/비밀번호 찾기</span>
               <span className='mx-2'>|</span>
@@ -141,6 +170,31 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
           </div>
         </form>
       </div>
+
+      <Dialog open={showAutoLoginDialog} onOpenChange={setShowAutoLoginDialog}>
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>자동로그인 사용 확인</DialogTitle>
+            <DialogDescription className='text-left leading-relaxed'>
+              자동로그인을 사용하시면 다음부터 회원아이디와 패스워드를 입력하실 필요가 없습니다.
+              <br />
+              그러나 공공장소에서는 개인정보가 유출될 수 있으니 사용을 자제하여 주십시오.
+              <br />
+              자동로그인을 사용하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='flex-col gap-2 sm:flex-row'>
+            <DialogClose asChild>
+              <Button type='button' variant='outline' onClick={handleAutoLoginCancel}>
+                취소
+              </Button>
+            </DialogClose>
+            <Button type='button' onClick={handleAutoLoginConfirm}>
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { executeQuery } from './database';
 import { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/user';
 
@@ -140,6 +141,78 @@ export const registerUser = async (userData: RegisterRequest): Promise<AuthRespo
   }
 };
 
+// 자동 로그인을 위한 보안 키 생성 (PHP 프로젝트와 유사한 방식)
+export const generateAutoLoginKey = (userAgent: string, password: string): string => {
+  // Next.js 환경에서 더 적절한 서버 식별자 사용
+  const serverInfo = process.env.VERCEL_URL || process.env.NEXTAUTH_URL || 'localhost';
+  const serverSoftware = 'NextJS';
+  return crypto
+    .createHash('md5')
+    .update(serverInfo + serverSoftware + userAgent + password)
+    .digest('hex');
+};
+
+// 자동 로그인 쿠키 검증
+export const verifyAutoLoginCookie = async (
+  mb_id: string,
+  autoKey: string,
+  userAgent: string,
+): Promise<User | null> => {
+  try {
+    // 사용자 정보 조회
+    const users = (await executeQuery('SELECT * FROM g5_member WHERE mb_id = ?', [
+      mb_id,
+    ])) as unknown[];
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    const user = users[0] as User & {
+      mb_password: string;
+      mb_intercept_date: string;
+      mb_leave_date: string;
+    };
+
+    // 차단되거나 탈퇴한 회원 체크
+    if (user.mb_intercept_date || user.mb_leave_date) {
+      return null;
+    }
+
+    // 저장된 키와 현재 생성한 키 비교
+    const expectedKey = generateAutoLoginKey(userAgent, user.mb_password);
+    if (autoKey !== expectedKey) {
+      return null;
+    }
+
+    // 로그인 정보 업데이트
+    const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    await executeQuery('UPDATE g5_member SET mb_today_login = ?, mb_login_ip = ? WHERE mb_id = ?', [
+      now,
+      '127.0.0.1',
+      mb_id,
+    ]);
+
+    // 비밀번호 제외한 사용자 정보 반환
+    const userWithoutPassword: User = {
+      mb_no: user.mb_no,
+      mb_id: user.mb_id,
+      mb_name: user.mb_name,
+      mb_nick: user.mb_nick,
+      mb_email: user.mb_email,
+      mb_level: user.mb_level,
+      mb_datetime: user.mb_datetime,
+      mb_today_login: user.mb_today_login,
+      mb_login_ip: user.mb_login_ip,
+    };
+
+    return userWithoutPassword;
+  } catch (error) {
+    console.error('Auto login verification error:', error);
+    return null;
+  }
+};
+
 // 사용자 로그인을 처리하고 인증 토큰을 발급
 export const loginUser = async (loginData: LoginRequest): Promise<AuthResponse> => {
   try {
@@ -194,6 +267,7 @@ export const loginUser = async (loginData: LoginRequest): Promise<AuthResponse> 
       message: '로그인 성공',
       user: userWithoutPassword,
       token,
+      autoLoginKey: loginData.auto_login ? user.mb_password : undefined,
     };
   } catch (error) {
     console.error('Login error:', error);

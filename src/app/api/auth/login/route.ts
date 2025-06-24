@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loginUser } from '@/lib/auth';
+import { loginUser, generateAutoLoginKey } from '@/lib/auth';
 import { LoginRequest } from '@/types/user';
 
 export const POST = async (request: NextRequest) => {
@@ -25,6 +25,29 @@ export const POST = async (request: NextRequest) => {
         sameSite: 'strict',
         maxAge: 24 * 60 * 60, // 24시간
       });
+
+      // 자동 로그인이 활성화된 경우 자동 로그인 쿠키 설정
+      if (body.auto_login && result.user) {
+        const userAgent = request.headers.get('user-agent') || '';
+
+        // 사용자 정보를 다시 조회하여 비밀번호 해시를 가져옴
+        const autoLoginKey = generateAutoLoginKey(userAgent, result.autoLoginKey || '');
+
+        // 자동 로그인 쿠키 설정 (31일간 유지)
+        response.cookies.set('ck_mb_id', result.user.mb_id, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 31 * 24 * 60 * 60, // 31일
+        });
+
+        response.cookies.set('ck_auto', autoLoginKey, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 31 * 24 * 60 * 60, // 31일
+        });
+      }
 
       return response;
     } else {

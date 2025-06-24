@@ -13,6 +13,7 @@ export interface User {
 export interface LoginRequest {
   mb_id: string;
   password: string;
+  auto_login?: boolean;
 }
 
 export interface RegisterRequest {
@@ -29,4 +30,5 @@ export interface AuthResponse {
   message: string;
   user?: User;
   token?: string;
+  autoLoginKey?: string;
 }

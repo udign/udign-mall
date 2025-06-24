@@ -15,6 +15,21 @@ export const POST = async () => {
       maxAge: 0, // 즉시 만료
     });
 
+    // 자동 로그인 쿠키도 제거
+    response.cookies.set('ck_mb_id', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 0, // 즉시 만료
+    });
+
+    response.cookies.set('ck_auto', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 0, // 즉시 만료
+    });
+
     return response;
   } catch (error) {
     console.error('Logout API error:', error);
