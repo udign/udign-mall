@@ -8,7 +8,7 @@ import { Product, ProductListResponse } from '@/types/product';
 import CommonPagination from '@/components/CommonPagination';
 import { PAGINATION_CONFIG } from '@/config/pagination';
 
-export default function FashionPage() {
+export default function ShoesPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,13 +18,10 @@ export default function FashionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const categoryId = searchParams.get('ca_id') || PAGINATION_CONFIG.DEFAULT_CATEGORY_ID;
+  const categoryId = searchParams.get('ca_id') || '20'; // shoes 카테고리 ID
   const currentPage = parseInt(searchParams.get('page') || '1');
 
-  const fetchProducts = async (
-    pageNum: number = 1,
-    catId: string = PAGINATION_CONFIG.DEFAULT_CATEGORY_ID,
-  ) => {
+  const fetchProducts = async (pageNum: number = 1, catId: string = '20') => {
     try {
       setLoading(true);
 
@@ -62,9 +59,9 @@ export default function FashionPage() {
     // 초기 로드 시 URL 파라미터가 없으면 기본값으로 설정
     if (!searchParams.get('ca_id') && !searchParams.get('page')) {
       const params = new URLSearchParams();
-      params.set('ca_id', PAGINATION_CONFIG.DEFAULT_CATEGORY_ID);
+      params.set('ca_id', '20');
       params.set('page', '1');
-      router.replace(`/fashion?${params.toString()}`);
+      router.replace(`/shoes?${params.toString()}`);
     } else {
       fetchProducts(currentPage, categoryId);
     }
@@ -119,7 +116,7 @@ export default function FashionPage() {
           </div>
 
           <div className='mb-8'>
-            <h1 className='mb-2 text-3xl font-bold text-gray-900'>{categoryName || '패션'}</h1>
+            <h1 className='mb-2 text-3xl font-bold text-gray-900'>{categoryName || '신발'}</h1>
             <p className='text-gray-600'>총 {products.length}개의 작품이 있습니다.</p>
           </div>
 
@@ -173,7 +170,7 @@ export default function FashionPage() {
               <CommonPagination
                 currentPageNumber={currentPage}
                 totalPageCount={totalPages}
-                pathname='/fashion'
+                pathname='/shoes'
                 queryParams={{ ca_id: categoryId }}
               />
             </>
