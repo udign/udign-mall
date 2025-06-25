@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Product } from '@/types/product';
 import CommonPagination from '@/components/CommonPagination';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
@@ -70,7 +71,10 @@ export default function CategoryProductList({
   fallbackCategoryName,
   onRetry,
 }: CategoryProductListProps) {
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+
+  const router = useRouter();
+
   const { user } = useAuth();
 
   const handleProductClick = (e: React.MouseEvent, productId: string) => {
@@ -79,8 +83,7 @@ export default function CategoryProductList({
     if (!user) {
       setShowLoginDialog(true);
     } else {
-      // 로그인된 경우 상품 상세 페이지로 이동
-      window.location.href = `/product/${productId}`;
+      router.push(`/product/${productId}`);
     }
   };
   return (

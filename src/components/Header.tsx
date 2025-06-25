@@ -86,7 +86,7 @@ export default function Header() {
               {isLoading ? (
                 <span className='text-gray-500'>로딩 중...</span>
               ) : user ? (
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <button className='hover:text-primary-hover flex cursor-pointer items-center gap-1 text-base text-gray-600 transition-colors'>
                       <span>{user.mb_nick} 님</span>
