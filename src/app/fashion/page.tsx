@@ -28,15 +28,15 @@ export default function FashionPage() {
     try {
       setLoading(true);
 
-      // 📊 실제 데이터 사용 (데이터베이스에서 가져오기)
-      // const response = await fetch(
-      //   `/api/products?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
-      // );
-
-      // 🎭 더미 데이터 사용 (테스트용 가짜 데이터)
+      // 실제 데이터 사용 (데이터베이스에서 가져오기)
       const response = await fetch(
-        `/api/products/dummy?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
+        `/api/products?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
       );
+
+      // 더미 데이터 사용 (테스트용 가짜 데이터)
+      // const response = await fetch(
+      //   `/api/products/dummy?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
+      // );
 
       if (!response.ok) {
         throw new Error('상품을 불러오는데 실패했습니다.');
@@ -70,20 +70,16 @@ export default function FashionPage() {
     }
   }, [currentPage, categoryId, searchParams, router]);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ko-KR').format(price);
-  };
-
   return (
-    <>
+    <div className='px-6 py-5 sm:px-10'>
       {loading ? (
-        <div className='container mx-auto px-4 py-8'>
+        <div className='container mx-auto'>
           <div className='flex min-h-64 items-center justify-center'>
             <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600'></div>
           </div>
         </div>
       ) : error ? (
-        <div className='container mx-auto px-4 py-8'>
+        <div className='container mx-auto'>
           <div className='text-center'>
             <h2 className='mb-4 text-2xl font-bold text-red-600'>오류 발생</h2>
             <p className='mb-4 text-gray-600'>{error}</p>
@@ -96,13 +92,10 @@ export default function FashionPage() {
           </div>
         </div>
       ) : (
-        <div className='container mx-auto px-4 py-8'>
+        <div className='container mx-auto'>
           <div className='mb-8'>
             <h1 className='mb-2 text-3xl font-bold text-gray-900'>{categoryName || '패션'}</h1>
-            <p className='text-gray-600'>총 {products.length}개의 상품이 있습니다.</p>
-            <div className='mt-4 text-sm text-gray-500'>
-              <span>패션 카테고리의 모든 상품을 확인해보세요</span>
-            </div>
+            <p className='text-gray-600'>총 {products.length}개의 작품이 있습니다.</p>
           </div>
 
           {products.length === 0 ? (
@@ -116,7 +109,7 @@ export default function FashionPage() {
                   <Link
                     key={product.it_id}
                     href={`/product/${product.it_id}`}
-                    className='block overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg'
+                    className='block space-y-2 overflow-hidden rounded-lg border border-gray-200 bg-white'
                   >
                     <div className='relative aspect-square'>
                       {product.it_img1 ? (
@@ -126,6 +119,15 @@ export default function FashionPage() {
                           fill
                           className='object-cover'
                           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw'
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML =
+                                '<div class="flex h-full w-full items-center justify-center bg-gray-200"><span class="text-gray-400">이미지 없음</span></div>';
+                            }
+                          }}
                         />
                       ) : (
                         <div className='flex h-full w-full items-center justify-center bg-gray-200'>
@@ -135,68 +137,24 @@ export default function FashionPage() {
                     </div>
 
                     <div className='p-4'>
-                      <h3
-                        className='mb-2 overflow-hidden font-semibold text-gray-900'
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                        }}
-                      >
+                      <h3 className='overflow-hidden font-medium text-gray-900'>
                         {product.it_name}
                       </h3>
-
-                      {product.creator_name && (
-                        <p className='mb-2 text-sm text-gray-600'>작가: {product.creator_name}</p>
-                      )}
-
-                      <div className='flex items-center justify-between'>
-                        <div className='flex flex-col'>
-                          {product.it_cust_price > 0 &&
-                            product.it_cust_price !== product.it_price && (
-                              <span className='text-sm text-gray-400 line-through'>
-                                {formatPrice(product.it_cust_price)}원
-                              </span>
-                            )}
-                          <span className='text-lg font-bold text-blue-600'>
-                            {formatPrice(product.it_price)}원
-                          </span>
-                        </div>
-
-                        <div className='flex items-center space-x-2 text-sm text-gray-500'>
-                          {product.it_use_avg > 0 && <span>★ {product.it_use_avg}</span>}
-                          <span>조회 {product.it_hit}</span>
-                        </div>
-                      </div>
-
-                      {product.it_basic && (
-                        <p
-                          className='mt-2 overflow-hidden text-sm text-gray-600'
-                          style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                          }}
-                        >
-                          {product.it_basic}
-                        </p>
-                      )}
                     </div>
                   </Link>
                 ))}
               </div>
 
-              {/* 공통 페이지네이션 컴포넌트 사용 */}
               <CommonPagination
                 currentPageNumber={currentPage}
                 totalPageCount={totalPages}
-                baseUrl='/fashion'
+                pathname='/fashion'
                 queryParams={{ ca_id: categoryId }}
               />
             </>
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

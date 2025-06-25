@@ -143,12 +143,12 @@ export async function GET(request: NextRequest) {
     // 페이지네이션 적용
     const items = allDummyProducts.slice(offset, offset + limit);
 
-    // 이미지 URL 처리 (더미 데이터는 모두 null이지만 일관성을 위해)
+    // 이미지 URL 처리 (더미 데이터는 모두 null이지만 일관성을 위해 public/images/item 폴더 참조 형태로 설정)
     const processedItems = items.map((item) => ({
       ...item,
-      it_img1: item.it_img1 ? `/api/images/item/${item.it_img1}` : null,
-      it_img2: item.it_img2 ? `/api/images/item/${item.it_img2}` : null,
-      it_img3: item.it_img3 ? `/api/images/item/${item.it_img3}` : null,
+      it_img1: item.it_img1 ? `/images/item/${item.it_img1}` : null,
+      it_img2: item.it_img2 ? `/images/item/${item.it_img2}` : null,
+      it_img3: item.it_img3 ? `/images/item/${item.it_img3}` : null,
     }));
 
     // 개발자를 위한 로그
