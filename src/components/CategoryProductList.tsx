@@ -114,7 +114,7 @@ export default function CategoryProductList({
               <div
                 key={product.it_id}
                 onClick={(e) => handleProductClick(e, product.it_id)}
-                className='block cursor-pointer space-y-2 overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform hover:scale-105'
+                className='block cursor-pointer space-y-2 overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform duration-400 ease-out hover:scale-101'
               >
                 <div className='relative aspect-square'>
                   {product.it_img1 ? (
@@ -122,7 +122,7 @@ export default function CategoryProductList({
                       src={product.it_img1}
                       alt={product.it_name}
                       fill
-                      className='object-cover'
+                      className='object-cover p-4'
                       sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw'
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
