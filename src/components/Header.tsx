@@ -16,14 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 
 interface NavMenuItem {
   href: string;
@@ -63,11 +56,6 @@ export default function Header() {
     }
   };
 
-  const handleLoginConfirm = () => {
-    setShowLoginDialog(false);
-    router.push(ROUTES.LOGIN);
-  };
-
   return (
     <>
       <header className='sticky top-0 z-50 bg-white'>
@@ -98,7 +86,7 @@ export default function Header() {
               {isLoading ? (
                 <span className='text-gray-500'>로딩 중...</span>
               ) : user ? (
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <button className='hover:text-primary-hover flex cursor-pointer items-center gap-1 text-base text-gray-600 transition-colors'>
                       <span>{user.mb_nick} 님</span>
@@ -155,28 +143,7 @@ export default function Header() {
         </div>
       </header>
 
-      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>로그인이 필요합니다</DialogTitle>
-            <DialogDescription>회원이시라면 로그인 후 이용해 주십시오.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter className='flex-col gap-2 sm:flex-row sm:gap-2'>
-            <button
-              onClick={() => setShowLoginDialog(false)}
-              className='focus:ring-primary w-full cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
-            >
-              취소
-            </button>
-            <button
-              onClick={handleLoginConfirm}
-              className='bg-primary hover:bg-primary-hover focus:ring-primary w-full cursor-pointer rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
-            >
-              확인
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LoginRequiredDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
     </>
   );
 }
