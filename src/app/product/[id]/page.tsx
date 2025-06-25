@@ -41,6 +41,65 @@ interface ProductDetailResponse {
   error?: string;
 }
 
+// 썸네일 컴포넌트
+interface ThumbnailProps {
+  image: string;
+  index: number;
+  productName: string;
+  isSelected: boolean;
+  onClick: (image: string) => void;
+}
+
+function Thumbnail({ image, index, productName, isSelected, onClick }: ThumbnailProps) {
+  return (
+    <div
+      className={`h-16 w-16 cursor-pointer overflow-hidden rounded-lg transition-colors ${
+        isSelected
+          ? 'border-primary border-2'
+          : index === 0
+            ? 'border-2 border-gray-300 hover:border-gray-400'
+            : 'border border-gray-200 hover:border-gray-400'
+      }`}
+      onClick={() => onClick(image)}
+    >
+      <Image
+        src={image}
+        alt={`${productName} 썸네일 ${index + 1}`}
+        width={64}
+        height={64}
+        className='h-full w-full object-cover'
+      />
+    </div>
+  );
+}
+
+// 메인 이미지 컴포넌트
+interface MainImageProps {
+  selectedImage: string | null;
+  productName: string;
+  className?: string;
+  sizes?: string;
+}
+
+function MainImage({
+  selectedImage,
+  productName,
+  className = '',
+  sizes = '(max-width: 768px) 100vw, 50vw',
+}: MainImageProps) {
+  return (
+    <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${className}`}>
+      {selectedImage ? (
+        <Image src={selectedImage} alt={productName} fill className='object-cover' sizes={sizes} />
+      ) : (
+        <div className='flex h-full w-full items-center justify-center'>
+          <span className='text-gray-400'>이미지 없음</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProductDetailPage() {
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -48,6 +107,7 @@ export default function ProductDetailPage() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [prevProduct, setPrevProduct] = useState<{ it_id: string; it_name: string } | null>(null);
   const [nextProduct, setNextProduct] = useState<{ it_id: string; it_name: string } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const params = useParams();
   const router = useRouter();
@@ -76,6 +136,8 @@ export default function ProductDetailPage() {
           setProduct(data.product);
           setPrevProduct(data.prev_product || null);
           setNextProduct(data.next_product || null);
+          // 첫 번째 이미지를 기본 선택 이미지로 설정
+          setSelectedImage(data.product.it_img1);
         } else {
           setError(data.error || '상품을 불러오는데 실패했습니다.');
         }
@@ -123,7 +185,17 @@ export default function ProductDetailPage() {
     router.push('/');
   };
 
-  console.log(product);
+  const handleThumbnailClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+  };
+
+  // 이미지 배열 생성 로직
+  const getProductImages = () => {
+    if (!product) return [];
+    return [product.it_img1, product.it_img2, product.it_img3].filter(Boolean) as string[];
+  };
+
+  const productImages = getProductImages();
 
   return authLoading || loading ? (
     <div className='flex min-h-screen items-center justify-center'>
@@ -161,58 +233,57 @@ export default function ProductDetailPage() {
     </div>
   ) : (
     <div className='min-h-screen bg-white'>
-      {/* 메인 컨테이너 */}
-      <div className='mx-auto max-w-6xl px-6 py-8 sm:px-10'>
+      <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
         <div className='flex flex-col gap-8 lg:flex-row'>
-          {/* 왼쪽: 상품 이미지 */}
           <div className='lg:w-1/2'>
-            {/* 썸네일 이미지들 */}
-            <div className='mb-4 flex gap-2'>
-              {product.it_img1 && (
-                <div className='h-16 w-16 overflow-hidden rounded-lg border-2 border-gray-300'>
-                  <Image
-                    src={product.it_img1}
-                    alt={`${product.it_name} 썸네일 1`}
-                    width={64}
-                    height={64}
-                    className='h-full w-full object-cover'
+            {/* 데스크톱: 썸네일 왼쪽, 메인 이미지 오른쪽 */}
+            <div className='hidden gap-4 sm:flex'>
+              <div className='flex flex-col gap-2'>
+                {productImages.map((image, index) => (
+                  <Thumbnail
+                    key={image}
+                    image={image}
+                    index={index}
+                    productName={product.it_name}
+                    isSelected={selectedImage === image}
+                    onClick={handleThumbnailClick}
                   />
-                </div>
-              )}
-              {product.it_img2 && (
-                <div className='h-16 w-16 overflow-hidden rounded-lg border border-gray-200'>
-                  <Image
-                    src={product.it_img2}
-                    alt={`${product.it_name} 썸네일 2`}
-                    width={64}
-                    height={64}
-                    className='h-full w-full object-cover'
-                  />
-                </div>
-              )}
+                ))}
+              </div>
+
+              <MainImage
+                selectedImage={selectedImage}
+                productName={product.it_name}
+                className='flex-1'
+                sizes='(max-width: 768px) 100vw, 50vw'
+              />
             </div>
 
-            {/* 메인 이미지 */}
-            <div className='relative aspect-square overflow-hidden rounded-lg bg-gray-100'>
-              {product.it_img1 ? (
-                <Image
-                  src={product.it_img1}
-                  alt={product.it_name}
-                  fill
-                  className='object-cover'
-                  sizes='(max-width: 768px) 100vw, 50vw'
-                />
-              ) : (
-                <div className='flex h-full w-full items-center justify-center'>
-                  <span className='text-gray-400'>이미지 없음</span>
-                </div>
-              )}
+            {/* 모바일: 메인 이미지 위, 썸네일 아래 */}
+            <div className='sm:hidden'>
+              <MainImage
+                selectedImage={selectedImage}
+                productName={product.it_name}
+                className='mb-4 w-full'
+                sizes='100vw'
+              />
+
+              <div className='flex justify-start gap-2'>
+                {productImages.map((image, index) => (
+                  <Thumbnail
+                    key={image}
+                    image={image}
+                    index={index}
+                    productName={product.it_name}
+                    isSelected={selectedImage === image}
+                    onClick={handleThumbnailClick}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* 오른쪽: 상품 정보 */}
           <div className='relative lg:w-1/2'>
-            {/* 우측 상단 하트 아이콘 */}
             <button
               onClick={handleLikeToggle}
               className='absolute top-0 right-0 p-2 text-2xl transition-colors hover:scale-110'
@@ -220,10 +291,8 @@ export default function ProductDetailPage() {
               {product.is_liked ? '❤️' : '🤍'}
             </button>
 
-            {/* 상품 제목 */}
             <h1 className='mb-6 pr-12 text-2xl font-bold text-gray-900'>{product.it_name}</h1>
 
-            {/* 작품 설명 섹션 */}
             <div className='mb-8'>
               <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
               <div className='space-y-2 leading-relaxed text-gray-700'>
@@ -236,7 +305,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* 좋아요 및 목표 정보 */}
             <div className='mb-8 rounded-lg bg-gray-50 p-4'>
               <div className='mb-2 flex items-center justify-between'>
                 <span className='text-sm text-gray-600'>현재 좋아요</span>
@@ -261,7 +329,6 @@ export default function ProductDetailPage() {
               </p>
             </div>
 
-            {/* 상태 표시 */}
             {product.is_under_review && (
               <div className='mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
                 <p className='font-medium text-yellow-800'>🔍 현재 심의 진행 중입니다</p>
@@ -278,7 +345,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* 하단 네비게이션 */}
         <div className='mt-12 flex items-center justify-between border-t border-gray-200 pt-8'>
           <div className='flex items-center'>
             {prevProduct ? (
@@ -311,7 +377,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* 상품 상세 정보 */}
         {product.it_info && (
           <div className='mt-12 border-t border-gray-200 pt-8'>
             <h2 className='mb-4 text-xl font-bold text-gray-900'>상품 상세 정보</h2>
