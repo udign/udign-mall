@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Product } from '@/types/product';
 import CommonPagination from '@/components/CommonPagination';
+import LoginRequiredDialog from '@/components/LoginRequiredDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CategoryProductListProps {
   products: Product[];
@@ -68,6 +70,19 @@ export default function CategoryProductList({
   fallbackCategoryName,
   onRetry,
 }: CategoryProductListProps) {
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const { user } = useAuth();
+
+  const handleProductClick = (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+
+    if (!user) {
+      setShowLoginDialog(true);
+    } else {
+      // 로그인된 경우 상품 상세 페이지로 이동
+      window.location.href = `/product/${productId}`;
+    }
+  };
   return (
     <div>
       <div className='mb-8'>
@@ -79,7 +94,6 @@ export default function CategoryProductList({
         </p>
       </div>
 
-      {/* 메시지 섹션 */}
       <div className='mb-8 rounded-lg bg-gray-50 p-6 text-center'>
         <p className='mb-1 text-lg text-gray-700'>
           마음에 드는 디자인에 <span className='text-red-500'>❤️</span>를 눌러주세요.
@@ -97,10 +111,10 @@ export default function CategoryProductList({
         <>
           <div className='mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
             {products.map((product) => (
-              <Link
+              <div
                 key={product.it_id}
-                href={`/product/${product.it_id}`}
-                className='block space-y-2 overflow-hidden rounded-lg border border-gray-200 bg-white'
+                onClick={(e) => handleProductClick(e, product.it_id)}
+                className='block cursor-pointer space-y-2 overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform hover:scale-105'
               >
                 <div className='relative aspect-square'>
                   {product.it_img1 ? (
@@ -130,7 +144,7 @@ export default function CategoryProductList({
                 <div className='p-4'>
                   <h3 className='overflow-hidden font-medium text-gray-900'>{product.it_name}</h3>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 
@@ -142,6 +156,13 @@ export default function CategoryProductList({
           />
         </>
       )}
+
+      <LoginRequiredDialog
+        open={showLoginDialog}
+        onOpenChange={setShowLoginDialog}
+        title='상품 상세보기'
+        description='상품 상세 정보를 보시려면 로그인이 필요합니다.'
+      />
     </div>
   );
 }

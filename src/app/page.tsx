@@ -7,14 +7,7 @@ import { useRouter } from 'next/navigation';
 import { FaPlus } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 
 export default function Home() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
@@ -35,11 +28,6 @@ export default function Home() {
     } else {
       router.push(ROUTES.UPLOAD);
     }
-  };
-
-  const handleLoginConfirm = () => {
-    setShowLoginDialog(false);
-    router.push(ROUTES.LOGIN);
   };
 
   return (
@@ -69,7 +57,7 @@ export default function Home() {
             <button
               onClick={handleUploadClick}
               disabled={isLoading}
-              className='bg-primary hover:bg-primary-hover flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl px-6 py-2.5 text-lg text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-md sm:gap-3 sm:rounded-3xl sm:px-8 sm:py-3.5 sm:text-2xl'
+              className='bg-primary hover:bg-primary-hover flex w-full max-w-xs cursor-pointer items-center justify-center gap-2 rounded-2xl px-6 py-2.5 text-lg text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-md sm:gap-3 sm:rounded-3xl sm:px-8 sm:py-3.5 sm:text-2xl'
             >
               <FaPlus className='text-primary rounded-full bg-white p-1 text-lg sm:text-2xl' />내
               디자인 업로드하기
@@ -92,28 +80,12 @@ export default function Home() {
         </section>
       </main>
 
-      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>로그인이 필요합니다</DialogTitle>
-            <DialogDescription>회원이시라면 로그인 후 이용해 주십시오.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter className='flex-col gap-2 sm:flex-row sm:gap-2'>
-            <button
-              onClick={() => setShowLoginDialog(false)}
-              className='focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
-            >
-              취소
-            </button>
-            <button
-              onClick={handleLoginConfirm}
-              className='bg-primary hover:bg-primary-hover focus:ring-primary w-full rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto'
-            >
-              확인
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LoginRequiredDialog
+        open={showLoginDialog}
+        onOpenChange={setShowLoginDialog}
+        title='디자인 업로드'
+        description='디자인을 업로드하시려면 로그인이 필요합니다.'
+      />
     </>
   );
 }
