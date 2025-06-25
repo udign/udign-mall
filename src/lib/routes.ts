@@ -12,6 +12,9 @@ export const ROUTES = {
   SHOES: '/shoes',
   OTHERS: '/others',
 
+  // 상품 상세 페이지
+  PRODUCT: '/product',
+
   // 기능 페이지
   UPLOAD: '/upload',
   MY_UDIGN: '/my-udign',

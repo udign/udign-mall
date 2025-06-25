@@ -36,6 +36,23 @@ export interface Product {
   likes_count: string;
 }
 
+export interface ProductDetail extends Product {
+  it_info: string; // 상품 상세 정보
+  it_mobile_info: string; // 모바일 상품 정보
+  it_head_html: string; // 상단 HTML
+  it_tail_html: string; // 하단 HTML
+  it_4: number; // 목표 인원
+  it_8: number; // 심의 기간
+  it_9: string; // 수동 심의 여부 (Y/N)
+  it_10: string; // 심의 완료 여부 (Y/N)
+  ca_name: string; // 카테고리 이름
+  is_liked: boolean; // 현재 사용자가 좋아요했는지 여부
+  current_likes: number; // 현재 좋아요 수
+  goal_attainment: boolean; // 목표 달성 여부
+  is_under_review: boolean; // 심의중 여부
+  is_review_completed: boolean; // 심의 완료 여부
+}
+
 export interface ProductListResponse {
   success: boolean;
   category: Category;
@@ -47,5 +64,18 @@ export interface ProductListResponse {
     totalPages: number;
     hasNext: boolean;
     hasPrev: boolean;
+  };
+}
+
+export interface ProductDetailResponse {
+  success: boolean;
+  product: ProductDetail;
+  prev_product?: {
+    it_id: string;
+    it_name: string;
+  };
+  next_product?: {
+    it_id: string;
+    it_name: string;
   };
 }
