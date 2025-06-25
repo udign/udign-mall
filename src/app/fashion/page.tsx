@@ -73,13 +73,11 @@ export default function FashionPage() {
   return (
     <div className='px-6 py-5 sm:px-10'>
       {loading ? (
-        <div className='container mx-auto'>
-          <div className='flex min-h-64 items-center justify-center'>
-            <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600'></div>
-          </div>
+        <div className='flex min-h-64 items-center justify-center'>
+          <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600'></div>
         </div>
       ) : error ? (
-        <div className='container mx-auto'>
+        <div>
           <div className='text-center'>
             <h2 className='mb-4 text-2xl font-bold text-red-600'>오류 발생</h2>
             <p className='mb-4 text-gray-600'>{error}</p>
@@ -92,7 +90,18 @@ export default function FashionPage() {
           </div>
         </div>
       ) : (
-        <div className='container mx-auto'>
+        <div>
+          <div className='mb-8 aspect-video overflow-hidden rounded-xl'>
+            <video
+              src='/videos/fashion-banner-pc.mp4'
+              className='h-auto w-full object-cover'
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          </div>
+
           <div className='mb-8'>
             <h1 className='mb-2 text-3xl font-bold text-gray-900'>{categoryName || '패션'}</h1>
             <p className='text-gray-600'>총 {products.length}개의 작품이 있습니다.</p>

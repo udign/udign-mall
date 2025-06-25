@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko'>
-      <body className={`${inter.className} mx-auto max-w-[1840px]`}>
+      <body className={`${inter.className} container mx-auto`}>
         <AuthProvider>
           <LayoutContent>{children}</LayoutContent>
           <Footer />

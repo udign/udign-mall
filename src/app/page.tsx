@@ -45,8 +45,8 @@ export default function Home() {
   return (
     <>
       <main>
-        <div className='relative mx-4 overflow-hidden rounded-xl sm:mx-6 md:mx-8 lg:mx-10'>
-          <div className='aspect-video'>
+        <div className='px-6 py-5 sm:px-10'>
+          <div className='aspect-video overflow-hidden rounded-xl'>
             <video
               src='/videos/main-banner-pc.mp4'
               autoPlay
@@ -64,7 +64,7 @@ export default function Home() {
             />
           </div>
         </div>
-        <section className='mx-auto mb-10 px-6 py-14 sm:px-10 sm:py-20'>
+        <section className='mb-10 px-6 py-14 sm:px-10 sm:py-20'>
           <div className='flex flex-col items-center gap-y-14 sm:gap-y-20'>
             <button
               onClick={handleUploadClick}
