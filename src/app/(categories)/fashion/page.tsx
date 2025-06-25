@@ -1,11 +1,12 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useCategoryProducts } from '@/hooks/useCategoryProducts';
 import CategoryProductList from '@/components/CategoryProductList';
 import { CATEGORY_IDS } from '@/config/pagination';
 import { ROUTES } from '@/lib/routes';
 
-export default function FashionPage() {
+function FashionContent() {
   const { products, loading, error, totalPages, categoryName, currentPage, categoryId, refetch } =
     useCategoryProducts({
       defaultCategoryId: CATEGORY_IDS.FASHION,
@@ -25,5 +26,13 @@ export default function FashionPage() {
       fallbackCategoryName='fashion'
       onRetry={refetch}
     />
+  );
+}
+
+export default function FashionPage() {
+  return (
+    <Suspense>
+      <FashionContent />
+    </Suspense>
   );
 }
