@@ -6,7 +6,6 @@ interface NotFoundStateProps {
   title?: string;
   message?: string;
   showGoHome?: boolean;
-  fullScreen?: boolean;
   className?: string;
 }
 
@@ -14,7 +13,6 @@ export default function NotFoundState({
   title = '페이지를 찾을 수 없습니다',
   message,
   showGoHome = true,
-  fullScreen = false,
   className = '',
 }: NotFoundStateProps) {
   const router = useRouter();
@@ -23,9 +21,7 @@ export default function NotFoundState({
     router.push(ROUTES.HOME);
   };
 
-  const containerClass = fullScreen
-    ? 'flex min-h-screen items-center justify-center'
-    : 'flex min-h-100 items-center justify-center';
+  const containerClass = 'flex min-h-[32rem] items-center justify-center py-24';
 
   return (
     <div className={`${containerClass} ${className}`}>

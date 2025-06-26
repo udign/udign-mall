@@ -8,7 +8,6 @@ interface ErrorStateProps {
   showRetry?: boolean;
   showGoHome?: boolean;
   onRetry?: () => void;
-  fullScreen?: boolean;
   className?: string;
 }
 
@@ -18,7 +17,6 @@ export default function ErrorState({
   showRetry = false,
   showGoHome = true,
   onRetry,
-  fullScreen = false,
   className = '',
 }: ErrorStateProps) {
   const router = useRouter();
@@ -27,9 +25,7 @@ export default function ErrorState({
     router.push(ROUTES.HOME);
   };
 
-  const containerClass = fullScreen
-    ? 'flex min-h-screen items-center justify-center'
-    : 'flex min-h-100 items-center justify-center';
+  const containerClass = 'flex min-h-[32rem] items-center justify-center py-24';
 
   return (
     <div className={`${containerClass} ${className}`}>

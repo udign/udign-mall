@@ -236,14 +236,13 @@ export default function ProductDetailPage() {
   return authLoading || loading ? (
     <LoadingState
       message={authLoading ? '인증 정보를 확인하는 중...' : '작품 정보를 불러오는 중...'}
-      fullScreen={true}
     />
   ) : error ? (
-    <ErrorState message={error} fullScreen={true} showGoHome={true} />
+    <ErrorState message={error} showGoHome={true} />
   ) : !product ? (
-    <NotFoundState title='상품을 찾을 수 없습니다' fullScreen={true} />
+    <NotFoundState title='상품을 찾을 수 없습니다' />
   ) : (
-    <div className='min-h-screen bg-white'>
+    <div className='bg-white'>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
         <div className='flex flex-col gap-8 lg:flex-row'>
           <div className='lg:w-1/2'>
@@ -305,7 +304,7 @@ export default function ProductDetailPage() {
           <div className='relative lg:w-1/2'>
             <button
               onClick={handleLikeToggle}
-              className='absolute top-0 right-0 cursor-pointer p-2 text-2xl transition-transform duration-400 ease-out hover:scale-110'
+              className='duration-400 absolute right-0 top-0 cursor-pointer p-2 text-2xl transition-transform ease-out hover:scale-110'
             >
               {product.is_liked ? <FcLike /> : <FcLikePlaceholder />}
             </button>
