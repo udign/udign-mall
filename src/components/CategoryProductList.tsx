@@ -105,7 +105,15 @@ export default function CategoryProductList({
       </div>
 
       {loading ? (
-        <ProductListSkeleton />
+        <>
+          <ProductListSkeleton />
+          <CommonPagination
+            currentPageNumber={currentPage}
+            totalPageCount={totalPages}
+            pathname={pathname}
+            queryParams={{ ca_id: categoryId }}
+          />
+        </>
       ) : error ? (
         <ErrorState error={error} onRetry={onRetry} />
       ) : products.length === 0 ? (
