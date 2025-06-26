@@ -62,6 +62,7 @@ export default function CategoryProductList({
       router.push(`/product/${productId}`);
     }
   };
+
   return (
     <div>
       <div className='mb-8'>

@@ -63,12 +63,11 @@ export async function GET(request: NextRequest) {
     const countResult = (await executeQuery(countQuery, [likePattern])) as { total: number }[];
     const totalCount = countResult[0].total;
 
-    // 이미지 URL 처리 (public/images/item 폴더의 정적 파일 참조)
     const processedItems = items.map((item) => ({
       ...item,
-      it_img1: item.it_img1 ? `/images/item/${item.it_img1}` : null,
-      it_img2: item.it_img2 ? `/images/item/${item.it_img2}` : null,
-      it_img3: item.it_img3 ? `/images/item/${item.it_img3}` : null,
+      it_img1: item.it_img1 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img1}` : null,
+      it_img2: item.it_img2 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img2}` : null,
+      it_img3: item.it_img3 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img3}` : null,
     }));
 
     return NextResponse.json({
