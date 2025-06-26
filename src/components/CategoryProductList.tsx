@@ -5,6 +5,7 @@ import { Product } from '@/types/product';
 import CommonPagination from '@/components/CommonPagination';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { ErrorState, EmptyState } from '@/components/ui';
 
 interface CategoryProductListProps {
   products: Product[];
@@ -30,31 +31,6 @@ function ProductListSkeleton() {
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-function ErrorState({ error, onRetry }: { error: string; onRetry: () => void }) {
-  return (
-    <div className='flex min-h-100 items-center justify-center'>
-      <div className='text-center'>
-        <h2 className='mb-4 text-2xl font-bold text-red-600'>오류 발생</h2>
-        <p className='mb-4 text-gray-600'>{error}</p>
-        <button
-          onClick={onRetry}
-          className='bg-primary hover:bg-primary-hover rounded-lg px-6 py-2 text-white transition-colors'
-        >
-          다시 시도
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className='py-16 text-center'>
-      <p className='text-lg text-gray-500'>등록된 상품이 없습니다.</p>
     </div>
   );
 }
@@ -105,11 +81,19 @@ export default function CategoryProductList({
       </div>
 
       {loading ? (
-        <ProductListSkeleton />
+        <>
+          <ProductListSkeleton />
+          <CommonPagination
+            currentPageNumber={currentPage}
+            totalPageCount={totalPages}
+            pathname={pathname}
+            queryParams={{ ca_id: categoryId }}
+          />
+        </>
       ) : error ? (
-        <ErrorState error={error} onRetry={onRetry} />
+        <ErrorState message={error} onRetry={onRetry} showRetry={true} />
       ) : products.length === 0 ? (
-        <EmptyState />
+        <EmptyState title='등록된 상품이 없습니다' />
       ) : (
         <>
           <div className='mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>

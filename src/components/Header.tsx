@@ -15,8 +15,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
+import { LoadingSpinner } from '@/components/ui';
 
 interface NavMenuItem {
   href: string;
@@ -84,7 +85,7 @@ export default function Header() {
               </button>
 
               {isLoading ? (
-                <span className='text-gray-500'>로딩 중...</span>
+                <LoadingSpinner size='sm' />
               ) : user ? (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
