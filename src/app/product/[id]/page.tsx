@@ -5,6 +5,11 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
+import { ROUTES } from '@/lib/routes';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
+import { Button } from '@/components/ui';
+import { LoadingState, ErrorState, NotFoundState } from '@/components/ui';
 
 interface ProductDetail {
   it_id: string;
@@ -48,9 +53,19 @@ interface ThumbnailProps {
   productName: string;
   isSelected: boolean;
   onClick: (image: string) => void;
+  isImageFailed: boolean;
+  onImageError: (image: string) => void;
 }
 
-function Thumbnail({ image, index, productName, isSelected, onClick }: ThumbnailProps) {
+function Thumbnail({
+  image,
+  index,
+  productName,
+  isSelected,
+  onClick,
+  isImageFailed,
+  onImageError,
+}: ThumbnailProps) {
   return (
     <div
       className={`h-16 w-16 cursor-pointer overflow-hidden rounded-lg transition-colors ${
@@ -62,13 +77,20 @@ function Thumbnail({ image, index, productName, isSelected, onClick }: Thumbnail
       }`}
       onClick={() => onClick(image)}
     >
-      <Image
-        src={image}
-        alt={`${productName} 썸네일 ${index + 1}`}
-        width={64}
-        height={64}
-        className='h-full w-full object-cover'
-      />
+      {!isImageFailed ? (
+        <Image
+          src={image}
+          alt={`${productName} 썸네일 ${index + 1}`}
+          width={64}
+          height={64}
+          className='h-full w-full object-cover'
+          onError={() => onImageError(image)}
+        />
+      ) : (
+        <div className='flex h-full w-full items-center justify-center bg-gray-200'>
+          <span className='text-xs text-gray-400'>이미지 없음</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -79,6 +101,8 @@ interface MainImageProps {
   productName: string;
   className?: string;
   sizes?: string;
+  isImageFailed: boolean;
+  onImageError: (image: string) => void;
 }
 
 function MainImage({
@@ -86,13 +110,22 @@ function MainImage({
   productName,
   className = '',
   sizes = '(max-width: 768px) 100vw, 50vw',
+  isImageFailed,
+  onImageError,
 }: MainImageProps) {
   return (
-    <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${className}`}>
-      {selectedImage ? (
-        <Image src={selectedImage} alt={productName} fill className='object-cover' sizes={sizes} />
+    <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-200 ${className}`}>
+      {selectedImage && !isImageFailed ? (
+        <Image
+          src={selectedImage}
+          alt={productName}
+          fill
+          className='object-cover'
+          sizes={sizes}
+          onError={() => onImageError(selectedImage)}
+        />
       ) : (
-        <div className='flex h-full w-full items-center justify-center'>
+        <div className='flex h-full w-full items-center justify-center bg-gray-200'>
           <span className='text-gray-400'>이미지 없음</span>
         </div>
       )}
@@ -108,6 +141,7 @@ export default function ProductDetailPage() {
   const [prevProduct, setPrevProduct] = useState<{ it_id: string; it_name: string } | null>(null);
   const [nextProduct, setNextProduct] = useState<{ it_id: string; it_name: string } | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   const params = useParams();
   const router = useRouter();
@@ -182,11 +216,13 @@ export default function ProductDetailPage() {
 
   const handleLoginDialogClose = () => {
     setShowLoginDialog(false);
-    router.push('/');
+    router.push(ROUTES.HOME);
   };
 
-  const handleThumbnailClick = (imageUrl: string) => {
-    setSelectedImage(imageUrl);
+  const handleThumbnailClick = (imageUrl: string) => setSelectedImage(imageUrl);
+
+  const handleImageError = (imageUrl: string) => {
+    setFailedImages((prev) => new Set(prev).add(imageUrl));
   };
 
   // 이미지 배열 생성 로직
@@ -198,39 +234,14 @@ export default function ProductDetailPage() {
   const productImages = getProductImages();
 
   return authLoading || loading ? (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='text-center'>
-        <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600'></div>
-        <p className='text-gray-600'>
-          {authLoading ? '인증 정보를 확인하는 중...' : '상품 정보를 불러오는 중...'}
-        </p>
-      </div>
-    </div>
+    <LoadingState
+      message={authLoading ? '인증 정보를 확인하는 중...' : '작품 정보를 불러오는 중...'}
+      fullScreen={true}
+    />
   ) : error ? (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='text-center'>
-        <h2 className='mb-4 text-2xl font-bold text-red-600'>오류 발생</h2>
-        <p className='mb-4 text-gray-600'>{error}</p>
-        <button
-          onClick={() => router.push('/')}
-          className='bg-primary hover:bg-primary-hover rounded-lg px-6 py-2 text-white transition-colors'
-        >
-          홈으로 돌아가기
-        </button>
-      </div>
-    </div>
+    <ErrorState message={error} fullScreen={true} showGoHome={true} />
   ) : !product ? (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='text-center'>
-        <h2 className='mb-4 text-2xl font-bold text-gray-800'>상품을 찾을 수 없습니다</h2>
-        <button
-          onClick={() => router.push('/')}
-          className='rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700'
-        >
-          홈으로 돌아가기
-        </button>
-      </div>
-    </div>
+    <NotFoundState title='상품을 찾을 수 없습니다' fullScreen={true} />
   ) : (
     <div className='min-h-screen bg-white'>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
@@ -247,6 +258,8 @@ export default function ProductDetailPage() {
                     productName={product.it_name}
                     isSelected={selectedImage === image}
                     onClick={handleThumbnailClick}
+                    isImageFailed={failedImages.has(image)}
+                    onImageError={handleImageError}
                   />
                 ))}
               </div>
@@ -256,6 +269,8 @@ export default function ProductDetailPage() {
                 productName={product.it_name}
                 className='flex-1'
                 sizes='(max-width: 768px) 100vw, 50vw'
+                isImageFailed={selectedImage ? failedImages.has(selectedImage) : false}
+                onImageError={handleImageError}
               />
             </div>
 
@@ -266,6 +281,8 @@ export default function ProductDetailPage() {
                 productName={product.it_name}
                 className='mb-4 w-full'
                 sizes='100vw'
+                isImageFailed={selectedImage ? failedImages.has(selectedImage) : false}
+                onImageError={handleImageError}
               />
 
               <div className='flex justify-start gap-2'>
@@ -277,6 +294,8 @@ export default function ProductDetailPage() {
                     productName={product.it_name}
                     isSelected={selectedImage === image}
                     onClick={handleThumbnailClick}
+                    isImageFailed={failedImages.has(image)}
+                    onImageError={handleImageError}
                   />
                 ))}
               </div>
@@ -286,9 +305,9 @@ export default function ProductDetailPage() {
           <div className='relative lg:w-1/2'>
             <button
               onClick={handleLikeToggle}
-              className='absolute top-0 right-0 p-2 text-2xl transition-colors hover:scale-110'
+              className='absolute top-0 right-0 cursor-pointer p-2 text-2xl transition-transform duration-400 ease-out hover:scale-110'
             >
-              {product.is_liked ? '❤️' : '🤍'}
+              {product.is_liked ? <FcLike /> : <FcLikePlaceholder />}
             </button>
 
             <h1 className='mb-6 pr-12 text-2xl font-bold text-gray-900'>{product.it_name}</h1>
@@ -308,15 +327,15 @@ export default function ProductDetailPage() {
             <div className='mb-8 rounded-lg bg-gray-50 p-4'>
               <div className='mb-2 flex items-center justify-between'>
                 <span className='text-sm text-gray-600'>현재 좋아요</span>
-                <span className='text-lg font-bold text-red-500'>{product.current_likes}명</span>
+                <span className='text-lg font-bold text-gray-600'>{product.current_likes}명</span>
               </div>
               <div className='mb-3 flex items-center justify-between'>
                 <span className='text-sm text-gray-600'>목표 인원</span>
-                <span className='text-lg font-bold text-blue-600'>{product.it_4}명</span>
+                <span className='text-primary text-lg font-bold'>{product.it_4}명</span>
               </div>
               <div className='h-2 w-full rounded-full bg-gray-200'>
                 <div
-                  className='h-2 rounded-full bg-blue-600 transition-all duration-300'
+                  className='bg-primary h-2 rounded-full transition-all duration-300'
                   style={{
                     width: `${Math.min((product.current_likes / product.it_4) * 100, 100)}%`,
                   }}
@@ -345,35 +364,50 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <div className='mt-12 flex items-center justify-between border-t border-gray-200 pt-8'>
-          <div className='flex items-center'>
-            {prevProduct ? (
-              <button
-                onClick={() => router.push(`/product/${prevProduct.it_id}`)}
-                className='flex items-center gap-2 px-4 py-2 text-gray-600 transition-colors hover:text-gray-900'
-              >
-                <span>previous</span>
-              </button>
-            ) : (
-              <div className='flex items-center gap-2 px-4 py-2 text-gray-300'>
-                <span>previous</span>
-              </div>
-            )}
-          </div>
-
-          <div className='flex items-center'>
-            {nextProduct ? (
-              <button
-                onClick={() => router.push(`/product/${nextProduct.it_id}`)}
-                className='flex items-center gap-2 px-4 py-2 text-gray-600 transition-colors hover:text-gray-900'
-              >
-                <span>next</span>
-              </button>
-            ) : (
-              <div className='flex items-center gap-2 px-4 py-2 text-gray-300'>
-                <span>next</span>
-              </div>
-            )}
+        <div className='mt-12'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center'>
+              {prevProduct ? (
+                <Button
+                  variant='outline'
+                  onClick={() => router.push(`/product/${prevProduct.it_id}`)}
+                  className='group flex items-center gap-1 px-5 py-3'
+                >
+                  <ChevronLeftIcon className='h-5 w-5 text-gray-400 transition-colors group-hover:text-gray-600' />
+                  <div className='text-left'>
+                    <div className='max-w-32 truncate text-sm text-gray-900'>previous</div>
+                  </div>
+                </Button>
+              ) : (
+                <Button variant='outline' disabled className='flex items-center gap-1 px-5 py-3'>
+                  <ChevronLeftIcon className='h-5 w-5 text-gray-300' />
+                  <div className='text-left'>
+                    <div className='text-sm text-gray-400'>이전 작품 없음</div>
+                  </div>
+                </Button>
+              )}
+            </div>
+            <div className='flex items-center'>
+              {nextProduct ? (
+                <Button
+                  variant='outline'
+                  onClick={() => router.push(`/product/${nextProduct.it_id}`)}
+                  className='group flex items-center gap-1 px-5 py-3'
+                >
+                  <div className='text-right'>
+                    <div className='max-w-32 truncate text-sm text-gray-900'>next</div>
+                  </div>
+                  <ChevronRightIcon className='h-5 w-5 text-gray-400 transition-colors group-hover:text-gray-600' />
+                </Button>
+              ) : (
+                <Button variant='outline' disabled className='flex items-center gap-1 px-5 py-3'>
+                  <div className='text-right'>
+                    <div className='text-sm text-gray-400'>다음 작품 없음</div>
+                  </div>
+                  <ChevronRightIcon className='h-5 w-5 text-gray-300' />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 

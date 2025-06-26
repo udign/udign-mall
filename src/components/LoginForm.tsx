@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Switch } from '@/components/ui/switch';
 import {
+  Switch,
   Dialog,
   DialogClose,
   DialogContent,
@@ -11,8 +11,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui';
+import { Button } from '@/components/ui';
 
 interface LoginFormProps {
   onSuccess?: () => void;
