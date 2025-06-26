@@ -168,13 +168,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // 조회수 증가
     await executeQuery('UPDATE g5_shop_item SET it_hit = it_hit + 1 WHERE it_id = ?', [productId]);
 
-    // 이미지 URL 처리 (public/images/item 폴더 사용)
     const getImageUrl = (imagePath: string) => {
       if (!imagePath) return null;
       if (imagePath.startsWith('http')) return imagePath;
-      if (imagePath.startsWith('/')) return imagePath;
-      // public/images/item 폴더 내의 이미지 파일 경로 생성
-      return `/images/item/${imagePath}`;
+      // Vercel Storage의 이미지 URL 생성
+      return `${process.env.VERCEL_BLOB_BASE_URL}/item/${imagePath}`;
     };
 
     const response = {
