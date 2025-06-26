@@ -135,17 +135,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       }
     }
 
-    // 먼저 모든 상품의 it_order 값을 확인
-    const allItemsQuery = `
-      SELECT it_id, it_name, it_order, it_time
-      FROM g5_shop_item 
-      WHERE it_use = '1'
-      ORDER BY it_time DESC
-      LIMIT 10
-    `;
-    const allItemsResults = await executeQuery(allItemsQuery, []);
-    console.log('모든 상품의 it_order 값:', allItemsResults);
-
     // it_order가 모두 0인 경우, it_time을 기준으로 이전/다음 상품 조회
     // 이전 상품: 현재보다 늦게 등록된 상품 (더 최신)
     const prevProductQuery = `
