@@ -102,6 +102,7 @@ export const generateToken = (user: User): string => {
     {
       mb_no: user.mb_no,
       mb_id: user.mb_id,
+      mb_name: user.mb_name,
       mb_level: user.mb_level,
     },
     JWT_SECRET,
