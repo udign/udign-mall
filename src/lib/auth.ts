@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import pbkdf2 from 'pbkdf2';
 import { executeQuery } from './database';
 import { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/user';
 
@@ -12,12 +13,87 @@ export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, saltRounds);
 };
 
+// PBKDF2-SHA256 해시 검증 (Django 스타일)
+export const verifyPBKDF2Password = (password: string, hashedPassword: string): boolean => {
+  try {
+    // Django 형태: sha256:iterations:salt:hash
+    const parts = hashedPassword.split(':');
+    if (parts.length !== 4 || parts[0] !== 'sha256') {
+      return false;
+    }
+
+    const iterations = parseInt(parts[1]);
+    const salt = parts[2];
+    const storedHash = parts[3];
+
+    // Django PBKDF2 방식: salt를 그대로 문자열로 사용
+    // 저장된 해시의 길이에 따라 키 길이 결정 (base64 32문자 = 24바이트)
+    const keyLength = Math.ceil((storedHash.length * 3) / 4);
+    const derivedKey = pbkdf2.pbkdf2Sync(password, salt, iterations, keyLength, 'sha256');
+    const computedHash = derivedKey.toString('base64');
+
+    return computedHash === storedHash;
+  } catch {
+    return false;
+  }
+};
+
+// 다양한 비밀번호 해시 방식을 검증하는 함수
+export const verifyLegacyPassword = (password: string, hashedPassword: string): boolean => {
+  // 1. PBKDF2-SHA256 해시 검증 (Django 스타일)
+  if (hashedPassword.startsWith('sha256:')) {
+    return verifyPBKDF2Password(password, hashedPassword);
+  }
+
+  // 2. MD5 해시 검증 (구버전 그누보드)
+  const md5Hash = crypto.createHash('md5').update(password).digest('hex');
+  if (md5Hash === hashedPassword) {
+    return true;
+  }
+
+  // 3. 평문 비밀번호 검증 (개발/테스트 환경)
+  if (password === hashedPassword) {
+    return true;
+  }
+
+  // 4. SHA1 해시 검증
+  const sha1Hash = crypto.createHash('sha1').update(password).digest('hex');
+  if (sha1Hash === hashedPassword) {
+    return true;
+  }
+
+  return false;
+};
+
 // 입력된 비밀번호와 해시된 비밀번호를 비교하여 일치 여부 확인
 export const verifyPassword = async (
   password: string,
   hashedPassword: string,
 ): Promise<boolean> => {
-  return await bcrypt.compare(password, hashedPassword);
+  // 1. bcrypt 해시 검증 (새로운 사용자)
+  try {
+    const bcryptResult = await bcrypt.compare(password, hashedPassword);
+    if (bcryptResult) {
+      return true;
+    }
+  } catch {
+    // bcrypt 검증 실패 시 다른 방식으로 시도
+  }
+
+  // 2. PHP password_hash 검증 (기존 그누보드 사용자)
+  // PHP의 password_hash는 $2y$ 또는 $2a$로 시작
+  if (hashedPassword.startsWith('$2y$') || hashedPassword.startsWith('$2a$')) {
+    try {
+      // bcrypt와 호환되는 형태로 변환하여 검증
+      const compatibleHash = hashedPassword.replace(/^\$2y\$/, '$2a$');
+      return await bcrypt.compare(password, compatibleHash);
+    } catch {
+      // PHP password_hash 검증 실패
+    }
+  }
+
+  // 3. 레거시 해시 방식 검증
+  return verifyLegacyPassword(password, hashedPassword);
 };
 
 // 사용자 정보를 기반으로 JWT 토큰을 생성하여 인증에 사용
@@ -229,7 +305,30 @@ export const loginUser = async (loginData: LoginRequest): Promise<AuthResponse> 
       };
     }
 
-    const user = users[0] as User & { mb_password: string };
+    const user = users[0] as User & {
+      mb_password: string;
+      mb_intercept_date: string;
+      mb_leave_date: string;
+    };
+
+    // 차단되거나 탈퇴한 회원 체크
+    if (
+      user.mb_intercept_date &&
+      user.mb_intercept_date !== '' &&
+      user.mb_intercept_date !== '0000-00-00'
+    ) {
+      return {
+        success: false,
+        message: '차단된 회원입니다.',
+      };
+    }
+
+    if (user.mb_leave_date && user.mb_leave_date !== '' && user.mb_leave_date !== '0000-00-00') {
+      return {
+        success: false,
+        message: '탈퇴한 회원입니다.',
+      };
+    }
 
     // 비밀번호 확인
     const isPasswordValid = await verifyPassword(loginData.password, user.mb_password);
@@ -239,6 +338,18 @@ export const loginUser = async (loginData: LoginRequest): Promise<AuthResponse> 
         success: false,
         message: '비밀번호가 일치하지 않습니다.',
       };
+    }
+
+    // 기존 비밀번호가 레거시 방식인 경우 bcrypt로 업데이트
+    if (
+      !user.mb_password.startsWith('$2') &&
+      verifyLegacyPassword(loginData.password, user.mb_password)
+    ) {
+      const newHashedPassword = await hashPassword(loginData.password);
+      await executeQuery('UPDATE g5_member SET mb_password = ? WHERE mb_id = ?', [
+        newHashedPassword,
+        loginData.mb_id,
+      ]);
     }
 
     // 로그인 정보 업데이트
