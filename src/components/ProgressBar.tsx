@@ -76,18 +76,30 @@ export default function ProgressBar({ statusText, ctStatus }: ProgressBarProps) 
       break;
   }
 
+  // 각 단계별 색상 정의 (회색에서 검은색으로 점진적 변화)
+  const getStepColor = (stepIndex: number, isCompleted: boolean) => {
+    if (!isCompleted) return 'bg-gray-300';
+
+    const colors = [
+      'bg-gray-400', // 1단계
+      'bg-gray-500', // 2단계
+      'bg-gray-600', // 3단계
+      'bg-gray-700', // 4단계
+      'bg-gray-800', // 5단계
+      'bg-gray-900', // 6단계
+    ];
+
+    return colors[stepIndex] || 'bg-gray-300';
+  };
+
   return (
     <div className='w-full'>
       {/* 진행 바 */}
-      <div className='mb-2 flex'>
+      <div className='mb-3 flex gap-1'>
         {Array.from({ length: 6 }, (_, index) => (
           <div
             key={index}
-            className={`mx-0.5 h-3 flex-1 rounded-sm ${
-              index < progressCount
-                ? `bg-gradient-to-r from-gray-400 to-gray-${Math.min(900, 400 + index * 100)}`
-                : 'bg-gray-200'
-            } `}
+            className={`h-2 flex-1 rounded-full ${getStepColor(index, index < progressCount)}`}
           />
         ))}
       </div>

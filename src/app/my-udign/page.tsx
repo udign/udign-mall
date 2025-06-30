@@ -10,7 +10,9 @@ import { Button } from '@/components/ui/primitives/button';
 import ArtworkCard from '@/components/ArtworkCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { BsLightbulb } from 'react-icons/bs';
+import { IoIosList } from 'react-icons/io';
 import MessageDialog from '@/components/ui/MessageDialog';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
 
 interface MyUdignData {
   products: ProductsByStatus;
@@ -37,14 +39,14 @@ export default function MyUdignPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState<string>('all');
-
-  // Dialog 상태
   const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState<string>('');
 
   const router = useRouter();
 
   const { user, isLoading } = useAuth();
+
+  const currentProducts = data?.products[currentTab] || [];
 
   useEffect(() => {
     if (isLoading) return;
@@ -98,7 +100,6 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
-        // 데이터 새로고침
         await fetchData();
       } else {
         setMessageContent(result.message || '처리 중 오류가 발생했습니다.');
@@ -215,25 +216,19 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
-        // 성공 시 전체 데이터 새로고침하여 카운트도 함께 업데이트
         await fetchData();
       } else {
         throw new Error(result.message || '상태 변경에 실패했습니다.');
       }
     } catch (error) {
       console.error('관리자 토글 실패:', error);
-      throw error; // ArtworkCard에서 에러 처리하도록 다시 throw
+      throw error;
     }
   };
 
-  const currentProducts = data?.products[currentTab] || [];
-
   return isLoading || loading ? (
     <div className='flex min-h-screen items-center justify-center'>
-      <div className='text-center'>
-        <div className='mx-auto h-32 w-32 animate-spin rounded-full border-b-2 border-purple-500'></div>
-        <p className='mt-4 text-gray-600'>로딩 중...</p>
-      </div>
+      <LoadingSpinner size='lg' message='로딩 중...' />
     </div>
   ) : error ? (
     <div className='flex min-h-screen items-center justify-center'>
@@ -248,15 +243,17 @@ export default function MyUdignPage() {
     data && (
       <div className='min-h-screen'>
         <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
-          <div className='mb-6 rounded-lg bg-gray-50 p-6'>
-            <div className='flex items-center justify-between'>
+          <div className='mb-6 rounded-lg bg-gray-50 p-4 sm:p-6'>
+            <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
               <div>
-                <h1 className='mb-2 text-2xl font-bold text-gray-900'>My UDIGN</h1>
-                <p className='text-gray-600'>나만의 특별한 디자인 여정</p>
+                <h1 className='mb-1 text-xl font-bold text-gray-900 sm:mb-2 sm:text-2xl'>
+                  My UDIGN
+                </h1>
+                <p className='text-sm text-gray-600 sm:text-base'>나만의 특별한 디자인 여정</p>
               </div>
-              <div className='text-right'>
-                <p className='text-lg font-semibold'>{data.user.mb_name}님</p>
-                <p className='text-gray-600'>유다인에 오신 것을 환영합니다</p>
+              <div className='text-left sm:text-right'>
+                <p className='text-base font-semibold sm:text-lg'>{data.user.mb_name}님</p>
+                <p className='text-sm text-gray-600 sm:text-base'>유다인에 오신 것을 환영합니다</p>
               </div>
             </div>
           </div>
@@ -288,14 +285,16 @@ export default function MyUdignPage() {
               </p>
             </div>
 
-            <div className='flex items-center justify-between rounded-lg bg-gray-50 px-10 py-4'>
+            <div className='scrollbar-hide flex items-center justify-between overflow-x-auto rounded-lg bg-gray-50 px-4 py-4 sm:px-6'>
               {steps
                 .map((step, index) => [
                   <div key={`step-${index}`} className='text-center'>
-                    <p className='max-w-18 text-xs font-medium text-gray-700'>{step}</p>
+                    <p className='min-w-20 text-xs font-medium whitespace-nowrap text-gray-700 sm:min-w-18'>
+                      {step}
+                    </p>
                   </div>,
                   index < steps.length - 1 && (
-                    <div key={`arrow-${index}`} className='mx-2 text-gray-400'>
+                    <div key={`arrow-${index}`} className='mx-1 text-gray-400 sm:mx-2'>
                       →
                     </div>
                   ),
@@ -308,37 +307,34 @@ export default function MyUdignPage() {
           <div className='rounded-lg border border-gray-100 p-6'>
             <div className='mb-6 flex items-center justify-between'>
               <h2 className='text-xl font-semibold'>나의 작품 현황</h2>
-              <Link href='/order-history' className='text-sm text-purple-600 hover:text-purple-800'>
-                📋 전체 주문내역
+              <Link
+                href='/order-history'
+                className='flex items-center gap-1 text-sm font-semibold text-gray-700'
+              >
+                <IoIosList className='h-4 w-4' />
+                전체 주문내역
               </Link>
             </div>
 
-            <div className='border-b border-gray-200'>
-              <nav className='-mb-px flex space-x-8'>
+            <div className='border-b border-gray-100'>
+              <nav className='scrollbar-hide flex overflow-x-auto'>
                 {Object.entries(STATUS_GROUPS).map(([key, label]) => (
-                  <Button
+                  <button
                     key={key}
                     onClick={() => handleTabChange(key)}
-                    variant='ghost'
-                    className={`flex items-center border-b-2 px-1 py-2 text-sm font-medium whitespace-nowrap ${
-                      currentTab === key
-                        ? 'border-purple-500 text-purple-600'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    } `}
+                    className={`relative flex min-w-24 flex-1 cursor-pointer items-center justify-center gap-2 pb-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 hover:text-gray-900 ${
+                      currentTab === key ? 'text-gray-900' : 'text-gray-500'
+                    }`}
                   >
+                    {key === 'interest' && '❤️ '}
                     {label}
                     {data.counts[key] > 0 && (
-                      <span
-                        className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${
-                          currentTab === key
-                            ? 'bg-purple-100 text-purple-600'
-                            : 'bg-gray-100 text-gray-600'
-                        } `}
-                      >
-                        {data.counts[key]}
-                      </span>
+                      <span className='text-gray-400'>{data.counts[key]}</span>
                     )}
-                  </Button>
+                    {currentTab === key && (
+                      <div className='absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-gray-900' />
+                    )}
+                  </button>
                 ))}
               </nav>
             </div>
