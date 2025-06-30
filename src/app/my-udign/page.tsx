@@ -58,9 +58,8 @@ export default function MyUdignPage() {
   const [messageContent, setMessageContent] = useState<string>('');
   const [tabStates, setTabStates] = useState<TabPageStates>({});
 
-  console.log(tabStates);
-
   const router = useRouter();
+
   const { user: authUser, isLoading } = useAuth();
 
   // 초기 탭 상태 생성
@@ -103,10 +102,17 @@ export default function MyUdignPage() {
 
       // 모든 탭의 첫 페이지 데이터를 병렬로 가져오기
       const tabKeys = Object.keys(STATUS_GROUPS);
-      const promises = tabKeys.map((tab) =>
-        fetch(`/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`)
-          .then((res) => res.json())
-          .then((result) => ({ tab, result })),
+      const promises = tabKeys.map(async (tab) =>
+        // fetch(`/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`)
+        //   .then((res) => res.json())
+        //   .then((result) => ({ tab, result })),
+        {
+          const response = await fetch(
+            `/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`,
+          );
+          const result = await response.json();
+          return { tab, result };
+        },
       );
 
       const responses = await Promise.all(promises);
@@ -114,8 +120,9 @@ export default function MyUdignPage() {
       // 첫 번째 응답에서 사용자 정보와 카운트 설정
       const firstSuccessResponse = responses.find((r) => r.result.success);
       if (firstSuccessResponse) {
-        setUser(firstSuccessResponse.result.data.user);
-        setCounts(firstSuccessResponse.result.data.counts);
+        const { user, counts } = firstSuccessResponse.result.data;
+        setUser(user);
+        setCounts(counts);
       }
 
       // 모든 탭 상태 업데이트
@@ -480,7 +487,7 @@ export default function MyUdignPage() {
         <p className='mb-4 text-red-600'>{error}</p>
         <Button
           onClick={() => fetchAllTabsInitialData()}
-          className='bg-purple-500 hover:bg-purple-600'
+          className='bg-primary hover:bg-primary-hover'
         >
           다시 시도
         </Button>
