@@ -17,9 +17,8 @@ function ShoesContent() {
     currentPage,
     refetch,
   } = useCategoryProducts({
-    defaultCategoryId: '', // 모든 카테고리 포함
+    categoryId: CATEGORY_IDS.SHOES,
     pathname: ROUTES.SHOES,
-    targetCategoryId: CATEGORY_IDS.SHOES, // 신발 카테고리 정보 표시
   });
 
   return (

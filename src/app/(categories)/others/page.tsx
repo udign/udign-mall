@@ -17,9 +17,8 @@ function OthersContent() {
     currentPage,
     refetch,
   } = useCategoryProducts({
-    defaultCategoryId: '', // 모든 카테고리 포함
+    categoryId: CATEGORY_IDS.OTHERS,
     pathname: ROUTES.OTHERS,
-    targetCategoryId: CATEGORY_IDS.OTHERS, // 기타 카테고리 정보 표시
   });
 
   return (

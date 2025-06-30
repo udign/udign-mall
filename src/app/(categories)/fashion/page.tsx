@@ -17,9 +17,8 @@ function FashionContent() {
     currentPage,
     refetch,
   } = useCategoryProducts({
-    defaultCategoryId: '', // 모든 카테고리 포함
+    categoryId: CATEGORY_IDS.FASHION,
     pathname: ROUTES.FASHION,
-    targetCategoryId: CATEGORY_IDS.FASHION, // 패션 카테고리 정보 표시
   });
 
   return (

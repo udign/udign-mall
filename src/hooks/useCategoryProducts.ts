@@ -4,9 +4,8 @@ import { Product, ProductListResponse } from '@/types/product';
 import { PAGINATION_CONFIG } from '@/config/pagination';
 
 interface UseCategoryProductsProps {
-  defaultCategoryId: string;
+  categoryId: string; // 필터링 및 표시할 카테고리 ID (빈 문자열이면 모든 카테고리)
   pathname: string;
-  targetCategoryId?: string; // 표시하고 싶은 카테고리 ID
 }
 
 interface UseCategoryProductsReturn {
@@ -21,9 +20,8 @@ interface UseCategoryProductsReturn {
 }
 
 export const useCategoryProducts = ({
-  defaultCategoryId,
+  categoryId,
   pathname,
-  targetCategoryId,
 }: UseCategoryProductsProps): UseCategoryProductsReturn => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -43,9 +41,10 @@ export const useCategoryProducts = ({
         setLoading(true);
         setError(null);
 
-        // 모든 작품을 보여주되, 카테고리별 정보는 별도로 처리
+        // 카테고리별 작품 필터링
+        const categoryParam = categoryId ? `&category=${categoryId}` : '';
         const response = await fetch(
-          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
+          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryParam}`,
         );
 
         if (!response.ok) {
@@ -58,10 +57,10 @@ export const useCategoryProducts = ({
           setProducts(data.items);
           setTotalPages(data.pagination.totalPages);
 
-          // 타겟 카테고리 ID가 있으면 해당 카테고리 정보 사용
-          if (targetCategoryId && data.categoryCounts[targetCategoryId]) {
-            setCategoryName(data.categoryCounts[targetCategoryId].name);
-            setCategoryCount(data.categoryCounts[targetCategoryId].count);
+          // 카테고리 ID가 있으면 해당 카테고리 정보 사용
+          if (categoryId && data.categoryCounts[categoryId]) {
+            setCategoryName(data.categoryCounts[categoryId].name);
+            setCategoryCount(data.categoryCounts[categoryId].count);
           } else {
             setCategoryName('모든 작품');
             setCategoryCount(data.pagination.totalCount);
@@ -75,7 +74,7 @@ export const useCategoryProducts = ({
         setLoading(false);
       }
     },
-    [currentPage, targetCategoryId],
+    [currentPage, categoryId],
   );
 
   const refetch = useCallback(() => fetchProducts(currentPage), [fetchProducts, currentPage]);
@@ -89,7 +88,7 @@ export const useCategoryProducts = ({
     } else {
       fetchProducts(currentPage);
     }
-  }, [currentPage, searchParams, router, defaultCategoryId, pathname, fetchProducts]);
+  }, [currentPage, searchParams, router, categoryId, pathname, fetchProducts]);
 
   return {
     products,

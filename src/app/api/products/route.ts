@@ -8,20 +8,33 @@ export const GET = async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
+    const categoryFilter = searchParams.get('category'); // 카테고리 필터 파라미터 추가
     const offset = (page - 1) * limit;
 
-    // 모든 카테고리 정보 가져오기 (임시로 첫 번째 카테고리 정보만 사용)
-    const categoryQuery = `
-      SELECT * FROM g5_shop_category 
-      WHERE ca_use = '1'
-      ORDER BY ca_id ASC
-      LIMIT 1
-    `;
-    const categoryResult = (await executeQuery(categoryQuery, [])) as Category[];
+    // 카테고리 정보 가져오기
+    let category: Category;
+    if (categoryFilter) {
+      const categoryQuery = `
+        SELECT * FROM g5_shop_category 
+        WHERE ca_use = '1' AND ca_id = ?
+        LIMIT 1
+      `;
+      const categoryResult = (await executeQuery(categoryQuery, [categoryFilter])) as Category[];
+      category = categoryResult[0] || { ca_id: categoryFilter, ca_name: '알 수 없는 카테고리' };
+    } else {
+      // 모든 카테고리 정보 가져오기 (임시로 첫 번째 카테고리 정보만 사용)
+      const categoryQuery = `
+        SELECT * FROM g5_shop_category 
+        WHERE ca_use = '1'
+        ORDER BY ca_id ASC
+        LIMIT 1
+      `;
+      const categoryResult = (await executeQuery(categoryQuery, [])) as Category[];
+      category = categoryResult[0] || { ca_id: 'all', ca_name: '모든 작품' };
+    }
 
-    const category = categoryResult[0] || { ca_id: 'all', ca_name: '모든 작품' };
-
-    // 모든 상품 가져오기 (필터링 제거)
+    // 카테고리별 상품 가져오기
+    const categoryCondition = categoryFilter ? `AND i.ca_id = ?` : '';
     const itemsQuery = `
       SELECT 
         i.it_id,
@@ -49,11 +62,12 @@ export const GET = async (request: NextRequest) => {
         FROM g5_shop_interrest 
         GROUP BY it_id
       ) like_count ON i.it_id = like_count.it_id
-      WHERE i.it_use = '1'
+      WHERE i.it_use = '1' ${categoryCondition}
       ORDER BY i.it_id DESC
     `;
 
-    const allItems = (await executeQuery(itemsQuery, [])) as (Product &
+    const queryParams = categoryFilter ? [categoryFilter] : [];
+    const allItems = (await executeQuery(itemsQuery, queryParams)) as (Product &
       RowDataPacket & {
         target_likes: number;
         current_likes: number;
@@ -140,7 +154,8 @@ export const GET = async (request: NextRequest) => {
       ),
       // 모든 데이터 정보
       _meta: {
-        mode: 'all',
+        mode: categoryFilter ? 'category' : 'all',
+        categoryFilter: categoryFilter || null,
         queriedAt: new Date().toISOString(),
         filteredByAccess: false,
         originalCount: totalCount,
