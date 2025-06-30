@@ -87,6 +87,8 @@ export default function MyUdignPage() {
     setCurrentTab(tabId);
   };
 
+  console.log(data);
+
   const handleInterestToggle = async (itemId: string) => {
     try {
       const response = await fetch('/api/my-udign/interest', {
@@ -100,7 +102,76 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
-        await fetchData();
+        setData((prevData) => {
+          if (!prevData) return prevData;
+
+          const updatedProducts: ProductsByStatus = {};
+          const updatedCounts = { ...prevData.counts };
+
+          // 변경되는 아이템의 이전 상태 찾기 (관리자 토글과 동일한 패턴)
+          const targetArtwork = Object.values(prevData.products)
+            .flat()
+            .find((artwork) => artwork.it_id === itemId);
+
+          if (!targetArtwork) return prevData;
+
+          const wasLiked = !!targetArtwork.ir_id;
+          const isNowLiked = !wasLiked; // 토글이므로 반대
+
+          // 카운트 업데이트
+          if (wasLiked && !isNowLiked) {
+            // 좋아요 해제 시
+            updatedCounts.interest = Math.max(0, updatedCounts.interest - 1);
+
+            // 컬렉션 상태의 작품인 경우 all과 collection 카운트도 감소
+            if (targetArtwork._status_text === '컬렉션') {
+              updatedCounts.all = Math.max(0, updatedCounts.all - 1);
+              updatedCounts.collection = Math.max(0, updatedCounts.collection - 1);
+            }
+          } else if (!wasLiked && isNowLiked) {
+            // 좋아요 추가 시
+            updatedCounts.interest = updatedCounts.interest + 1;
+
+            // 컬렉션 상태의 작품인 경우 all과 collection 카운트도 증가
+            if (targetArtwork._status_text === '컬렉션') {
+              updatedCounts.all = updatedCounts.all + 1;
+              updatedCounts.collection = updatedCounts.collection + 1;
+            }
+          }
+
+          Object.keys(prevData.products).forEach((tabKey) => {
+            if (tabKey === 'interest' && wasLiked && !isNowLiked) {
+              // interest 탭에서 좋아요 해제된 아이템 제거
+              updatedProducts[tabKey] = prevData.products[tabKey].filter(
+                (artwork) => artwork.it_id !== itemId,
+              );
+            } else if (wasLiked && !isNowLiked && targetArtwork._status_text === '컬렉션') {
+              // 컬렉션 상태의 작품에서 좋아요 해제 시 해당 탭에서도 제거
+              updatedProducts[tabKey] = prevData.products[tabKey].filter(
+                (artwork) => artwork.it_id !== itemId,
+              );
+            } else {
+              // 다른 경우에는 상태만 업데이트
+              updatedProducts[tabKey] = prevData.products[tabKey].map((artwork) => {
+                if (artwork.it_id === itemId) {
+                  return {
+                    ...artwork,
+                    ir_id: isNowLiked ? 'temp' : undefined,
+                    ir_time: isNowLiked ? new Date().toISOString() : undefined,
+                    _iCount: isNowLiked ? artwork._iCount + 1 : Math.max(0, artwork._iCount - 1),
+                  };
+                }
+                return artwork;
+              });
+            }
+          });
+
+          return {
+            ...prevData,
+            products: updatedProducts,
+            counts: updatedCounts,
+          };
+        });
       } else {
         setMessageContent(result.message || '처리 중 오류가 발생했습니다.');
         setShowMessageDialog(true);
@@ -127,7 +198,32 @@ export default function MyUdignPage() {
       if (result.success) {
         setMessageContent(result.message);
         setShowMessageDialog(true);
-        await fetchData();
+
+        setData((prevData) => {
+          if (!prevData) return prevData;
+
+          const updatedProducts: ProductsByStatus = {};
+
+          Object.keys(prevData.products).forEach((tabKey) => {
+            updatedProducts[tabKey] = prevData.products[tabKey].map((artwork) => {
+              if (artwork.od_id === orderId) {
+                return {
+                  ...artwork,
+                  od_status: '취소',
+                  ct_status: '취소',
+                  _status_text: '주문취소',
+                  _status_key: 'cancelled',
+                };
+              }
+              return artwork;
+            });
+          });
+
+          return {
+            ...prevData,
+            products: updatedProducts,
+          };
+        });
       } else {
         setMessageContent(result.message || '주문 취소 중 오류가 발생했습니다.');
         setShowMessageDialog(true);
@@ -154,7 +250,32 @@ export default function MyUdignPage() {
       if (result.success) {
         setMessageContent(result.message);
         setShowMessageDialog(true);
-        await fetchData();
+
+        setData((prevData) => {
+          if (!prevData) return prevData;
+
+          const updatedProducts: ProductsByStatus = {};
+
+          Object.keys(prevData.products).forEach((tabKey) => {
+            updatedProducts[tabKey] = prevData.products[tabKey].map((artwork) => {
+              if (artwork.od_id === orderId) {
+                return {
+                  ...artwork,
+                  od_status: '구매확정',
+                  ct_status: '구매확정',
+                  _status_text: '구매확정',
+                  _status_key: 'completed',
+                };
+              }
+              return artwork;
+            });
+          });
+
+          return {
+            ...prevData,
+            products: updatedProducts,
+          };
+        });
       } else {
         setMessageContent(result.message || '구매 확정 중 오류가 발생했습니다.');
         setShowMessageDialog(true);
@@ -187,7 +308,33 @@ export default function MyUdignPage() {
       if (result.success) {
         setMessageContent(result.message);
         setShowMessageDialog(true);
-        await fetchData();
+
+        setData((prevData) => {
+          if (!prevData) return prevData;
+
+          const updatedProducts: ProductsByStatus = {};
+
+          Object.keys(prevData.products).forEach((tabKey) => {
+            updatedProducts[tabKey] = prevData.products[tabKey].map((artwork) => {
+              if (artwork.od_id === returnData.orderId) {
+                return {
+                  ...artwork,
+                  return_status: 'pending',
+                  return_type: returnData.returnType,
+                  return_id: 'temp',
+                  return_updated: new Date().toISOString(),
+                  _status_text: returnData.returnType === 'exchange' ? '교환신청' : '반품신청',
+                };
+              }
+              return artwork;
+            });
+          });
+
+          return {
+            ...prevData,
+            products: updatedProducts,
+          };
+        });
       } else {
         setMessageContent(result.message || '교환/반품 신청 중 오류가 발생했습니다.');
         setShowMessageDialog(true);
@@ -215,8 +362,60 @@ export default function MyUdignPage() {
 
       const result = await response.json();
 
-      if (result.success) {
-        await fetchData();
+      if (result.success && result.data) {
+        setData((prevData) => {
+          if (!prevData) return prevData;
+
+          const updatedProducts: ProductsByStatus = {};
+          const updatedCounts = { ...prevData.counts };
+
+          // 변경되는 아이템의 이전 상태 찾기
+          const targetArtwork = Object.values(prevData.products)
+            .flat()
+            .find((artwork) => artwork.it_id === itemId);
+
+          if (!targetArtwork) return prevData;
+
+          const oldStatusKey = targetArtwork._status_key;
+
+          // 새로운 상태 키 결정
+          let newStatusKey = 'collection';
+          if (newStatus === 'Y') {
+            newStatusKey = 'review'; // 심의중
+          } else if (newStatus === 'N') {
+            newStatusKey = 'payment'; // 구매 진행
+          }
+
+          // 상태가 변경되는 경우 카운트 업데이트
+          if (oldStatusKey !== newStatusKey) {
+            // 기존 탭에서 개수 감소
+            if (updatedCounts[oldStatusKey] > 0) {
+              updatedCounts[oldStatusKey] = updatedCounts[oldStatusKey] - 1;
+            }
+            // 새 탭에서 개수 증가
+            updatedCounts[newStatusKey] = (updatedCounts[newStatusKey] || 0) + 1;
+          }
+
+          Object.keys(prevData.products).forEach((tabKey) => {
+            updatedProducts[tabKey] = prevData.products[tabKey].map((artwork) => {
+              if (artwork.it_id === itemId) {
+                return {
+                  ...artwork,
+                  it_10: result.data.it_10,
+                  _status_text: result.data.statusText,
+                  _status_key: newStatusKey,
+                };
+              }
+              return artwork;
+            });
+          });
+
+          return {
+            ...prevData,
+            products: updatedProducts,
+            counts: updatedCounts,
+          };
+        });
       } else {
         throw new Error(result.message || '상태 변경에 실패했습니다.');
       }

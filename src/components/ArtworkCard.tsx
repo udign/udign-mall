@@ -62,6 +62,7 @@ export default function ArtworkCard({
   };
 
   const handleInterestConfirm = () => {
+    setShowInterestConfirmDialog(false);
     onInterestToggle(artwork.it_id);
   };
 
@@ -313,7 +314,7 @@ export default function ArtworkCard({
                 </div>
               )}
 
-              {/* 좋아요 토글 */}
+              {/* 좋아요 버튼 */}
               {!artwork._goalAttainment && artwork._status_text === '컬렉션' && (
                 <Button
                   onClick={(e) => {
