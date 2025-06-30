@@ -5,9 +5,13 @@ import { STATUS_GROUPS, STATUS_MAPPING } from './constants';
 export async function getArtworksByUser(
   userId: string,
   isAdmin: boolean = false,
+  page: number = 1,
+  limit: number = 10,
+  tab: string = 'all',
 ): Promise<{
   products: ProductsByStatus;
   counts: StatusCounts;
+  hasMore: boolean;
 }> {
   try {
     // 기본 쿼리 설정
@@ -101,16 +105,16 @@ export async function getArtworksByUser(
              ord.od_settle_case, ord.od_status, ord.od_invoice, ord.od_delivery_company
     `;
 
-    // 쿼리 실행
-    const query = `${sqlSelect} ${sqlCommon} ${sqlSearch} ${sqlOrder}`;
+    // 전체 데이터 쿼리 실행 (상태 결정을 위해)
+    const allQuery = `${sqlSelect} ${sqlCommon} ${sqlSearch} ${sqlOrder}`;
     const params = isAdmin
       ? [userId, userId, userId, userId, userId]
       : [userId, userId, userId, userId, userId];
 
-    const results = (await executeQuery(query, params)) as any[];
+    const allResults = (await executeQuery(allQuery, params)) as any[];
 
     // 상태별 데이터 분류
-    const productsByStatus: ProductsByStatus = {
+    const allProductsByStatus: ProductsByStatus = {
       all: [],
       collection: [],
       review: [],
@@ -122,7 +126,7 @@ export async function getArtworksByUser(
       cancelled: [],
     };
 
-    for (const row of results) {
+    for (const row of allResults) {
       // 좋아요 수 계산
       const countQuery = `SELECT COUNT(*) as cnt FROM g5_shop_interrest WHERE it_id = ?`;
       const countResult = (await executeQuery(countQuery, [row.it_id])) as any[];
@@ -141,17 +145,39 @@ export async function getArtworksByUser(
       };
 
       // 상태별 그룹화
-      productsByStatus[statusInfo.statusKey].push(artworkStatus);
-      productsByStatus.all.push(artworkStatus);
+      allProductsByStatus[statusInfo.statusKey].push(artworkStatus);
+      allProductsByStatus.all.push(artworkStatus);
     }
 
     // 상태별 카운트 계산
     const counts: StatusCounts = {};
     Object.keys(STATUS_GROUPS).forEach((key) => {
-      counts[key] = productsByStatus[key].length;
+      counts[key] = allProductsByStatus[key].length;
     });
 
-    return { products: productsByStatus, counts };
+    // 탭별 페이지네이션 적용
+    const targetProducts = allProductsByStatus[tab] || [];
+    const offset = (page - 1) * limit;
+    const paginatedProducts = targetProducts.slice(offset, offset + limit);
+    const hasMore = targetProducts.length > offset + limit;
+
+    // 페이지네이션된 결과를 ProductsByStatus 형태로 변환
+    const products: ProductsByStatus = {
+      all: [],
+      collection: [],
+      review: [],
+      payment: [],
+      paymentCompleted: [],
+      making: [],
+      shipping: [],
+      completed: [],
+      cancelled: [],
+    };
+
+    // 해당 탭에만 페이지네이션된 데이터 할당
+    products[tab] = paginatedProducts;
+
+    return { products, counts, hasMore };
   } catch (error) {
     console.error('Error fetching artworks:', error);
     throw error;

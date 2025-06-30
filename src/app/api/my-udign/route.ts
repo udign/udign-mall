@@ -23,13 +23,26 @@ export async function GET(request: NextRequest) {
     const userId = decoded.mb_id;
     const isAdmin = decoded.mb_level >= 10;
 
-    const { products, counts } = await getArtworksByUser(userId, isAdmin);
+    // URL 파라미터에서 페이지네이션 정보 추출
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const tab = searchParams.get('tab') || 'all';
+
+    const { products, counts, hasMore } = await getArtworksByUser(
+      userId,
+      isAdmin,
+      page,
+      limit,
+      tab,
+    );
 
     return NextResponse.json({
       success: true,
       data: {
         products,
         counts,
+        hasMore,
         user: {
           mb_id: decoded.mb_id,
           mb_name: decoded.mb_name,
