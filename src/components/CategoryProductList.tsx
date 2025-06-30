@@ -5,7 +5,8 @@ import { Product } from '@/types/product';
 import CommonPagination from '@/components/CommonPagination';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { useAuth } from '@/contexts/AuthContext';
-import { ErrorState, EmptyState } from '@/components/ui';
+import ErrorState from '@/components/states/ErrorState';
+import EmptyState from '@/components/states/EmptyState';
 
 interface CategoryProductListProps {
   products: Product[];

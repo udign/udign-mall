@@ -8,8 +8,10 @@ import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
-import { Button } from '@/components/ui';
-import { LoadingState, ErrorState, NotFoundState } from '@/components/ui';
+import { Button } from '@/components/ui/primitives/button';
+import LoadingState from '@/components/states/LoadingState';
+import ErrorState from '@/components/states/ErrorState';
+import NotFoundState from '@/components/states/NotFoundState';
 
 interface ProductDetail {
   it_id: string;
@@ -304,7 +306,7 @@ export default function ProductDetailPage() {
           <div className='relative lg:w-1/2'>
             <button
               onClick={handleLikeToggle}
-              className='duration-400 absolute right-0 top-0 cursor-pointer p-2 text-2xl transition-transform ease-out hover:scale-110'
+              className='absolute top-0 right-0 cursor-pointer p-2 text-2xl transition-transform duration-400 ease-out hover:scale-110'
             >
               {product.is_liked ? <FcLike /> : <FcLikePlaceholder />}
             </button>

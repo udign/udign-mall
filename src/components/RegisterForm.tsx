@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Switch } from '@/components/ui';
+import { Switch } from '@/components/ui/primitives/switch';
 
 interface RegisterFormProps {
   onSuccess?: () => void;

@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Switch } from '@/components/ui/primitives/switch';
 import {
-  Switch,
   Dialog,
   DialogClose,
   DialogContent,
@@ -11,8 +11,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui';
-import { Button } from '@/components/ui';
+} from '@/components/ui/primitives/dialog';
+import { Button } from '@/components/ui/primitives/button';
 
 interface LoginFormProps {
   onSuccess?: () => void;

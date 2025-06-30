@@ -15,9 +15,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui';
+} from '@/components/ui/primitives/dropdown-menu';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
-import { LoadingSpinner } from '@/components/ui';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
 
 interface NavMenuItem {
   href: string;

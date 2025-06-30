@@ -4,8 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui';
-import { Switch } from '@/components/ui';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/primitives/accordion';
+import { Switch } from '@/components/ui/primitives/switch';
 import { termsOfService, privacyPolicy } from '@/lib/terms-content';
 import { ROUTES } from '@/lib/routes';
 
