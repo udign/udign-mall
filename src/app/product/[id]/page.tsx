@@ -304,12 +304,14 @@ export default function ProductDetailPage() {
           </div>
 
           <div className='relative lg:w-1/2'>
-            <button
+            <Button
               onClick={handleLikeToggle}
-              className='absolute top-0 right-0 cursor-pointer p-2 text-2xl transition-transform duration-400 ease-out hover:scale-110'
+              variant='ghost'
+              size='icon'
+              className='absolute top-0 right-0 p-2 text-2xl transition-transform duration-400 ease-out hover:scale-110'
             >
               {product.is_liked ? <FcLike /> : <FcLikePlaceholder />}
-            </button>
+            </Button>
 
             <h1 className='mb-6 pr-12 text-2xl font-bold text-gray-900'>{product.it_name}</h1>
 

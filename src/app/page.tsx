@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Button } from '@/components/ui/primitives/button';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -54,14 +55,15 @@ export default function Home() {
         </div>
         <section className='mb-10 px-6 py-14 sm:px-10 sm:py-20'>
           <div className='flex flex-col items-center gap-y-14 sm:gap-y-20'>
-            <button
+            <Button
               onClick={handleUploadClick}
               disabled={isLoading}
-              className='bg-primary hover:bg-primary-hover flex w-full max-w-xs cursor-pointer items-center justify-center gap-2 rounded-2xl px-6 py-2.5 text-lg text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-md sm:gap-3 sm:rounded-3xl sm:px-8 sm:py-3.5 sm:text-2xl'
+              className='h-14 w-full max-w-xs gap-2 rounded-2xl px-6 text-lg sm:max-w-md sm:gap-3 sm:rounded-3xl sm:text-2xl'
+              size='lg'
             >
               <FaPlus className='text-primary rounded-full bg-white p-1 text-lg sm:text-2xl' />내
               디자인 업로드하기
-            </button>
+            </Button>
             <p className='text-gray-dark text-center text-xl font-bold tracking-tight sm:text-3xl'>
               오직 당신만을 위한 디자인을 선택하세요. 최고의 선물이 완성됩니다.
             </p>

@@ -1,11 +1,8 @@
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/primitives/dialog';
 import { Button } from '@/components/ui/primitives/button';
+import FormDialog from '@/components/ui/FormDialog';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface CancelOrderModalProps {
   isOpen: boolean;
@@ -22,19 +19,23 @@ export default function CancelOrderModal({
 }: CancelOrderModalProps) {
   const [cancelMemo, setCancelMemo] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showMessageDialog, setShowMessageDialog] = useState(false);
+  const [messageContent, setMessageContent] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!cancelMemo.trim()) {
-      alert('취소 사유를 입력해주세요.');
+      setMessageContent('취소 사유를 입력해주세요.');
+      setShowMessageDialog(true);
       return;
     }
 
-    if (!confirm('주문을 정말 취소하시겠습니까?')) {
-      return;
-    }
+    setShowConfirmDialog(true);
+  };
 
+  const handleConfirmCancel = async () => {
     setIsSubmitting(true);
     try {
       await onSubmit(orderId, cancelMemo);
@@ -48,12 +49,8 @@ export default function CancelOrderModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-md'>
-        <DialogHeader>
-          <DialogTitle>주문취소</DialogTitle>
-        </DialogHeader>
-
+    <>
+      <FormDialog open={isOpen} onOpenChange={onClose} title='주문취소'>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label className='mb-2 block text-sm font-medium text-gray-700'>주문취소사유</label>
@@ -83,7 +80,24 @@ export default function CancelOrderModal({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </FormDialog>
+
+      <ConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        title='주문취소 확인'
+        description='주문을 정말 취소하시겠습니까?'
+        onConfirm={handleConfirmCancel}
+        variant='destructive'
+        confirmText='취소하기'
+      />
+
+      <MessageDialog
+        open={showMessageDialog}
+        onOpenChange={setShowMessageDialog}
+        title='알림'
+        description={messageContent}
+      />
+    </>
   );
 }

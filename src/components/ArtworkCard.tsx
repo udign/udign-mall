@@ -7,15 +7,9 @@ import ReturnModal from '@/components/ReturnModal';
 import CancelOrderModal from '@/components/CancelOrderModal';
 import { Switch } from '@/components/ui/primitives/switch';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/primitives/dialog';
 import { Button } from '@/components/ui/primitives/button';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface ArtworkCardProps {
   artwork: ArtworkStatus;
@@ -56,20 +50,28 @@ export default function ArtworkCard({
     null,
   );
 
+  // 추가 Dialog 상태들
+  const [showInterestConfirmDialog, setShowInterestConfirmDialog] = useState<boolean>(false);
+  const [showPurchaseConfirmDialog, setShowPurchaseConfirmDialog] = useState<boolean>(false);
+
   const router = useRouter();
 
   const { user } = useAuth();
 
   const handleInterestClick = () => {
-    if (confirm('❤️ 상품을 취소하시겠습니까?')) {
-      onInterestToggle(artwork.it_id);
-    }
+    setShowInterestConfirmDialog(true);
+  };
+
+  const handleInterestConfirm = () => {
+    onInterestToggle(artwork.it_id);
   };
 
   const handlePurchaseConfirm = () => {
-    if (confirm('구매 확정 하시겠습니까?')) {
-      onPurchaseConfirm(artwork.od_id!);
-    }
+    setShowPurchaseConfirmDialog(true);
+  };
+
+  const handlePurchaseConfirmAction = () => {
+    onPurchaseConfirm(artwork.od_id!);
   };
 
   const handleAdminToggle = async (checked: boolean) => {
@@ -220,94 +222,101 @@ export default function ArtworkCard({
             <div className='flex flex-col space-y-2'>
               {/* 구매 진행 */}
               {artwork._status_text === '구매 진행' && (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/product/${artwork.it_id}`);
                   }}
-                  className='rounded bg-purple-600 px-4 py-2 text-sm text-white hover:bg-purple-700'
+                  className='bg-purple-600 hover:bg-purple-700'
+                  size='sm'
                 >
                   🛒 구매하기
-                </button>
+                </Button>
               )}
 
               {/* 결제대기 */}
               {artwork._status_text === '결제대기' && artwork.od_settle_case !== '무통장' && (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/product/${artwork.it_id}`);
                   }}
-                  className='rounded bg-purple-600 px-4 py-2 text-sm text-white hover:bg-purple-700'
+                  className='bg-purple-600 hover:bg-purple-700'
+                  size='sm'
                 >
                   🛒 구매하기
-                </button>
+                </Button>
               )}
 
               {/* 구매취소 */}
               {((artwork.od_settle_case === '무통장' && artwork._status_text === '결제대기') ||
                 artwork._status_text === '결제완료') && (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowCancelModal(true);
                   }}
-                  className='rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700'
+                  variant='destructive'
+                  size='sm'
                 >
                   ❌ 구매취소
-                </button>
+                </Button>
               )}
 
               {/* 구매확정 & 교환/반품 */}
               {(artwork._status_text === '수령 완료' || artwork._status_text === '완료') && (
                 <>
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePurchaseConfirm();
                     }}
-                    className='rounded bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700'
+                    className='bg-green-600 hover:bg-green-700'
+                    size='sm'
                   >
                     ✅ 구매확정
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowReturnModal(true);
                     }}
-                    className='rounded bg-yellow-600 px-4 py-2 text-sm text-white hover:bg-yellow-700'
+                    className='bg-yellow-600 hover:bg-yellow-700'
+                    size='sm'
                   >
                     🔄 교환/반품
-                  </button>
+                  </Button>
                 </>
               )}
 
               {/* 상품문의 */}
               {(artwork._status_text === '상품 제작' || artwork._status_text === '제작중') && (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/product/${artwork.it_id}/qa`);
                   }}
-                  className='rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700'
+                  className='bg-blue-600 hover:bg-blue-700'
+                  size='sm'
                 >
                   ❓ 상품문의
-                </button>
+                </Button>
               )}
 
               {/* 배송조회 */}
               {(artwork._status_text === '배송 진행' || artwork._status_text === '배송중') && (
                 <div className='text-center'>
                   {artwork.od_invoice && artwork.od_delivery_company ? (
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         // 배송조회 로직
                       }}
-                      className='rounded bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700'
+                      className='bg-indigo-600 hover:bg-indigo-700'
+                      size='sm'
                     >
                       📦 배송조회
-                    </button>
+                    </Button>
                   ) : (
                     <span className='rounded bg-gray-100 px-3 py-1 text-sm text-gray-500'>
                       운송장 등록 중
@@ -318,15 +327,17 @@ export default function ArtworkCard({
 
               {/* 좋아요 취소 */}
               {!artwork._goalAttainment && artwork._status_text === '컬렉션' && artwork.ir_id && (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleInterestClick();
                   }}
-                  className='rounded border border-red-300 px-3 py-2 text-sm text-red-500 hover:bg-red-50'
+                  variant='outline'
+                  className='border-red-300 text-red-500 hover:bg-red-50'
+                  size='sm'
                 >
                   💔
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -349,37 +360,43 @@ export default function ArtworkCard({
       />
 
       {/* 확인 Dialog */}
-      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>확인</DialogTitle>
-            <DialogDescription>{confirmMessage}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={handleCancelAction} variant='outline'>
-              취소
-            </Button>
-            <Button onClick={handleConfirmAction} variant='default'>
-              확인
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        title='확인'
+        description={confirmMessage}
+        onConfirm={handleConfirmAction}
+        onCancel={handleCancelAction}
+      />
 
       {/* 메시지 Dialog */}
-      <Dialog open={showMessageDialog} onOpenChange={setShowMessageDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{messageTitle}</DialogTitle>
-            <DialogDescription>{messageContent}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setShowMessageDialog(false)} variant='default'>
-              확인
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <MessageDialog
+        open={showMessageDialog}
+        onOpenChange={setShowMessageDialog}
+        title={messageTitle}
+        description={messageContent}
+      />
+
+      {/* 관심상품 취소 확인 Dialog */}
+      <ConfirmDialog
+        open={showInterestConfirmDialog}
+        onOpenChange={setShowInterestConfirmDialog}
+        title='관심상품 취소'
+        description='❤️ 상품을 취소하시겠습니까?'
+        onConfirm={handleInterestConfirm}
+        variant='destructive'
+        confirmText='취소하기'
+      />
+
+      {/* 구매확정 확인 Dialog */}
+      <ConfirmDialog
+        open={showPurchaseConfirmDialog}
+        onOpenChange={setShowPurchaseConfirmDialog}
+        title='구매확정'
+        description='구매 확정 하시겠습니까?'
+        onConfirm={handlePurchaseConfirmAction}
+        confirmText='확정하기'
+      />
     </>
   );
 }

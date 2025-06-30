@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { FiAlertCircle, FiInbox } from 'react-icons/fi';
 import { ProductsByStatus, StatusCounts } from '@/types/artwork';
 import { STATUS_GROUPS } from '@/lib/constants';
+import { Button } from '@/components/ui/primitives/button';
 import ArtworkCard from '@/components/ArtworkCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { BsLightbulb } from 'react-icons/bs';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface MyUdignData {
   products: ProductsByStatus;
@@ -35,6 +37,10 @@ export default function MyUdignPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState<string>('all');
+
+  // Dialog 상태
+  const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
+  const [messageContent, setMessageContent] = useState<string>('');
 
   const router = useRouter();
 
@@ -95,11 +101,13 @@ export default function MyUdignPage() {
         // 데이터 새로고침
         await fetchData();
       } else {
-        alert(result.message || '처리 중 오류가 발생했습니다.');
+        setMessageContent(result.message || '처리 중 오류가 발생했습니다.');
+        setShowMessageDialog(true);
       }
     } catch (error) {
       console.error('관심상품 토글 실패:', error);
-      alert('서버 통신 중 오류가 발생했습니다.');
+      setMessageContent('서버 통신 중 오류가 발생했습니다.');
+      setShowMessageDialog(true);
     }
   };
 
@@ -116,14 +124,17 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert(result.message);
+        setMessageContent(result.message);
+        setShowMessageDialog(true);
         await fetchData();
       } else {
-        alert(result.message || '주문 취소 중 오류가 발생했습니다.');
+        setMessageContent(result.message || '주문 취소 중 오류가 발생했습니다.');
+        setShowMessageDialog(true);
       }
     } catch (error) {
       console.error('주문 취소 실패:', error);
-      alert('서버 통신 중 오류가 발생했습니다.');
+      setMessageContent('서버 통신 중 오류가 발생했습니다.');
+      setShowMessageDialog(true);
     }
   };
 
@@ -140,14 +151,17 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert(result.message);
+        setMessageContent(result.message);
+        setShowMessageDialog(true);
         await fetchData();
       } else {
-        alert(result.message || '구매 확정 중 오류가 발생했습니다.');
+        setMessageContent(result.message || '구매 확정 중 오류가 발생했습니다.');
+        setShowMessageDialog(true);
       }
     } catch (error) {
       console.error('구매 확정 실패:', error);
-      alert('서버 통신 중 오류가 발생했습니다.');
+      setMessageContent('서버 통신 중 오류가 발생했습니다.');
+      setShowMessageDialog(true);
     }
   };
 
@@ -170,14 +184,17 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert(result.message);
+        setMessageContent(result.message);
+        setShowMessageDialog(true);
         await fetchData();
       } else {
-        alert(result.message || '교환/반품 신청 중 오류가 발생했습니다.');
+        setMessageContent(result.message || '교환/반품 신청 중 오류가 발생했습니다.');
+        setShowMessageDialog(true);
       }
     } catch (error) {
       console.error('교환/반품 신청 실패:', error);
-      alert('서버 통신 중 오류가 발생했습니다.');
+      setMessageContent('서버 통신 중 오류가 발생했습니다.');
+      setShowMessageDialog(true);
     }
   };
 
@@ -222,12 +239,9 @@ export default function MyUdignPage() {
     <div className='flex min-h-screen items-center justify-center'>
       <div className='text-center'>
         <p className='mb-4 text-red-600'>{error}</p>
-        <button
-          onClick={fetchData}
-          className='rounded bg-purple-500 px-4 py-2 text-white hover:bg-purple-600'
-        >
+        <Button onClick={fetchData} className='bg-purple-500 hover:bg-purple-600'>
           다시 시도
-        </button>
+        </Button>
       </div>
     </div>
   ) : (
@@ -302,9 +316,10 @@ export default function MyUdignPage() {
             <div className='border-b border-gray-200'>
               <nav className='-mb-px flex space-x-8'>
                 {Object.entries(STATUS_GROUPS).map(([key, label]) => (
-                  <button
+                  <Button
                     key={key}
                     onClick={() => handleTabChange(key)}
+                    variant='ghost'
                     className={`flex items-center border-b-2 px-1 py-2 text-sm font-medium whitespace-nowrap ${
                       currentTab === key
                         ? 'border-purple-500 text-purple-600'
@@ -323,7 +338,7 @@ export default function MyUdignPage() {
                         {data.counts[key]}
                       </span>
                     )}
-                  </button>
+                  </Button>
                 ))}
               </nav>
             </div>
@@ -353,6 +368,13 @@ export default function MyUdignPage() {
             </div>
           </div>
         </div>
+
+        <MessageDialog
+          open={showMessageDialog}
+          onOpenChange={setShowMessageDialog}
+          title='알림'
+          description={messageContent}
+        />
       </div>
     )
   );

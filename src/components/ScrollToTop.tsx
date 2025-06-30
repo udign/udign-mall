@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/primitives/button';
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -29,11 +30,12 @@ export default function ScrollToTop() {
   };
 
   return (
-    <button
+    <Button
       onClick={scrollToTop}
-      className={`fixed right-8 bottom-8 z-50 flex h-12 w-12 cursor-pointer items-center justify-center rounded-lg bg-[#1f2428] text-white shadow-lg transition-all duration-300 hover:bg-[#2d3339] ${
+      className={`fixed right-8 bottom-8 z-50 h-12 w-12 bg-[#1f2428] text-white shadow-lg transition-all duration-300 hover:bg-[#2d3339] ${
         isVisible ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
       }`}
+      size='icon'
       aria-label='맨 위로 이동'
     >
       <svg
@@ -50,6 +52,6 @@ export default function ScrollToTop() {
           d='M5 10l7-7m0 0l7 7m-7-7v18'
         />
       </svg>
-    </button>
+    </Button>
   );
 }

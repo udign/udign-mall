@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Switch } from '@/components/ui/primitives/switch';
+import { Button } from '@/components/ui/primitives/button';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -59,11 +60,6 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
   const isRequiredAgreementsFilled = useMemo(() => {
     return agreements.ageAgree && agreements.termsAgree;
   }, [agreements]);
-
-  const buttonClass =
-    isAllFieldsFilled && isRequiredAgreementsFilled
-      ? 'bg-primary hover:bg-primary-hover'
-      : 'bg-gray-light hover:bg-gray-medium';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -313,24 +309,26 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             </div>
           </div>
 
-          <button
-            className={`${buttonClass} mt-2 w-full cursor-pointer rounded px-4 py-3 font-medium text-white transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50`}
+          <Button
+            className='mt-2 w-full'
             type='submit'
             disabled={isLoading || !isAllFieldsFilled || !isRequiredAgreementsFilled}
+            variant={isAllFieldsFilled && isRequiredAgreementsFilled ? 'default' : 'secondary'}
           >
             {isLoading ? '가입 중...' : '회원가입'}
-          </button>
+          </Button>
 
           <div className='text-center text-sm text-gray-300'>
             이미 계정이 있으신가요?{' '}
             {onSwitchToLogin && (
-              <button
+              <Button
                 type='button'
                 onClick={onSwitchToLogin}
-                className='hover:text-primary cursor-pointer font-medium text-white'
+                variant='link'
+                className='hover:text-primary h-auto p-0 font-medium text-white'
               >
                 로그인
-              </button>
+              </Button>
             )}
           </div>
         </form>

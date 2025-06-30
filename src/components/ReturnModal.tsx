@@ -1,11 +1,7 @@
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/primitives/dialog';
 import { Button } from '@/components/ui/primitives/button';
+import FormDialog from '@/components/ui/FormDialog';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface ReturnModalProps {
   isOpen: boolean;
@@ -28,12 +24,15 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
     reason: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMessageDialog, setShowMessageDialog] = useState(false);
+  const [messageContent, setMessageContent] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.phone || !formData.reason) {
-      alert('모든 필드를 입력해주세요.');
+      setMessageContent('모든 필드를 입력해주세요.');
+      setShowMessageDialog(true);
       return;
     }
 
@@ -53,12 +52,8 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-md'>
-        <DialogHeader>
-          <DialogTitle>교환/반품 신청</DialogTitle>
-        </DialogHeader>
-
+    <>
+      <FormDialog open={isOpen} onOpenChange={onClose} title='교환/반품 신청'>
         <form onSubmit={handleSubmit}>
           <div className='space-y-4'>
             <div>
@@ -146,7 +141,14 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </FormDialog>
+
+      <MessageDialog
+        open={showMessageDialog}
+        onOpenChange={setShowMessageDialog}
+        title='알림'
+        description={messageContent}
+      />
+    </>
   );
 }
