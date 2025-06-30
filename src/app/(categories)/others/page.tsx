@@ -7,11 +7,20 @@ import { CATEGORY_IDS } from '@/config/pagination';
 import { ROUTES } from '@/lib/routes';
 
 function OthersContent() {
-  const { products, loading, error, totalPages, categoryName, currentPage, categoryId, refetch } =
-    useCategoryProducts({
-      defaultCategoryId: CATEGORY_IDS.OTHERS,
-      pathname: ROUTES.OTHERS,
-    });
+  const {
+    products,
+    loading,
+    error,
+    totalPages,
+    categoryName,
+    categoryCount,
+    currentPage,
+    refetch,
+  } = useCategoryProducts({
+    defaultCategoryId: '', // 모든 카테고리 포함
+    pathname: ROUTES.OTHERS,
+    targetCategoryId: CATEGORY_IDS.OTHERS, // 기타 카테고리 정보 표시
+  });
 
   return (
     <CategoryProductList
@@ -20,8 +29,8 @@ function OthersContent() {
       error={error}
       totalPages={totalPages}
       categoryName={categoryName}
+      categoryCount={categoryCount}
       currentPage={currentPage}
-      categoryId={categoryId}
       pathname={ROUTES.OTHERS}
       fallbackCategoryName='others'
       onRetry={refetch}

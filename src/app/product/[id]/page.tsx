@@ -262,20 +262,6 @@ export default function ProductDetailPage() {
     <ErrorState message={error} showGoHome={true} />
   ) : !product ? (
     <NotFoundState title='상품을 찾을 수 없습니다' />
-  ) : !product.has_access ? (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='text-center'>
-        <h1 className='mb-4 text-2xl font-bold text-gray-900'>접근 권한이 없습니다</h1>
-        <p className='mb-6 text-gray-600'>
-          {product.is_review_completed
-            ? '심의가 완료된 상품은 좋아요한 회원만 접근할 수 있습니다.'
-            : '이 작품에 접근하려면 먼저 좋아요를 눌러주세요.'}
-        </p>
-        <Button onClick={() => router.push('/')} variant='default'>
-          홈으로 돌아가기
-        </Button>
-      </div>
-    </div>
   ) : (
     <div className='bg-white'>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>

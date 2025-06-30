@@ -14,8 +14,8 @@ interface CategoryProductListProps {
   error: string | null;
   totalPages: number;
   categoryName: string;
+  categoryCount: number;
   currentPage: number;
-  categoryId: string;
   pathname: string;
   fallbackCategoryName: string;
   onRetry: () => void;
@@ -42,8 +42,8 @@ export default function CategoryProductList({
   error,
   totalPages,
   categoryName,
+  categoryCount,
   currentPage,
-  categoryId,
   pathname,
   fallbackCategoryName,
   onRetry,
@@ -73,9 +73,7 @@ export default function CategoryProductList({
           {categoryName || fallbackCategoryName}
         </h1>
         <p className='text-gray-600'>
-          {loading
-            ? '작품을 불러오는 중...'
-            : `현재 페이지에 ${products.length}개의 작품이 있습니다.`}
+          {loading ? '작품을 불러오는 중...' : `총 ${categoryCount}개의 작품이 있습니다.`}
         </p>
       </div>
 
@@ -93,7 +91,7 @@ export default function CategoryProductList({
             currentPageNumber={currentPage}
             totalPageCount={totalPages}
             pathname={pathname}
-            queryParams={{ ca_id: categoryId }}
+            queryParams={{}}
           />
         </>
       ) : error ? (
@@ -145,7 +143,7 @@ export default function CategoryProductList({
             currentPageNumber={currentPage}
             totalPageCount={totalPages}
             pathname={pathname}
-            queryParams={{ ca_id: categoryId }}
+            queryParams={{}}
           />
         </>
       )}

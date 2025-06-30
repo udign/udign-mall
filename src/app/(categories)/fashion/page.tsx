@@ -7,11 +7,20 @@ import { CATEGORY_IDS } from '@/config/pagination';
 import { ROUTES } from '@/lib/routes';
 
 function FashionContent() {
-  const { products, loading, error, totalPages, categoryName, currentPage, categoryId, refetch } =
-    useCategoryProducts({
-      defaultCategoryId: CATEGORY_IDS.FASHION,
-      pathname: ROUTES.FASHION,
-    });
+  const {
+    products,
+    loading,
+    error,
+    totalPages,
+    categoryName,
+    categoryCount,
+    currentPage,
+    refetch,
+  } = useCategoryProducts({
+    defaultCategoryId: '', // 모든 카테고리 포함
+    pathname: ROUTES.FASHION,
+    targetCategoryId: CATEGORY_IDS.FASHION, // 패션 카테고리 정보 표시
+  });
 
   return (
     <CategoryProductList
@@ -20,8 +29,8 @@ function FashionContent() {
       error={error}
       totalPages={totalPages}
       categoryName={categoryName}
+      categoryCount={categoryCount}
       currentPage={currentPage}
-      categoryId={categoryId}
       pathname={ROUTES.FASHION}
       fallbackCategoryName='fashion'
       onRetry={refetch}

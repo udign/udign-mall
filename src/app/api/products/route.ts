@@ -1,51 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { Category, Product } from '@/types/product';
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
 import { RowDataPacket } from 'mysql2';
-
-interface JwtPayload {
-  mb_id: string;
-  [key: string]: unknown;
-}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const categoryId = searchParams.get('ca_id') || '10'; // 기본값: 패션 카테고리
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     const offset = (page - 1) * limit;
 
-    // 현재 로그인한 사용자 정보 가져오기
-    let currentUserId: string | null = null;
-    try {
-      const cookieStore = await cookies();
-      const token = cookieStore.get('auth-token')?.value;
-
-      if (token && process.env.JWT_SECRET) {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
-        currentUserId = decoded.mb_id;
-      }
-    } catch {
-      // 토큰이 유효하지 않은 경우 무시
-    }
-
-    // 카테고리 정보 가져오기
+    // 모든 카테고리 정보 가져오기 (임시로 첫 번째 카테고리 정보만 사용)
     const categoryQuery = `
       SELECT * FROM g5_shop_category 
-      WHERE ca_id = ? AND ca_use = '1'
+      WHERE ca_use = '1'
+      ORDER BY ca_id ASC
+      LIMIT 1
     `;
-    const categoryResult = (await executeQuery(categoryQuery, [categoryId])) as Category[];
+    const categoryResult = (await executeQuery(categoryQuery, [])) as Category[];
 
-    if (categoryResult.length === 0) {
-      return NextResponse.json({ error: '등록된 분류가 없습니다.' }, { status: 404 });
-    }
+    const category = categoryResult[0] || { ca_id: 'all', ca_name: '모든 작품' };
 
-    const category = categoryResult[0];
-
-    // 상품 목록 가져오기 (접근 제한 로직 포함)
+    // 모든 상품 가져오기 (필터링 제거)
     const itemsQuery = `
       SELECT 
         i.it_id,
@@ -66,86 +42,53 @@ export async function GET(request: NextRequest) {
         i.it_2 as creator_name,
         i.it_3 as description,
         i.it_4 as target_likes,
-        i.it_8 as review_days,
-        i.it_9 as manual_review,
-        i.it_10 as review_completed,
-        COALESCE(like_count.cnt, 0) as current_likes,
-        CASE WHEN user_like.mb_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
+        COALESCE(like_count.cnt, 0) as current_likes
       FROM g5_shop_item i
       LEFT JOIN (
         SELECT it_id, COUNT(*) as cnt 
         FROM g5_shop_interrest 
         GROUP BY it_id
       ) like_count ON i.it_id = like_count.it_id
-      LEFT JOIN g5_shop_interrest user_like ON i.it_id = user_like.it_id AND user_like.mb_id = ?
-      WHERE i.ca_id LIKE ? AND i.it_use = '1' AND i.it_soldout = '0'
+      WHERE i.it_use = '1'
+      ORDER BY i.it_id DESC
     `;
 
-    // 카테고리 ID에 따른 LIKE 조건 설정
-    const likePattern = categoryId + '%';
-    const allItems = (await executeQuery(itemsQuery, [
-      currentUserId || '',
-      likePattern,
-    ])) as (Product &
+    const allItems = (await executeQuery(itemsQuery, [])) as (Product &
       RowDataPacket & {
         target_likes: number;
-        review_days: number;
-        manual_review: 'Y' | 'N';
-        review_completed: 'Y' | 'N';
         current_likes: number;
-        is_liked: number;
       })[];
 
-    // 접근 제한 로직 적용하여 필터링
-    const accessibleItems = allItems.filter((item) => {
-      const targetCount = parseInt(String(item.target_likes)) || 0;
-      const currentLikes = item.current_likes || 0;
-      const goalAttainment = currentLikes >= targetCount;
-      const isReviewCompleted = item.review_completed === 'N';
-      const manualReview = item.manual_review === 'Y';
-      const reviewDays = parseInt(String(item.review_days)) || 0;
+    const totalCount = allItems.length;
 
-      // 심의중 여부 확인
-      let isUnderReview = false;
-      if (!isReviewCompleted) {
-        if (goalAttainment && !manualReview) {
-          // 자동 심의: 목표 달성시 심의중
-          isUnderReview = true;
-        } else if (manualReview && reviewDays > 0) {
-          // 수동 심의: 기간 확인 필요 (실제로는 첫 좋아요 시간을 확인해야 하지만, 여기서는 단순화)
-          isUnderReview = goalAttainment;
-        }
-      }
+    // 카테고리별 작품 개수 계산
+    const categoryCountsQuery = `
+      SELECT 
+        c.ca_id,
+        c.ca_name,
+        COUNT(i.it_id) as item_count
+      FROM g5_shop_category c
+      LEFT JOIN g5_shop_item i ON i.ca_id LIKE CONCAT(c.ca_id, '%') AND i.it_use = '1'
+      WHERE c.ca_use = '1' AND LENGTH(c.ca_id) = 2
+      GROUP BY c.ca_id, c.ca_name
+      ORDER BY c.ca_id
+    `;
 
-      // 접근 권한 체크
-      if (!currentUserId) {
-        // 비회원인 경우 심의중/심의완료 상품 제외
-        return !isReviewCompleted && !isUnderReview;
-      } else {
-        // 회원인 경우
-        if (isReviewCompleted || isUnderReview) {
-          // 심의 완료되었거나 심의중인 상품은 좋아요한 회원만
-          return Boolean(item.is_liked);
-        }
-        // 컬렉션 상태는 모두 접근 가능
-        return true;
-      }
-    });
+    const categoryCounts = (await executeQuery(categoryCountsQuery, [])) as {
+      ca_id: string;
+      ca_name: string;
+      item_count: number;
+    }[];
 
-    const totalAccessibleCount = accessibleItems.length;
-
-    // 정렬 적용 (it_order, it_id DESC)
-    const sortedItems = accessibleItems.sort((a, b) => {
-      if (a.it_order !== b.it_order) {
-        return a.it_order - b.it_order;
-      }
+    // 정렬 적용 (it_id DESC - 최신순)
+    const sortedItems = allItems.sort((a, b) => {
       return b.it_id.localeCompare(a.it_id);
     });
 
     // 페이지네이션 적용
-    const finalPaginatedItems = sortedItems.slice(offset, offset + limit);
+    const paginatedItems = sortedItems.slice(offset, offset + limit);
 
-    const processedItems = finalPaginatedItems.map((item) => ({
+    const processedItems = paginatedItems.map((item) => ({
       it_id: item.it_id,
       it_name: item.it_name,
       it_basic: item.it_basic,
@@ -179,19 +122,29 @@ export async function GET(request: NextRequest) {
       pagination: {
         page,
         limit,
-        totalCount: totalAccessibleCount,
-        totalPages: Math.ceil(totalAccessibleCount / limit),
-        hasNext: page * limit < totalAccessibleCount,
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasNext: page * limit < totalCount,
         hasPrev: page > 1,
       },
-      // 실제 데이터 정보
+      // 카테고리별 작품 개수 정보 추가
+      categoryCounts: categoryCounts.reduce(
+        (acc, cat) => {
+          acc[cat.ca_id] = {
+            name: cat.ca_name,
+            count: cat.item_count,
+          };
+          return acc;
+        },
+        {} as Record<string, { name: string; count: number }>,
+      ),
+      // 모든 데이터 정보
       _meta: {
-        mode: 'real',
+        mode: 'all',
         queriedAt: new Date().toISOString(),
-        categoryId,
-        filteredByAccess: true,
-        originalCount: allItems.length,
-        accessibleCount: totalAccessibleCount,
+        filteredByAccess: false,
+        originalCount: totalCount,
+        accessibleCount: totalCount,
       },
     });
   } catch (error) {

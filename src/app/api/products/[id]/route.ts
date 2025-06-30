@@ -135,172 +135,67 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       }
     }
 
-    // 접근 권한을 고려한 이전/다음 상품 조회
-    const getAccessibleNavigationProducts = async () => {
-      // 이전/다음 상품 후보들을 더 많이 조회 (접근 권한 필터링을 위해)
-      const prevProductCandidatesQuery = `
+    // 모든 작품에서 이전/다음 상품 조회 (필터링 제거)
+    const getNavigationProducts = async () => {
+      // 이전/다음 상품 조회 (모든 작품 대상)
+      const prevProductQuery = `
         SELECT 
           i.it_id, 
-          i.it_name,
-          i.it_4 as target_likes,
-          i.it_8 as review_days,
-          i.it_9 as manual_review,
-          i.it_10 as review_completed,
-          COALESCE(like_count.cnt, 0) as current_likes,
-          CASE WHEN user_like.mb_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
+          i.it_name
         FROM g5_shop_item i
-        LEFT JOIN (
-          SELECT it_id, COUNT(*) as cnt 
-          FROM g5_shop_interrest 
-          GROUP BY it_id
-        ) like_count ON i.it_id = like_count.it_id
-        LEFT JOIN g5_shop_interrest user_like ON i.it_id = user_like.it_id AND user_like.mb_id = ?
         WHERE i.it_time > ? AND i.it_use = '1'
         ORDER BY i.it_time ASC 
-        LIMIT 10
+        LIMIT 1
       `;
 
-      const nextProductCandidatesQuery = `
+      const nextProductQuery = `
         SELECT 
           i.it_id, 
-          i.it_name,
-          i.it_4 as target_likes,
-          i.it_8 as review_days,
-          i.it_9 as manual_review,
-          i.it_10 as review_completed,
-          COALESCE(like_count.cnt, 0) as current_likes,
-          CASE WHEN user_like.mb_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
+          i.it_name
         FROM g5_shop_item i
-        LEFT JOIN (
-          SELECT it_id, COUNT(*) as cnt 
-          FROM g5_shop_interrest 
-          GROUP BY it_id
-        ) like_count ON i.it_id = like_count.it_id
-        LEFT JOIN g5_shop_interrest user_like ON i.it_id = user_like.it_id AND user_like.mb_id = ?
         WHERE i.it_time < ? AND i.it_use = '1'
         ORDER BY i.it_time DESC 
-        LIMIT 10
+        LIMIT 1
       `;
 
-      const prevCandidates = (await executeQuery(prevProductCandidatesQuery, [
-        currentUserId || '',
+      const prevResults = (await executeQuery(prevProductQuery, [
         product.it_time,
-      ])) as (NavigationRow & {
-        target_likes: number;
-        review_days: number;
-        manual_review: 'Y' | 'N';
-        review_completed: 'Y' | 'N';
-        current_likes: number;
-        is_liked: number;
-      })[];
+      ])) as NavigationRow[];
 
-      const nextCandidates = (await executeQuery(nextProductCandidatesQuery, [
-        currentUserId || '',
+      const nextResults = (await executeQuery(nextProductQuery, [
         product.it_time,
-      ])) as (NavigationRow & {
-        target_likes: number;
-        review_days: number;
-        manual_review: 'Y' | 'N';
-        review_completed: 'Y' | 'N';
-        current_likes: number;
-        is_liked: number;
-      })[];
-
-      // 접근 권한 체크 함수
-      const hasAccessToProduct = (item: (typeof prevCandidates)[0]) => {
-        const targetCount = parseInt(String(item.target_likes)) || 0;
-        const currentLikes = item.current_likes || 0;
-        const goalAttainment = currentLikes >= targetCount;
-        const isReviewCompleted = item.review_completed === 'N';
-        const manualReview = item.manual_review === 'Y';
-        const reviewDays = parseInt(String(item.review_days)) || 0;
-
-        // 심의중 여부 확인
-        let isUnderReview = false;
-        if (!isReviewCompleted) {
-          if (goalAttainment && !manualReview) {
-            // 자동 심의: 목표 달성시 심의중
-            isUnderReview = true;
-          } else if (manualReview && reviewDays > 0) {
-            // 수동 심의: 기간 확인 필요 (여기서는 단순화)
-            isUnderReview = goalAttainment;
-          }
-        }
-
-        // 접근 권한 체크
-        if (!currentUserId) {
-          // 비회원인 경우 심의중/심의완료 상품 제외
-          return !isReviewCompleted && !isUnderReview;
-        } else {
-          // 회원인 경우
-          if (isReviewCompleted || isUnderReview) {
-            // 심의 완료되었거나 심의중인 상품은 좋아요한 회원만
-            return Boolean(item.is_liked);
-          }
-          // 컬렉션 상태는 모두 접근 가능
-          return true;
-        }
-      };
-
-      // 접근 가능한 첫 번째 상품 찾기
-      const accessiblePrev = prevCandidates.find(hasAccessToProduct);
-      const accessibleNext = nextCandidates.find(hasAccessToProduct);
+      ])) as NavigationRow[];
 
       return {
-        prevProduct: accessiblePrev
-          ? { it_id: accessiblePrev.it_id, it_name: accessiblePrev.it_name }
+        prevProduct: prevResults[0]
+          ? { it_id: prevResults[0].it_id, it_name: prevResults[0].it_name }
           : null,
-        nextProduct: accessibleNext
-          ? { it_id: accessibleNext.it_id, it_name: accessibleNext.it_name }
+        nextProduct: nextResults[0]
+          ? { it_id: nextResults[0].it_id, it_name: nextResults[0].it_name }
           : null,
       };
     };
 
-    const { prevProduct, nextProduct } = await getAccessibleNavigationProducts();
+    const { prevProduct, nextProduct } = await getNavigationProducts();
 
-    // 접근 권한 체크 (UDIGN 프리오더 시스템 로직에 따라)
-    let hasAccess = true;
-    let statusMessage = '';
-
-    if (!currentUserId) {
-      // 비회원인 경우
-      if (isReviewCompleted || isUnderReview) {
-        hasAccess = false;
-        statusMessage = '회원 로그인이 필요합니다.';
-      }
-    } else {
-      // 회원인 경우
-      if (isReviewCompleted || isUnderReview) {
-        // 심의 완료되었거나 심의중인 상품은 좋아요한 회원만 접근 가능
-        if (!product.is_liked) {
-          hasAccess = false;
-          statusMessage = isReviewCompleted
-            ? '심의가 완료된 상품은 좋아요한 회원만 접근할 수 있습니다.'
-            : '심의중인 상품은 좋아요한 회원만 접근할 수 있습니다.';
-        }
-      }
-    }
+    // 모든 작품에 접근 가능하도록 설정
+    const hasAccess = true;
 
     // 구매 가능 여부
-    const canPurchase = isReviewCompleted && hasAccess && currentUserId;
+    const canPurchase = isReviewCompleted && currentUserId;
 
     // 상태 메시지 설정
-    if (!statusMessage) {
-      if (isReviewCompleted) {
-        statusMessage = '구매 가능한 상품입니다.';
-      } else if (isUnderReview) {
-        statusMessage = '현재 심의 진행 중입니다.';
-      } else {
-        statusMessage = '좋아요 모집 중입니다.';
-      }
+    let statusMessage = '';
+    if (isReviewCompleted) {
+      statusMessage = '구매 가능한 상품입니다.';
+    } else if (isUnderReview) {
+      statusMessage = '현재 심의 진행 중입니다.';
+    } else {
+      statusMessage = '좋아요 모집 중입니다.';
     }
 
-    // 조회수 증가 (접근 권한이 있는 경우에만)
-    if (hasAccess) {
-      await executeQuery('UPDATE g5_shop_item SET it_hit = it_hit + 1 WHERE it_id = ?', [
-        productId,
-      ]);
-    }
+    // 조회수 증가
+    await executeQuery('UPDATE g5_shop_item SET it_hit = it_hit + 1 WHERE it_id = ?', [productId]);
 
     const getImageUrl = (imagePath: string) => {
       if (!imagePath) return null;
