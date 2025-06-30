@@ -65,9 +65,15 @@ export async function GET(request: NextRequest) {
 
     const processedItems = items.map((item) => ({
       ...item,
-      it_img1: item.it_img1 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img1}` : null,
-      it_img2: item.it_img2 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img2}` : null,
-      it_img3: item.it_img3 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img3}` : null,
+      it_img1: item.it_img1
+        ? `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${item.it_img1}`
+        : null,
+      it_img2: item.it_img2
+        ? `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${item.it_img2}`
+        : null,
+      it_img3: item.it_img3
+        ? `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${item.it_img3}`
+        : null,
     }));
 
     return NextResponse.json({

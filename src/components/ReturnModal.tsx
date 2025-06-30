@@ -1,4 +1,11 @@
 import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/primitives/dialog';
+import { Button } from '@/components/ui/primitives/button';
 
 interface ReturnModalProps {
   isOpen: boolean;
@@ -45,17 +52,12 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className='bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black'>
-      <div className='mx-4 w-full max-w-md rounded-lg bg-white p-6'>
-        <div className='mb-4 flex items-center justify-between'>
-          <h3 className='text-lg font-semibold'>교환/반품 신청</h3>
-          <button onClick={onClose} className='text-gray-400 hover:text-gray-600'>
-            ✕
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>교환/반품 신청</DialogTitle>
+        </DialogHeader>
 
         <form onSubmit={handleSubmit}>
           <div className='space-y-4'>
@@ -130,24 +132,21 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
           </div>
 
           <div className='mt-6 flex space-x-3'>
-            <button
+            <Button
               type='button'
               onClick={onClose}
-              className='flex-1 rounded border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50'
+              variant='outline'
+              className='flex-1'
               disabled={isSubmitting}
             >
               취소
-            </button>
-            <button
-              type='submit'
-              className='flex-1 rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700 disabled:opacity-50'
-              disabled={isSubmitting}
-            >
+            </Button>
+            <Button type='submit' variant='default' className='flex-1' disabled={isSubmitting}>
               {isSubmitting ? '처리중...' : '제출'}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

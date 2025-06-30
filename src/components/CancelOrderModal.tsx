@@ -1,4 +1,11 @@
 import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/primitives/dialog';
+import { Button } from '@/components/ui/primitives/button';
 
 interface CancelOrderModalProps {
   isOpen: boolean;
@@ -40,20 +47,15 @@ export default function CancelOrderModal({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className='bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black'>
-      <div className='mx-4 w-full max-w-md rounded-lg bg-white p-6'>
-        <div className='mb-4 flex items-center justify-between'>
-          <h3 className='text-lg font-semibold'>주문취소</h3>
-          <button onClick={onClose} className='text-gray-400 hover:text-gray-600'>
-            ✕
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>주문취소</DialogTitle>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
-          <div className='mb-4'>
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <div>
             <label className='mb-2 block text-sm font-medium text-gray-700'>주문취소사유</label>
             <input
               type='text'
@@ -67,24 +69,21 @@ export default function CancelOrderModal({
           </div>
 
           <div className='flex space-x-3'>
-            <button
+            <Button
               type='button'
               onClick={onClose}
-              className='flex-1 rounded border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50'
+              variant='outline'
+              className='flex-1'
               disabled={isSubmitting}
             >
               닫기
-            </button>
-            <button
-              type='submit'
-              className='flex-1 rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:opacity-50'
-              disabled={isSubmitting}
-            >
+            </Button>
+            <Button type='submit' variant='destructive' className='flex-1' disabled={isSubmitting}>
               {isSubmitting ? '처리중...' : '주문취소'}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
