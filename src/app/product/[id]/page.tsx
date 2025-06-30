@@ -150,6 +150,7 @@ export default function ProductDetailPage() {
   const [nextProduct, setNextProduct] = useState<{ it_id: string; it_name: string } | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [quantity, setQuantity] = useState<number>(1);
 
   const params = useParams();
   const router = useRouter();
@@ -231,6 +232,18 @@ export default function ProductDetailPage() {
 
   const handleImageError = (imageUrl: string) => {
     setFailedImages((prev) => new Set(prev).add(imageUrl));
+  };
+
+  const handleQuantityIncrease = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleQuantityDecrease = () => {
+    setQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const getTotalPrice = () => {
+    return product ? product.it_price * quantity : 0;
   };
 
   // 이미지 배열 생성 로직
@@ -335,114 +348,160 @@ export default function ProductDetailPage() {
 
             <h1 className='mb-6 pr-12 text-2xl font-bold text-gray-900'>{product.it_name}</h1>
 
-            <div className='mb-8'>
-              <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
-              <div className='space-y-2 leading-relaxed text-gray-700'>
-                {product.description && <p>{product.description}</p>}
-                {product.creator_name && (
-                  <p className='text-sm text-gray-600'>
-                    디자이너: <span className='font-medium'>{product.creator_name}</span>
-                  </p>
-                )}
-              </div>
-            </div>
+            {/* 구매 가능한 상품 - 구매 전용 정보 표시 */}
+            {product.can_purchase ? (
+              <div className='space-y-6'>
+                {/* 가격 정보 */}
+                <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                  <h3 className='mb-3 text-lg font-semibold text-gray-900'>가격 정보</h3>
+                  <div className='space-y-2'>
+                    {product.it_cust_price > 0 && (
+                      <div className='flex items-center justify-between'>
+                        <span className='text-sm text-gray-600'>시중가격</span>
+                        <span className='text-sm text-gray-500 line-through'>
+                          {product.it_cust_price.toLocaleString()}원
+                        </span>
+                      </div>
+                    )}
+                    <div className='flex items-center justify-between'>
+                      <span className='text-base font-medium text-gray-900'>판매가격</span>
+                      <span className='text-primary text-xl font-bold'>
+                        {product.it_price.toLocaleString()}원
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-            <div className='mb-8 rounded-lg bg-gray-50 p-4'>
-              <div className='mb-2 flex items-center justify-between'>
-                <span className='text-sm text-gray-600'>현재 좋아요</span>
-                <span className='text-lg font-bold text-gray-600'>{product.current_likes}명</span>
-              </div>
-              <div className='mb-3 flex items-center justify-between'>
-                <span className='text-sm text-gray-600'>목표 인원</span>
-                <span className='text-primary text-lg font-bold'>{product.it_4}명</span>
-              </div>
-              <div className='h-2 w-full rounded-full bg-gray-200'>
-                <div
-                  className='bg-primary h-2 rounded-full transition-all duration-300'
-                  style={{
-                    width: `${Math.min((product.current_likes / product.it_4) * 100, 100)}%`,
-                  }}
-                ></div>
-              </div>
-              <p className='mt-2 text-xs text-gray-500'>
-                {product.goal_attainment
-                  ? '목표 달성!'
-                  : `목표까지 ${product.it_4 - product.current_likes}명 남았습니다.`}
-              </p>
-            </div>
+                {/* 수량 선택 */}
+                <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                  <h3 className='mb-3 text-lg font-semibold text-gray-900'>수량 선택</h3>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-sm text-gray-600'>구매 수량</span>
+                    <div className='flex items-center gap-2'>
+                      <Button
+                        variant='outline'
+                        size='icon'
+                        className='h-8 w-8'
+                        onClick={handleQuantityDecrease}
+                      >
+                        -
+                      </Button>
+                      <span className='w-12 text-center font-medium'>{quantity}</span>
+                      <Button
+                        variant='outline'
+                        size='icon'
+                        className='h-8 w-8'
+                        onClick={handleQuantityIncrease}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                </div>
 
-            {/* 상태 메시지 */}
-            <div className='mb-6'>
-              {product.is_review_completed ? (
+                {/* 총 금액 */}
+                <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-lg font-semibold text-gray-900'>총 금액</span>
+                    <span className='text-primary text-xl font-bold'>
+                      {getTotalPrice().toLocaleString()}원
+                    </span>
+                  </div>
+                </div>
+
+                {/* 구매 버튼 */}
+                <div className='space-y-3'>
+                  <Button
+                    className='bg-primary hover:bg-primary/90 w-full text-white'
+                    size='lg'
+                    onClick={() => {
+                      alert('장바구니 기능은 개발 중입니다.');
+                    }}
+                  >
+                    장바구니 담기
+                  </Button>
+                  <Button
+                    variant='outline'
+                    className='border-primary text-primary hover:bg-primary w-full hover:text-white'
+                    size='lg'
+                    onClick={() => {
+                      alert('바로 구매 기능은 개발 중입니다.');
+                    }}
+                  >
+                    바로 구매하기
+                  </Button>
+                </div>
+
+                {/* 심의 완료 상태 메시지 */}
                 <div className='rounded-lg border border-green-200 bg-green-50 p-4'>
                   <p className='font-medium text-green-800'>✅ 심의가 완료되었습니다</p>
                   <p className='mt-1 text-sm text-green-600'>구매 가능한 상품입니다.</p>
                 </div>
-              ) : product.is_under_review ? (
-                <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
-                  <p className='font-medium text-yellow-800'>🔍 현재 심의 진행 중입니다</p>
-                  <p className='mt-1 text-sm text-yellow-600'>
-                    {product.it_9 === 'Y'
-                      ? `수동 심의 (${product.it_8}일 후 자동 진행)`
-                      : '자동 심의 (목표 달성시 즉시 진행)'}
-                  </p>
-                  <p className='mt-1 text-sm text-yellow-600'>심의 완료 후 구매 가능합니다.</p>
-                </div>
-              ) : (
-                <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
-                  <p className='font-medium text-blue-800'>📝 좋아요 모집 중입니다</p>
-                  <p className='mt-1 text-sm text-blue-600'>
-                    목표 인원 달성시 {product.it_9 === 'Y' ? '수동' : '자동'} 심의로 진행됩니다.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* 가격 정보 (심의 완료시에만 표시) */}
-            {product.is_review_completed && (
-              <div className='mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <h3 className='mb-3 text-lg font-semibold text-gray-900'>가격 정보</h3>
-                <div className='space-y-2'>
-                  {product.it_cust_price > 0 && (
-                    <div className='flex items-center justify-between'>
-                      <span className='text-sm text-gray-600'>시중가격</span>
-                      <span className='text-sm text-gray-500 line-through'>
-                        {product.it_cust_price.toLocaleString()}원
-                      </span>
-                    </div>
-                  )}
-                  <div className='flex items-center justify-between'>
-                    <span className='text-base font-medium text-gray-900'>판매가격</span>
-                    <span className='text-primary text-xl font-bold'>
-                      {product.it_price.toLocaleString()}원
-                    </span>
+              </div>
+            ) : (
+              /* 구매 불가능한 상품 - 작품 정보 및 진행 상황 표시 */
+              <div className='space-y-6'>
+                {/* 작품 설명 */}
+                <div>
+                  <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
+                  <div className='space-y-2 leading-relaxed text-gray-700'>
+                    {product.description && <p>{product.description}</p>}
+                    {product.creator_name && (
+                      <p className='text-sm text-gray-600'>
+                        디자이너: <span className='font-medium'>{product.creator_name}</span>
+                      </p>
+                    )}
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* 구매 버튼 (심의 완료시에만 표시) */}
-            {product.can_purchase && (
-              <div className='space-y-3'>
-                <Button
-                  className='bg-primary hover:bg-primary/90 w-full text-white'
-                  size='lg'
-                  onClick={() => {
-                    alert('장바구니 기능은 개발 중입니다.');
-                  }}
-                >
-                  장바구니 담기
-                </Button>
-                <Button
-                  variant='outline'
-                  className='border-primary text-primary hover:bg-primary w-full hover:text-white'
-                  size='lg'
-                  onClick={() => {
-                    alert('바로 구매 기능은 개발 중입니다.');
-                  }}
-                >
-                  바로 구매하기
-                </Button>
+                {/* 좋아요 진행 상황 */}
+                <div className='rounded-lg bg-gray-50 p-4'>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <span className='text-sm text-gray-600'>현재 좋아요</span>
+                    <span className='text-lg font-bold text-gray-600'>
+                      {product.current_likes}명
+                    </span>
+                  </div>
+                  <div className='mb-3 flex items-center justify-between'>
+                    <span className='text-sm text-gray-600'>목표 인원</span>
+                    <span className='text-primary text-lg font-bold'>{product.it_4}명</span>
+                  </div>
+                  <div className='h-2 w-full rounded-full bg-gray-200'>
+                    <div
+                      className='bg-primary h-2 rounded-full transition-all duration-300'
+                      style={{
+                        width: `${Math.min((product.current_likes / product.it_4) * 100, 100)}%`,
+                      }}
+                    ></div>
+                  </div>
+                  <p className='mt-2 text-xs text-gray-500'>
+                    {product.goal_attainment
+                      ? '목표 달성!'
+                      : `목표까지 ${product.it_4 - product.current_likes}명 남았습니다.`}
+                  </p>
+                </div>
+
+                {/* 상태 메시지 */}
+                <div>
+                  {product.is_under_review ? (
+                    <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
+                      <p className='font-medium text-yellow-800'>🔍 현재 심의 진행 중입니다</p>
+                      <p className='mt-1 text-sm text-yellow-600'>
+                        {product.it_9 === 'Y'
+                          ? `수동 심의 (${product.it_8}일 후 자동 진행)`
+                          : '자동 심의 (목표 달성시 즉시 진행)'}
+                      </p>
+                      <p className='mt-1 text-sm text-yellow-600'>심의 완료 후 구매 가능합니다.</p>
+                    </div>
+                  ) : (
+                    <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
+                      <p className='font-medium text-blue-800'>📝 좋아요 모집 중입니다</p>
+                      <p className='mt-1 text-sm text-blue-600'>
+                        목표 인원 달성시 {product.it_9 === 'Y' ? '수동' : '자동'} 심의로 진행됩니다.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
