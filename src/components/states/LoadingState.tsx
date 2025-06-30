@@ -1,4 +1,4 @@
-import LoadingSpinner from './LoadingSpinner';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
 
 interface LoadingStateProps {
   message?: string;

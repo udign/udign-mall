@@ -3,7 +3,7 @@ import { executeQuery } from '@/lib/database';
 import { Category, Product } from '@/types/product';
 import { RowDataPacket } from 'mysql2';
 
-export async function GET(request: NextRequest) {
+export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -154,4 +154,4 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+};

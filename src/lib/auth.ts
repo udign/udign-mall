@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import pbkdf2 from 'pbkdf2';
-import { executeQuery } from './database';
+import { executeQuery } from '@/lib/database';
 import { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/user';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';

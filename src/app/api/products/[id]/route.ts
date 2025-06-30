@@ -41,7 +41,10 @@ interface NavigationRow extends RowDataPacket {
   it_name: string;
 }
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   try {
     const { id: productId } = await params;
 
@@ -248,4 +251,4 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       { status: 500 },
     );
   }
-}
+};

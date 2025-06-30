@@ -1,8 +1,8 @@
-import { executeQuery } from './database';
+import { executeQuery } from '@/lib/database';
 import { ArtworkStatus, ProductsByStatus, StatusCounts } from '@/types/artwork';
-import { STATUS_GROUPS, STATUS_MAPPING } from './constants';
+import { STATUS_GROUPS, STATUS_MAPPING } from '@/lib/constants';
 
-export async function getArtworksByUser(
+export const getArtworksByUser = async (
   userId: string,
   isAdmin: boolean = false,
   page: number = 1,
@@ -12,7 +12,7 @@ export async function getArtworksByUser(
   products: ProductsByStatus;
   counts: StatusCounts;
   hasMore: boolean;
-}> {
+}> => {
   try {
     // 기본 쿼리 설정
     let sqlCommon = '';
@@ -111,6 +111,7 @@ export async function getArtworksByUser(
       ? [userId, userId, userId, userId, userId]
       : [userId, userId, userId, userId, userId];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const allResults = (await executeQuery(allQuery, params)) as any[];
 
     // 상태별 데이터 분류
@@ -129,6 +130,7 @@ export async function getArtworksByUser(
     for (const row of allResults) {
       // 좋아요 수 계산
       const countQuery = `SELECT COUNT(*) as cnt FROM g5_shop_interrest WHERE it_id = ?`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const countResult = (await executeQuery(countQuery, [row.it_id])) as any[];
       const iCount = countResult[0]?.cnt || 0;
       const goalAttainment = iCount >= row.it_4;
@@ -182,12 +184,13 @@ export async function getArtworksByUser(
     console.error('Error fetching artworks:', error);
     throw error;
   }
-}
+};
 
-function determineStatus(
+const determineStatus = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   row: any,
   goalAttainment: boolean,
-): { statusKey: string; statusText: string } {
+): { statusKey: string; statusText: string } => {
   let statusKey = 'collection';
   let statusText = '컬렉션';
 
@@ -294,15 +297,16 @@ function determineStatus(
   }
 
   return { statusKey, statusText };
-}
+};
 
-export async function toggleInterest(
+export const toggleInterest = async (
   userId: string,
   itemId: string,
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string }> => {
   try {
     // 현재 관심 상태 확인
     const checkQuery = `SELECT ir_id FROM g5_shop_interrest WHERE mb_id = ? AND it_id = ?`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const existing = (await executeQuery(checkQuery, [userId, itemId])) as any[];
 
     if (existing.length > 0) {
@@ -320,12 +324,12 @@ export async function toggleInterest(
     console.error('Error toggling interest:', error);
     return { success: false, message: '처리 중 오류가 발생했습니다.' };
   }
-}
+};
 
-export async function cancelOrder(
+export const cancelOrder = async (
   orderId: string,
   cancelMemo: string,
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string }> => {
   try {
     const updateQuery = `UPDATE g5_shop_order SET od_status = '취소', od_cancel_memo = ? WHERE od_id = ?`;
     await executeQuery(updateQuery, [cancelMemo, orderId]);
@@ -339,11 +343,11 @@ export async function cancelOrder(
     console.error('Error canceling order:', error);
     return { success: false, message: '주문 취소 중 오류가 발생했습니다.' };
   }
-}
+};
 
-export async function confirmPurchase(
+export const confirmPurchase = async (
   orderId: string,
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string }> => {
   try {
     const updateQuery = `UPDATE g5_shop_order SET od_status = '구매확정' WHERE od_id = ?`;
     await executeQuery(updateQuery, [orderId]);
@@ -357,16 +361,16 @@ export async function confirmPurchase(
     console.error('Error confirming purchase:', error);
     return { success: false, message: '구매 확정 중 오류가 발생했습니다.' };
   }
-}
+};
 
-export async function submitReturn(data: {
+export const submitReturn = async (data: {
   orderId: string;
   name: string;
   phone: string;
   returnType: 'exchange' | 'return';
   reason: string;
   userId: string;
-}): Promise<{ success: boolean; message: string }> {
+}): Promise<{ success: boolean; message: string }> => {
   try {
     const insertQuery = `
       INSERT INTO g5_shop_return (od_id, mb_id, return_type, return_status, customer_name, customer_phone, reason, created_at, updated_at)
@@ -387,4 +391,4 @@ export async function submitReturn(data: {
     console.error('Error submitting return:', error);
     return { success: false, message: '교환/반품 신청 중 오류가 발생했습니다.' };
   }
-}
+};

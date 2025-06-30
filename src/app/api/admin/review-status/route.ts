@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { verifyToken } from '@/lib/auth';
 
-export async function POST(request: NextRequest) {
+export const POST = async (request: NextRequest) => {
   try {
     // 쿠키에서 토큰 확인
     const token = request.cookies.get('auth-token')?.value;
@@ -76,4 +76,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+};

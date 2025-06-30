@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { toggleInterest } from '@/lib/artwork-service';
 import { verifyToken } from '@/lib/auth';
 
-export async function POST(request: NextRequest) {
+export const POST = async (request: NextRequest) => {
   try {
     const token = request.cookies.get('auth-token')?.value;
 
@@ -34,4 +34,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+};
