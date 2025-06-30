@@ -73,7 +73,9 @@ export default function CategoryProductList({
           {categoryName || fallbackCategoryName}
         </h1>
         <p className='text-gray-600'>
-          {loading ? '작품을 불러오는 중...' : `총 ${products.length}개의 작품이 있습니다.`}
+          {loading
+            ? '작품을 불러오는 중...'
+            : `현재 페이지에 ${products.length}개의 작품이 있습니다.`}
         </p>
       </div>
 

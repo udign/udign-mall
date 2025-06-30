@@ -32,6 +32,12 @@ interface ProductDetail {
   is_under_review: boolean;
   is_review_completed: boolean;
   it_4: number; // 목표 인원
+  it_8: number; // 심의 기간
+  it_9: 'Y' | 'N'; // 수동 심의 여부
+  it_10: 'Y' | 'N'; // 심의 완료 여부
+  has_access: boolean; // 접근 권한 (좋아요한 회원인지)
+  can_purchase: boolean; // 구매 가능 여부
+  status_message: string; // 상태 메시지
 }
 
 interface ProductDetailResponse {
@@ -243,6 +249,20 @@ export default function ProductDetailPage() {
     <ErrorState message={error} showGoHome={true} />
   ) : !product ? (
     <NotFoundState title='상품을 찾을 수 없습니다' />
+  ) : !product.has_access ? (
+    <div className='flex min-h-screen items-center justify-center'>
+      <div className='text-center'>
+        <h1 className='mb-4 text-2xl font-bold text-gray-900'>접근 권한이 없습니다</h1>
+        <p className='mb-6 text-gray-600'>
+          {product.is_review_completed
+            ? '심의가 완료된 상품은 좋아요한 회원만 접근할 수 있습니다.'
+            : '이 작품에 접근하려면 먼저 좋아요를 눌러주세요.'}
+        </p>
+        <Button onClick={() => router.push('/')} variant='default'>
+          홈으로 돌아가기
+        </Button>
+      </div>
+    </div>
   ) : (
     <div className='bg-white'>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
@@ -351,17 +371,78 @@ export default function ProductDetailPage() {
               </p>
             </div>
 
-            {product.is_under_review && (
-              <div className='mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
-                <p className='font-medium text-yellow-800'>🔍 현재 심의 진행 중입니다</p>
-                <p className='mt-1 text-sm text-yellow-600'>심의 완료 후 구매 가능합니다.</p>
+            {/* 상태 메시지 */}
+            <div className='mb-6'>
+              {product.is_review_completed ? (
+                <div className='rounded-lg border border-green-200 bg-green-50 p-4'>
+                  <p className='font-medium text-green-800'>✅ 심의가 완료되었습니다</p>
+                  <p className='mt-1 text-sm text-green-600'>구매 가능한 상품입니다.</p>
+                </div>
+              ) : product.is_under_review ? (
+                <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
+                  <p className='font-medium text-yellow-800'>🔍 현재 심의 진행 중입니다</p>
+                  <p className='mt-1 text-sm text-yellow-600'>
+                    {product.it_9 === 'Y'
+                      ? `수동 심의 (${product.it_8}일 후 자동 진행)`
+                      : '자동 심의 (목표 달성시 즉시 진행)'}
+                  </p>
+                  <p className='mt-1 text-sm text-yellow-600'>심의 완료 후 구매 가능합니다.</p>
+                </div>
+              ) : (
+                <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
+                  <p className='font-medium text-blue-800'>📝 좋아요 모집 중입니다</p>
+                  <p className='mt-1 text-sm text-blue-600'>
+                    목표 인원 달성시 {product.it_9 === 'Y' ? '수동' : '자동'} 심의로 진행됩니다.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 가격 정보 (심의 완료시에만 표시) */}
+            {product.is_review_completed && (
+              <div className='mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                <h3 className='mb-3 text-lg font-semibold text-gray-900'>가격 정보</h3>
+                <div className='space-y-2'>
+                  {product.it_cust_price > 0 && (
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm text-gray-600'>시중가격</span>
+                      <span className='text-sm text-gray-500 line-through'>
+                        {product.it_cust_price.toLocaleString()}원
+                      </span>
+                    </div>
+                  )}
+                  <div className='flex items-center justify-between'>
+                    <span className='text-base font-medium text-gray-900'>판매가격</span>
+                    <span className='text-primary text-xl font-bold'>
+                      {product.it_price.toLocaleString()}원
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
 
-            {product.is_review_completed && (
-              <div className='mb-6 rounded-lg border border-green-200 bg-green-50 p-4'>
-                <p className='font-medium text-green-800'>✅ 심의가 완료되었습니다</p>
-                <p className='mt-1 text-sm text-green-600'>구매 가능한 상품입니다.</p>
+            {/* 구매 버튼 (심의 완료시에만 표시) */}
+            {product.can_purchase && (
+              <div className='space-y-3'>
+                <Button
+                  className='bg-primary hover:bg-primary/90 w-full text-white'
+                  size='lg'
+                  onClick={() => {
+                    alert('장바구니 기능은 개발 중입니다.');
+                  }}
+                >
+                  장바구니 담기
+                </Button>
+                <Button
+                  variant='outline'
+                  className='border-primary text-primary hover:bg-primary w-full hover:text-white'
+                  size='lg'
+                  onClick={() => {
+                    alert('바로 구매 기능은 개발 중입니다.');
+                  }}
+                >
+                  바로 구매하기
+                </Button>
               </div>
             )}
           </div>
