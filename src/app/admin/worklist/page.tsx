@@ -9,10 +9,12 @@ import CommonPagination from '@/components/CommonPagination';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Button } from '@/components/ui/primitives/button';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
+import { ROUTES } from '@/lib/routes';
 
 const tableHeaders = ['이미지', '작품명', '작품 ID', '판매자 ID', '판매가격', '좋아요', '관리'];
 
-export default function ReviewManagement() {
+export default function WorkListManagement() {
   const [items, setItems] = useState<ReviewItem[]>([]);
   const [stats, setStats] = useState<ReviewStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -185,9 +187,8 @@ export default function ReviewManagement() {
             </div>
 
             {loading ? (
-              <div className='flex h-32 items-center justify-center'>
-                <div className='h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600'></div>
-                <span className='ml-2 text-gray-600'>로딩 중...</span>
+              <div className='h-32'>
+                <LoadingSpinner size='md' message='로딩 중...' />
               </div>
             ) : items.length === 0 ? (
               <div className='py-8 text-center text-gray-500'>등록된 작품이 없습니다.</div>
@@ -367,7 +368,7 @@ export default function ReviewManagement() {
                   <CommonPagination
                     currentPageNumber={currentPage}
                     totalPageCount={totalPages}
-                    pathname='/admin/review'
+                    pathname={ROUTES.ADMIN_WORKLIST}
                     onPageChange={handlePageChange}
                   />
                 </div>

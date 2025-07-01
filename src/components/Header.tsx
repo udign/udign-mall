@@ -109,6 +109,14 @@ export default function Header() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end' className='w-36 p-0'>
+                      {user.mb_level >= 10 && (
+                        <DropdownMenuItem
+                          onClick={() => router.push(ROUTES.ADMIN)}
+                          className='cursor-pointer'
+                        >
+                          관리자
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
                         로그아웃
                       </DropdownMenuItem>
