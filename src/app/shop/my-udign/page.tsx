@@ -209,7 +209,6 @@ export default function MyUdignPage() {
     }
   }, [currentTab, tabStates]);
 
-  // 커스텀 훅으로 IntersectionObserver 처리
   const observerRef = useIntersectionObserver(loadMoreData);
 
   const handleInterestToggle = async (itemId: string) => {
@@ -225,30 +224,87 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
+        // 먼저 현재 좋아요 상태 확인
+        let wasLiked = false;
+        let isNowLiked = false;
+
+        // 현재 탭 데이터에서 작품 찾기
+        const currentArtwork = currentTabData.find((artwork) => artwork.it_id === itemId);
+
+        if (currentArtwork) {
+          wasLiked = !!currentArtwork.ir_id;
+          isNowLiked = !wasLiked;
+        }
+
         // 모든 탭의 데이터 업데이트
         setTabStates((prev) => {
           const updated = { ...prev };
 
-          Object.keys(updated).forEach((tab) => {
-            if (updated[tab].data.length > 0) {
-              updated[tab].data = updated[tab].data.map((artwork) => {
-                if (artwork.it_id === itemId) {
-                  const wasLiked = !!artwork.ir_id;
-                  const isNowLiked = !wasLiked;
-
-                  return {
-                    ...artwork,
-                    ir_id: isNowLiked ? 'temp' : undefined,
-                    ir_time: isNowLiked ? new Date().toISOString() : undefined,
-                    _iCount: isNowLiked ? artwork._iCount + 1 : Math.max(0, artwork._iCount - 1),
-                  };
+          if (wasLiked && !isNowLiked) {
+            // 좋아요 해제된 경우: 좋아요 관련 탭들에서 작품 제거
+            Object.keys(updated).forEach((tab) => {
+              if (updated[tab].data.length > 0) {
+                if (tab === 'all' || tab === 'collection') {
+                  // 전체 탭과 컬렉션(❤️ 디자인) 탭에서는 작품 완전 제거
+                  updated[tab].data = updated[tab].data.filter(
+                    (artwork) => artwork.it_id !== itemId,
+                  );
+                } else {
+                  // 다른 탭에서는 좋아요 상태만 업데이트
+                  updated[tab].data = updated[tab].data.map((artwork) => {
+                    if (artwork.it_id === itemId) {
+                      return {
+                        ...artwork,
+                        ir_id: undefined,
+                        ir_time: undefined,
+                        _iCount: Math.max(0, artwork._iCount - 1),
+                      };
+                    }
+                    return artwork;
+                  });
                 }
-                return artwork;
-              });
-            }
-          });
+              }
+            });
+          } else if (!wasLiked && isNowLiked) {
+            // 좋아요 추가된 경우: 모든 탭에서 상태 업데이트
+            Object.keys(updated).forEach((tab) => {
+              if (updated[tab].data.length > 0) {
+                updated[tab].data = updated[tab].data.map((artwork) => {
+                  if (artwork.it_id === itemId) {
+                    return {
+                      ...artwork,
+                      ir_id: 'temp',
+                      ir_time: new Date().toISOString(),
+                      _iCount: artwork._iCount + 1,
+                    };
+                  }
+                  return artwork;
+                });
+              }
+            });
+          }
 
           return updated;
+        });
+
+        // 🔑 핵심: counts도 즉시 업데이트 (좋아요 관련 탭들)
+        setCounts((prev) => {
+          if (wasLiked && !isNowLiked) {
+            // 좋아요 해제시: 전체와 컬렉션 카운트 감소
+            return {
+              ...prev,
+              all: Math.max(0, prev.all - 1),
+              collection: Math.max(0, prev.collection - 1),
+            };
+          } else if (!wasLiked && isNowLiked) {
+            // 좋아요 추가시: 전체와 컬렉션 카운트 증가
+            return {
+              ...prev,
+              all: prev.all + 1,
+              collection: prev.collection + 1,
+            };
+          }
+          return prev;
         });
       } else {
         setMessageContent(result.message || '처리 중 오류가 발생했습니다.');
@@ -576,7 +632,6 @@ export default function MyUdignPage() {
                       currentTab === key ? 'text-gray-900' : 'text-gray-500'
                     }`}
                   >
-                    {key === 'interest' && '❤️ '}
                     {label}
                     {counts[key] > 0 && <span className='text-gray-400'>{counts[key]}</span>}
                     {currentTab === key && (
