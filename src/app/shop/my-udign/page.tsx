@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArtworkStatus, ProductsByStatus, StatusCounts } from '@/types/artwork';
 import { STATUS_GROUPS } from '@/lib/constants';
-import { PAGINATION_CONFIG } from '@/config/pagination';
+import { PAGINATION_CONFIG } from '@/lib/constants';
 import ArtworkCard from '@/components/ArtworkCard';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import MessageDialog from '@/components/ui/MessageDialog';
@@ -496,7 +496,7 @@ export default function MyUdignPage() {
   ) : (
     user && (
       <div className='min-h-screen'>
-        <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
+        <div className='px-4 py-8 sm:px-6 lg:px-8'>
           <div className='mb-6 rounded-lg bg-gray-50 p-4 sm:p-6'>
             <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
               <div>

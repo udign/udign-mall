@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-import LayoutContent from '@/components/LayoutContent';
-import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import { AuthProvider } from '@/contexts/AuthContext';
 
@@ -23,8 +21,7 @@ export default function RootLayout({
     <html lang='ko'>
       <body className={`${inter.className} container mx-auto`}>
         <AuthProvider>
-          <LayoutContent>{children}</LayoutContent>
-          <Footer />
+          {children}
           <ScrollToTop />
         </AuthProvider>
       </body>

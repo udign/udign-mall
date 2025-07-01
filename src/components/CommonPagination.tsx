@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/primitives/pagination';
 import { Button } from '@/components/ui/primitives/button';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { PAGINATION_CONFIG } from '@/config/pagination';
+import { PAGINATION_CONFIG } from '@/lib/constants';
 
 interface CommonPaginationProps {
   currentPageNumber: number;

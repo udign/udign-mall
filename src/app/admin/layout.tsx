@@ -26,9 +26,10 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
-function AdminLayout({ children }: AdminLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['상품관리']);
+
   const pathname = usePathname();
 
   const menuItems: MenuItem[] = [
@@ -188,5 +189,3 @@ function AdminLayout({ children }: AdminLayoutProps) {
     </div>
   );
 }
-
-export default AdminLayout;

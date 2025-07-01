@@ -7,6 +7,8 @@ import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { useAuth } from '@/contexts/AuthContext';
 import ErrorState from '@/components/states/ErrorState';
 import EmptyState from '@/components/states/EmptyState';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
+import { ROUTES } from '@/lib/routes';
 
 interface CategoryProductListProps {
   products: Product[];
@@ -19,21 +21,6 @@ interface CategoryProductListProps {
   pathname: string;
   fallbackCategoryName: string;
   onRetry: () => void;
-}
-
-function ProductListSkeleton() {
-  return (
-    <div className='mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-      {Array.from({ length: 8 }).map((_, index) => (
-        <div key={index} className='overflow-hidden rounded-lg border border-gray-200 bg-white'>
-          <div className='aspect-square animate-pulse bg-gray-200' />
-          <div className='p-4'>
-            <div className='h-5 w-3/4 animate-pulse rounded bg-gray-200' />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export default function CategoryProductList({
@@ -60,7 +47,7 @@ export default function CategoryProductList({
     if (!user) {
       setShowLoginDialog(true);
     } else {
-      router.push(`/product/${productId}`);
+      router.push(`${ROUTES.PRODUCT}/${productId}`);
     }
   };
 
@@ -83,15 +70,9 @@ export default function CategoryProductList({
       </div>
 
       {loading ? (
-        <>
-          <ProductListSkeleton />
-          <CommonPagination
-            currentPageNumber={currentPage}
-            totalPageCount={totalPages}
-            pathname={pathname}
-            queryParams={{}}
-          />
-        </>
+        <div className='flex min-h-96 items-center justify-center'>
+          <LoadingSpinner size='lg' message='작품을 불러오는 중입니다...' />
+        </div>
       ) : error ? (
         <ErrorState message={error} onRetry={onRetry} showRetry={true} />
       ) : products.length === 0 ? (

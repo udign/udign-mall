@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/primitives/button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
+import { ROUTES } from '@/lib/routes';
 
 interface ArtworkCardProps {
   artwork: ArtworkStatus;
@@ -131,8 +132,8 @@ export default function ArtworkCard({
   return (
     <>
       <div
-        className={`rounded-lg border border-gray-200 bg-white p-4 ${isClickable && 'cursor-pointer transition-transform duration-400 ease-out hover:scale-101'} `}
-        onClick={isClickable ? () => router.push(`/product/${artwork.it_id}`) : undefined}
+        className={`rounded-lg border border-gray-200 bg-white p-4 ${isClickable && 'cursor-pointer transition-transform duration-400 ease-out hover:scale-101'}`}
+        onClick={isClickable ? () => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`) : undefined}
       >
         <div className='relative'>
           <div className='flex flex-col space-y-4 lg:flex-row lg:items-start lg:space-y-0 lg:space-x-6 lg:pr-32'>

@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { CheckCircle, AlertCircle, Check, X } from 'lucide-react';
-import AdminLayout from '@/components/admin/AdminLayout';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 import { ReviewItem, ReviewStats } from '@/types/review';
 import { STATUS_GROUPS } from '@/lib/constants';
 import CommonPagination from '@/components/CommonPagination';
-import { PAGINATION_CONFIG } from '@/config/pagination';
+import { PAGINATION_CONFIG } from '@/lib/constants';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Button } from '@/components/ui/primitives/button';
 
@@ -130,7 +129,7 @@ export default function ReviewManagement() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className='space-y-6'>
         {/* 헤더 */}
         <div className='flex items-center justify-between'>
@@ -392,6 +391,6 @@ export default function ReviewManagement() {
         onConfirm={() => handleItemAction(confirmDialog.itemId, confirmDialog.action)}
         onCancel={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
       />
-    </AdminLayout>
+    </>
   );
 }
