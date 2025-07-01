@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/primitives';
+import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
 
 interface NotFoundStateProps {

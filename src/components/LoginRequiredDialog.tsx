@@ -6,8 +6,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui';
-import { Button } from '@/components/ui';
+} from '@/components/ui/primitives/dialog';
+import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
 
 interface LoginRequiredDialogProps {

@@ -17,7 +17,10 @@ interface CountRow extends RowDataPacket {
   cnt: number;
 }
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   try {
     const { id: productId } = await params;
 
@@ -108,4 +111,4 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       { status: 500 },
     );
   }
-}
+};

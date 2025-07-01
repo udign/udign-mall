@@ -7,11 +7,19 @@ import { CATEGORY_IDS } from '@/config/pagination';
 import { ROUTES } from '@/lib/routes';
 
 function ShoesContent() {
-  const { products, loading, error, totalPages, categoryName, currentPage, categoryId, refetch } =
-    useCategoryProducts({
-      defaultCategoryId: CATEGORY_IDS.SHOES,
-      pathname: ROUTES.SHOES,
-    });
+  const {
+    products,
+    loading,
+    error,
+    totalPages,
+    categoryName,
+    categoryCount,
+    currentPage,
+    refetch,
+  } = useCategoryProducts({
+    categoryId: CATEGORY_IDS.SHOES,
+    pathname: ROUTES.SHOES,
+  });
 
   return (
     <CategoryProductList
@@ -20,8 +28,8 @@ function ShoesContent() {
       error={error}
       totalPages={totalPages}
       categoryName={categoryName}
+      categoryCount={categoryCount}
       currentPage={currentPage}
-      categoryId={categoryId}
       pathname={ROUTES.SHOES}
       fallbackCategoryName='shoes'
       onRetry={refetch}

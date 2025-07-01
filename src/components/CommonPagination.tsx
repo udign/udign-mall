@@ -1,7 +1,12 @@
 import { useRouter } from 'next/navigation';
 import { usePagination } from '@/hooks/usePagination';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/ui';
-import { Button } from '@/components/ui';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+} from '@/components/ui/primitives/pagination';
+import { Button } from '@/components/ui/primitives/button';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { PAGINATION_CONFIG } from '@/config/pagination';
 

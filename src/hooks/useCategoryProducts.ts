@@ -4,7 +4,7 @@ import { Product, ProductListResponse } from '@/types/product';
 import { PAGINATION_CONFIG } from '@/config/pagination';
 
 interface UseCategoryProductsProps {
-  defaultCategoryId: string;
+  categoryId: string; // 필터링 및 표시할 카테고리 ID (빈 문자열이면 모든 카테고리)
   pathname: string;
 }
 
@@ -14,13 +14,13 @@ interface UseCategoryProductsReturn {
   error: string | null;
   totalPages: number;
   categoryName: string;
+  categoryCount: number;
   currentPage: number;
-  categoryId: string;
   refetch: () => void;
 }
 
 export const useCategoryProducts = ({
-  defaultCategoryId,
+  categoryId,
   pathname,
 }: UseCategoryProductsProps): UseCategoryProductsReturn => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -28,28 +28,24 @@ export const useCategoryProducts = ({
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [categoryName, setCategoryName] = useState<string>('');
+  const [categoryCount, setCategoryCount] = useState<number>(0);
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const categoryId = searchParams.get('ca_id') || defaultCategoryId;
   const currentPage = parseInt(searchParams.get('page') || '1');
 
   const fetchProducts = useCallback(
-    async (pageNum: number = currentPage, catId: string = categoryId) => {
+    async (pageNum: number = currentPage) => {
       try {
         setLoading(true);
         setError(null);
 
-        // 실 데이터
+        // 카테고리별 작품 필터링
+        const categoryParam = categoryId ? `&category=${categoryId}` : '';
         const response = await fetch(
-          `/api/products?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
+          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryParam}`,
         );
-
-        // 더미 데이터
-        // const response = await fetch(
-        //   `/api/products/dummy?ca_id=${catId}&page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
-        // );
 
         if (!response.ok) {
           throw new Error('상품을 불러오는데 실패했습니다.');
@@ -60,7 +56,15 @@ export const useCategoryProducts = ({
         if (data.success) {
           setProducts(data.items);
           setTotalPages(data.pagination.totalPages);
-          setCategoryName(data.category.ca_name);
+
+          // 카테고리 ID가 있으면 해당 카테고리 정보 사용
+          if (categoryId && data.categoryCounts[categoryId]) {
+            setCategoryName(data.categoryCounts[categoryId].name);
+            setCategoryCount(data.categoryCounts[categoryId].count);
+          } else {
+            setCategoryName('모든 작품');
+            setCategoryCount(data.pagination.totalCount);
+          }
         } else {
           throw new Error('상품 데이터를 처리하는데 실패했습니다.');
         }
@@ -73,22 +77,18 @@ export const useCategoryProducts = ({
     [currentPage, categoryId],
   );
 
-  const refetch = useCallback(
-    () => fetchProducts(currentPage, categoryId),
-    [fetchProducts, currentPage, categoryId],
-  );
+  const refetch = useCallback(() => fetchProducts(currentPage), [fetchProducts, currentPage]);
 
   useEffect(() => {
     // 초기 로드 시 URL 파라미터가 없으면 기본값으로 설정
-    if (!searchParams.get('ca_id') && !searchParams.get('page')) {
+    if (!searchParams.get('page')) {
       const params = new URLSearchParams();
-      params.set('ca_id', defaultCategoryId);
       params.set('page', '1');
       router.replace(`${pathname}?${params.toString()}`);
     } else {
-      fetchProducts(currentPage, categoryId);
+      fetchProducts(currentPage);
     }
-  }, [currentPage, categoryId, searchParams, router, defaultCategoryId, pathname, fetchProducts]);
+  }, [currentPage, searchParams, router, categoryId, pathname, fetchProducts]);
 
   return {
     products,
@@ -96,8 +96,8 @@ export const useCategoryProducts = ({
     error,
     totalPages,
     categoryName,
+    categoryCount,
     currentPage,
-    categoryId,
     refetch,
   };
 };

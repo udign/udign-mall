@@ -7,11 +7,19 @@ import { CATEGORY_IDS } from '@/config/pagination';
 import { ROUTES } from '@/lib/routes';
 
 function FashionContent() {
-  const { products, loading, error, totalPages, categoryName, currentPage, categoryId, refetch } =
-    useCategoryProducts({
-      defaultCategoryId: CATEGORY_IDS.FASHION,
-      pathname: ROUTES.FASHION,
-    });
+  const {
+    products,
+    loading,
+    error,
+    totalPages,
+    categoryName,
+    categoryCount,
+    currentPage,
+    refetch,
+  } = useCategoryProducts({
+    categoryId: CATEGORY_IDS.FASHION,
+    pathname: ROUTES.FASHION,
+  });
 
   return (
     <CategoryProductList
@@ -20,8 +28,8 @@ function FashionContent() {
       error={error}
       totalPages={totalPages}
       categoryName={categoryName}
+      categoryCount={categoryCount}
       currentPage={currentPage}
-      categoryId={categoryId}
       pathname={ROUTES.FASHION}
       fallbackCategoryName='fashion'
       onRetry={refetch}

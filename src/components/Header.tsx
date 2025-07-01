@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -15,9 +14,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui';
+} from '@/components/ui/primitives/dropdown-menu';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
-import { LoadingSpinner } from '@/components/ui';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
+import { Button } from '@/components/ui/primitives/button';
 
 interface NavMenuItem {
   href: string;
@@ -63,7 +63,11 @@ export default function Header() {
         <div className='space-y-5 px-6 py-5 sm:px-10'>
           <div className='flex items-center gap-3'>
             <div className='non-login'>
-              <Link href={ROUTES.HOME} className='flex items-center'>
+              <Button
+                onClick={() => router.push(ROUTES.HOME)}
+                variant='ghost'
+                className='flex h-auto items-center p-0 hover:bg-transparent'
+              >
                 <Image
                   src='/images/udign-header.png'
                   alt='UDIGN'
@@ -71,27 +75,34 @@ export default function Header() {
                   height={40}
                   className='h-auto'
                 />
-              </Link>
+              </Button>
             </div>
-            <div className='text-gray-dark ml-auto flex items-center gap-4'>
-              <Link href={ROUTES.HOME} className='hover:text-primary-hover transition-colors'>
+            <div className='text-gray-dark ml-auto flex items-center gap-1'>
+              <Button
+                onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
+                variant='ghost'
+                className='hover:text-primary-hover'
+              >
                 <FaRegUserCircle className='text-xl' />
-              </Link>
-              <button className='hover:text-primary-hover cursor-pointer transition-colors'>
+              </Button>
+              <Button variant='ghost' className='hover:text-primary-hover'>
                 <FiBox className='text-xl' />
-              </button>
-              <button className='hover:text-primary-hover cursor-pointer transition-colors'>
+              </Button>
+              <Button variant='ghost' className='hover:text-primary-hover'>
                 <HiOutlineSearch className='text-xl' />
-              </button>
+              </Button>
 
               {isLoading ? (
                 <LoadingSpinner size='sm' />
               ) : user ? (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <button className='hover:text-primary-hover flex cursor-pointer items-center gap-1 text-base text-gray-600 transition-colors'>
+                    <Button
+                      variant='ghost'
+                      className='hover:text-primary-hover text-base text-gray-600'
+                    >
                       <span>{user.mb_nick} 님</span>
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end' className='w-36 p-0'>
                     <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
@@ -100,46 +111,53 @@ export default function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link href={ROUTES.LOGIN} className='hover:text-primary-hover transition-colors'>
-                  로그인
-                </Link>
+                <Button
+                  onClick={() => router.push(ROUTES.LOGIN)}
+                  variant='ghost'
+                  className='hover:text-primary-hover text-base text-gray-600'
+                >
+                  <span>로그인</span>
+                </Button>
               )}
 
-              <button className='hover:text-primary-hover cursor-pointer transition-colors'>
+              <Button variant='ghost' className='hover:text-primary-hover'>
                 <HiOutlineMenu className='text-xl' />
-              </button>
+              </Button>
             </div>
           </div>
           <nav className='hidden sm:flex sm:items-center sm:justify-between'>
-            <ul className='flex gap-5'>
+            <ul className='flex items-center gap-1'>
               {NAV_MENU_ITEMS.map((item) => (
-                <li key={item.href}>
+                <li key={item.href} className='flex items-center'>
                   {item.requiresAuth ? (
-                    <button
+                    <Button
                       onClick={(e) => handleAuthRequiredClick(e, item.href)}
-                      className='text-gray-medium hover:text-primary-hover flex cursor-pointer items-center gap-1 text-lg font-semibold transition-colors'
+                      variant='ghost'
+                      className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
                     >
                       {item.label}
                       <IoIosArrowDown className='text-sm' />
-                    </button>
+                    </Button>
                   ) : (
-                    <Link
-                      href={item.href}
-                      className='text-gray-medium hover:text-primary-hover flex items-center gap-1 text-lg font-semibold transition-colors'
+                    <Button
+                      onClick={() => router.push(item.href)}
+                      variant='ghost'
+                      className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
                     >
                       {item.label}
                       <IoIosArrowDown className='text-sm' />
-                    </Link>
+                    </Button>
                   )}
                 </li>
               ))}
             </ul>
-            <button
+            <Button
               onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
-              className='text-gray-medium hover:text-primary-hover cursor-pointer text-lg font-semibold transition-colors'
+              variant='ghost'
+              className='text-gray-medium hover:text-primary-hover h-10 text-lg font-semibold'
             >
               My UDIGN
-            </button>
+            </Button>
           </nav>
         </div>
       </header>

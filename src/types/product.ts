@@ -65,6 +65,7 @@ export interface ProductListResponse {
     hasNext: boolean;
     hasPrev: boolean;
   };
+  categoryCounts: Record<string, { name: string; count: number }>;
 }
 
 export interface ProductDetailResponse {

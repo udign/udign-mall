@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import pbkdf2 from 'pbkdf2';
-import { executeQuery } from './database';
+import { executeQuery } from '@/lib/database';
 import { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/user';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -102,6 +102,7 @@ export const generateToken = (user: User): string => {
     {
       mb_no: user.mb_no,
       mb_id: user.mb_id,
+      mb_name: user.mb_name,
       mb_level: user.mb_level,
     },
     JWT_SECRET,

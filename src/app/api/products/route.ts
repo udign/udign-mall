@@ -1,73 +1,132 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { Category, Product } from '@/types/product';
+import { RowDataPacket } from 'mysql2';
 
-export async function GET(request: NextRequest) {
+export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
-    const categoryId = searchParams.get('ca_id') || '10'; // 기본값: 패션 카테고리
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
+    const categoryFilter = searchParams.get('category'); // 카테고리 필터 파라미터 추가
     const offset = (page - 1) * limit;
 
     // 카테고리 정보 가져오기
-    const categoryQuery = `
-      SELECT * FROM g5_shop_category 
-      WHERE ca_id = ? AND ca_use = '1'
-    `;
-    const categoryResult = (await executeQuery(categoryQuery, [categoryId])) as Category[];
-
-    if (categoryResult.length === 0) {
-      return NextResponse.json({ error: '등록된 분류가 없습니다.' }, { status: 404 });
+    let category: Category;
+    if (categoryFilter) {
+      const categoryQuery = `
+        SELECT * FROM g5_shop_category 
+        WHERE ca_use = '1' AND ca_id = ?
+        LIMIT 1
+      `;
+      const categoryResult = (await executeQuery(categoryQuery, [categoryFilter])) as Category[];
+      category = categoryResult[0] || { ca_id: categoryFilter, ca_name: '알 수 없는 카테고리' };
+    } else {
+      // 모든 카테고리 정보 가져오기 (임시로 첫 번째 카테고리 정보만 사용)
+      const categoryQuery = `
+        SELECT * FROM g5_shop_category 
+        WHERE ca_use = '1'
+        ORDER BY ca_id ASC
+        LIMIT 1
+      `;
+      const categoryResult = (await executeQuery(categoryQuery, [])) as Category[];
+      category = categoryResult[0] || { ca_id: 'all', ca_name: '모든 작품' };
     }
 
-    const category = categoryResult[0];
-
-    // 상품 목록 가져오기 (카테고리별)
+    // 카테고리별 상품 가져오기
+    const categoryCondition = categoryFilter ? `AND i.ca_id = ?` : '';
     const itemsQuery = `
       SELECT 
-        it_id,
-        it_name,
-        it_basic,
-        it_cust_price,
-        it_price,
-        it_img1,
-        it_img2,
-        it_img3,
-        it_use_avg,
-        it_use_cnt,
-        it_hit,
-        it_time,
-        it_update_time,
-        ca_id,
-        it_1 as creator_id,
-        it_2 as creator_name,
-        it_3 as description,
-        it_4 as likes_count
-      FROM g5_shop_item 
-      WHERE ca_id LIKE ? AND it_use = '1' AND it_soldout = '0'
-      ORDER BY it_order, it_id DESC
-      LIMIT ${limit} OFFSET ${offset}
+        i.it_id,
+        i.it_name,
+        i.it_basic,
+        i.it_cust_price,
+        i.it_price,
+        i.it_img1,
+        i.it_img2,
+        i.it_img3,
+        i.it_use_avg,
+        i.it_use_cnt,
+        i.it_hit,
+        i.it_time,
+        i.it_update_time,
+        i.ca_id,
+        i.it_1 as creator_id,
+        i.it_2 as creator_name,
+        i.it_3 as description,
+        i.it_4 as target_likes,
+        COALESCE(like_count.cnt, 0) as current_likes
+      FROM g5_shop_item i
+      LEFT JOIN (
+        SELECT it_id, COUNT(*) as cnt 
+        FROM g5_shop_interrest 
+        GROUP BY it_id
+      ) like_count ON i.it_id = like_count.it_id
+      WHERE i.it_use = '1' ${categoryCondition}
+      ORDER BY i.it_id DESC
     `;
 
-    // 카테고리 ID에 따른 LIKE 조건 설정
-    const likePattern = categoryId + '%';
-    const items = (await executeQuery(itemsQuery, [likePattern])) as Product[];
+    const queryParams = categoryFilter ? [categoryFilter] : [];
+    const allItems = (await executeQuery(itemsQuery, queryParams)) as (Product &
+      RowDataPacket & {
+        target_likes: number;
+        current_likes: number;
+      })[];
 
-    // 전체 상품 수 가져오기
-    const countQuery = `
-      SELECT COUNT(*) as total 
-      FROM g5_shop_item 
-      WHERE ca_id LIKE ? AND it_use = '1' AND it_soldout = '0'
+    const totalCount = allItems.length;
+
+    // 카테고리별 작품 개수 계산
+    const categoryCountsQuery = `
+      SELECT 
+        c.ca_id,
+        c.ca_name,
+        COUNT(i.it_id) as item_count
+      FROM g5_shop_category c
+      LEFT JOIN g5_shop_item i ON i.ca_id LIKE CONCAT(c.ca_id, '%') AND i.it_use = '1'
+      WHERE c.ca_use = '1' AND LENGTH(c.ca_id) = 2
+      GROUP BY c.ca_id, c.ca_name
+      ORDER BY c.ca_id
     `;
-    const countResult = (await executeQuery(countQuery, [likePattern])) as { total: number }[];
-    const totalCount = countResult[0].total;
 
-    const processedItems = items.map((item) => ({
-      ...item,
-      it_img1: item.it_img1 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img1}` : null,
-      it_img2: item.it_img2 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img2}` : null,
-      it_img3: item.it_img3 ? `${process.env.VERCEL_BLOB_BASE_URL}/item/${item.it_img3}` : null,
+    const categoryCounts = (await executeQuery(categoryCountsQuery, [])) as {
+      ca_id: string;
+      ca_name: string;
+      item_count: number;
+    }[];
+
+    // 정렬 적용 (it_id DESC - 최신순)
+    const sortedItems = allItems.sort((a, b) => {
+      return b.it_id.localeCompare(a.it_id);
+    });
+
+    // 페이지네이션 적용
+    const paginatedItems = sortedItems.slice(offset, offset + limit);
+
+    const processedItems = paginatedItems.map((item) => ({
+      it_id: item.it_id,
+      it_name: item.it_name,
+      it_basic: item.it_basic,
+      it_cust_price: item.it_cust_price,
+      it_price: item.it_price,
+      it_img1: item.it_img1
+        ? `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${item.it_img1}`
+        : null,
+      it_img2: item.it_img2
+        ? `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${item.it_img2}`
+        : null,
+      it_img3: item.it_img3
+        ? `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${item.it_img3}`
+        : null,
+      it_use_avg: item.it_use_avg,
+      it_use_cnt: item.it_use_cnt,
+      it_hit: item.it_hit,
+      it_time: item.it_time,
+      it_update_time: item.it_update_time,
+      ca_id: item.ca_id,
+      creator_id: item.creator_id,
+      creator_name: item.creator_name,
+      description: item.description,
+      likes_count: item.current_likes, // current_likes를 likes_count로 매핑
     }));
 
     return NextResponse.json({
@@ -82,11 +141,25 @@ export async function GET(request: NextRequest) {
         hasNext: page * limit < totalCount,
         hasPrev: page > 1,
       },
-      // 실제 데이터 정보
+      // 카테고리별 작품 개수 정보 추가
+      categoryCounts: categoryCounts.reduce(
+        (acc, cat) => {
+          acc[cat.ca_id] = {
+            name: cat.ca_name,
+            count: cat.item_count,
+          };
+          return acc;
+        },
+        {} as Record<string, { name: string; count: number }>,
+      ),
+      // 모든 데이터 정보
       _meta: {
-        mode: 'real',
+        mode: categoryFilter ? 'category' : 'all',
+        categoryFilter: categoryFilter || null,
         queriedAt: new Date().toISOString(),
-        categoryId,
+        filteredByAccess: false,
+        originalCount: totalCount,
+        accessibleCount: totalCount,
       },
     });
   } catch (error) {
@@ -96,4 +169,4 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+};

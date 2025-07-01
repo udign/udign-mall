@@ -2,17 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  Switch,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui';
-import { Button } from '@/components/ui';
+import { Switch } from '@/components/ui/primitives/switch';
+import { Button } from '@/components/ui/primitives/button';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -39,10 +31,6 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
   const isAllFieldsFilled = useMemo(() => {
     return formData.mb_id.trim() !== '' && formData.password.trim() !== '';
   }, [formData]);
-
-  const buttonClass = isAllFieldsFilled
-    ? 'bg-primary hover:bg-primary-hover'
-    : 'bg-gray-light hover:bg-gray-medium';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -137,13 +125,14 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
             />
           </div>
 
-          <button
-            className={`${buttonClass} mt-2 w-full cursor-pointer rounded px-4 py-3 font-medium text-white transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50`}
+          <Button
+            className='mt-2 w-full'
             type='submit'
             disabled={isLoading}
+            variant={isAllFieldsFilled ? 'default' : 'secondary'}
           >
             {isLoading ? '로그인 중...' : '로그인'}
-          </button>
+          </Button>
 
           <div className='flex items-center justify-between text-sm'>
             <div className='flex cursor-pointer items-center text-gray-300'>
@@ -158,43 +147,28 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
               <span className='cursor-pointer hover:text-white'>아이디/비밀번호 찾기</span>
               <span className='mx-2'>|</span>
               {onSwitchToRegister && (
-                <button
+                <Button
                   type='button'
                   onClick={onSwitchToRegister}
-                  className='cursor-pointer hover:text-white'
+                  variant='link'
+                  className='h-auto p-0 text-gray-300 hover:text-white'
                 >
                   회원가입
-                </button>
+                </Button>
               )}
             </div>
           </div>
         </form>
       </div>
 
-      <Dialog open={showAutoLoginDialog} onOpenChange={setShowAutoLoginDialog}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>자동로그인 사용 확인</DialogTitle>
-            <DialogDescription className='text-left leading-relaxed'>
-              자동로그인을 사용하시면 다음부터 회원아이디와 패스워드를 입력하실 필요가 없습니다.
-              <br />
-              그러나 공공장소에서는 개인정보가 유출될 수 있으니 사용을 자제하여 주십시오.
-              <br />
-              자동로그인을 사용하시겠습니까?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className='flex-col gap-2 sm:flex-row'>
-            <DialogClose asChild>
-              <Button type='button' variant='outline' onClick={handleAutoLoginCancel}>
-                취소
-              </Button>
-            </DialogClose>
-            <Button type='button' onClick={handleAutoLoginConfirm}>
-              확인
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={showAutoLoginDialog}
+        onOpenChange={setShowAutoLoginDialog}
+        title='자동로그인 사용 확인'
+        description='자동로그인을 사용하시면 다음부터 회원아이디와 패스워드를 입력하실 필요가 없습니다. 그러나 공공장소에서는 개인정보가 유출될 수 있으니 사용을 자제하여 주십시오. 자동로그인을 사용하시겠습니까?'
+        onConfirm={handleAutoLoginConfirm}
+        onCancel={handleAutoLoginCancel}
+      />
     </div>
   );
 }

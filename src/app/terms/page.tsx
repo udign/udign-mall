@@ -4,10 +4,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui';
-import { Switch } from '@/components/ui';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/primitives/accordion';
+import { Switch } from '@/components/ui/primitives/switch';
+import { Button } from '@/components/ui/primitives/button';
 import { termsOfService, privacyPolicy } from '@/lib/terms-content';
 import { ROUTES } from '@/lib/routes';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface Agreements {
   all: boolean;
@@ -21,6 +28,9 @@ export default function TermsPage() {
     terms: false,
     privacy: false,
   });
+
+  // Dialog 상태
+  const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -51,7 +61,7 @@ export default function TermsPage() {
     if (agreements.terms && agreements.privacy) {
       router.push(ROUTES.REGISTER);
     } else {
-      alert('필수 약관에 동의해주세요.');
+      setShowMessageDialog(true);
     }
   };
 
@@ -145,27 +155,32 @@ export default function TermsPage() {
             </div>
 
             <div className='mt-8 flex space-x-4'>
-              <button
+              <Button
                 onClick={() => router.push(ROUTES.HOME)}
-                className='flex-1 cursor-pointer rounded bg-gray-600 px-4 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-500'
+                variant='secondary'
+                className='flex-1'
               >
                 취소
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleSubmit}
                 disabled={!isSubmitEnabled}
-                className={`flex-1 cursor-pointer rounded px-4 py-3 font-medium text-white transition-colors duration-200 ${
-                  isSubmitEnabled
-                    ? 'bg-primary hover:bg-primary-hover cursor-pointer'
-                    : 'bg-gray-light cursor-not-allowed opacity-50'
-                }`}
+                variant={isSubmitEnabled ? 'default' : 'secondary'}
+                className='flex-1'
               >
                 신규계정 생성
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </div>
+
+      <MessageDialog
+        open={showMessageDialog}
+        onOpenChange={setShowMessageDialog}
+        title='알림'
+        description='필수 약관에 동의해주세요.'
+      />
     </div>
   );
 }

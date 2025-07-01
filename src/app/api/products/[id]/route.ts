@@ -41,7 +41,10 @@ interface NavigationRow extends RowDataPacket {
   it_name: string;
 }
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   try {
     const { id: productId } = await params;
 
@@ -135,35 +138,64 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       }
     }
 
-    // it_order가 모두 0인 경우, it_time을 기준으로 이전/다음 상품 조회
-    // 이전 상품: 현재보다 늦게 등록된 상품 (더 최신)
-    const prevProductQuery = `
-      SELECT it_id, it_name 
-      FROM g5_shop_item 
-      WHERE it_time > ? AND it_use = '1'
-      ORDER BY it_time ASC 
-      LIMIT 1
-    `;
+    // 모든 작품에서 이전/다음 상품 조회 (필터링 제거)
+    const getNavigationProducts = async () => {
+      // 이전/다음 상품 조회 (모든 작품 대상)
+      const prevProductQuery = `
+        SELECT 
+          i.it_id, 
+          i.it_name
+        FROM g5_shop_item i
+        WHERE i.it_time > ? AND i.it_use = '1'
+        ORDER BY i.it_time ASC 
+        LIMIT 1
+      `;
 
-    // 다음 상품: 현재보다 일찍 등록된 상품 (더 오래된)
-    const nextProductQuery = `
-      SELECT it_id, it_name 
-      FROM g5_shop_item 
-      WHERE it_time < ? AND it_use = '1'
-      ORDER BY it_time DESC 
-      LIMIT 1
-    `;
+      const nextProductQuery = `
+        SELECT 
+          i.it_id, 
+          i.it_name
+        FROM g5_shop_item i
+        WHERE i.it_time < ? AND i.it_use = '1'
+        ORDER BY i.it_time DESC 
+        LIMIT 1
+      `;
 
-    const prevProductResults = (await executeQuery(prevProductQuery, [
-      product.it_time,
-    ])) as NavigationRow[];
+      const prevResults = (await executeQuery(prevProductQuery, [
+        product.it_time,
+      ])) as NavigationRow[];
 
-    const nextProductResults = (await executeQuery(nextProductQuery, [
-      product.it_time,
-    ])) as NavigationRow[];
+      const nextResults = (await executeQuery(nextProductQuery, [
+        product.it_time,
+      ])) as NavigationRow[];
 
-    const prevProduct = prevProductResults[0] || null;
-    const nextProduct = nextProductResults[0] || null;
+      return {
+        prevProduct: prevResults[0]
+          ? { it_id: prevResults[0].it_id, it_name: prevResults[0].it_name }
+          : null,
+        nextProduct: nextResults[0]
+          ? { it_id: nextResults[0].it_id, it_name: nextResults[0].it_name }
+          : null,
+      };
+    };
+
+    const { prevProduct, nextProduct } = await getNavigationProducts();
+
+    // 모든 작품에 접근 가능하도록 설정
+    const hasAccess = true;
+
+    // 구매 가능 여부
+    const canPurchase = isReviewCompleted && currentUserId;
+
+    // 상태 메시지 설정
+    let statusMessage = '';
+    if (isReviewCompleted) {
+      statusMessage = '구매 가능한 상품입니다.';
+    } else if (isUnderReview) {
+      statusMessage = '현재 심의 진행 중입니다.';
+    } else {
+      statusMessage = '좋아요 모집 중입니다.';
+    }
 
     // 조회수 증가
     await executeQuery('UPDATE g5_shop_item SET it_hit = it_hit + 1 WHERE it_id = ?', [productId]);
@@ -172,7 +204,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       if (!imagePath) return null;
       if (imagePath.startsWith('http')) return imagePath;
       // Vercel Storage의 이미지 URL 생성
-      return `${process.env.VERCEL_BLOB_BASE_URL}/item/${imagePath}`;
+      return `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${imagePath}`;
     };
 
     const response = {
@@ -200,6 +232,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         is_under_review: isUnderReview,
         is_review_completed: isReviewCompleted,
         it_4: targetCount, // 목표 인원
+        it_8: parseInt(product.it_8) || 0, // 심의 기간
+        it_9: product.it_9, // 수동 심의 여부
+        it_10: product.it_10, // 심의 완료 여부
+        has_access: hasAccess, // 접근 권한
+        can_purchase: canPurchase, // 구매 가능 여부
+        status_message: statusMessage, // 상태 메시지
       },
       prev_product: prevProduct || undefined,
       next_product: nextProduct || undefined,
@@ -213,4 +251,4 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       { status: 500 },
     );
   }
-}
+};
