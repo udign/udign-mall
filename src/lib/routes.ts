@@ -5,6 +5,7 @@ export const ROUTES = {
 
   // 관리자 페이지
   ADMIN: '/admin',
+  ADMIN_WORKLIST: '/admin/worklist',
 
   // 인증 관련
   LOGIN: '/shop/login',
