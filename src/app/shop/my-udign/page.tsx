@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { FiInbox, FiAlertCircle } from 'react-icons/fi';
 import { BsLightbulb } from 'react-icons/bs';
 import { IoIosList } from 'react-icons/io';
+import { ROUTES } from '@/lib/routes';
 
 interface MyUdignData {
   products: ProductsByStatus;
@@ -80,7 +81,7 @@ export default function MyUdignPage() {
     if (isLoading) return;
 
     if (!authUser) {
-      router.push('/login?redirect=/my-udign');
+      router.push(ROUTES.LOGIN);
       return;
     }
 
@@ -102,18 +103,13 @@ export default function MyUdignPage() {
 
       // 모든 탭의 첫 페이지 데이터를 병렬로 가져오기
       const tabKeys = Object.keys(STATUS_GROUPS);
-      const promises = tabKeys.map(async (tab) =>
-        // fetch(`/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`)
-        //   .then((res) => res.json())
-        //   .then((result) => ({ tab, result })),
-        {
-          const response = await fetch(
-            `/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`,
-          );
-          const result = await response.json();
-          return { tab, result };
-        },
-      );
+      const promises = tabKeys.map(async (tab) => {
+        const response = await fetch(
+          `/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`,
+        );
+        const result = await response.json();
+        return { tab, result };
+      });
 
       const responses = await Promise.all(promises);
 

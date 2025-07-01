@@ -7,9 +7,9 @@ export const ROUTES = {
   ADMIN: '/admin',
 
   // 인증 관련
-  LOGIN: '/login',
-  REGISTER: '/register',
-  TERMS: '/terms',
+  LOGIN: '/shop/login',
+  REGISTER: '/shop/register',
+  TERMS: '/shop/terms',
 
   // 카테고리 페이지
   FASHION: '/shop/fashion',
