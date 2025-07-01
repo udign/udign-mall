@@ -7,7 +7,6 @@ import ProgressBar from '@/components/ProgressBar';
 import ReturnModal from '@/components/ReturnModal';
 import CancelOrderModal from '@/components/CancelOrderModal';
 import { Switch } from '@/components/ui/primitives/switch';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/primitives/button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
@@ -54,8 +53,6 @@ export default function ArtworkCard({
 
   const router = useRouter();
 
-  const { user } = useAuth();
-
   const isClickable = artwork._status_text === '컬렉션' || artwork._status_text === '심의중';
 
   const handleInterestClick = () => {
@@ -82,28 +79,11 @@ export default function ArtworkCard({
       ? '해당 작품의 심의를 종료하시겠습니까?'
       : '해당 작품을 심의중으로 변경하시겠습니까?';
 
-    if (!user) {
-      setMessageTitle('로그인 필요');
-      setMessageContent('로그인이 필요합니다.');
-      setShowMessageDialog(true);
-      return;
-    }
-
-    if (!onAdminToggle) {
-      setMessageTitle('기능 사용 불가');
-      setMessageContent('관리자 토글 기능을 사용할 수 없습니다.');
-      setShowMessageDialog(true);
-      return;
-    }
-
     setConfirmMessage(confirmMsg);
     setPendingToggleAction(() => async () => {
       setIsToggling(true);
       try {
-        await onAdminToggle(artwork.it_id, newStatus);
-        setMessageTitle('상태 변경 완료');
-        setMessageContent('상태가 변경되었습니다.');
-        setShowMessageDialog(true);
+        await onAdminToggle!(artwork.it_id, newStatus);
       } catch (error) {
         console.error('관리자 토글 실패:', error);
         setMessageTitle('오류 발생');

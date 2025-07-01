@@ -476,6 +476,12 @@ export default function MyUdignPage() {
 
   const handleAdminToggle = async (itemId: string, newStatus: string) => {
     try {
+      // 먼저 현재 상품 상태 확인
+      const currentArtwork = currentTabData.find((artwork) => artwork.it_id === itemId);
+      if (!currentArtwork) return;
+
+      const oldStatusKey = currentArtwork._status_key;
+
       const response = await fetch('/api/admin/review-status', {
         method: 'POST',
         headers: {
@@ -491,34 +497,68 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success && result.data) {
+        // 새로운 상태 결정
+        let newStatusKey = 'collection';
+        if (newStatus === 'Y') {
+          newStatusKey = 'review'; // 심의중
+        } else if (newStatus === 'N') {
+          newStatusKey = 'payment'; // 구매 진행
+        }
+
         // 모든 탭의 데이터 업데이트
         setTabStates((prev) => {
           const updated = { ...prev };
 
           Object.keys(updated).forEach((tab) => {
             if (updated[tab].data.length > 0) {
-              updated[tab].data = updated[tab].data.map((artwork) => {
-                if (artwork.it_id === itemId) {
-                  let newStatusKey = 'collection';
-                  if (newStatus === 'Y') {
-                    newStatusKey = 'review';
-                  } else if (newStatus === 'N') {
-                    newStatusKey = 'payment';
-                  }
-
-                  return {
-                    ...artwork,
+              if (tab === oldStatusKey) {
+                // 기존 탭에서는 상품 제거
+                updated[tab].data = updated[tab].data.filter((artwork) => artwork.it_id !== itemId);
+              } else if (tab === newStatusKey) {
+                // 새로운 탭에 상품 추가 (이미 존재하지 않는 경우에만)
+                const exists = updated[tab].data.some((artwork) => artwork.it_id === itemId);
+                if (!exists) {
+                  const updatedArtwork = {
+                    ...currentArtwork,
                     it_10: result.data.it_10,
                     _status_text: result.data.statusText,
                     _status_key: newStatusKey,
                   };
+                  updated[tab].data = [updatedArtwork, ...updated[tab].data];
                 }
-                return artwork;
-              });
+              } else if (tab === 'all') {
+                // 전체 탭에서는 상태만 업데이트
+                updated[tab].data = updated[tab].data.map((artwork) => {
+                  if (artwork.it_id === itemId) {
+                    return {
+                      ...artwork,
+                      it_10: result.data.it_10,
+                      _status_text: result.data.statusText,
+                      _status_key: newStatusKey,
+                    };
+                  }
+                  return artwork;
+                });
+              }
             }
           });
 
           return updated;
+        });
+
+        // 네비게이션 카운트 업데이트
+        setCounts((prev) => {
+          const newCounts = { ...prev };
+
+          // 기존 탭 카운트 감소
+          if (newCounts[oldStatusKey] > 0) {
+            newCounts[oldStatusKey] = newCounts[oldStatusKey] - 1;
+          }
+
+          // 새로운 탭 카운트 증가
+          newCounts[newStatusKey] = (newCounts[newStatusKey] || 0) + 1;
+
+          return newCounts;
         });
       } else {
         throw new Error(result.message || '상태 변경에 실패했습니다.');
