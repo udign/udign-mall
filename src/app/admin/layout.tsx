@@ -3,7 +3,14 @@
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  ChevronDown,
+  ChevronRight,
+  Store,
+  LogOut,
+} from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +26,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/primitives/sidebar';
+import { Button } from '@/components/ui/primitives/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 
@@ -69,6 +77,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   const isActive = (href: string) => pathname === href;
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        window.location.replace(ROUTES.SHOP);
+      }
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      alert('로그아웃 중 오류가 발생했습니다.');
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -145,10 +169,38 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </Sidebar>
 
       <SidebarInset>
-        <header className='flex h-16 shrink-0 items-center gap-2 border-b px-4'>
-          <SidebarTrigger className='-ml-1' />
-          <div className='bg-border h-4 w-px' />
-          <h1 className='text-lg font-semibold'>유다인 관리자 페이지</h1>
+        <header className='flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4'>
+          <div className='flex items-center gap-2'>
+            <SidebarTrigger className='-ml-1' />
+            <div className='bg-border h-4 w-px' />
+            <h1 className='text-lg font-semibold'>유다인 관리자 페이지</h1>
+          </div>
+
+          <div className='flex items-center gap-2'>
+            <Button
+              onClick={() => router.push(ROUTES.SHOP)}
+              variant='ghost'
+              size='sm'
+              className='flex items-center gap-2'
+              title='쇼핑몰로 이동'
+              aria-label='쇼핑몰로 이동'
+            >
+              <Store className='h-4 w-4' />
+              <span className='hidden md:inline'>쇼핑몰로 이동</span>
+            </Button>
+
+            <Button
+              onClick={handleLogout}
+              variant='ghost'
+              size='sm'
+              className='flex items-center gap-2'
+              title='로그아웃'
+              aria-label='로그아웃'
+            >
+              <LogOut className='h-4 w-4' />
+              <span className='hidden md:inline'>로그아웃</span>
+            </Button>
+          </div>
         </header>
 
         <main className='flex-1 space-y-4 p-4 md:p-6'>{children}</main>
