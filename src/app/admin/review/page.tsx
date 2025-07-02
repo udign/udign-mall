@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle, AlertCircle, Database, XCircle } from 'lucide-react';
@@ -25,7 +25,7 @@ const tableHeaders = [
   '관리',
 ];
 
-export default function ReviewManagement() {
+function ReviewManagement() {
   const [items, setItems] = useState<ReviewItem[]>([]);
   const [stats, setStats] = useState<ReviewStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -586,5 +586,13 @@ export default function ReviewManagement() {
         onCancel={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
       />
     </>
+  );
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense>
+      <ReviewManagement />
+    </Suspense>
   );
 }
