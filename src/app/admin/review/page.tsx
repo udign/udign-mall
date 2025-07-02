@@ -460,7 +460,6 @@ function ReviewManagement() {
                                         handleToggleVisibility(item.it_id, item.it_use)
                                       }
                                       disabled={visibilityLoading === item.it_id}
-                                      className='cursor-pointer'
                                     />
                                     <span className='text-sm text-gray-700'>
                                       {Number(item.it_use) === 1 ? '승인' : '반려'}

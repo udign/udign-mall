@@ -4,7 +4,7 @@ import { executeQuery } from '@/lib/database';
 export const POST = async (request: NextRequest) => {
   try {
     const body = await request.json();
-    const { action, item_id, admin_memo, rejection_reason } = body;
+    const { action, item_id, rejection_reason } = body;
 
     // 유효성 검사
     if (!action || !item_id) {
@@ -65,17 +65,6 @@ export const POST = async (request: NextRequest) => {
 
     // 상품 상태 업데이트
     await executeQuery('UPDATE g5_shop_item SET it_10 = ? WHERE it_id = ?', [updateValue, item_id]);
-
-    // 검수 로그 기록 (옵션 - 로그 테이블이 있다면)
-    // 여기서는 간단히 콘솔 로그로 대체
-    console.log('검수 처리:', {
-      item_id,
-      item_name: item.it_name,
-      action: logAction,
-      admin_memo,
-      rejection_reason,
-      timestamp: new Date().toISOString(),
-    });
 
     const actionTextMap: Record<string, string> = {
       approve: '승인',
