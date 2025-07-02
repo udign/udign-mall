@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, Database, XCircle } from 'lucide-react';
 import { ReviewItem, ReviewStats } from '@/types/review';
 import { STATUS_GROUPS } from '@/lib/constants';
 import CommonPagination from '@/components/CommonPagination';
@@ -21,7 +21,7 @@ const tableHeaders = [
   '판매자 ID',
   '판매가격',
   '좋아요',
-  '사이트 노출',
+  '디자인 검수',
   '관리',
 ];
 
@@ -176,10 +176,10 @@ export default function ReviewManagement() {
           ),
         );
       } else {
-        alert(result.message || '사이트 노출 상태 변경 중 오류가 발생했습니다.');
+        alert(result.message || '디자인 검수 상태 변경 중 오류가 발생했습니다.');
       }
     } catch (error) {
-      console.error('사이트 노출 상태 변경 실패:', error);
+      console.error('디자인 검수 상태 변경 실패:', error);
       alert('서버 통신 중 오류가 발생했습니다.');
     } finally {
       setVisibilityLoading(null);
@@ -210,9 +210,54 @@ export default function ReviewManagement() {
         </div>
 
         {/* 통계 카드 */}
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+          {/* 전체 작품 */}
+          <div className='rounded-lg bg-white p-2'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center'>
+                <div className='rounded-lg bg-blue-100 p-3'>
+                  <Database className='h-6 w-6 text-blue-600' />
+                </div>
+                <div className='ml-4'>
+                  <p className='text-sm font-medium text-gray-600'>전체 작품</p>
+                  <p className='text-3xl font-bold text-blue-600'>{stats?.allItems || 0}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 디자인 검수 승인 */}
+          <div className='rounded-lg bg-white p-2'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center'>
+                <div className='rounded-lg bg-green-100 p-3'>
+                  <CheckCircle className='h-6 w-6 text-green-600' />
+                </div>
+                <div className='ml-4'>
+                  <p className='text-sm font-medium text-gray-600'>디자인 검수 승인</p>
+                  <p className='text-3xl font-bold text-green-600'>{stats?.approvedItems || 0}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 디자인 검수 반려 */}
+          <div className='rounded-lg bg-white p-2'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center'>
+                <div className='rounded-lg bg-red-100 p-3'>
+                  <XCircle className='h-6 w-6 text-red-600' />
+                </div>
+                <div className='ml-4'>
+                  <p className='text-sm font-medium text-gray-600'>디자인 검수 반려</p>
+                  <p className='text-3xl font-bold text-red-600'>{stats?.rejectedItems || 0}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* 제작 검토 */}
-          <div className='rounded-lg bg-white p-6'>
+          <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
                 <div className='rounded-lg bg-orange-100 p-3'>
@@ -227,15 +272,15 @@ export default function ReviewManagement() {
           </div>
 
           {/* 구매 진행 */}
-          <div className='rounded-lg bg-white p-6'>
+          <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
-                <div className='rounded-lg bg-green-100 p-3'>
-                  <CheckCircle className='h-6 w-6 text-green-600' />
+                <div className='rounded-lg bg-purple-100 p-3'>
+                  <CheckCircle className='h-6 w-6 text-purple-600' />
                 </div>
                 <div className='ml-4'>
                   <p className='text-sm font-medium text-gray-600'>{STATUS_GROUPS.payment}</p>
-                  <p className='text-3xl font-bold text-green-600'>{stats?.payment || 0}</p>
+                  <p className='text-3xl font-bold text-purple-600'>{stats?.payment || 0}</p>
                 </div>
               </div>
             </div>
@@ -244,7 +289,7 @@ export default function ReviewManagement() {
 
         {/* 검수 목록 테이블 */}
         <div className='rounded-lg bg-white'>
-          <div className='p-6'>
+          <div>
             <div className='mb-4 flex items-center justify-between'>
               <h3 className='text-lg font-semibold text-gray-900'>전체 작품 목록</h3>
               <p className='text-sm text-gray-600'>
@@ -253,7 +298,7 @@ export default function ReviewManagement() {
             </div>
 
             {loading ? (
-              <div className='h-32'>
+              <div className='mt-50'>
                 <LoadingSpinner size='md' message='로딩 중...' />
               </div>
             ) : items.length === 0 ? (

@@ -5,7 +5,7 @@ export const ROUTES = {
 
   // 관리자 페이지
   ADMIN: '/admin',
-  ADMIN_REVIEW: '/admin/review?page=1',
+  ADMIN_REVIEW: '/admin/review',
 
   // 인증 관련
   LOGIN: '/shop/login',
@@ -13,9 +13,9 @@ export const ROUTES = {
   TERMS: '/shop/terms',
 
   // 카테고리 페이지
-  FASHION: '/shop/fashion?page=1',
-  SHOES: '/shop/shoes?page=1',
-  OTHERS: '/shop/others?page=1',
+  FASHION: '/shop/fashion',
+  SHOES: '/shop/shoes',
+  OTHERS: '/shop/others',
 
   // 상품 상세 페이지
   PRODUCT: '/shop/product',

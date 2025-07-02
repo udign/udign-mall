@@ -57,6 +57,9 @@ export interface ReviewLog {
 
 export interface ReviewStats {
   all: number;
+  allItems: number; // 전체 작품 수
+  approvedItems: number; // 사이트 노출 승인된 작품 수
+  rejectedItems: number; // 사이트 노출 반려된 작품 수
   total: number;
   pending: number;
   in_review: number;

@@ -72,7 +72,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <SidebarProvider>
-      <Sidebar variant='inset'>
+      <Sidebar variant='sidebar'>
         <SidebarHeader>
           <div className='bg-primary flex items-center justify-center rounded-lg py-4 text-white'>
             <h1 className='text-lg font-bold'>유다인 관리자</h1>

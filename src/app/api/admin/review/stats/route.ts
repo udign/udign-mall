@@ -3,11 +3,26 @@ import { executeQuery } from '@/lib/database';
 
 export const GET = async () => {
   try {
-    // 전체 상품 수 조회
-    const totalRows = (await executeQuery(
+    // 전체 상품 수 조회 (사이트 노출 여부 상관없이)
+    const allItemsRows = (await executeQuery('SELECT COUNT(*) as total FROM g5_shop_item')) as {
+      total: number;
+    }[];
+    const allItems = allItemsRows[0].total;
+
+    // 사이트 노출 승인된 상품 수 조회
+    const approvedItemsRows = (await executeQuery(
       'SELECT COUNT(*) as total FROM g5_shop_item WHERE it_use = "1"',
     )) as { total: number }[];
-    const total = totalRows[0].total;
+    const approvedItems = approvedItemsRows[0].total;
+
+    // 사이트 노출 반려된 상품 수 조회
+    const rejectedItemsRows = (await executeQuery(
+      'SELECT COUNT(*) as total FROM g5_shop_item WHERE it_use = "0"',
+    )) as { total: number }[];
+    const rejectedItems = rejectedItemsRows[0].total;
+
+    // 기존 호환성을 위한 total (승인된 상품 수)
+    const total = approvedItems;
 
     // 컬렉션: 목표 미달성 상품들
     const collectionRows = (await executeQuery(`
@@ -109,6 +124,9 @@ export const GET = async () => {
 
     const stats = {
       all: total,
+      allItems, // 전체 작품 수
+      approvedItems, // 사이트 노출 승인된 작품 수
+      rejectedItems, // 사이트 노출 반려된 작품 수
       collection,
       review,
       payment,
