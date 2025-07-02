@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { ReviewItem, ReviewStats } from '@/types/review';
@@ -12,14 +13,23 @@ import { Button } from '@/components/ui/primitives/button';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { ROUTES } from '@/lib/routes';
 
-const tableHeaders = ['이미지', '작품명', '작품 ID', '판매자 ID', '판매가격', '좋아요', '관리'];
+const tableHeaders = [
+  '이미지',
+  '작품명',
+  '작품 ID',
+  '판매자 ID',
+  '판매가격',
+  '좋아요',
+  '사이트 노출',
+  '관리',
+];
 
-export default function WorkListManagement() {
+export default function ReviewManagement() {
   const [items, setItems] = useState<ReviewItem[]>([]);
   const [stats, setStats] = useState<ReviewStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [visibilityLoading, setVisibilityLoading] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
@@ -35,11 +45,11 @@ export default function WorkListManagement() {
     itemName: '',
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [currentPage]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1');
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -76,7 +86,18 @@ export default function WorkListManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
+
+  useEffect(() => {
+    // 초기 로드 시 URL 파라미터가 없으면 기본값으로 설정
+    if (!searchParams.get('page')) {
+      const params = new URLSearchParams();
+      params.set('page', '1');
+      router.replace(`${ROUTES.ADMIN_REVIEW}?${params.toString()}`);
+    } else {
+      fetchData();
+    }
+  }, [currentPage, searchParams, router, fetchData]);
 
   const showConfirmDialog = (itemId: string, action: 'payment' | 'review', itemName: string) => {
     setConfirmDialog({
@@ -122,8 +143,52 @@ export default function WorkListManagement() {
     }
   };
 
+  const handleToggleVisibility = async (itemId: string, currentVisibility: '1' | '0' | number) => {
+    try {
+      setVisibilityLoading(itemId);
+
+      // 숫자를 문자열로 변환
+      const currentValue = String(currentVisibility);
+      const newVisibility = currentValue === '1' ? '0' : '1';
+
+      const response = await fetch('/api/admin/review/toggle-visibility', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          itemId,
+          visibility: newVisibility,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 로컬 상태 업데이트 - 숫자 타입으로 업데이트
+        setItems((prev) =>
+          prev.map((item) =>
+            item.it_id === itemId
+              ? { ...item, it_use: Number(newVisibility) as unknown as '1' | '0' }
+              : item,
+          ),
+        );
+      } else {
+        alert(result.message || '사이트 노출 상태 변경 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('사이트 노출 상태 변경 실패:', error);
+      alert('서버 통신 중 오류가 발생했습니다.');
+    } finally {
+      setVisibilityLoading(null);
+    }
+  };
+
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    router.push(`${ROUTES.ADMIN_REVIEW}?${params.toString()}`);
   };
 
   const handleImageError = (itemId: string) => {
@@ -132,7 +197,7 @@ export default function WorkListManagement() {
 
   return (
     <>
-      <div className='space-y-6'>
+      <div className='space-y-4'>
         {/* 헤더 */}
         <div className='flex items-center justify-between'>
           <div>
@@ -282,6 +347,30 @@ export default function WorkListManagement() {
                           </td>
                           <td className='px-6 py-4 text-center'>
                             <div className='flex justify-center'>
+                              <div className='flex items-center space-x-2'>
+                                {visibilityLoading === item.it_id ? (
+                                  <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600' />
+                                ) : (
+                                  <label className='flex cursor-pointer items-center space-x-2'>
+                                    <input
+                                      type='checkbox'
+                                      checked={Number(item.it_use) === 1}
+                                      onChange={() =>
+                                        handleToggleVisibility(item.it_id, item.it_use)
+                                      }
+                                      disabled={visibilityLoading === item.it_id}
+                                      className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                                    />
+                                    <span className='text-sm text-gray-700'>
+                                      {Number(item.it_use) === 1 ? '노출' : '숨김'}
+                                    </span>
+                                  </label>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className='px-6 py-4 text-center'>
+                            <div className='flex justify-center'>
                               <div className='flex space-x-2'>
                                 {/* 구매 진행 버튼 */}
                                 <Button
@@ -368,7 +457,7 @@ export default function WorkListManagement() {
                   <CommonPagination
                     currentPageNumber={currentPage}
                     totalPageCount={totalPages}
-                    pathname={ROUTES.ADMIN_WORKLIST}
+                    pathname={ROUTES.ADMIN_REVIEW}
                     onPageChange={handlePageChange}
                   />
                 </div>

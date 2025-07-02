@@ -79,7 +79,7 @@ export const GET = async (request: NextRequest) => {
         FROM g5_shop_interrest 
         GROUP BY it_id
       ) interests ON it.it_id = interests.it_id
-      WHERE it.it_use = "1"
+      WHERE 1=1
     `;
 
     // 검색 조건 추가

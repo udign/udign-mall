@@ -57,7 +57,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     },
     {
       label: '작품관리',
-      href: ROUTES.ADMIN_WORKLIST,
+      href: ROUTES.ADMIN_REVIEW,
       icon: <ShoppingBag className='h-4 w-4' />,
     },
   ];
