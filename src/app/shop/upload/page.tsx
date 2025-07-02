@@ -50,6 +50,7 @@ export default function UploadPage() {
     category: '',
     artworkName: '',
     description: '',
+    targetLikes: 100,
     agreeToTerms: false,
   });
 
@@ -192,6 +193,7 @@ export default function UploadPage() {
       uploadData.append('category', formData.category);
       uploadData.append('artworkName', formData.artworkName);
       uploadData.append('description', formData.description);
+      uploadData.append('targetLikes', formData.targetLikes.toString());
 
       // 대표 이미지
       uploadData.append('mainImage', mainImage.file);

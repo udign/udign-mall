@@ -44,7 +44,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     // 카테고리 검증
-    const validCategories = ['10', '20', '30']; // fashion, shoes, others
+    const validCategories = ['10', '20', '30'];
     if (!validCategories.includes(category)) {
       return NextResponse.json(
         {
