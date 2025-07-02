@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useCategoryProducts } from '@/hooks/useCategoryProducts';
 import CategoryProductList from '@/components/CategoryProductList';
-import { CATEGORY_IDS } from '@/config/pagination';
+import { CATEGORY_IDS } from '@/lib/constants';
 import { ROUTES } from '@/lib/routes';
 
 function ShoesContent() {

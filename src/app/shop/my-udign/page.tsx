@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArtworkStatus, ProductsByStatus, StatusCounts } from '@/types/artwork';
 import { STATUS_GROUPS } from '@/lib/constants';
-import { PAGINATION_CONFIG } from '@/config/pagination';
+import { PAGINATION_CONFIG } from '@/lib/constants';
 import ArtworkCard from '@/components/ArtworkCard';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import MessageDialog from '@/components/ui/MessageDialog';
@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { FiInbox, FiAlertCircle } from 'react-icons/fi';
 import { BsLightbulb } from 'react-icons/bs';
 import { IoIosList } from 'react-icons/io';
+import { ROUTES } from '@/lib/routes';
 
 interface MyUdignData {
   products: ProductsByStatus;
@@ -80,7 +81,7 @@ export default function MyUdignPage() {
     if (isLoading) return;
 
     if (!authUser) {
-      router.push('/login?redirect=/my-udign');
+      router.push(ROUTES.LOGIN);
       return;
     }
 
@@ -102,18 +103,13 @@ export default function MyUdignPage() {
 
       // 모든 탭의 첫 페이지 데이터를 병렬로 가져오기
       const tabKeys = Object.keys(STATUS_GROUPS);
-      const promises = tabKeys.map(async (tab) =>
-        // fetch(`/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`)
-        //   .then((res) => res.json())
-        //   .then((result) => ({ tab, result })),
-        {
-          const response = await fetch(
-            `/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`,
-          );
-          const result = await response.json();
-          return { tab, result };
-        },
-      );
+      const promises = tabKeys.map(async (tab) => {
+        const response = await fetch(
+          `/api/my-udign?page=1&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`,
+        );
+        const result = await response.json();
+        return { tab, result };
+      });
 
       const responses = await Promise.all(promises);
 
@@ -213,7 +209,6 @@ export default function MyUdignPage() {
     }
   }, [currentTab, tabStates]);
 
-  // 커스텀 훅으로 IntersectionObserver 처리
   const observerRef = useIntersectionObserver(loadMoreData);
 
   const handleInterestToggle = async (itemId: string) => {
@@ -229,30 +224,87 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success) {
+        // 먼저 현재 좋아요 상태 확인
+        let wasLiked = false;
+        let isNowLiked = false;
+
+        // 현재 탭 데이터에서 작품 찾기
+        const currentArtwork = currentTabData.find((artwork) => artwork.it_id === itemId);
+
+        if (currentArtwork) {
+          wasLiked = !!currentArtwork.ir_id;
+          isNowLiked = !wasLiked;
+        }
+
         // 모든 탭의 데이터 업데이트
         setTabStates((prev) => {
           const updated = { ...prev };
 
-          Object.keys(updated).forEach((tab) => {
-            if (updated[tab].data.length > 0) {
-              updated[tab].data = updated[tab].data.map((artwork) => {
-                if (artwork.it_id === itemId) {
-                  const wasLiked = !!artwork.ir_id;
-                  const isNowLiked = !wasLiked;
-
-                  return {
-                    ...artwork,
-                    ir_id: isNowLiked ? 'temp' : undefined,
-                    ir_time: isNowLiked ? new Date().toISOString() : undefined,
-                    _iCount: isNowLiked ? artwork._iCount + 1 : Math.max(0, artwork._iCount - 1),
-                  };
+          if (wasLiked && !isNowLiked) {
+            // 좋아요 해제된 경우: 좋아요 관련 탭들에서 작품 제거
+            Object.keys(updated).forEach((tab) => {
+              if (updated[tab].data.length > 0) {
+                if (tab === 'all' || tab === 'collection') {
+                  // 전체 탭과 컬렉션(❤️ 디자인) 탭에서는 작품 완전 제거
+                  updated[tab].data = updated[tab].data.filter(
+                    (artwork) => artwork.it_id !== itemId,
+                  );
+                } else {
+                  // 다른 탭에서는 좋아요 상태만 업데이트
+                  updated[tab].data = updated[tab].data.map((artwork) => {
+                    if (artwork.it_id === itemId) {
+                      return {
+                        ...artwork,
+                        ir_id: undefined,
+                        ir_time: undefined,
+                        _iCount: Math.max(0, artwork._iCount - 1),
+                      };
+                    }
+                    return artwork;
+                  });
                 }
-                return artwork;
-              });
-            }
-          });
+              }
+            });
+          } else if (!wasLiked && isNowLiked) {
+            // 좋아요 추가된 경우: 모든 탭에서 상태 업데이트
+            Object.keys(updated).forEach((tab) => {
+              if (updated[tab].data.length > 0) {
+                updated[tab].data = updated[tab].data.map((artwork) => {
+                  if (artwork.it_id === itemId) {
+                    return {
+                      ...artwork,
+                      ir_id: 'temp',
+                      ir_time: new Date().toISOString(),
+                      _iCount: artwork._iCount + 1,
+                    };
+                  }
+                  return artwork;
+                });
+              }
+            });
+          }
 
           return updated;
+        });
+
+        // 🔑 핵심: counts도 즉시 업데이트 (좋아요 관련 탭들)
+        setCounts((prev) => {
+          if (wasLiked && !isNowLiked) {
+            // 좋아요 해제시: 전체와 컬렉션 카운트 감소
+            return {
+              ...prev,
+              all: Math.max(0, prev.all - 1),
+              collection: Math.max(0, prev.collection - 1),
+            };
+          } else if (!wasLiked && isNowLiked) {
+            // 좋아요 추가시: 전체와 컬렉션 카운트 증가
+            return {
+              ...prev,
+              all: prev.all + 1,
+              collection: prev.collection + 1,
+            };
+          }
+          return prev;
         });
       } else {
         setMessageContent(result.message || '처리 중 오류가 발생했습니다.');
@@ -424,6 +476,12 @@ export default function MyUdignPage() {
 
   const handleAdminToggle = async (itemId: string, newStatus: string) => {
     try {
+      // 먼저 현재 상품 상태 확인
+      const currentArtwork = currentTabData.find((artwork) => artwork.it_id === itemId);
+      if (!currentArtwork) return;
+
+      const oldStatusKey = currentArtwork._status_key;
+
       const response = await fetch('/api/admin/review-status', {
         method: 'POST',
         headers: {
@@ -439,34 +497,68 @@ export default function MyUdignPage() {
       const result = await response.json();
 
       if (result.success && result.data) {
+        // 새로운 상태 결정
+        let newStatusKey = 'collection';
+        if (newStatus === 'Y') {
+          newStatusKey = 'review'; // 심의중
+        } else if (newStatus === 'N') {
+          newStatusKey = 'payment'; // 구매 진행
+        }
+
         // 모든 탭의 데이터 업데이트
         setTabStates((prev) => {
           const updated = { ...prev };
 
           Object.keys(updated).forEach((tab) => {
             if (updated[tab].data.length > 0) {
-              updated[tab].data = updated[tab].data.map((artwork) => {
-                if (artwork.it_id === itemId) {
-                  let newStatusKey = 'collection';
-                  if (newStatus === 'Y') {
-                    newStatusKey = 'review';
-                  } else if (newStatus === 'N') {
-                    newStatusKey = 'payment';
-                  }
-
-                  return {
-                    ...artwork,
+              if (tab === oldStatusKey) {
+                // 기존 탭에서는 상품 제거
+                updated[tab].data = updated[tab].data.filter((artwork) => artwork.it_id !== itemId);
+              } else if (tab === newStatusKey) {
+                // 새로운 탭에 상품 추가 (이미 존재하지 않는 경우에만)
+                const exists = updated[tab].data.some((artwork) => artwork.it_id === itemId);
+                if (!exists) {
+                  const updatedArtwork = {
+                    ...currentArtwork,
                     it_10: result.data.it_10,
                     _status_text: result.data.statusText,
                     _status_key: newStatusKey,
                   };
+                  updated[tab].data = [updatedArtwork, ...updated[tab].data];
                 }
-                return artwork;
-              });
+              } else if (tab === 'all') {
+                // 전체 탭에서는 상태만 업데이트
+                updated[tab].data = updated[tab].data.map((artwork) => {
+                  if (artwork.it_id === itemId) {
+                    return {
+                      ...artwork,
+                      it_10: result.data.it_10,
+                      _status_text: result.data.statusText,
+                      _status_key: newStatusKey,
+                    };
+                  }
+                  return artwork;
+                });
+              }
             }
           });
 
           return updated;
+        });
+
+        // 네비게이션 카운트 업데이트
+        setCounts((prev) => {
+          const newCounts = { ...prev };
+
+          // 기존 탭 카운트 감소
+          if (newCounts[oldStatusKey] > 0) {
+            newCounts[oldStatusKey] = newCounts[oldStatusKey] - 1;
+          }
+
+          // 새로운 탭 카운트 증가
+          newCounts[newStatusKey] = (newCounts[newStatusKey] || 0) + 1;
+
+          return newCounts;
         });
       } else {
         throw new Error(result.message || '상태 변경에 실패했습니다.');
@@ -496,7 +588,7 @@ export default function MyUdignPage() {
   ) : (
     user && (
       <div className='min-h-screen'>
-        <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
+        <div className='px-4 py-8 sm:px-6 lg:px-8'>
           <div className='mb-6 rounded-lg bg-gray-50 p-4 sm:p-6'>
             <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
               <div>
@@ -580,7 +672,6 @@ export default function MyUdignPage() {
                       currentTab === key ? 'text-gray-900' : 'text-gray-500'
                     }`}
                   >
-                    {key === 'interest' && '❤️ '}
                     {label}
                     {counts[key] > 0 && <span className='text-gray-400'>{counts[key]}</span>}
                     {currentTab === key && (

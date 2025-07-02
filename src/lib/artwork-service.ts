@@ -89,6 +89,7 @@ export const getArtworksByUser = async (
       sqlSearch = `
         WHERE ir.mb_id = ?
         AND it.it_name != ''
+        AND it.it_use = '1'
         AND (cart.ct_status != '취소' OR cart.ct_status IS NULL)
         AND (ret.return_status != 'cancelled' OR ret.return_status IS NULL)
       `;

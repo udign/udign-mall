@@ -3,10 +3,10 @@
 import { Suspense } from 'react';
 import { useCategoryProducts } from '@/hooks/useCategoryProducts';
 import CategoryProductList from '@/components/CategoryProductList';
-import { CATEGORY_IDS } from '@/config/pagination';
+import { CATEGORY_IDS } from '@/lib/constants';
 import { ROUTES } from '@/lib/routes';
 
-function FashionContent() {
+function OthersContent() {
   const {
     products,
     loading,
@@ -17,8 +17,8 @@ function FashionContent() {
     currentPage,
     refetch,
   } = useCategoryProducts({
-    categoryId: CATEGORY_IDS.FASHION,
-    pathname: ROUTES.FASHION,
+    categoryId: CATEGORY_IDS.OTHERS,
+    pathname: ROUTES.OTHERS,
   });
 
   return (
@@ -30,17 +30,17 @@ function FashionContent() {
       categoryName={categoryName}
       categoryCount={categoryCount}
       currentPage={currentPage}
-      pathname={ROUTES.FASHION}
-      fallbackCategoryName='fashion'
+      pathname={ROUTES.OTHERS}
+      fallbackCategoryName='others'
       onRetry={refetch}
     />
   );
 }
 
-export default function FashionPage() {
+export default function OthersPage() {
   return (
     <Suspense>
-      <FashionContent />
+      <OthersContent />
     </Suspense>
   );
 }

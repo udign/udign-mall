@@ -499,7 +499,7 @@ export default function ProductDetailPage() {
               {prevProduct ? (
                 <Button
                   variant='outline'
-                  onClick={() => router.push(`/product/${prevProduct.it_id}`)}
+                  onClick={() => router.push(`${ROUTES.PRODUCT}/${prevProduct.it_id}`)}
                   className='group flex items-center gap-1 px-5 py-3'
                 >
                   <ChevronLeftIcon className='h-5 w-5 text-gray-400 transition-colors group-hover:text-gray-600' />
@@ -520,7 +520,7 @@ export default function ProductDetailPage() {
               {nextProduct ? (
                 <Button
                   variant='outline'
-                  onClick={() => router.push(`/product/${nextProduct.it_id}`)}
+                  onClick={() => router.push(`${ROUTES.PRODUCT}/${nextProduct.it_id}`)}
                   className='group flex items-center gap-1 px-5 py-3'
                 >
                   <div className='text-right'>
