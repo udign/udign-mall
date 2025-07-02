@@ -131,8 +131,45 @@ export default function ReviewManagement() {
         // 다이얼로그 닫기
         setConfirmDialog((prev) => ({ ...prev, open: false }));
 
-        // 데이터 새로고침
-        await fetchData();
+        // 현재 아이템의 상태를 찾아서 정확한 통계 업데이트
+        const currentItem = items.find((item) => item.it_id === itemId);
+        const previousStatus = currentItem?.review_status;
+        const newStatus = action === 'payment' ? 'approved' : 'in_review';
+
+        // 로컬 상태 업데이트 - 아이템의 review_status 변경
+        setItems((prev) =>
+          prev.map((item) =>
+            item.it_id === itemId
+              ? {
+                  ...item,
+                  review_status: newStatus,
+                }
+              : item,
+          ),
+        );
+
+        // 통계 데이터 실시간 업데이트
+        setStats((prevStats) => {
+          if (!prevStats) return prevStats;
+
+          const newStats = { ...prevStats };
+
+          // 이전 상태에서 빼기
+          if (previousStatus === 'in_review') {
+            newStats.review = Math.max(0, newStats.review - 1);
+          } else if (previousStatus === 'approved') {
+            newStats.payment = Math.max(0, newStats.payment - 1);
+          }
+
+          // 새로운 상태에 추가
+          if (newStatus === 'in_review') {
+            newStats.review = newStats.review + 1;
+          } else if (newStatus === 'approved') {
+            newStats.payment = newStats.payment + 1;
+          }
+
+          return newStats;
+        });
       } else {
         alert(result.message || '처리 중 오류가 발생했습니다.');
       }
@@ -175,6 +212,28 @@ export default function ReviewManagement() {
               : item,
           ),
         );
+
+        // 통계 데이터 실시간 업데이트
+        setStats((prevStats) => {
+          if (!prevStats) return prevStats;
+
+          const isApproving = newVisibility === '1'; // 승인으로 변경
+          const isRejecting = newVisibility === '0'; // 반려로 변경
+
+          return {
+            ...prevStats,
+            approvedItems: isApproving
+              ? prevStats.approvedItems + 1
+              : isRejecting
+                ? Math.max(0, prevStats.approvedItems - 1)
+                : prevStats.approvedItems,
+            rejectedItems: isRejecting
+              ? prevStats.rejectedItems + 1
+              : isApproving
+                ? Math.max(0, prevStats.rejectedItems - 1)
+                : prevStats.rejectedItems,
+          };
+        });
       } else {
         alert(result.message || '디자인 검수 상태 변경 중 오류가 발생했습니다.');
       }
