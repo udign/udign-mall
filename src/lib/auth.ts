@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import pbkdf2 from 'pbkdf2';
+import { cookies, headers } from 'next/headers';
 import { executeQuery } from '@/lib/database';
 import { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/user';
 
@@ -388,5 +389,74 @@ export const loginUser = async (loginData: LoginRequest): Promise<AuthResponse> 
       success: false,
       message: '로그인 중 오류가 발생했습니다.',
     };
+  }
+};
+
+// 서버에서 현재 사용자 정보를 가져오는 함수
+export const getCurrentUser = async (): Promise<User | null> => {
+  try {
+    const cookieStore = await cookies();
+    const headersList = await headers();
+
+    // JWT 토큰에서 사용자 정보 가져오기
+    const token = cookieStore.get('auth-token')?.value;
+
+    if (token) {
+      const decoded = verifyToken(token) as {
+        mb_no: number;
+        mb_id: string;
+        mb_name: string;
+        mb_level: number;
+      } | null;
+      if (decoded && decoded.mb_no) {
+        const users = (await executeQuery('SELECT * FROM g5_member WHERE mb_no = ?', [
+          decoded.mb_no,
+        ])) as unknown[];
+
+        if (users.length > 0) {
+          const user = users[0] as User & {
+            mb_intercept_date: string;
+            mb_leave_date: string;
+          };
+
+          // 차단되거나 탈퇴한 회원 체크
+          if (
+            (user.mb_intercept_date &&
+              user.mb_intercept_date !== '' &&
+              user.mb_intercept_date !== '0000-00-00') ||
+            (user.mb_leave_date && user.mb_leave_date !== '' && user.mb_leave_date !== '0000-00-00')
+          ) {
+            return null;
+          }
+
+          return {
+            mb_no: user.mb_no,
+            mb_id: user.mb_id,
+            mb_name: user.mb_name,
+            mb_nick: user.mb_nick,
+            mb_email: user.mb_email,
+            mb_level: user.mb_level,
+            mb_datetime: user.mb_datetime,
+            mb_today_login: user.mb_today_login,
+            mb_login_ip: user.mb_login_ip,
+          };
+        }
+      }
+    }
+
+    // 자동 로그인 쿠키에서 사용자 정보 가져오기
+    const autoLoginId = cookieStore.get('ck_mb_id')?.value;
+    const autoLoginKey = cookieStore.get('ck_auto')?.value;
+    const userAgent = headersList.get('user-agent') || '';
+
+    if (autoLoginId && autoLoginKey) {
+      const autoLoginUser = await verifyAutoLoginCookie(autoLoginId, autoLoginKey, userAgent);
+      return autoLoginUser;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Get current user error:', error);
+    return null;
   }
 };
