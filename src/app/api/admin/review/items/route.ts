@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
+import { getImageUrl } from '@/lib/utils';
 
 // 데이터베이스 결과 타입 정의
 interface DatabaseItem {
@@ -168,7 +169,7 @@ export const GET = async (request: NextRequest) => {
       return {
         it_id: item.it_id,
         it_name: item.it_name,
-        it_img1: item.it_img1,
+        it_img1: getImageUrl(item.it_img1) || '', // 완성된 이미지 URL로 변환
         it_1: item.it_1,
         it_2: item.it_2,
         it_3: item.it_3,

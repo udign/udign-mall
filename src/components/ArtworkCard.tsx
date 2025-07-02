@@ -120,7 +120,7 @@ export default function ArtworkCard({
             <div className='flex-shrink-0'>
               {artwork.it_img1 ? (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${artwork.it_img1}`}
+                  src={artwork.it_img1}
                   alt={artwork.it_name}
                   width={96}
                   height={96}

@@ -3,6 +3,7 @@ import { executeQuery } from '@/lib/database';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { RowDataPacket } from 'mysql2';
+import { getImageUrl } from '@/lib/utils';
 
 interface JwtPayload {
   mb_id: string;
@@ -199,13 +200,6 @@ export const GET = async (
 
     // 조회수 증가
     await executeQuery('UPDATE g5_shop_item SET it_hit = it_hit + 1 WHERE it_id = ?', [productId]);
-
-    const getImageUrl = (imagePath: string) => {
-      if (!imagePath) return null;
-      if (imagePath.startsWith('http')) return imagePath;
-      // Vercel Storage의 이미지 URL 생성
-      return `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${imagePath}`;
-    };
 
     const response = {
       success: true,

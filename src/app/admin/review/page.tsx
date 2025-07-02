@@ -393,10 +393,7 @@ function ReviewManagement() {
                                 </div>
                               ) : (
                                 <Image
-                                  src={
-                                    `${process.env.NEXT_PUBLIC_VERCEL_BLOB_BASE_URL}/item/${item.it_img1}` ||
-                                    '/images/no-image.png'
-                                  }
+                                  src={item.it_img1 || '/images/no-image.png'}
                                   alt={item.it_name}
                                   width={48}
                                   height={48}

@@ -1,6 +1,7 @@
 import { executeQuery } from '@/lib/database';
 import { ArtworkStatus, ProductsByStatus, StatusCounts } from '@/types/artwork';
 import { STATUS_GROUPS, STATUS_MAPPING } from '@/lib/constants';
+import { getImageUrl } from '@/lib/utils';
 
 export const getArtworksByUser = async (
   userId: string,
@@ -141,6 +142,7 @@ export const getArtworksByUser = async (
 
       const artworkStatus: ArtworkStatus = {
         ...row,
+        it_img1: getImageUrl(row.it_img1) || '',
         _goalAttainment: goalAttainment,
         _status_text: statusInfo.statusText,
         _status_key: statusInfo.statusKey,
