@@ -21,6 +21,7 @@ export const POST = async (request: NextRequest) => {
     const category = formData.get('category') as string;
     const artworkName = formData.get('artworkName') as string;
     const description = formData.get('description') as string;
+    const targetLikes = parseInt(formData.get('targetLikes') as string) || 100;
     const mainImage = formData.get('mainImage') as File;
 
     // 추가 이미지들 수집
@@ -145,7 +146,7 @@ export const POST = async (request: NextRequest) => {
           it_time, it_update_time, it_ip,
           it_head_html, it_tail_html, it_mobile_head_html, it_mobile_tail_html,
           it_info_value, it_shop_memo, it_use_avg,
-          it_1, it_2, it_3, it_order
+          it_1, it_2, it_3, it_4, it_order
         ) VALUES (
           ?, ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?,
@@ -155,7 +156,7 @@ export const POST = async (request: NextRequest) => {
           ?, ?, ?,
           ?, ?, ?, ?,
           ?, ?, ?,
-          ?, ?, ?, 0
+          ?, ?, ?, ?, 0
         )
       `;
 
@@ -207,6 +208,7 @@ export const POST = async (request: NextRequest) => {
         decoded.mb_id, // it_1: 등록자 ID
         decoded.mb_id, // it_2: 작가명 (회원 ID로 설정)
         description, // it_3: 작품설명
+        targetLikes, // it_4: 목표 좋아요 수
       ];
 
       await executeQuery(insertQuery, params);

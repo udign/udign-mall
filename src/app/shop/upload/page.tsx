@@ -50,7 +50,7 @@ export default function UploadPage() {
     category: '',
     artworkName: '',
     description: '',
-    targetLikes: 100,
+    targetLikes: '',
     agreeToTerms: false,
   });
 
