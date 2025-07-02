@@ -10,6 +10,7 @@ import CommonPagination from '@/components/CommonPagination';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Button } from '@/components/ui/primitives/button';
+import { Checkbox } from '@/components/ui/primitives/checkbox';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { ROUTES } from '@/lib/routes';
 
@@ -349,20 +350,19 @@ export default function ReviewManagement() {
                             <div className='flex justify-center'>
                               <div className='flex items-center space-x-2'>
                                 {visibilityLoading === item.it_id ? (
-                                  <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600' />
+                                  <LoadingSpinner size='sm' className='mb-0' />
                                 ) : (
                                   <label className='flex cursor-pointer items-center space-x-2'>
-                                    <input
-                                      type='checkbox'
+                                    <Checkbox
                                       checked={Number(item.it_use) === 1}
-                                      onChange={() =>
+                                      onCheckedChange={() =>
                                         handleToggleVisibility(item.it_id, item.it_use)
                                       }
                                       disabled={visibilityLoading === item.it_id}
-                                      className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                                      className='cursor-pointer'
                                     />
                                     <span className='text-sm text-gray-700'>
-                                      {Number(item.it_use) === 1 ? '노출' : '숨김'}
+                                      {Number(item.it_use) === 1 ? '승인' : '반려'}
                                     </span>
                                   </label>
                                 )}
@@ -397,7 +397,7 @@ export default function ReviewManagement() {
                                   }
                                 >
                                   {actionLoading === item.it_id ? (
-                                    <div className='h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent' />
+                                    <LoadingSpinner size='sm' className='mb-0 border-white' />
                                   ) : (
                                     '구매 진행'
                                   )}
@@ -438,7 +438,7 @@ export default function ReviewManagement() {
                                   }
                                 >
                                   {actionLoading === item.it_id ? (
-                                    <div className='h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent' />
+                                    <LoadingSpinner size='sm' className='mb-0 border-white' />
                                   ) : (
                                     '제작 검토'
                                   )}
