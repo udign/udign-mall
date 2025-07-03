@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import Image from 'next/image';
-import { v4 as uuidv4 } from 'uuid';
+
 import { loadTossPayments } from '@tosspayments/tosspayments-sdk';
 import type {
   WidgetSelectedPaymentMethod,
@@ -61,7 +61,7 @@ export default function CheckoutPage() {
 
   const { user, isLoading: authLoading } = useAuth();
 
-  const orderId = useMemo(() => uuidv4(), []);
+  const orderId = useMemo(() => Date.now().toString(), []);
 
   // 인증 상태 체크, 상품 정보 가져오기 및 구매자 정보 설정
   useEffect(() => {

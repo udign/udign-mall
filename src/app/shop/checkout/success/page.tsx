@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { PaymentMethodType } from '@/types/payment';
 import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
@@ -51,65 +52,61 @@ export default function PaymentSuccessPage() {
     const paymentKey = searchParams.get('paymentKey');
 
     if (paymentKey && orderId && amount) {
-      confirmPayment(paymentKey, orderId, parseInt(amount));
+      const confirmPayment = async () => {
+        try {
+          setIsConfirming(true);
+
+          // 토스페이먼츠 결제 승인 요청
+          const response = await fetch('/api/payments/confirm', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              paymentKey,
+              orderId,
+              amount: parseInt(amount),
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            const paymentData: PaymentData = result.paymentData;
+
+            setOrderInfo({
+              orderId: paymentData.orderId,
+              amount: paymentData.amount,
+              customerName: user?.mb_name || '',
+              orderDate: new Date(paymentData.approvedAt).toLocaleDateString('ko-KR'),
+              orderTime: new Date(paymentData.approvedAt).toLocaleTimeString('ko-KR'),
+              paymentMethod: getPaymentMethodName(paymentData.method),
+              paymentKey: paymentData.paymentKey,
+            });
+          } else {
+            setError(result.error || '결제 승인에 실패했습니다.');
+          }
+        } catch (err) {
+          console.error('결제 승인 처리 오류:', err);
+          setError('결제 승인 처리 중 오류가 발생했습니다.');
+        } finally {
+          setIsConfirming(false);
+          setLoading(false);
+        }
+      };
+
+      confirmPayment();
     } else {
       setError('결제 정보가 누락되었습니다.');
       setLoading(false);
     }
   }, [authLoading, user, searchParams, router]);
 
-  const confirmPayment = async (paymentKey: string, orderId: string, amount: number) => {
-    try {
-      setIsConfirming(true);
-
-      // 토스페이먼츠 결제 승인 요청
-      const response = await fetch('/api/payments/confirm', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          paymentKey,
-          orderId,
-          amount,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        const paymentData: PaymentData = result.paymentData;
-
-        setOrderInfo({
-          orderId: paymentData.orderId,
-          amount: paymentData.amount,
-          customerName: user?.mb_name || '',
-          orderDate: new Date(paymentData.approvedAt).toLocaleDateString('ko-KR'),
-          orderTime: new Date(paymentData.approvedAt).toLocaleTimeString('ko-KR'),
-          paymentMethod: getPaymentMethodName(paymentData.method),
-          paymentKey: paymentData.paymentKey,
-        });
-      } else {
-        setError(result.error || '결제 승인에 실패했습니다.');
-      }
-    } catch (err) {
-      console.error('결제 승인 처리 오류:', err);
-      setError('결제 승인 처리 중 오류가 발생했습니다.');
-    } finally {
-      setIsConfirming(false);
-      setLoading(false);
-    }
-  };
-
-  const getPaymentMethodName = (method: string): string => {
+  const getPaymentMethodName = (method: PaymentMethodType | string): string => {
     const methodNames: { [key: string]: string } = {
       CARD: '신용카드',
-      TRANSFER: '계좌이체',
-      VIRTUAL_ACCOUNT: '가상계좌',
-      MOBILE_PHONE: '휴대폰',
-      CULTURE_GIFT_CERTIFICATE: '문화상품권',
-      BOOK_GIFT_CERTIFICATE: '도서문화상품권',
-      GAME_GIFT_CERTIFICATE: '게임문화상품권',
+      NAVERPAY: '네이버페이',
+      TOSSPAY: '토스페이',
     };
     return methodNames[method] || method;
   };

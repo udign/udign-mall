@@ -44,15 +44,18 @@ export async function POST(request: NextRequest) {
           od_id, mb_id, od_name, od_email, od_hp,
           od_zip1, od_addr1, od_addr2,
           od_cart_price, od_receipt_price, od_status,
-          od_settle_case, od_time, od_ip
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
+          od_settle_case, od_tno, od_time, od_ip
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
       `;
+
+      // od_id는 타임스탬프 기반 숫자 ID를 생성
+      const numericOrderId = Date.now();
 
       const clientIp =
         request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
 
       await connection.execute(orderInsertQuery, [
-        paymentRequest.orderId,
+        numericOrderId,
         userId,
         paymentRequest.customerInfo.name,
         paymentRequest.customerInfo.email,
@@ -64,6 +67,7 @@ export async function POST(request: NextRequest) {
         0, // 아직 결제 완료 전이므로 0
         '주문',
         paymentRequest.paymentMethod,
+        paymentRequest.orderId, // UUID를 od_tno 필드에 저장
         clientIp,
       ]);
 

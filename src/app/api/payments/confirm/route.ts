@@ -38,6 +38,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 토스페이먼츠 API 응답 구조 확인을 위한 로그
+    console.log('토스페이먼츠 API 응답:', JSON.stringify(paymentData, null, 2));
+
     // 데이터베이스에서 주문 상태 업데이트
     const connection = await getConnection();
 
@@ -55,12 +58,16 @@ export async function POST(request: NextRequest) {
         WHERE od_id = ?
       `;
 
-      await connection.execute(updateOrderQuery, [
-        paymentData.totalAmount,
-        paymentData.method,
+      // 파라미터 값들 확인을 위한 로그
+      const updateParams = [
+        paymentData.totalAmount || amount,
+        paymentData.method || '카드',
         paymentData.paymentKey,
         orderId,
-      ]);
+      ];
+      console.log('UPDATE 쿼리 파라미터:', updateParams);
+
+      await connection.execute(updateOrderQuery, updateParams);
 
       // 장바구니 상태도 업데이트
       const updateCartQuery = `
