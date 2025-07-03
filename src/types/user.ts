@@ -4,6 +4,7 @@ export interface User {
   mb_name: string;
   mb_nick: string;
   mb_email: string;
+  mb_hp: string;
   mb_level: number;
   mb_datetime: string;
   mb_today_login: string;

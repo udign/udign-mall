@@ -76,7 +76,7 @@ export default function CheckoutPage() {
       ...prev,
       name: user.mb_name || '',
       email: user.mb_email || '',
-      phone: '',
+      phone: user.mb_hp || '',
     }));
 
     const itemId = searchParams.get('itemId');
@@ -148,10 +148,23 @@ export default function CheckoutPage() {
 
   // 결제 위젯 렌더링
   useEffect(() => {
-    if (!widgets || isPaymentWidgetReady || amount.value <= 0) return;
+    if (!widgets || amount.value <= 0) return;
 
     const renderPaymentWidget = async () => {
       try {
+        // 기존 위젯이 있다면 먼저 정리
+        if (paymentMethodsWidget) {
+          await paymentMethodsWidget.destroy();
+          setPaymentMethodsWidget(null);
+        }
+        if (agreementWidget) {
+          await agreementWidget.destroy();
+          setAgreementWidget(null);
+        }
+
+        // 위젯 상태 초기화
+        setIsPaymentWidgetReady(false);
+
         // 주문의 결제 금액 설정
         await widgets.setAmount(amount);
 
@@ -189,7 +202,7 @@ export default function CheckoutPage() {
     };
 
     renderPaymentWidget();
-  }, [widgets, isPaymentWidgetReady, amount]);
+  }, [widgets, amount.value]);
 
   const cleanupWidgets = useCallback(async () => {
     if (paymentMethodsWidget) {
