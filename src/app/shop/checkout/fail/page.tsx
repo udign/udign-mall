@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/primitives/button';
@@ -8,7 +8,7 @@ import LoadingState from '@/components/states/LoadingState';
 import { XCircleIcon } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
 
-export default function PaymentFailPage() {
+function PaymentFailContent() {
   const [failureReason, setFailureReason] = useState<string>('');
   const [isLoadingFailureInfo, setIsLoadingFailureInfo] = useState<boolean>(true);
 
@@ -82,5 +82,13 @@ export default function PaymentFailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentFailPage() {
+  return (
+    <Suspense fallback={<LoadingState message='결제 결과를 확인하는 중...' />}>
+      <PaymentFailContent />
+    </Suspense>
   );
 }

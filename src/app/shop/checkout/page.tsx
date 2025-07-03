@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { PaymentItem, PaymentRequest, PaymentMethodType } from '@/types/payment';
@@ -34,7 +34,7 @@ interface MessageDialogState {
   description: string;
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
   const [paymentMethodsWidget, setPaymentMethodsWidget] =
     useState<WidgetPaymentMethodWidget | null>(null);
@@ -548,5 +548,13 @@ export default function CheckoutPage() {
         description={messageDialogContent.description}
       />
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<LoadingState message='결제 페이지를 준비하는 중...' />}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

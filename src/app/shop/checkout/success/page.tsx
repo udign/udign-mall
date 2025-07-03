@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { PaymentMethodType } from '@/types/payment';
@@ -37,7 +37,7 @@ const getPaymentMethodName = (method: PaymentMethodType | string): string => {
   return methodNames[method] || method;
 };
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
   const [isProcessingOrder, setIsProcessingOrder] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -195,5 +195,13 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingState message='결제 결과를 불러오는 중...' />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
