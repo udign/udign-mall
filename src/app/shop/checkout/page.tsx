@@ -7,6 +7,7 @@ import { PaymentItem, PaymentRequest, PaymentMethodType } from '@/types/payment'
 import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
+import MessageDialog from '@/components/ui/MessageDialog';
 import Image from 'next/image';
 import { loadTossPayments } from '@tosspayments/tosspayments-sdk';
 import type {
@@ -26,6 +27,11 @@ interface CustomerInfo {
   address: string;
   detailAddress: string;
   zipCode: string;
+}
+
+interface MessageDialogState {
+  title: string;
+  description: string;
 }
 
 export default function CheckoutPage() {
@@ -48,13 +54,17 @@ export default function CheckoutPage() {
     zipCode: '',
   });
   const [orderItems, setOrderItems] = useState<PaymentItem[]>([]);
+  const [messageDialogContent, setMessageDialogContent] = useState<MessageDialogState>({
+    title: '',
+    description: '',
+  });
+  const [error, setError] = useState<string | null>(null);
 
   const [isPaymentSystemLoading, setIsPaymentSystemLoading] = useState<boolean>(true);
   const [isPaymentWidgetReady, setIsPaymentWidgetReady] = useState<boolean>(false);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState<boolean>(false);
   const [isAgreementAccepted, setIsAgreementAccepted] = useState<boolean>(true);
-
-  const [error, setError] = useState<string | null>(null);
+  const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,6 +72,17 @@ export default function CheckoutPage() {
   const { user, isLoading: authLoading } = useAuth();
 
   const orderId = useMemo(() => Date.now().toString(), []);
+
+  const isPaymentDisabled =
+    !customerInfo.name ||
+    !customerInfo.email ||
+    !customerInfo.phone ||
+    !customerInfo.address ||
+    !customerInfo.detailAddress ||
+    !customerInfo.zipCode ||
+    !isPaymentWidgetReady ||
+    !isAgreementAccepted ||
+    isPaymentProcessing;
 
   // 인증 상태 체크, 상품 정보 가져오기 및 구매자 정보 설정
   useEffect(() => {
@@ -238,6 +259,17 @@ export default function CheckoutPage() {
     const currentOrderId = orderId;
 
     try {
+      // 전화번호 형식 검증
+      if (customerInfo.phone.length < 10 || customerInfo.phone.length > 11) {
+        setMessageDialogContent({
+          title: '입력 오류',
+          description: '하이픈을 제외한 올바른 전화번호를 입력해주세요. (예: 01012345678)',
+        });
+        setShowMessageDialog(true);
+        setIsPaymentProcessing(false);
+        return;
+      }
+
       const paymentRequest: PaymentRequest = {
         items: orderItems,
         customerInfo,
@@ -291,9 +323,17 @@ export default function CheckoutPage() {
 
       const errorMessage = err instanceof Error ? err.message : '결제 요청에 실패했습니다.';
       if (errorMessage.includes('취소되었습니다') || errorMessage.includes('canceled')) {
-        console.log('사용자가 결제를 취소했습니다.');
+        setMessageDialogContent({
+          title: '결제 취소',
+          description: '결제가 취소되었습니다.',
+        });
+        setShowMessageDialog(true);
       } else {
-        alert('결제 요청에 실패했습니다.');
+        setMessageDialogContent({
+          title: '결제 실패',
+          description: '결제 요청에 실패했습니다. 다시 시도해 주세요.',
+        });
+        setShowMessageDialog(true);
       }
 
       setIsPaymentProcessing(false);
@@ -350,9 +390,12 @@ export default function CheckoutPage() {
               <div className='space-y-4'>
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className='mb-1 block text-sm font-medium text-gray-700'>받는 분</label>
+                    <label className='mb-1 block text-sm font-medium text-gray-700'>
+                      받는 분 <span className='text-red-500'>*</span>
+                    </label>
                     <input
                       type='text'
+                      required
                       value={customerInfo.name}
                       onChange={(e) =>
                         setCustomerInfo((prev) => ({ ...prev, name: e.target.value }))
@@ -361,21 +404,30 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className='mb-1 block text-sm font-medium text-gray-700'>연락처</label>
+                    <label className='mb-1 block text-sm font-medium text-gray-700'>
+                      연락처 <span className='text-red-500'>*</span>
+                    </label>
                     <input
-                      type='tel'
+                      type='number'
+                      required
                       value={customerInfo.phone}
-                      onChange={(e) =>
-                        setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))
-                      }
-                      className='focus:ring-primary w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:outline-none'
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        if (value.length <= 11)
+                          setCustomerInfo((prev) => ({ ...prev, phone: value }));
+                      }}
+                      placeholder='01012345678'
+                      className='focus:ring-primary w-full [appearance:textfield] rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
                     />
                   </div>
                 </div>
                 <div>
-                  <label className='mb-1 block text-sm font-medium text-gray-700'>이메일</label>
+                  <label className='mb-1 block text-sm font-medium text-gray-700'>
+                    이메일 <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     type='email'
+                    required
                     value={customerInfo.email}
                     onChange={(e) =>
                       setCustomerInfo((prev) => ({ ...prev, email: e.target.value }))
@@ -385,20 +437,29 @@ export default function CheckoutPage() {
                 </div>
                 <div className='grid grid-cols-3 gap-4'>
                   <div>
-                    <label className='mb-1 block text-sm font-medium text-gray-700'>우편번호</label>
+                    <label className='mb-1 block text-sm font-medium text-gray-700'>
+                      우편번호 <span className='text-red-500'>*</span>
+                    </label>
                     <input
-                      type='text'
+                      type='number'
+                      required
                       value={customerInfo.zipCode}
-                      onChange={(e) =>
-                        setCustomerInfo((prev) => ({ ...prev, zipCode: e.target.value }))
-                      }
-                      className='focus:ring-primary w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:outline-none'
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        if (value.length <= 5)
+                          setCustomerInfo((prev) => ({ ...prev, zipCode: value }));
+                      }}
+                      placeholder='12345'
+                      className='focus:ring-primary w-full [appearance:textfield] rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
                     />
                   </div>
                   <div className='col-span-2'>
-                    <label className='mb-1 block text-sm font-medium text-gray-700'>주소</label>
+                    <label className='mb-1 block text-sm font-medium text-gray-700'>
+                      주소 <span className='text-red-500'>*</span>
+                    </label>
                     <input
                       type='text'
+                      required
                       value={customerInfo.address}
                       onChange={(e) =>
                         setCustomerInfo((prev) => ({ ...prev, address: e.target.value }))
@@ -408,9 +469,12 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <div>
-                  <label className='mb-1 block text-sm font-medium text-gray-700'>상세 주소</label>
+                  <label className='mb-1 block text-sm font-medium text-gray-700'>
+                    상세 주소 <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     type='text'
+                    required
                     value={customerInfo.detailAddress}
                     onChange={(e) =>
                       setCustomerInfo((prev) => ({ ...prev, detailAddress: e.target.value }))
@@ -457,14 +521,7 @@ export default function CheckoutPage() {
                 onClick={handlePayment}
                 className='bg-primary hover:bg-primary/90 w-full text-white'
                 size='lg'
-                disabled={
-                  !customerInfo.name ||
-                  !customerInfo.email ||
-                  !customerInfo.phone ||
-                  !isPaymentWidgetReady ||
-                  !isAgreementAccepted ||
-                  isPaymentProcessing
-                }
+                disabled={isPaymentDisabled}
               >
                 {isPaymentProcessing
                   ? '결제 처리 중...'
@@ -483,6 +540,13 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      <MessageDialog
+        open={showMessageDialog}
+        onOpenChange={setShowMessageDialog}
+        title={messageDialogContent.title}
+        description={messageDialogContent.description}
+      />
     </div>
   );
 }

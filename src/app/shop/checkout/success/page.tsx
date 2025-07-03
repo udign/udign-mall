@@ -28,11 +28,19 @@ interface OrderInfo {
   paymentKey: string;
 }
 
+const getPaymentMethodName = (method: PaymentMethodType | string): string => {
+  const methodNames: { [key: string]: string } = {
+    CARD: '신용카드',
+    NAVERPAY: '네이버페이',
+    TOSSPAY: '토스페이',
+  };
+  return methodNames[method] || method;
+};
+
 export default function PaymentSuccessPage() {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
-  const [isConfirming, setIsConfirming] = useState<boolean>(true);
+  const [isProcessingOrder, setIsProcessingOrder] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -54,7 +62,7 @@ export default function PaymentSuccessPage() {
     if (paymentKey && orderId && amount) {
       const confirmPayment = async () => {
         try {
-          setIsConfirming(true);
+          setIsProcessingOrder(true);
 
           // 토스페이먼츠 결제 승인 요청
           const response = await fetch('/api/payments/confirm', {
@@ -90,49 +98,36 @@ export default function PaymentSuccessPage() {
           console.error('결제 승인 처리 오류:', err);
           setError('결제 승인 처리 중 오류가 발생했습니다.');
         } finally {
-          setIsConfirming(false);
-          setLoading(false);
+          setIsProcessingOrder(false);
         }
       };
 
       confirmPayment();
     } else {
       setError('결제 정보가 누락되었습니다.');
-      setLoading(false);
+      setIsProcessingOrder(false);
     }
   }, [authLoading, user, searchParams, router]);
 
-  const getPaymentMethodName = (method: PaymentMethodType | string): string => {
-    const methodNames: { [key: string]: string } = {
-      CARD: '신용카드',
-      NAVERPAY: '네이버페이',
-      TOSSPAY: '토스페이',
-    };
-    return methodNames[method] || method;
-  };
-
-  return authLoading || loading ? (
-    <LoadingState message={isConfirming ? '결제를 승인하는 중...' : '결제 결과를 확인하는 중...'} />
+  return authLoading || isProcessingOrder ? (
+    <LoadingState message='결제 결과를 처리하는 중...' />
   ) : error ? (
     <ErrorState message={error} showGoHome={true} />
   ) : (
-    <div className='min-h-screen bg-white'>
+    <div className='bg-white'>
       <div className='mx-auto max-w-2xl px-6 py-16'>
         <div className='space-y-8 text-center'>
-          {/* 성공 아이콘 */}
           <div className='flex justify-center'>
             <div className='flex h-20 w-20 items-center justify-center rounded-full bg-green-100'>
               <CheckCircleIcon className='h-12 w-12 text-green-600' />
             </div>
           </div>
 
-          {/* 메시지 */}
           <div className='space-y-4'>
             <h1 className='text-3xl font-bold text-gray-900'>결제가 완료되었습니다!</h1>
             <p className='text-lg text-gray-600'>주문이 정상적으로 접수되었습니다.</p>
           </div>
 
-          {/* 주문 정보 */}
           {orderInfo && (
             <div className='space-y-4 rounded-lg border border-gray-200 p-6 text-left'>
               <h2 className='mb-6 text-center text-lg font-semibold text-gray-900'>주문 정보</h2>
@@ -171,7 +166,6 @@ export default function PaymentSuccessPage() {
             </div>
           )}
 
-          {/* 안내 메시지 */}
           <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
             <div className='space-y-1 text-sm text-blue-800'>
               <p>• 주문 내역은 마이페이지에서 확인하실 수 있습니다.</p>
@@ -181,7 +175,6 @@ export default function PaymentSuccessPage() {
             </div>
           </div>
 
-          {/* 버튼들 */}
           <div className='space-y-3'>
             <Button
               onClick={() => router.push(ROUTES.MY_UDIGN)}
