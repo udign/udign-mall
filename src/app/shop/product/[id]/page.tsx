@@ -411,10 +411,10 @@ export default function ProductDetailPage() {
                     className='border-primary text-primary hover:bg-primary w-full hover:text-white'
                     size='lg'
                     onClick={() => {
-                      alert('바로 구매 기능은 개발 중입니다.');
+                      router.push(`/shop/checkout?itemId=${product.it_id}&quantity=${quantity}`);
                     }}
                   >
-                    바로 구매하기
+                    구매하기
                   </Button>
                 </div>
 
