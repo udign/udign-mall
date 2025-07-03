@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import Image from 'next/image';
-
 import { loadTossPayments } from '@tosspayments/tosspayments-sdk';
 import type {
   WidgetSelectedPaymentMethod,
@@ -16,8 +15,9 @@ import type {
   WidgetAgreementWidget,
   TossPaymentsWidgets,
 } from '@tosspayments/tosspayments-sdk';
+import { ROUTES } from '@/lib/routes';
 
-const clientKey = 'test_gck_EP59LybZ8B9gD7oZaa7kr6GYo7pR';
+const CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY;
 
 interface CustomerInfo {
   name: string;
@@ -68,7 +68,7 @@ export default function CheckoutPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push('/shop/login');
+      router.push(ROUTES.LOGIN);
       return;
     }
 
@@ -128,7 +128,11 @@ export default function CheckoutPage() {
 
     const initializePaymentWidget = async () => {
       try {
-        const tossPayments = await loadTossPayments(clientKey);
+        if (!CLIENT_KEY) {
+          throw new Error('토스페이먼츠 클라이언트 키가 설정되지 않았습니다.');
+        }
+
+        const tossPayments = await loadTossPayments(CLIENT_KEY);
 
         const widgetInstance = tossPayments.widgets({
           customerKey: 'By2OIT0GcNVub6nYuallA',
@@ -230,6 +234,8 @@ export default function CheckoutPage() {
     if (!widgets || orderItems.length === 0 || isPaymentProcessing || !isAgreementAccepted) return;
 
     setIsPaymentProcessing(true);
+    let orderCreated = false;
+    const currentOrderId = orderId;
 
     try {
       const paymentRequest: PaymentRequest = {
@@ -237,7 +243,7 @@ export default function CheckoutPage() {
         customerInfo,
         paymentMethod: selectedPaymentMethod,
         totalAmount: getTotalAmount(),
-        orderId,
+        orderId: currentOrderId,
       };
 
       const orderResponse = await fetch('/api/payments/create-order', {
@@ -252,9 +258,11 @@ export default function CheckoutPage() {
         throw new Error(orderResult.error || '주문 생성에 실패했습니다.');
       }
 
+      orderCreated = true;
+
       // 토스페이먼츠 결제 요청
       await widgets.requestPayment({
-        orderId: orderId,
+        orderId: currentOrderId,
         orderName:
           orderItems.length === 1
             ? orderItems[0].it_name
@@ -267,7 +275,27 @@ export default function CheckoutPage() {
       });
     } catch (err) {
       console.error('결제 요청 실패:', err);
-      alert('결제 요청에 실패했습니다.');
+
+      // 결제 취소/실패 시 생성된 주문 삭제
+      if (orderCreated) {
+        try {
+          await fetch('/api/payments/cancel-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: currentOrderId }),
+          });
+        } catch (cleanupErr) {
+          console.error('주문 정리 실패:', cleanupErr);
+        }
+      }
+
+      const errorMessage = err instanceof Error ? err.message : '결제 요청에 실패했습니다.';
+      if (errorMessage.includes('취소되었습니다') || errorMessage.includes('canceled')) {
+        console.log('사용자가 결제를 취소했습니다.');
+      } else {
+        alert('결제 요청에 실패했습니다.');
+      }
+
       setIsPaymentProcessing(false);
     }
   };

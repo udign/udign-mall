@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import { CheckCircleIcon } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 
 interface PaymentData {
   orderId: string;
@@ -42,11 +43,10 @@ export default function PaymentSuccessPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push('/shop/login');
+      router.push(ROUTES.LOGIN);
       return;
     }
 
-    // URL에서 토스페이먼츠 결제 결과 파라미터 추출
     const orderId = searchParams.get('orderId');
     const amount = searchParams.get('amount');
     const paymentKey = searchParams.get('paymentKey');
@@ -111,19 +111,11 @@ export default function PaymentSuccessPage() {
     return methodNames[method] || method;
   };
 
-  if (authLoading || loading) {
-    return (
-      <LoadingState
-        message={isConfirming ? '결제를 승인하는 중...' : '결제 결과를 확인하는 중...'}
-      />
-    );
-  }
-
-  if (error) {
-    return <ErrorState message={error} showGoHome={true} />;
-  }
-
-  return (
+  return authLoading || loading ? (
+    <LoadingState message={isConfirming ? '결제를 승인하는 중...' : '결제 결과를 확인하는 중...'} />
+  ) : error ? (
+    <ErrorState message={error} showGoHome={true} />
+  ) : (
     <div className='min-h-screen bg-white'>
       <div className='mx-auto max-w-2xl px-6 py-16'>
         <div className='space-y-8 text-center'>
@@ -192,7 +184,7 @@ export default function PaymentSuccessPage() {
           {/* 버튼들 */}
           <div className='space-y-3'>
             <Button
-              onClick={() => router.push('/shop/my-udign')}
+              onClick={() => router.push(ROUTES.MY_UDIGN)}
               className='bg-primary hover:bg-primary/90 w-full text-white'
               size='lg'
             >
@@ -200,7 +192,7 @@ export default function PaymentSuccessPage() {
             </Button>
             <Button
               variant='outline'
-              onClick={() => router.push('/shop')}
+              onClick={() => router.push(ROUTES.SHOP)}
               className='w-full'
               size='lg'
             >

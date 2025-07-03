@@ -29,12 +29,12 @@ export const getArtworksByUser = async (
         LEFT JOIN (
           SELECT ct.it_id, ct.ct_status, ct.ct_id, ct.od_id
           FROM g5_shop_cart ct
-          INNER JOIN g5_shop_order od ON ct.od_id = od.od_id
+          INNER JOIN g5_shop_order od ON ct.od_id = od.od_tno
           WHERE ct.mb_id = ?
           AND CONCAT(od.od_time, '-', LPAD(ct.ct_id, 10, '0')) = (
             SELECT MAX(CONCAT(od2.od_time, '-', LPAD(ct2.ct_id, 10, '0')))
             FROM g5_shop_cart ct2
-            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_id
+            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_tno
             WHERE ct2.it_id = ct.it_id AND ct2.mb_id = ?
           )
         ) cart ON it.it_id = cart.it_id
@@ -44,10 +44,10 @@ export const getArtworksByUser = async (
           WHERE r.mb_id = ?
         ) ret ON cart.od_id = ret.od_id
         LEFT JOIN (
-          SELECT od.od_id, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
+          SELECT od.od_id, od.od_tno, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
           FROM g5_shop_order od
           WHERE od.mb_id = ?
-        ) ord ON cart.od_id = ord.od_id
+        ) ord ON cart.od_id = ord.od_tno
       `;
 
       sqlSearch = `
@@ -66,12 +66,12 @@ export const getArtworksByUser = async (
         LEFT JOIN (
           SELECT ct.it_id, ct.ct_status, ct.ct_id, ct.od_id
           FROM g5_shop_cart ct
-          INNER JOIN g5_shop_order od ON ct.od_id = od.od_id
+          INNER JOIN g5_shop_order od ON ct.od_id = od.od_tno
           WHERE ct.mb_id = ?
           AND CONCAT(od.od_time, '-', LPAD(ct.ct_id, 10, '0')) = (
             SELECT MAX(CONCAT(od2.od_time, '-', LPAD(ct2.ct_id, 10, '0')))
             FROM g5_shop_cart ct2
-            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_id
+            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_tno
             WHERE ct2.it_id = ct.it_id AND ct2.mb_id = ?
           )
         ) cart ON ir.it_id = cart.it_id
@@ -81,10 +81,10 @@ export const getArtworksByUser = async (
           WHERE r.mb_id = ?
         ) ret ON cart.od_id = ret.od_id
         LEFT JOIN (
-          SELECT od.od_id, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
+          SELECT od.od_id, od.od_tno, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
           FROM g5_shop_order od
           WHERE od.mb_id = ?
-        ) ord ON cart.od_id = ord.od_id
+        ) ord ON cart.od_id = ord.od_tno
       `;
 
       sqlSearch = `
