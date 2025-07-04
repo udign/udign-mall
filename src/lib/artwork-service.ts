@@ -29,12 +29,12 @@ export const getArtworksByUser = async (
         LEFT JOIN (
           SELECT ct.it_id, ct.ct_status, ct.ct_id, ct.od_id
           FROM g5_shop_cart ct
-          INNER JOIN g5_shop_order od ON ct.od_id = od.od_id
+          INNER JOIN g5_shop_order od ON ct.od_id = od.od_tno
           WHERE ct.mb_id = ?
           AND CONCAT(od.od_time, '-', LPAD(ct.ct_id, 10, '0')) = (
             SELECT MAX(CONCAT(od2.od_time, '-', LPAD(ct2.ct_id, 10, '0')))
             FROM g5_shop_cart ct2
-            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_id
+            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_tno
             WHERE ct2.it_id = ct.it_id AND ct2.mb_id = ?
           )
         ) cart ON it.it_id = cart.it_id
@@ -44,17 +44,15 @@ export const getArtworksByUser = async (
           WHERE r.mb_id = ?
         ) ret ON cart.od_id = ret.od_id
         LEFT JOIN (
-          SELECT od.od_id, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
+          SELECT od.od_id, od.od_tno, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
           FROM g5_shop_order od
           WHERE od.mb_id = ?
-        ) ord ON cart.od_id = ord.od_id
+        ) ord ON cart.od_id = ord.od_tno
       `;
 
       sqlSearch = `
         WHERE it.it_name != ''
         AND it.it_use = '1'
-        AND (cart.ct_status != '취소' OR cart.ct_status IS NULL)
-        AND (ret.return_status != 'cancelled' OR ret.return_status IS NULL)
       `;
 
       sqlOrder = 'ORDER BY it.it_time DESC';
@@ -66,12 +64,12 @@ export const getArtworksByUser = async (
         LEFT JOIN (
           SELECT ct.it_id, ct.ct_status, ct.ct_id, ct.od_id
           FROM g5_shop_cart ct
-          INNER JOIN g5_shop_order od ON ct.od_id = od.od_id
+          INNER JOIN g5_shop_order od ON ct.od_id = od.od_tno
           WHERE ct.mb_id = ?
           AND CONCAT(od.od_time, '-', LPAD(ct.ct_id, 10, '0')) = (
             SELECT MAX(CONCAT(od2.od_time, '-', LPAD(ct2.ct_id, 10, '0')))
             FROM g5_shop_cart ct2
-            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_id
+            INNER JOIN g5_shop_order od2 ON ct2.od_id = od2.od_tno
             WHERE ct2.it_id = ct.it_id AND ct2.mb_id = ?
           )
         ) cart ON ir.it_id = cart.it_id
@@ -81,18 +79,16 @@ export const getArtworksByUser = async (
           WHERE r.mb_id = ?
         ) ret ON cart.od_id = ret.od_id
         LEFT JOIN (
-          SELECT od.od_id, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
+          SELECT od.od_id, od.od_tno, od.od_status, od.od_settle_case, od.od_invoice, od.od_delivery_company
           FROM g5_shop_order od
           WHERE od.mb_id = ?
-        ) ord ON cart.od_id = ord.od_id
+        ) ord ON cart.od_id = ord.od_tno
       `;
 
       sqlSearch = `
         WHERE ir.mb_id = ?
         AND it.it_name != ''
         AND it.it_use = '1'
-        AND (cart.ct_status != '취소' OR cart.ct_status IS NULL)
-        AND (ret.return_status != 'cancelled' OR ret.return_status IS NULL)
       `;
 
       sqlOrder = 'ORDER BY ir.ir_time DESC';
@@ -331,15 +327,24 @@ export const toggleInterest = async (
 
 export const cancelOrder = async (
   orderId: string,
-  cancelMemo: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _cancelMemo: string,
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const updateQuery = `UPDATE g5_shop_order SET od_status = '취소', od_cancel_memo = ? WHERE od_id = ?`;
-    await executeQuery(updateQuery, [cancelMemo, orderId]);
+    // orderId가 숫자형 od_id라고 가정하고 직접 사용
+    const numericOrderId = parseInt(orderId, 10);
 
-    // 장바구니 상태도 업데이트
+    if (isNaN(numericOrderId)) {
+      return { success: false, message: '유효하지 않은 주문 ID입니다.' };
+    }
+
+    // 주문 상태 업데이트 (숫자형 od_id 사용)
+    const updateQuery = `UPDATE g5_shop_order SET od_status = '취소' WHERE od_id = ?`;
+    await executeQuery(updateQuery, [numericOrderId]);
+
+    // 장바구니 상태 업데이트 (숫자형 od_id 사용)
     const updateCartQuery = `UPDATE g5_shop_cart SET ct_status = '취소' WHERE od_id = ?`;
-    await executeQuery(updateCartQuery, [orderId]);
+    await executeQuery(updateCartQuery, [numericOrderId]);
 
     return { success: true, message: '주문이 취소되었습니다.' };
   } catch (error) {
@@ -352,12 +357,20 @@ export const confirmPurchase = async (
   orderId: string,
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const updateQuery = `UPDATE g5_shop_order SET od_status = '구매확정' WHERE od_id = ?`;
-    await executeQuery(updateQuery, [orderId]);
+    // orderId가 숫자형 od_id라고 가정하고 직접 사용
+    const numericOrderId = parseInt(orderId, 10);
 
-    // 장바구니 상태도 업데이트
+    if (isNaN(numericOrderId)) {
+      return { success: false, message: '유효하지 않은 주문 ID입니다.' };
+    }
+
+    // 주문 상태 업데이트 (숫자형 od_id 사용)
+    const updateQuery = `UPDATE g5_shop_order SET od_status = '구매확정' WHERE od_id = ?`;
+    await executeQuery(updateQuery, [numericOrderId]);
+
+    // 장바구니 상태 업데이트 (숫자형 od_id 사용)
     const updateCartQuery = `UPDATE g5_shop_cart SET ct_status = '구매확정' WHERE od_id = ?`;
-    await executeQuery(updateCartQuery, [orderId]);
+    await executeQuery(updateCartQuery, [numericOrderId]);
 
     return { success: true, message: '구매가 확정되었습니다.' };
   } catch (error) {

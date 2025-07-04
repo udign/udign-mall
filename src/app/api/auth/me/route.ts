@@ -24,7 +24,7 @@ export const GET = async (request: NextRequest) => {
 
     // 사용자 정보 조회
     const users = (await executeQuery(
-      'SELECT mb_no, mb_id, mb_name, mb_nick, mb_email, mb_level, mb_datetime, mb_today_login, mb_login_ip FROM g5_member WHERE mb_id = ?',
+      'SELECT mb_no, mb_id, mb_name, mb_nick, mb_email, mb_hp, mb_level, mb_datetime, mb_today_login, mb_login_ip FROM g5_member WHERE mb_id = ?',
       [decoded.mb_id],
     )) as unknown[];
 

@@ -188,7 +188,7 @@ export default function ArtworkCard({
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`/product/${artwork.it_id}`);
+                    router.push(`/shop/checkout?itemId=${artwork.it_id}&quantity=1`);
                   }}
                   variant='default'
                   size='sm'
@@ -203,7 +203,7 @@ export default function ArtworkCard({
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`/product/${artwork.it_id}`);
+                    router.push(`/shop/checkout?itemId=${artwork.it_id}&quantity=1`);
                   }}
                   variant='default'
                   size='sm'
@@ -322,6 +322,7 @@ export default function ArtworkCard({
         orderId={artwork.od_id || ''}
       />
 
+      {/* 구매 취소 Dialog */}
       <CancelOrderModal
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}

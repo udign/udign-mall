@@ -40,7 +40,8 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const hideHeader = pathname === '/login' || pathname === '/register' || pathname === '/terms';
+  const hideHeader =
+    pathname === ROUTES.LOGIN || pathname === ROUTES.REGISTER || pathname === ROUTES.TERMS;
 
   const handleLogout = async () => {
     await logout();
