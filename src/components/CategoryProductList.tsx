@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
@@ -141,9 +141,12 @@ export default function CategoryProductList({
     }
   };
 
-  const handleImageError = (imageUrl: string) => {
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    const imageUrl = target.src;
+    target.style.display = 'none';
     setFailedImages((prev) => new Set(prev).add(imageUrl));
-  };
+  }, []);
 
   const getLikeInfo = (product: Product) => {
     const productLike = productLikes[product.it_id];
@@ -200,7 +203,6 @@ export default function CategoryProductList({
                   className='block cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform duration-400 ease-out hover:scale-101'
                 >
                   <div className='relative aspect-square'>
-                    {/* 좋아요 버튼 */}
                     <Button
                       onClick={(e) => handleLikeToggle(e, product.it_id)}
                       variant='ghost'
@@ -217,11 +219,7 @@ export default function CategoryProductList({
                         fill
                         className='object-cover p-4'
                         sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw'
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          if (product.it_img1) handleImageError(product.it_img1);
-                        }}
+                        onError={handleImageError}
                       />
                     ) : (
                       <div className='flex h-full w-full items-center justify-center bg-gray-200'>

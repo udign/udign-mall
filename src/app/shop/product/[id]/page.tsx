@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,7 +62,7 @@ interface ThumbnailProps {
   isSelected: boolean;
   onClick: (image: string) => void;
   isImageFailed: boolean;
-  onImageError: (image: string) => void;
+  onImageError: (e: React.SyntheticEvent<HTMLImageElement>) => void;
 }
 
 function Thumbnail({
@@ -92,7 +92,7 @@ function Thumbnail({
           width={64}
           height={64}
           className='h-full w-full object-cover'
-          onError={() => onImageError(image)}
+          onError={onImageError}
         />
       ) : (
         <div className='flex h-full w-full items-center justify-center bg-gray-200'>
@@ -110,7 +110,7 @@ interface MainImageProps {
   className?: string;
   sizes?: string;
   isImageFailed: boolean;
-  onImageError: (image: string) => void;
+  onImageError: (e: React.SyntheticEvent<HTMLImageElement>) => void;
 }
 
 function MainImage({
@@ -130,7 +130,7 @@ function MainImage({
           fill
           className='object-cover'
           sizes={sizes}
-          onError={() => onImageError(selectedImage)}
+          onError={onImageError}
         />
       ) : (
         <div className='flex h-full w-full items-center justify-center bg-gray-200'>
@@ -283,9 +283,11 @@ export default function ProductDetailPage() {
 
   const handleThumbnailClick = (imageUrl: string) => setSelectedImage(imageUrl);
 
-  const handleImageError = (imageUrl: string) => {
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    const imageUrl = target.src;
     setFailedImages((prev) => new Set(prev).add(imageUrl));
-  };
+  }, []);
 
   const handleQuantityIncrease = () => {
     setQuantity((prev) => prev + 1);
