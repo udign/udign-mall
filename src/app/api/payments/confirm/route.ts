@@ -44,6 +44,18 @@ export async function POST(request: NextRequest) {
     try {
       await connection.beginTransaction();
 
+      // 주문 테이블 업데이트
+      await connection.execute(
+        'UPDATE g5_shop_order SET od_status = ?, od_settle_case = ?, od_receipt_time = NOW() WHERE od_tno = ?',
+        ['입금', paymentData.method, orderId],
+      );
+
+      // 장바구니 상태 업데이트 (주문 ID로 매칭)
+      await connection.execute('UPDATE g5_shop_cart SET ct_status = ? WHERE od_id = ?', [
+        '입금',
+        orderId,
+      ]);
+
       await connection.commit();
 
       return NextResponse.json({
