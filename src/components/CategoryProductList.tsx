@@ -186,7 +186,7 @@ export default function CategoryProductList({
       ) : error ? (
         <ErrorState message={error} onRetry={onRetry} showRetry={true} />
       ) : products.length === 0 ? (
-        <EmptyState title='등록된 상품이 없습니다' />
+        <EmptyState title='등록된 작품이 없습니다' />
       ) : (
         <>
           <div className='mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
