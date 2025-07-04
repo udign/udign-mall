@@ -42,6 +42,7 @@ export default function CategoryProductList({
     Record<string, { isLiked: boolean; count: number }>
   >({});
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [likingInProgress, setLikingInProgress] = useState<Set<string>>(new Set());
 
   const router = useRouter();
 
@@ -66,7 +67,30 @@ export default function CategoryProductList({
       return;
     }
 
+    // 이미 진행 중인 요청이 있으면 무시 (연속 클릭 방지)
+    if (likingInProgress.has(productId)) {
+      return;
+    }
+
+    // 현재 상태 저장 (실패시 복구용)
+    const currentLikeInfo = getLikeInfo(products.find((p) => p.it_id === productId)!);
+    const wasLiked = currentLikeInfo.isLiked;
+    const currentCount = currentLikeInfo.count;
+
     try {
+      // 1. 진행 중 상태로 설정
+      setLikingInProgress((prev) => new Set(prev).add(productId));
+
+      // 2. 즉시 UI 업데이트 (Optimistic Update)
+      setProductLikes((prev) => ({
+        ...prev,
+        [productId]: {
+          isLiked: !wasLiked,
+          count: wasLiked ? currentCount - 1 : currentCount + 1,
+        },
+      }));
+
+      // 3. 백그라운드에서 API 호출
       const response = await fetch(`/api/products/${productId}/like`, {
         method: 'POST',
         headers: {
@@ -76,6 +100,7 @@ export default function CategoryProductList({
 
       if (response.ok) {
         const data = await response.json();
+        // 4. API 성공시 서버 데이터로 정확한 값 업데이트
         setProductLikes((prev) => ({
           ...prev,
           [productId]: {
@@ -83,9 +108,36 @@ export default function CategoryProductList({
             count: data.current_likes,
           },
         }));
+      } else {
+        // 5. API 실패시 원래 상태로 복구
+        setProductLikes((prev) => ({
+          ...prev,
+          [productId]: {
+            isLiked: wasLiked,
+            count: currentCount,
+          },
+        }));
+
+        console.error('좋아요 처리 실패');
       }
     } catch (err) {
+      // 6. 네트워크 오류시 원래 상태로 복구
+      setProductLikes((prev) => ({
+        ...prev,
+        [productId]: {
+          isLiked: wasLiked,
+          count: currentCount,
+        },
+      }));
+
       console.error('좋아요 처리 오류:', err);
+    } finally {
+      // 7. 진행 중 상태 해제
+      setLikingInProgress((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
     }
   };
 

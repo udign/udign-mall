@@ -151,6 +151,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [quantity, setQuantity] = useState<number>(1);
+  const [likingInProgress, setLikingInProgress] = useState<boolean>(false);
 
   const params = useParams();
   const router = useRouter();
@@ -198,7 +199,31 @@ export default function ProductDetailPage() {
   const handleLikeToggle = async () => {
     if (!user || !product) return;
 
+    // 이미 진행 중인 요청이 있으면 무시 (연속 클릭 방지)
+    if (likingInProgress) {
+      return;
+    }
+
+    // 현재 상태 저장 (실패시 복구용)
+    const wasLiked = product.is_liked;
+    const currentCount = product.current_likes;
+
     try {
+      // 1. 진행 중 상태로 설정
+      setLikingInProgress(true);
+
+      // 2. 즉시 UI 업데이트 (Optimistic Update)
+      setProduct((prev) =>
+        prev
+          ? {
+              ...prev,
+              is_liked: !wasLiked,
+              current_likes: wasLiked ? currentCount - 1 : currentCount + 1,
+            }
+          : null,
+      );
+
+      // 3. 백그라운드에서 API 호출
       const response = await fetch(`/api/products/${productId}/like`, {
         method: 'POST',
         headers: {
@@ -208,6 +233,7 @@ export default function ProductDetailPage() {
 
       if (response.ok) {
         const data = await response.json();
+        // 4. API 성공시 서버 데이터로 정확한 값 업데이트
         setProduct((prev) =>
           prev
             ? {
@@ -217,9 +243,36 @@ export default function ProductDetailPage() {
               }
             : null,
         );
+      } else {
+        // 5. API 실패시 원래 상태로 복구
+        setProduct((prev) =>
+          prev
+            ? {
+                ...prev,
+                is_liked: wasLiked,
+                current_likes: currentCount,
+              }
+            : null,
+        );
+
+        console.error('좋아요 처리 실패');
       }
     } catch (err) {
+      // 6. 네트워크 오류시 원래 상태로 복구
+      setProduct((prev) =>
+        prev
+          ? {
+              ...prev,
+              is_liked: wasLiked,
+              current_likes: currentCount,
+            }
+          : null,
+      );
+
       console.error('좋아요 처리 오류:', err);
+    } finally {
+      // 7. 진행 중 상태 해제
+      setLikingInProgress(false);
     }
   };
 
