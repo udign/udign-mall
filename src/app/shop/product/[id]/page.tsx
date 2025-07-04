@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import NotFoundState from '@/components/states/NotFoundState';
+import { LikeResponse } from '@/types/product';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface ProductDetail {
   it_id: string;
@@ -152,6 +154,10 @@ export default function ProductDetailPage() {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [quantity, setQuantity] = useState<number>(1);
   const [likingInProgress, setLikingInProgress] = useState<boolean>(false);
+  const [showOrderDialog, setShowOrderDialog] = useState<boolean>(false);
+  const [orderInfo, setOrderInfo] = useState<{ orderNumber: number; productName: string } | null>(
+    null,
+  );
 
   const params = useParams();
   const router = useRouter();
@@ -217,7 +223,8 @@ export default function ProductDetailPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: LikeResponse = await response.json();
+
         // 3. API 성공시 서버 데이터로 UI 업데이트
         setProduct((prev) =>
           prev
@@ -228,6 +235,15 @@ export default function ProductDetailPage() {
               }
             : null,
         );
+
+        // 4. 새로 좋아요를 추가한 경우 순번 모달 표시
+        if (data.is_liked && data.order_number && data.product_name) {
+          setOrderInfo({
+            orderNumber: data.order_number,
+            productName: data.product_name,
+          });
+          setShowOrderDialog(true);
+        }
       } else {
         console.error('좋아요 처리 실패');
       }
@@ -285,9 +301,8 @@ export default function ProductDetailPage() {
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
         <div className='flex flex-col gap-8 lg:flex-row'>
           <div className='lg:w-1/2'>
-            {/* 데스크톱: 썸네일 왼쪽, 메인 이미지 오른쪽 */}
-            <div className='hidden gap-4 sm:flex'>
-              <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-4 sm:flex-row'>
+              <div className='order-2 flex gap-2 sm:order-1 sm:flex-col'>
                 {productImages.map((image, index) => (
                   <Thumbnail
                     key={image}
@@ -301,42 +316,14 @@ export default function ProductDetailPage() {
                   />
                 ))}
               </div>
-
               <MainImage
                 selectedImage={selectedImage}
                 productName={product.it_name}
-                className='flex-1'
-                sizes='(max-width: 768px) 100vw, 50vw'
+                className='order-1 flex-1 sm:order-2'
+                sizes='(max-width: 640px) 100vw, 50vw'
                 isImageFailed={selectedImage ? failedImages.has(selectedImage) : false}
                 onImageError={handleImageError}
               />
-            </div>
-
-            {/* 모바일: 메인 이미지 위, 썸네일 아래 */}
-            <div className='sm:hidden'>
-              <MainImage
-                selectedImage={selectedImage}
-                productName={product.it_name}
-                className='mb-4 w-full'
-                sizes='100vw'
-                isImageFailed={selectedImage ? failedImages.has(selectedImage) : false}
-                onImageError={handleImageError}
-              />
-
-              <div className='flex justify-start gap-2'>
-                {productImages.map((image, index) => (
-                  <Thumbnail
-                    key={image}
-                    image={image}
-                    index={index}
-                    productName={product.it_name}
-                    isSelected={selectedImage === image}
-                    onClick={handleThumbnailClick}
-                    isImageFailed={failedImages.has(image)}
-                    onImageError={handleImageError}
-                  />
-                ))}
-              </div>
             </div>
           </div>
 
@@ -362,7 +349,6 @@ export default function ProductDetailPage() {
             {/* 구매 가능한 상품 - 구매 전용 정보 표시 */}
             {product.can_purchase ? (
               <div className='space-y-6'>
-                {/* 가격 정보 */}
                 <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
                   <h3 className='mb-3 text-lg font-semibold text-gray-900'>가격 정보</h3>
                   <div className='space-y-2'>
@@ -383,7 +369,6 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* 수량 선택 */}
                 <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
                   <h3 className='mb-3 text-lg font-semibold text-gray-900'>수량 선택</h3>
                   <div className='flex items-center justify-between'>
@@ -410,7 +395,6 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* 총 금액 */}
                 <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
                   <div className='flex items-center justify-between'>
                     <span className='text-lg font-semibold text-gray-900'>총 금액</span>
@@ -420,7 +404,6 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* 구매 버튼 */}
                 <div className='space-y-3'>
                   <Button
                     className='bg-primary hover:bg-primary/90 w-full text-white'
@@ -443,7 +426,6 @@ export default function ProductDetailPage() {
                   </Button>
                 </div>
 
-                {/* 심의 완료 상태 메시지 */}
                 <div className='rounded-lg border border-green-200 bg-green-50 p-4'>
                   <p className='font-medium text-green-800'>✅ 심의가 완료되었습니다</p>
                   <p className='mt-1 text-sm text-green-600'>구매 가능한 상품입니다.</p>
@@ -452,7 +434,6 @@ export default function ProductDetailPage() {
             ) : (
               /* 구매 불가능한 상품 - 작품 정보 및 진행 상황 표시 */
               <div className='space-y-6'>
-                {/* 작품 설명 */}
                 <div>
                   <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
                   <div className='space-y-2 leading-relaxed text-gray-700'>
@@ -465,7 +446,6 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* 좋아요 진행 상황 */}
                 <div className='rounded-lg bg-gray-50 p-4'>
                   <div className='mb-2 flex items-center justify-between'>
                     <span className='text-sm text-gray-600'>현재 좋아요</span>
@@ -492,7 +472,6 @@ export default function ProductDetailPage() {
                   </p>
                 </div>
 
-                {/* 상태 메시지 */}
                 <div>
                   {product.is_under_review ? (
                     <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
@@ -581,6 +560,19 @@ export default function ProductDetailPage() {
         onOpenChange={handleLoginDialogClose}
         title='로그인 필요'
         description='상품 상세 정보를 보시려면 로그인이 필요합니다.'
+      />
+
+      {/* 좋아요 순번 모달 */}
+      <MessageDialog
+        open={showOrderDialog}
+        onOpenChange={setShowOrderDialog}
+        title='좋아요 등록 완료'
+        description={
+          orderInfo
+            ? `고객님은 ${orderInfo.productName}의 **No. ${orderInfo.orderNumber}** 컬렉터입니다.\n\n단 몇 명만을 위한 이 창작의 여정에 함께 해주셔서 진심으로 감사드립니다.`
+            : ''
+        }
+        confirmText='확인'
       />
     </div>
   );

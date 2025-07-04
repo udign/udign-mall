@@ -3,8 +3,10 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
 import { Product } from '@/types/product';
+import { LikeResponse } from '@/types/product';
 import CommonPagination from '@/components/CommonPagination';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
+import MessageDialog from '@/components/ui/MessageDialog';
 import { Button } from '@/components/ui/primitives/button';
 import { useAuth } from '@/contexts/AuthContext';
 import ErrorState from '@/components/states/ErrorState';
@@ -43,6 +45,10 @@ export default function CategoryProductList({
   >({});
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [likingInProgress, setLikingInProgress] = useState<Set<string>>(new Set());
+  const [showOrderDialog, setShowOrderDialog] = useState<boolean>(false);
+  const [orderInfo, setOrderInfo] = useState<{ orderNumber: number; productName: string } | null>(
+    null,
+  );
 
   const router = useRouter();
 
@@ -85,7 +91,8 @@ export default function CategoryProductList({
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: LikeResponse = await response.json();
+
         // 3. API 성공시 서버 데이터로 UI 업데이트
         setProductLikes((prev) => ({
           ...prev,
@@ -94,13 +101,22 @@ export default function CategoryProductList({
             count: data.current_likes,
           },
         }));
+
+        // 4. 새로 좋아요를 추가한 경우 순번 모달 표시
+        if (data.is_liked && data.order_number && data.product_name) {
+          setOrderInfo({
+            orderNumber: data.order_number,
+            productName: data.product_name,
+          });
+          setShowOrderDialog(true);
+        }
       } else {
         console.error('좋아요 처리 실패');
       }
     } catch (err) {
       console.error('좋아요 처리 오류:', err);
     } finally {
-      // 4. 진행 중 상태 해제
+      // 5. 진행 중 상태 해제
       setLikingInProgress((prev) => {
         const newSet = new Set(prev);
         newSet.delete(productId);
@@ -231,6 +247,19 @@ export default function CategoryProductList({
         onOpenChange={setShowLoginDialog}
         title='상품 상세보기'
         description='상품 상세 정보를 보시려면 로그인이 필요합니다.'
+      />
+
+      {/* 좋아요 순번 모달 */}
+      <MessageDialog
+        open={showOrderDialog}
+        onOpenChange={setShowOrderDialog}
+        title='선택해주셔서 감사합니다.'
+        description={
+          orderInfo
+            ? `고객님은 ${orderInfo.productName}의 No. ${orderInfo.orderNumber} 컬렉터입니다.\n\n단 몇 명만을 위한 이 창작의 여정에 함께 해주셔서 진심으로 감사드립니다.`
+            : ''
+        }
+        confirmText='확인'
       />
     </div>
   );

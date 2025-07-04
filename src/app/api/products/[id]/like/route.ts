@@ -17,6 +17,14 @@ interface CountRow extends RowDataPacket {
   cnt: number;
 }
 
+interface ProductRow extends RowDataPacket {
+  it_name: string;
+}
+
+interface OrderRow extends RowDataPacket {
+  order_number: number;
+}
+
 export const POST = async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -72,6 +80,9 @@ export const POST = async (
     const checkResults = (await executeQuery(checkQuery, [productId, currentUserId])) as CountRow[];
     const isCurrentlyLiked = checkResults[0]?.cnt > 0;
 
+    let orderNumber: number | undefined;
+    let productName: string | undefined;
+
     if (isCurrentlyLiked) {
       // 좋아요 취소
       await executeQuery('DELETE FROM g5_shop_interrest WHERE it_id = ? AND mb_id = ?', [
@@ -87,6 +98,30 @@ export const POST = async (
         'INSERT INTO g5_shop_interrest (it_id, mb_id, ir_time, ir_ip) VALUES (?, ?, NOW(), ?)',
         [productId, currentUserId, clientIp],
       );
+
+      // 새로 좋아요를 추가한 경우 순번과 상품명 계산
+
+      // 1. 상품명 조회
+      const productQuery = `SELECT it_name FROM g5_shop_item WHERE it_id = ?`;
+      const productResults = (await executeQuery(productQuery, [productId])) as ProductRow[];
+      productName = productResults[0]?.it_name;
+
+      // 2. 현재 사용자의 좋아요 순번 계산 (좋아요 등록 시간 기준 오름차순)
+      const orderQuery = `
+        SELECT COUNT(*) as order_number 
+        FROM g5_shop_interrest 
+        WHERE it_id = ? AND ir_time <= (
+          SELECT ir_time 
+          FROM g5_shop_interrest 
+          WHERE mb_id = ? AND it_id = ?
+        )
+      `;
+      const orderResults = (await executeQuery(orderQuery, [
+        productId,
+        currentUserId,
+        productId,
+      ])) as OrderRow[];
+      orderNumber = orderResults[0]?.order_number;
     }
 
     // 업데이트된 좋아요 수 조회
@@ -99,11 +134,26 @@ export const POST = async (
     const countResults = (await executeQuery(countQuery, [productId])) as CountRow[];
     const currentLikes = countResults[0]?.cnt || 0;
 
-    return NextResponse.json({
+    // 응답 객체 구성
+    const response: {
+      success: boolean;
+      is_liked: boolean;
+      current_likes: number;
+      order_number?: number;
+      product_name?: string;
+    } = {
       success: true,
       is_liked: !isCurrentlyLiked,
       current_likes: currentLikes,
-    });
+    };
+
+    // 새로 좋아요를 추가한 경우에만 순번과 상품명 포함
+    if (!isCurrentlyLiked && orderNumber && productName) {
+      response.order_number = orderNumber;
+      response.product_name = productName;
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('좋아요 처리 오류:', error);
     return NextResponse.json(

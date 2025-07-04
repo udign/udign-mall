@@ -36,11 +36,15 @@ export default function MessageDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+          <DialogTitle className='text-center text-lg font-semibold'>{title}</DialogTitle>
+          {description && (
+            <DialogDescription className='text-center leading-relaxed text-gray-700'>
+              {description}
+            </DialogDescription>
+          )}
         </DialogHeader>
-        <DialogFooter>
-          <Button onClick={handleConfirm} variant='default'>
+        <DialogFooter className='sm:justify-center'>
+          <Button onClick={handleConfirm} variant='default' className='px-8'>
             {confirmText}
           </Button>
         </DialogFooter>

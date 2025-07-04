@@ -82,3 +82,10 @@ export interface ProductDetailResponse {
     it_name: string;
   };
 }
+
+export interface LikeResponse {
+  is_liked: boolean;
+  current_likes: number;
+  order_number?: number; // 좋아요 순번 (새로 좋아요할 때만 포함)
+  product_name?: string; // 상품명 (새로 좋아요할 때만 포함)
+}
