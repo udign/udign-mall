@@ -204,26 +204,11 @@ export default function ProductDetailPage() {
       return;
     }
 
-    // 현재 상태 저장 (실패시 복구용)
-    const wasLiked = product.is_liked;
-    const currentCount = product.current_likes;
-
     try {
       // 1. 진행 중 상태로 설정
       setLikingInProgress(true);
 
-      // 2. 즉시 UI 업데이트 (Optimistic Update)
-      setProduct((prev) =>
-        prev
-          ? {
-              ...prev,
-              is_liked: !wasLiked,
-              current_likes: wasLiked ? currentCount - 1 : currentCount + 1,
-            }
-          : null,
-      );
-
-      // 3. 백그라운드에서 API 호출
+      // 2. API 호출
       const response = await fetch(`/api/products/${productId}/like`, {
         method: 'POST',
         headers: {
@@ -233,7 +218,7 @@ export default function ProductDetailPage() {
 
       if (response.ok) {
         const data = await response.json();
-        // 4. API 성공시 서버 데이터로 정확한 값 업데이트
+        // 3. API 성공시 서버 데이터로 UI 업데이트
         setProduct((prev) =>
           prev
             ? {
@@ -244,34 +229,12 @@ export default function ProductDetailPage() {
             : null,
         );
       } else {
-        // 5. API 실패시 원래 상태로 복구
-        setProduct((prev) =>
-          prev
-            ? {
-                ...prev,
-                is_liked: wasLiked,
-                current_likes: currentCount,
-              }
-            : null,
-        );
-
         console.error('좋아요 처리 실패');
       }
     } catch (err) {
-      // 6. 네트워크 오류시 원래 상태로 복구
-      setProduct((prev) =>
-        prev
-          ? {
-              ...prev,
-              is_liked: wasLiked,
-              current_likes: currentCount,
-            }
-          : null,
-      );
-
       console.error('좋아요 처리 오류:', err);
     } finally {
-      // 7. 진행 중 상태 해제
+      // 4. 진행 중 상태 해제
       setLikingInProgress(false);
     }
   };
@@ -382,9 +345,16 @@ export default function ProductDetailPage() {
               onClick={handleLikeToggle}
               variant='ghost'
               size='icon'
-              className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90'
+              disabled={likingInProgress}
+              className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90 disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
             >
-              {product.is_liked ? <FcLike /> : <FcLikePlaceholder />}
+              {likingInProgress ? (
+                <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+              ) : product.is_liked ? (
+                <FcLike />
+              ) : (
+                <FcLikePlaceholder />
+              )}
             </Button>
 
             <h1 className='mb-6 pr-12 text-2xl font-bold text-gray-900'>{product.it_name}</h1>

@@ -72,25 +72,11 @@ export default function CategoryProductList({
       return;
     }
 
-    // 현재 상태 저장 (실패시 복구용)
-    const currentLikeInfo = getLikeInfo(products.find((p) => p.it_id === productId)!);
-    const wasLiked = currentLikeInfo.isLiked;
-    const currentCount = currentLikeInfo.count;
-
     try {
       // 1. 진행 중 상태로 설정
       setLikingInProgress((prev) => new Set(prev).add(productId));
 
-      // 2. 즉시 UI 업데이트 (Optimistic Update)
-      setProductLikes((prev) => ({
-        ...prev,
-        [productId]: {
-          isLiked: !wasLiked,
-          count: wasLiked ? currentCount - 1 : currentCount + 1,
-        },
-      }));
-
-      // 3. 백그라운드에서 API 호출
+      // 2. API 호출
       const response = await fetch(`/api/products/${productId}/like`, {
         method: 'POST',
         headers: {
@@ -100,7 +86,7 @@ export default function CategoryProductList({
 
       if (response.ok) {
         const data = await response.json();
-        // 4. API 성공시 서버 데이터로 정확한 값 업데이트
+        // 3. API 성공시 서버 데이터로 UI 업데이트
         setProductLikes((prev) => ({
           ...prev,
           [productId]: {
@@ -109,30 +95,12 @@ export default function CategoryProductList({
           },
         }));
       } else {
-        // 5. API 실패시 원래 상태로 복구
-        setProductLikes((prev) => ({
-          ...prev,
-          [productId]: {
-            isLiked: wasLiked,
-            count: currentCount,
-          },
-        }));
-
         console.error('좋아요 처리 실패');
       }
     } catch (err) {
-      // 6. 네트워크 오류시 원래 상태로 복구
-      setProductLikes((prev) => ({
-        ...prev,
-        [productId]: {
-          isLiked: wasLiked,
-          count: currentCount,
-        },
-      }));
-
       console.error('좋아요 처리 오류:', err);
     } finally {
-      // 7. 진행 중 상태 해제
+      // 4. 진행 중 상태 해제
       setLikingInProgress((prev) => {
         const newSet = new Set(prev);
         newSet.delete(productId);
@@ -157,10 +125,10 @@ export default function CategoryProductList({
       };
     }
 
-    // 초기값: 서버에서 받은 데이터 또는 기본값
+    // 초기값: 하나의 일관된 소스에서만 가져오기
     return {
       isLiked: product.is_liked || false,
-      count: product.current_likes || parseInt(product.likes_count) || 0,
+      count: product.current_likes || 0,
     };
   };
 
@@ -207,9 +175,16 @@ export default function CategoryProductList({
                       onClick={(e) => handleLikeToggle(e, product.it_id)}
                       variant='ghost'
                       size='icon'
-                      className='absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90'
+                      disabled={likingInProgress.has(product.it_id)}
+                      className='absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90 disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
                     >
-                      {likeInfo.isLiked ? <FcLike /> : <FcLikePlaceholder />}
+                      {likingInProgress.has(product.it_id) ? (
+                        <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+                      ) : likeInfo.isLiked ? (
+                        <FcLike />
+                      ) : (
+                        <FcLikePlaceholder />
+                      )}
                     </Button>
 
                     {product.it_img1 && !failedImages.has(product.it_img1) ? (
