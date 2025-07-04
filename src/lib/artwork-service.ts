@@ -53,8 +53,6 @@ export const getArtworksByUser = async (
       sqlSearch = `
         WHERE it.it_name != ''
         AND it.it_use = '1'
-        AND (cart.ct_status != '취소' OR cart.ct_status IS NULL)
-        AND (ret.return_status != 'cancelled' OR ret.return_status IS NULL)
       `;
 
       sqlOrder = 'ORDER BY it.it_time DESC';
@@ -91,8 +89,6 @@ export const getArtworksByUser = async (
         WHERE ir.mb_id = ?
         AND it.it_name != ''
         AND it.it_use = '1'
-        AND (cart.ct_status != '취소' OR cart.ct_status IS NULL)
-        AND (ret.return_status != 'cancelled' OR ret.return_status IS NULL)
       `;
 
       sqlOrder = 'ORDER BY ir.ir_time DESC';
@@ -331,15 +327,24 @@ export const toggleInterest = async (
 
 export const cancelOrder = async (
   orderId: string,
-  cancelMemo: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _cancelMemo: string,
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const updateQuery = `UPDATE g5_shop_order SET od_status = '취소', od_cancel_memo = ? WHERE od_id = ?`;
-    await executeQuery(updateQuery, [cancelMemo, orderId]);
+    // orderId가 숫자형 od_id라고 가정하고 직접 사용
+    const numericOrderId = parseInt(orderId, 10);
 
-    // 장바구니 상태도 업데이트
+    if (isNaN(numericOrderId)) {
+      return { success: false, message: '유효하지 않은 주문 ID입니다.' };
+    }
+
+    // 주문 상태 업데이트 (숫자형 od_id 사용)
+    const updateQuery = `UPDATE g5_shop_order SET od_status = '취소' WHERE od_id = ?`;
+    await executeQuery(updateQuery, [numericOrderId]);
+
+    // 장바구니 상태 업데이트 (숫자형 od_id 사용)
     const updateCartQuery = `UPDATE g5_shop_cart SET ct_status = '취소' WHERE od_id = ?`;
-    await executeQuery(updateCartQuery, [orderId]);
+    await executeQuery(updateCartQuery, [numericOrderId]);
 
     return { success: true, message: '주문이 취소되었습니다.' };
   } catch (error) {
@@ -352,12 +357,20 @@ export const confirmPurchase = async (
   orderId: string,
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const updateQuery = `UPDATE g5_shop_order SET od_status = '구매확정' WHERE od_id = ?`;
-    await executeQuery(updateQuery, [orderId]);
+    // orderId가 숫자형 od_id라고 가정하고 직접 사용
+    const numericOrderId = parseInt(orderId, 10);
 
-    // 장바구니 상태도 업데이트
+    if (isNaN(numericOrderId)) {
+      return { success: false, message: '유효하지 않은 주문 ID입니다.' };
+    }
+
+    // 주문 상태 업데이트 (숫자형 od_id 사용)
+    const updateQuery = `UPDATE g5_shop_order SET od_status = '구매확정' WHERE od_id = ?`;
+    await executeQuery(updateQuery, [numericOrderId]);
+
+    // 장바구니 상태 업데이트 (숫자형 od_id 사용)
     const updateCartQuery = `UPDATE g5_shop_cart SET ct_status = '구매확정' WHERE od_id = ?`;
-    await executeQuery(updateCartQuery, [orderId]);
+    await executeQuery(updateCartQuery, [numericOrderId]);
 
     return { success: true, message: '구매가 확정되었습니다.' };
   } catch (error) {

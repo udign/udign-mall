@@ -322,6 +322,7 @@ export default function ArtworkCard({
         orderId={artwork.od_id || ''}
       />
 
+      {/* 구매 취소 Dialog */}
       <CancelOrderModal
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}

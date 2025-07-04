@@ -319,6 +319,12 @@ export default function MyUdignPage() {
 
   const handleOrderCancel = async (orderId: string, cancelMemo: string) => {
     try {
+      // 먼저 현재 작품 상태 확인
+      const currentArtwork = currentTabData.find((artwork) => artwork.od_id === orderId);
+      if (!currentArtwork) return;
+
+      const oldStatusKey = currentArtwork._status_key;
+
       const response = await fetch('/api/my-udign/cancel-order', {
         method: 'POST',
         headers: {
@@ -333,28 +339,66 @@ export default function MyUdignPage() {
         setMessageContent(result.message);
         setShowMessageDialog(true);
 
-        // 모든 탭의 데이터 업데이트
+        const newStatusKey = 'cancelled';
+
+        // 탭 간 이동 로직
         setTabStates((prev) => {
           const updated = { ...prev };
 
           Object.keys(updated).forEach((tab) => {
             if (updated[tab].data.length > 0) {
-              updated[tab].data = updated[tab].data.map((artwork) => {
-                if (artwork.od_id === orderId) {
-                  return {
-                    ...artwork,
+              if (tab === oldStatusKey) {
+                // 기존 탭에서는 작품 제거
+                updated[tab].data = updated[tab].data.filter(
+                  (artwork) => artwork.od_id !== orderId,
+                );
+              } else if (tab === newStatusKey) {
+                // 새로운 탭에 작품 추가 (이미 존재하지 않는 경우에만)
+                const exists = updated[tab].data.some((artwork) => artwork.od_id === orderId);
+                if (!exists) {
+                  const updatedArtwork = {
+                    ...currentArtwork,
                     od_status: '취소',
                     ct_status: '취소',
                     _status_text: '주문취소',
-                    _status_key: 'cancelled',
+                    _status_key: newStatusKey,
                   };
+                  updated[tab].data = [updatedArtwork, ...updated[tab].data];
                 }
-                return artwork;
-              });
+              } else if (tab === 'all') {
+                // 전체 탭에서는 상태만 업데이트
+                updated[tab].data = updated[tab].data.map((artwork) => {
+                  if (artwork.od_id === orderId) {
+                    return {
+                      ...artwork,
+                      od_status: '취소',
+                      ct_status: '취소',
+                      _status_text: '주문취소',
+                      _status_key: newStatusKey,
+                    };
+                  }
+                  return artwork;
+                });
+              }
             }
           });
 
           return updated;
+        });
+
+        // 카운트 업데이트
+        setCounts((prev) => {
+          const newCounts = { ...prev };
+
+          // 기존 탭 카운트 감소
+          if (newCounts[oldStatusKey] > 0) {
+            newCounts[oldStatusKey] = newCounts[oldStatusKey] - 1;
+          }
+
+          // 새로운 탭 카운트 증가
+          newCounts[newStatusKey] = (newCounts[newStatusKey] || 0) + 1;
+
+          return newCounts;
         });
       } else {
         setMessageContent(result.message || '주문 취소 중 오류가 발생했습니다.');
@@ -369,6 +413,12 @@ export default function MyUdignPage() {
 
   const handlePurchaseConfirm = async (orderId: string) => {
     try {
+      // 먼저 현재 작품 상태 확인
+      const currentArtwork = currentTabData.find((artwork) => artwork.od_id === orderId);
+      if (!currentArtwork) return;
+
+      const oldStatusKey = currentArtwork._status_key;
+
       const response = await fetch('/api/my-udign/confirm-purchase', {
         method: 'POST',
         headers: {
@@ -383,28 +433,66 @@ export default function MyUdignPage() {
         setMessageContent(result.message);
         setShowMessageDialog(true);
 
-        // 모든 탭의 데이터 업데이트
+        const newStatusKey = 'completed';
+
+        // 탭 간 이동 로직
         setTabStates((prev) => {
           const updated = { ...prev };
 
           Object.keys(updated).forEach((tab) => {
             if (updated[tab].data.length > 0) {
-              updated[tab].data = updated[tab].data.map((artwork) => {
-                if (artwork.od_id === orderId) {
-                  return {
-                    ...artwork,
+              if (tab === oldStatusKey) {
+                // 기존 탭에서는 작품 제거
+                updated[tab].data = updated[tab].data.filter(
+                  (artwork) => artwork.od_id !== orderId,
+                );
+              } else if (tab === newStatusKey) {
+                // 새로운 탭에 작품 추가 (이미 존재하지 않는 경우에만)
+                const exists = updated[tab].data.some((artwork) => artwork.od_id === orderId);
+                if (!exists) {
+                  const updatedArtwork = {
+                    ...currentArtwork,
                     od_status: '구매확정',
                     ct_status: '구매확정',
                     _status_text: '구매확정',
-                    _status_key: 'completed',
+                    _status_key: newStatusKey,
                   };
+                  updated[tab].data = [updatedArtwork, ...updated[tab].data];
                 }
-                return artwork;
-              });
+              } else if (tab === 'all') {
+                // 전체 탭에서는 상태만 업데이트
+                updated[tab].data = updated[tab].data.map((artwork) => {
+                  if (artwork.od_id === orderId) {
+                    return {
+                      ...artwork,
+                      od_status: '구매확정',
+                      ct_status: '구매확정',
+                      _status_text: '구매확정',
+                      _status_key: newStatusKey,
+                    };
+                  }
+                  return artwork;
+                });
+              }
             }
           });
 
           return updated;
+        });
+
+        // 카운트 업데이트
+        setCounts((prev) => {
+          const newCounts = { ...prev };
+
+          // 기존 탭 카운트 감소
+          if (newCounts[oldStatusKey] > 0) {
+            newCounts[oldStatusKey] = newCounts[oldStatusKey] - 1;
+          }
+
+          // 새로운 탭 카운트 증가
+          newCounts[newStatusKey] = (newCounts[newStatusKey] || 0) + 1;
+
+          return newCounts;
         });
       } else {
         setMessageContent(result.message || '구매 확정 중 오류가 발생했습니다.');
