@@ -157,10 +157,10 @@ export default function CategoryProductList({
       };
     }
 
-    // 초기값: 서버에서 받은 데이터 또는 기본값
+    // 초기값: 하나의 일관된 소스에서만 가져오기
     return {
       isLiked: product.is_liked || false,
-      count: product.current_likes || parseInt(product.likes_count) || 0,
+      count: product.current_likes || 0,
     };
   };
 
