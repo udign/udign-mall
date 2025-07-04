@@ -39,7 +39,9 @@ export const GET = async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
-    const categoryFilter = searchParams.get('category'); // 카테고리 필터 파라미터 추가
+    const categoryFilter = searchParams.get('category'); // 1차 카테고리 필터 파라미터
+    const subCategoryFilter = searchParams.get('subcategory'); // 2차 카테고리 필터 파라미터
+    const thirdCategoryFilter = searchParams.get('thirdcategory'); // 3차 카테고리 필터 파라미터 추가
     const offset = (page - 1) * limit;
 
     // 현재 로그인한 사용자 정보 가져오기
@@ -79,8 +81,55 @@ export const GET = async (request: NextRequest) => {
     }
 
     // 카테고리별 상품 가져오기 (사용자별 좋아요 상태 포함)
-    const categoryCondition = categoryFilter ? `AND i.ca_id = ?` : '';
-    const itemsQuery = `
+    let categoryCondition = '';
+    const queryParams = [currentUserId || ''];
+
+    if (categoryFilter) {
+      categoryCondition += ' AND i.ca_id = ?';
+      queryParams.push(categoryFilter);
+    }
+
+    if (subCategoryFilter) {
+      categoryCondition += ' AND i.ca_id2 = ?';
+      queryParams.push(subCategoryFilter);
+    }
+
+    if (thirdCategoryFilter) {
+      categoryCondition += ' AND TRIM(i.ca_id3) = ?';
+      queryParams.push(thirdCategoryFilter);
+    }
+
+    // 3차 카테고리 필터링 테스트를 위한 간단한 쿼리
+    const itemsQuery = thirdCategoryFilter
+      ? `
+      SELECT 
+        i.it_id,
+        i.it_name,
+        i.it_basic,
+        i.it_cust_price,
+        i.it_price,
+        i.it_img1,
+        i.it_img2,
+        i.it_img3,
+        i.it_use_avg,
+        i.it_use_cnt,
+        i.it_hit,
+        i.it_time,
+        i.it_update_time,
+        i.ca_id,
+        i.ca_id2,
+        i.ca_id3,
+        i.it_1 as creator_id,
+        i.it_2 as creator_name,
+        i.it_3 as description,
+        i.it_4 as target_likes,
+        0 as current_likes,
+        0 as is_liked
+      FROM g5_shop_item i
+      WHERE i.it_use = '1' ${categoryCondition}
+      ORDER BY i.it_id DESC
+    `
+      : `
       SELECT 
         i.it_id,
         i.it_name,
@@ -112,9 +161,9 @@ export const GET = async (request: NextRequest) => {
       WHERE i.it_use = '1' ${categoryCondition}
       ORDER BY i.it_id DESC
     `;
-
-    const queryParams = [currentUserId || '', ...(categoryFilter ? [categoryFilter] : [])];
-    const allItems = (await executeQuery(itemsQuery, queryParams)) as ProductRow[];
+    // 3차 카테고리 필터링일 때는 user_like JOIN을 제거하므로 파라미터 조정
+    const finalQueryParams = thirdCategoryFilter ? queryParams.slice(1) : queryParams;
+    const allItems = (await executeQuery(itemsQuery, finalQueryParams)) as ProductRow[];
 
     const totalCount = allItems.length;
 
