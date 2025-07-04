@@ -327,7 +327,7 @@ export default function ProductDetailPage() {
               onClick={handleLikeToggle}
               variant='ghost'
               size='icon'
-              className='absolute top-0 right-0 p-2 text-2xl transition-transform duration-400 ease-out hover:scale-110'
+              className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90'
             >
               {product.is_liked ? <FcLike /> : <FcLikePlaceholder />}
             </Button>

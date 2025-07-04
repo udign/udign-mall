@@ -34,6 +34,8 @@ export interface Product {
   creator_name: string;
   description: string;
   likes_count: string;
+  is_liked?: boolean; // 현재 사용자가 좋아요했는지 여부 (선택적)
+  current_likes?: number; // 현재 좋아요 수 (선택적)
 }
 
 export interface ProductDetail extends Product {

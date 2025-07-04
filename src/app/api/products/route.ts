@@ -1,8 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
-import { Category, Product } from '@/types/product';
+import { Category } from '@/types/product';
 import { RowDataPacket } from 'mysql2';
 import { getImageUrl } from '@/lib/utils';
+import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
+
+interface JwtPayload {
+  mb_id: string;
+  [key: string]: unknown;
+}
+
+interface ProductRow extends RowDataPacket {
+  it_id: string;
+  it_name: string;
+  it_basic: string;
+  it_cust_price: number;
+  it_price: number;
+  it_img1: string;
+  it_img2: string;
+  it_img3: string;
+  it_use_avg: number;
+  it_use_cnt: number;
+  it_hit: number;
+  it_time: string;
+  it_update_time: string;
+  ca_id: string;
+  creator_id: string;
+  creator_name: string;
+  description: string;
+  target_likes: number;
+  current_likes: number;
+  is_liked: number;
+}
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -11,6 +41,20 @@ export const GET = async (request: NextRequest) => {
     const limit = parseInt(searchParams.get('limit') || '12');
     const categoryFilter = searchParams.get('category'); // 카테고리 필터 파라미터 추가
     const offset = (page - 1) * limit;
+
+    // 현재 로그인한 사용자 정보 가져오기
+    let currentUserId: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      const token = cookieStore.get('auth-token')?.value;
+
+      if (token && process.env.JWT_SECRET) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+        currentUserId = decoded.mb_id;
+      }
+    } catch {
+      // 토큰이 유효하지 않은 경우 무시 (비로그인 사용자)
+    }
 
     // 카테고리 정보 가져오기
     let category: Category;
@@ -34,7 +78,7 @@ export const GET = async (request: NextRequest) => {
       category = categoryResult[0] || { ca_id: 'all', ca_name: '모든 작품' };
     }
 
-    // 카테고리별 상품 가져오기
+    // 카테고리별 상품 가져오기 (사용자별 좋아요 상태 포함)
     const categoryCondition = categoryFilter ? `AND i.ca_id = ?` : '';
     const itemsQuery = `
       SELECT 
@@ -56,23 +100,21 @@ export const GET = async (request: NextRequest) => {
         i.it_2 as creator_name,
         i.it_3 as description,
         i.it_4 as target_likes,
-        COALESCE(like_count.cnt, 0) as current_likes
+        COALESCE(like_count.cnt, 0) as current_likes,
+        CASE WHEN user_like.mb_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
       FROM g5_shop_item i
       LEFT JOIN (
         SELECT it_id, COUNT(*) as cnt 
         FROM g5_shop_interrest 
         GROUP BY it_id
       ) like_count ON i.it_id = like_count.it_id
+      LEFT JOIN g5_shop_interrest user_like ON i.it_id = user_like.it_id AND user_like.mb_id = ?
       WHERE i.it_use = '1' ${categoryCondition}
       ORDER BY i.it_id DESC
     `;
 
-    const queryParams = categoryFilter ? [categoryFilter] : [];
-    const allItems = (await executeQuery(itemsQuery, queryParams)) as (Product &
-      RowDataPacket & {
-        target_likes: number;
-        current_likes: number;
-      })[];
+    const queryParams = [currentUserId || '', ...(categoryFilter ? [categoryFilter] : [])];
+    const allItems = (await executeQuery(itemsQuery, queryParams)) as ProductRow[];
 
     const totalCount = allItems.length;
 
@@ -121,7 +163,9 @@ export const GET = async (request: NextRequest) => {
       creator_id: item.creator_id,
       creator_name: item.creator_name,
       description: item.description,
-      likes_count: item.current_likes, // current_likes를 likes_count로 매핑
+      likes_count: item.current_likes.toString(), // current_likes를 likes_count로 매핑
+      is_liked: Boolean(item.is_liked), // 사용자별 좋아요 상태 추가
+      current_likes: item.current_likes, // 현재 좋아요 수 추가
     }));
 
     return NextResponse.json({
@@ -155,6 +199,7 @@ export const GET = async (request: NextRequest) => {
         filteredByAccess: false,
         originalCount: totalCount,
         accessibleCount: totalCount,
+        currentUserId: currentUserId || null,
       },
     });
   } catch (error) {
