@@ -19,11 +19,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko'>
-      <body className={`${inter.className} container mx-auto`}>
-        <AuthProvider>
-          {children}
-          <ScrollToTop />
-        </AuthProvider>
+      <body className={inter.className}>
+        <div className='flex min-h-screen justify-center'>
+          <div className='container'>
+            <AuthProvider>
+              {children}
+              <ScrollToTop />
+            </AuthProvider>
+          </div>
+        </div>
       </body>
     </html>
   );

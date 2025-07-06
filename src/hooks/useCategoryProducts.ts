@@ -34,6 +34,8 @@ export const useCategoryProducts = ({
   const searchParams = useSearchParams();
 
   const currentPage = parseInt(searchParams.get('page') || '1');
+  const subCategoryId = searchParams.get('subcategory');
+  const thirdCategoryId = searchParams.get('thirdcategory');
 
   const fetchProducts = useCallback(
     async (pageNum: number = currentPage) => {
@@ -43,8 +45,10 @@ export const useCategoryProducts = ({
 
         // 카테고리별 작품 필터링
         const categoryParam = categoryId ? `&category=${categoryId}` : '';
+        const subCategoryParam = subCategoryId ? `&subcategory=${subCategoryId}` : '';
+        const thirdCategoryParam = thirdCategoryId ? `&thirdcategory=${thirdCategoryId}` : '';
         const response = await fetch(
-          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryParam}`,
+          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryParam}${subCategoryParam}${thirdCategoryParam}`,
         );
 
         if (!response.ok) {
@@ -57,14 +61,77 @@ export const useCategoryProducts = ({
           setProducts(data.items);
           setTotalPages(data.pagination.totalPages);
 
-          // 카테고리 ID가 있으면 해당 카테고리 정보 사용
+          // 카테고리명 설정
+          let displayName = '모든 작품';
           if (categoryId && data.categoryCounts[categoryId]) {
-            setCategoryName(data.categoryCounts[categoryId].name);
-            setCategoryCount(data.categoryCounts[categoryId].count);
-          } else {
-            setCategoryName('모든 작품');
-            setCategoryCount(data.pagination.totalCount);
+            displayName = data.categoryCounts[categoryId].name;
+
+            // 서브카테고리가 있는 경우 카테고리명에 추가
+            if (subCategoryId) {
+              const subCategoryNames: Record<string, string> = {
+                '1010': 'men',
+                '1020': 'women',
+                '1030': 'common',
+                '1040': 'kids',
+                '2010': 'men',
+                '2020': 'women',
+                '3010': 'men',
+                '3020': 'women',
+              };
+              const subCategoryName = subCategoryNames[subCategoryId];
+              if (subCategoryName) {
+                displayName = `${displayName} > ${subCategoryName}`;
+
+                // 3차 카테고리가 있는 경우 추가
+                if (thirdCategoryId) {
+                  const thirdCategoryNames: Record<string, string> = {
+                    // Fashion
+                    '101010': 'top',
+                    '101020': 'bottom',
+                    '101030': 'outer',
+                    '101040': 'product',
+                    '101050': 'space',
+                    '102010': 'top',
+                    '102020': 'bottom',
+                    '102030': 'outer',
+                    '102040': 'product',
+                    '102050': 'space',
+                    '103010': 'top',
+                    '103020': 'bottom',
+                    // Shoes
+                    '201010': '운동화',
+                    '201020': '구두/스니커즈',
+                    '201030': '워커',
+                    '201040': '샌들/슬리퍼',
+                    '201050': '레인부츠',
+                    '202010': '운동화',
+                    '202020': '구두/스니커즈',
+                    '202030': '샌들/슬리퍼',
+                    '202040': '부츠',
+                    '202050': '레인부츠',
+                    // Others
+                    '301010': '상의',
+                    '301020': '하의',
+                    '301030': 'graphic',
+                    '301040': 'product',
+                    '301050': 'space',
+                    '302010': '상의',
+                    '302020': '하의',
+                    '302030': 'graphic',
+                    '302040': 'product',
+                    '302050': 'space',
+                  };
+                  const thirdCategoryName = thirdCategoryNames[thirdCategoryId];
+                  if (thirdCategoryName) {
+                    displayName = `${displayName} > ${thirdCategoryName}`;
+                  }
+                }
+              }
+            }
           }
+
+          setCategoryName(displayName);
+          setCategoryCount(data.pagination.totalCount);
         } else {
           throw new Error('상품 데이터를 처리하는데 실패했습니다.');
         }
@@ -74,7 +141,7 @@ export const useCategoryProducts = ({
         setLoading(false);
       }
     },
-    [currentPage, categoryId],
+    [currentPage, categoryId, subCategoryId, thirdCategoryId],
   );
 
   const refetch = useCallback(() => fetchProducts(currentPage), [fetchProducts, currentPage]);
@@ -84,11 +151,27 @@ export const useCategoryProducts = ({
     if (!searchParams.get('page')) {
       const params = new URLSearchParams();
       params.set('page', '1');
+      // 기존 파라미터가 있으면 유지
+      if (subCategoryId) {
+        params.set('subcategory', subCategoryId);
+      }
+      if (thirdCategoryId) {
+        params.set('thirdcategory', thirdCategoryId);
+      }
       router.replace(`${pathname}?${params.toString()}`);
     } else {
       fetchProducts(currentPage);
     }
-  }, [currentPage, searchParams, router, categoryId, pathname, fetchProducts]);
+  }, [
+    currentPage,
+    searchParams,
+    router,
+    categoryId,
+    subCategoryId,
+    thirdCategoryId,
+    pathname,
+    fetchProducts,
+  ]);
 
   return {
     products,
