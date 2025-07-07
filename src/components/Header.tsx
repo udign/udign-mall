@@ -20,11 +20,13 @@ import {
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
+import SearchSidebar from '@/components/SearchSidebar';
 import { Button } from '@/components/ui/primitives/button';
 
 export default function Header() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
 
   const { user, logout, isLoading } = useAuth();
   const { count: viewedProductsCount } = useTodayViewedProducts();
@@ -55,6 +57,10 @@ export default function Header() {
 
   const handleTodayViewedClick = () => {
     setIsSidebarOpen(true);
+  };
+
+  const handleSearchClick = () => {
+    setIsSearchSidebarOpen(true);
   };
 
   return (
@@ -98,7 +104,11 @@ export default function Header() {
                     </span>
                   )}
                 </Button>
-                <Button variant='ghost' className='hover:text-primary-hover'>
+                <Button
+                  variant='ghost'
+                  className='hover:text-primary-hover'
+                  onClick={handleSearchClick}
+                >
                   <HiOutlineSearch className='text-xl' />
                 </Button>
 
@@ -248,6 +258,7 @@ export default function Header() {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />
+        <SearchSidebar isOpen={isSearchSidebarOpen} onClose={() => setIsSearchSidebarOpen(false)} />
       </>
     )
   );
