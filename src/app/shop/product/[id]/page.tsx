@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
@@ -163,6 +164,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
 
   const { user, isLoading: authLoading } = useAuth();
+  const { addViewedProduct } = useTodayViewedProducts();
 
   const productId = params.id as string;
 
@@ -188,6 +190,30 @@ export default function ProductDetailPage() {
           setNextProduct(data.next_product || null);
           // 첫 번째 이미지를 기본 선택 이미지로 설정
           setSelectedImage(data.product.it_img1);
+
+          // 오늘 본 상품 목록에 추가
+          addViewedProduct({
+            it_id: data.product.it_id,
+            it_name: data.product.it_name,
+            it_img1: data.product.it_img1,
+            it_price: data.product.it_price,
+            creator_name: data.product.creator_name,
+            it_basic: data.product.it_basic,
+            it_cust_price: data.product.it_cust_price,
+            it_img2: data.product.it_img2,
+            it_img3: data.product.it_img3,
+            it_use_avg: 0,
+            it_use_cnt: 0,
+            it_hit: 0,
+            it_time: '',
+            it_update_time: '',
+            ca_id: '',
+            creator_id: '',
+            description: data.product.description,
+            likes_count: data.product.current_likes.toString(),
+            is_liked: data.product.is_liked,
+            current_likes: data.product.current_likes,
+          });
         } else {
           setError(data.error || '상품을 불러오는데 실패했습니다.');
         }
@@ -200,7 +226,7 @@ export default function ProductDetailPage() {
     };
 
     fetchProductDetail();
-  }, [productId, user, authLoading]);
+  }, [productId, user, authLoading, addViewedProduct]);
 
   const handleLikeToggle = async () => {
     if (!user || !product) return;

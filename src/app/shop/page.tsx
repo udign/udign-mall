@@ -14,7 +14,6 @@ export default function ShopPage() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
 
   const router = useRouter();
-
   const { user, isLoading } = useAuth();
 
   const handleUploadClick = (e: React.MouseEvent) => {

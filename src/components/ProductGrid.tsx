@@ -1,0 +1,235 @@
+'use client';
+
+import { useState, useCallback } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
+import { Product } from '@/types/product';
+import { LikeResponse } from '@/types/product';
+import LoginRequiredDialog from '@/components/LoginRequiredDialog';
+import MessageDialog from '@/components/ui/MessageDialog';
+import { Button } from '@/components/ui/primitives/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { ROUTES } from '@/lib/routes';
+
+interface ProductGridProps {
+  products: ProductType[];
+  className?: string;
+}
+
+interface SearchProduct {
+  it_id: string;
+  it_name: string;
+  it_basic: string;
+  it_cust_price: number;
+  it_price: number;
+  it_img1: string | null;
+  it_img2: string | null;
+  it_img3: string | null;
+  it_use_avg: number;
+  it_use_cnt: number;
+  it_hit: number;
+  it_time: string;
+  it_update_time: string;
+  ca_id: string;
+  creator_id: string;
+  creator_name: string;
+  description: string;
+  likes_count: string;
+  is_liked: boolean;
+  current_likes: number;
+}
+
+type ProductType = Product | SearchProduct;
+
+export default function ProductGrid({ products, className = '' }: ProductGridProps) {
+  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+  const [productLikes, setProductLikes] = useState<
+    Record<string, { isLiked: boolean; count: number }>
+  >({});
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [likingInProgress, setLikingInProgress] = useState<Set<string>>(new Set());
+  const [showOrderDialog, setShowOrderDialog] = useState<boolean>(false);
+  const [orderInfo, setOrderInfo] = useState<{ orderNumber: number; productName: string } | null>(
+    null,
+  );
+
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const handleProductClick = (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+
+    if (!user) {
+      setShowLoginDialog(true);
+    } else {
+      router.push(`${ROUTES.PRODUCT}/${productId}`);
+    }
+  };
+
+  const handleLikeToggle = async (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      setShowLoginDialog(true);
+      return;
+    }
+
+    // 이미 진행 중인 요청이 있으면 무시 (연속 클릭 방지)
+    if (likingInProgress.has(productId)) {
+      return;
+    }
+
+    try {
+      // 1. 진행 중 상태로 설정
+      setLikingInProgress((prev) => new Set(prev).add(productId));
+
+      // 2. API 호출
+      const response = await fetch(`/api/products/${productId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data: LikeResponse = await response.json();
+
+        // 3. API 성공시 서버 데이터로 UI 업데이트
+        setProductLikes((prev) => ({
+          ...prev,
+          [productId]: {
+            isLiked: data.is_liked,
+            count: data.current_likes,
+          },
+        }));
+
+        // 4. 새로 좋아요를 추가한 경우 순번 모달 표시
+        if (data.is_liked && data.order_number && data.product_name) {
+          setOrderInfo({
+            orderNumber: data.order_number,
+            productName: data.product_name,
+          });
+          setShowOrderDialog(true);
+        }
+      } else {
+        console.error('좋아요 처리 실패');
+      }
+    } catch (err) {
+      console.error('좋아요 처리 오류:', err);
+    } finally {
+      // 5. 진행 중 상태 해제
+      setLikingInProgress((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    const imageUrl = target.src;
+    target.style.display = 'none';
+    setFailedImages((prev) => new Set(prev).add(imageUrl));
+  }, []);
+
+  const getLikeInfo = (product: ProductType) => {
+    const productLike = productLikes[product.it_id];
+    if (productLike) {
+      return {
+        isLiked: productLike.isLiked,
+        count: productLike.count,
+      };
+    }
+
+    // 초기값: 하나의 일관된 소스에서만 가져오기
+    return {
+      isLiked: product.is_liked || false,
+      count: product.current_likes || 0,
+    };
+  };
+
+  return (
+    <>
+      <div
+        className={`grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${className}`}
+      >
+        {products.map((product) => {
+          const likeInfo = getLikeInfo(product);
+
+          return (
+            <div
+              key={product.it_id}
+              onClick={(e) => handleProductClick(e, product.it_id)}
+              className='block cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform duration-400 ease-out hover:scale-101'
+            >
+              <div className='relative aspect-square'>
+                <Button
+                  onClick={(e) => handleLikeToggle(e, product.it_id)}
+                  variant='ghost'
+                  size='icon'
+                  disabled={likingInProgress.has(product.it_id)}
+                  className='absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90 disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
+                >
+                  {likingInProgress.has(product.it_id) ? (
+                    <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+                  ) : likeInfo.isLiked ? (
+                    <FcLike />
+                  ) : (
+                    <FcLikePlaceholder />
+                  )}
+                </Button>
+
+                {product.it_img1 && !failedImages.has(product.it_img1) ? (
+                  <Image
+                    src={product.it_img1}
+                    alt={product.it_name}
+                    fill
+                    className='object-cover p-4'
+                    sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw'
+                    onError={handleImageError}
+                  />
+                ) : (
+                  <div className='flex h-full w-full items-center justify-center bg-gray-200'>
+                    <span className='text-gray-400'>이미지 없음</span>
+                  </div>
+                )}
+              </div>
+
+              <div className='p-4'>
+                <h3 className='flex overflow-hidden font-medium text-gray-900'>
+                  {product.it_name}
+                </h3>
+                <div className='flex items-center gap-1'>
+                  <FcLike />
+                  <p className='mt-1 text-sm text-gray-500'>{likeInfo.count}명이 좋아합니다</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <LoginRequiredDialog
+        open={showLoginDialog}
+        onOpenChange={setShowLoginDialog}
+        title='상품 상세보기'
+        description='상품 상세 정보를 보시려면 로그인이 필요합니다.'
+      />
+
+      <MessageDialog
+        open={showOrderDialog}
+        onOpenChange={setShowOrderDialog}
+        title='선택해주셔서 감사합니다.'
+        description={
+          orderInfo
+            ? `고객님은 ${orderInfo.productName}의 No. ${orderInfo.orderNumber} 컬렉터입니다.\n\n단 몇 명만을 위한 이 창작의 여정에 함께 해주셔서 진심으로 감사드립니다.`
+            : ''
+        }
+        confirmText='확인'
+      />
+    </>
+  );
+}
