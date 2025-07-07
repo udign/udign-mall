@@ -8,6 +8,7 @@ import { FiBox } from 'react-icons/fi';
 import { FaRegUserCircle } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import { ROUTES } from '@/lib/routes';
 import { NAV_MENU_ITEMS } from '@/lib/navigation';
 import {
@@ -18,12 +19,15 @@ import {
 } from '@/components/ui/primitives/dropdown-menu';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
+import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import { Button } from '@/components/ui/primitives/button';
 
 export default function Header() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   const { user, logout, isLoading } = useAuth();
+  const { count: viewedProductsCount } = useTodayViewedProducts();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -49,6 +53,10 @@ export default function Header() {
     }
   };
 
+  const handleTodayViewedClick = () => {
+    setIsSidebarOpen(true);
+  };
+
   return (
     !hideHeader && (
       <>
@@ -57,7 +65,7 @@ export default function Header() {
             <div className='flex items-center gap-3'>
               <div className='non-login'>
                 <Button
-                  onClick={() => router.push(ROUTES.HOME)}
+                  onClick={() => router.push(ROUTES.SHOP)}
                   variant='ghost'
                   className='flex h-auto items-center p-0 hover:bg-transparent'
                 >
@@ -78,8 +86,17 @@ export default function Header() {
                 >
                   <FaRegUserCircle className='text-xl' />
                 </Button>
-                <Button variant='ghost' className='hover:text-primary-hover'>
+                <Button
+                  variant='ghost'
+                  className='hover:text-primary-hover relative'
+                  onClick={handleTodayViewedClick}
+                >
                   <FiBox className='text-xl' />
+                  {viewedProductsCount > 0 && (
+                    <span className='absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs text-white'>
+                      {viewedProductsCount}
+                    </span>
+                  )}
                 </Button>
                 <Button variant='ghost' className='hover:text-primary-hover'>
                   <HiOutlineSearch className='text-xl' />
@@ -227,6 +244,10 @@ export default function Header() {
         </header>
 
         <LoginRequiredDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
+        <TodayViewedProductsSidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
       </>
     )
   );
