@@ -156,14 +156,14 @@ export default function Header() {
 
                 <Button
                   variant='ghost'
-                  className='hover:text-primary-hover sm:hidden'
+                  className='hover:text-primary-hover md:hidden'
                   onClick={handleNavigationClick}
                 >
                   <HiOutlineMenu className='text-xl' />
                 </Button>
               </div>
             </div>
-            <nav className='hidden sm:flex sm:items-center sm:justify-between'>
+            <nav className='hidden md:flex md:items-center md:justify-between'>
               <ul className='flex items-center gap-1'>
                 {NAV_MENU_ITEMS.map((item) => (
                   <li key={item.href} className='flex items-center'>
