@@ -8,7 +8,7 @@ interface FooterNavLink {
 }
 
 const FOOTER_NAV_LINKS: FooterNavLink[] = [
-  { href: ROUTES.ABOUT, label: 'about UDIGN' },
+  { href: ROUTES.COMPANY, label: 'about UDIGN' },
   { href: ROUTES.GUIDE, label: '이용안내' },
   { href: ROUTES.TERMS, label: '이용약관' },
   { href: ROUTES.PRIVACY, label: '개인정보처리방침' },
@@ -17,7 +17,7 @@ const FOOTER_NAV_LINKS: FooterNavLink[] = [
 
 export default function Footer() {
   return (
-    <footer className='space-y-10 border-t border-gray-200 px-6 py-6 sm:px-10 lg:space-y-20'>
+    <footer className='space-y-10 border-t border-gray-200 px-6 py-6 sm:px-10 lg:space-y-18'>
       <div className='mx-auto max-w-7xl flex-row justify-between space-y-10 lg:flex lg:space-y-0'>
         <div className='mb-10 flex justify-center lg:mb-0 lg:flex-shrink-0 lg:justify-start'>
           <Image src='/images/udign-footer.png' alt='UDIGN' width={150} height={60} />

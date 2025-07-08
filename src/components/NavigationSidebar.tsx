@@ -165,6 +165,41 @@ export default function NavigationSidebar({ isOpen, onClose }: NavigationSidebar
                 </div>
               </div>
             </div>
+
+            <div className='mb-6'>
+              <h3 className='mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase'>
+                ABOUT US
+              </h3>
+              <div className='space-y-1'>
+                <div className='py-2'>
+                  <Button
+                    variant='ghost'
+                    className='hover:text-primary-hover w-full justify-start pl-4 text-left text-lg font-semibold text-gray-700 hover:bg-gray-50'
+                    onClick={() => handleNavigation(ROUTES.COMPANY)}
+                  >
+                    사이트 소개
+                  </Button>
+                </div>
+                <div className='py-2'>
+                  <Button
+                    variant='ghost'
+                    className='hover:text-primary-hover w-full justify-start pl-4 text-left text-lg font-semibold text-gray-700 hover:bg-gray-50'
+                    onClick={() => handleNavigation(ROUTES.TERMS)}
+                  >
+                    서비스 이용약관
+                  </Button>
+                </div>
+                <div className='py-2'>
+                  <Button
+                    variant='ghost'
+                    className='hover:text-primary-hover w-full justify-start pl-4 text-left text-lg font-semibold text-gray-700 hover:bg-gray-50'
+                    onClick={() => handleNavigation(ROUTES.PRIVACY)}
+                  >
+                    개인정보 처리방침
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </SheetContent>

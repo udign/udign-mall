@@ -25,7 +25,7 @@ export const ROUTES = {
   MY_UDIGN: '/shop/my-udign',
 
   // 정보 페이지
-  ABOUT: '/shop/about',
+  COMPANY: '/shop/company',
   GUIDE: '/shop/guide',
   PRIVACY: '/shop/privacy',
   BAND: '/shop/band',
