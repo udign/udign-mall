@@ -47,17 +47,17 @@ export default function NavigationSidebar({ isOpen, onClose }: NavigationSidebar
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side='right' className='w-[320px] p-0 [&>button]:hidden'>
-        <SheetHeader className='flex flex-row items-center justify-end p-6 pb-0'>
-          <SheetTitle className='hidden text-xl font-bold'>메뉴</SheetTitle>
-          <SheetDescription className='hidden'>사이트 네비게이션 메뉴</SheetDescription>
-          <Button variant='ghost' size='icon' onClick={onClose} className='h-8 w-8'>
-            <X className='h-4 w-4' />
-          </Button>
-        </SheetHeader>
-
+      <SheetContent side='right' className='h-full w-80 p-0 [&>button]:hidden'>
         <div className='flex h-full flex-col'>
-          <div className='flex-1 overflow-y-auto p-6 pt-4'>
+          <SheetHeader className='flex-shrink-0 flex-row items-center justify-end p-6 pb-0'>
+            <SheetTitle className='hidden text-xl font-bold'>메뉴</SheetTitle>
+            <SheetDescription className='hidden'>사이트 네비게이션 메뉴</SheetDescription>
+            <Button variant='ghost' size='icon' onClick={onClose} className='h-8 w-8'>
+              <X className='h-4 w-4' />
+            </Button>
+          </SheetHeader>
+
+          <div className='min-h-0 flex-1 overflow-y-auto p-6 pt-4'>
             <div className='mb-6'>
               <h3 className='mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase'>
                 CATEGORY
