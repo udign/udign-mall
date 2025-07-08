@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Store,
   LogOut,
+  Users,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -53,6 +54,11 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
       label: '대시보드',
       href: ROUTES.ADMIN,
       icon: <LayoutDashboard className='h-4 w-4' />,
+    },
+    {
+      label: '회원 관리',
+      href: ROUTES.ADMIN_MEMBER,
+      icon: <Users className='h-4 w-4' />,
     },
     {
       label: '작품관리',
