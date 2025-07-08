@@ -10,7 +10,7 @@ interface FooterNavLink {
 const FOOTER_NAV_LINKS: FooterNavLink[] = [
   { href: ROUTES.COMPANY, label: 'about UDIGN' },
   { href: ROUTES.GUIDE, label: '이용안내' },
-  { href: ROUTES.TERMS, label: '이용약관' },
+  { href: ROUTES.PROVISION, label: '이용약관' },
   { href: ROUTES.PRIVACY, label: '개인정보처리방침' },
   { href: ROUTES.BAND, label: '벤더페이지' },
 ];

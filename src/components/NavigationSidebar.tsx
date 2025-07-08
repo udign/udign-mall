@@ -184,7 +184,7 @@ export default function NavigationSidebar({ isOpen, onClose }: NavigationSidebar
                   <Button
                     variant='ghost'
                     className='hover:text-primary-hover w-full justify-start pl-4 text-left text-lg font-semibold text-gray-700 hover:bg-gray-50'
-                    onClick={() => handleNavigation(ROUTES.TERMS)}
+                    onClick={() => handleNavigation(ROUTES.PROVISION)}
                   >
                     서비스 이용약관
                   </Button>

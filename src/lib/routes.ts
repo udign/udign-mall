@@ -27,6 +27,7 @@ export const ROUTES = {
   // 정보 페이지
   COMPANY: '/shop/company',
   GUIDE: '/shop/guide',
+  PROVISION: '/shop/provision',
   PRIVACY: '/shop/privacy',
   BAND: '/shop/band',
 } as const;
