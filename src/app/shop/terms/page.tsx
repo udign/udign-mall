@@ -28,8 +28,6 @@ export default function TermsPage() {
     terms: false,
     privacy: false,
   });
-
-  // Dialog 상태
   const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
 
   const router = useRouter();

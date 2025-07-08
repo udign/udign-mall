@@ -21,12 +21,14 @@ import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
+import NavigationSidebar from '@/components/NavigationSidebar';
 import { Button } from '@/components/ui/primitives/button';
 
 export default function Header() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
+  const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState<boolean>(false);
 
   const { user, logout, isLoading } = useAuth();
   const { count: viewedProductsCount } = useTodayViewedProducts();
@@ -61,6 +63,10 @@ export default function Header() {
 
   const handleSearchClick = () => {
     setIsSearchSidebarOpen(true);
+  };
+
+  const handleNavigationClick = () => {
+    setIsNavigationSidebarOpen(true);
   };
 
   return (
@@ -148,12 +154,16 @@ export default function Header() {
                   </Button>
                 )}
 
-                <Button variant='ghost' className='hover:text-primary-hover'>
+                <Button
+                  variant='ghost'
+                  className='hover:text-primary-hover md:hidden'
+                  onClick={handleNavigationClick}
+                >
                   <HiOutlineMenu className='text-xl' />
                 </Button>
               </div>
             </div>
-            <nav className='hidden sm:flex sm:items-center sm:justify-between'>
+            <nav className='hidden md:flex md:items-center md:justify-between'>
               <ul className='flex items-center gap-1'>
                 {NAV_MENU_ITEMS.map((item) => (
                   <li key={item.href} className='flex items-center'>
@@ -236,7 +246,6 @@ export default function Header() {
                         className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
                       >
                         {item.label}
-                        <IoIosArrowDown className='text-sm' />
                       </Button>
                     )}
                   </li>
@@ -259,6 +268,10 @@ export default function Header() {
           onClose={() => setIsSidebarOpen(false)}
         />
         <SearchSidebar isOpen={isSearchSidebarOpen} onClose={() => setIsSearchSidebarOpen(false)} />
+        <NavigationSidebar
+          isOpen={isNavigationSidebarOpen}
+          onClose={() => setIsNavigationSidebarOpen(false)}
+        />
       </>
     )
   );

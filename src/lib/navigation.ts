@@ -232,4 +232,5 @@ export const NAV_MENU_ITEMS: NavMenuItem[] = [
     ],
   },
   { href: ROUTES.UPLOAD, label: '디자인 업로드', requiresAuth: true },
+  { href: ROUTES.GUIDE, label: '이용안내' },
 ];
