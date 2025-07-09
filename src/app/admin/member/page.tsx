@@ -239,12 +239,12 @@ export default function MemberManagePage() {
         <div className='rounded-lg bg-white p-4'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center'>
-              <div className='rounded-lg bg-blue-100 p-3'>
-                <Users className='h-6 w-6 text-blue-600' />
+              <div className='rounded-lg bg-green-100 p-3'>
+                <Users className='h-6 w-6 text-green-600' />
               </div>
               <div className='ml-4'>
                 <p className='text-sm font-medium text-gray-600'>전체 회원</p>
-                <p className='text-2xl font-bold text-blue-600'>{stats?.totalMembers || 0}</p>
+                <p className='text-2xl font-bold text-green-600'>{stats?.totalMembers || 0}</p>
               </div>
             </div>
           </div>
