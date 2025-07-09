@@ -167,10 +167,11 @@ export default function SalesPage() {
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold'>매출현황</h1>
-        <div className='flex items-center gap-2'>
-          <TrendingUp className='text-primary h-5 w-5' />
-          <span className='text-muted-foreground text-sm'>매출 데이터 분석</span>
+        <div>
+          <h1 className='text-2xl font-bold'>매출현황</h1>
+          <p className='mt-1 text-gray-600'>
+            일일, 일간, 월간, 연간 매출 데이터를 조회하고 분석할 수 있습니다.
+          </p>
         </div>
       </div>
 
