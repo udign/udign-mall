@@ -43,23 +43,13 @@ const statusOptions = [
   },
 ];
 
-const tableHeaders = [
-  '아이디',
-  '이름',
-  '닉네임',
-  '상태',
-  '권한',
-  '휴대폰',
-  '전화번호',
-  '최종접속',
-  '가입일',
-];
+const tableHeaders = ['아이디', '이름', '닉네임', '상태', '권한', '휴대폰', '최종접속', '가입일'];
 
 const levelOptions = [
-  { minLevel: 10, label: '관리자' },
-  { minLevel: 5, label: '우수회원' },
-  { minLevel: 2, label: '정회원' },
-  { minLevel: 0, label: '일반회원' },
+  { minLevel: 10, label: '관리자', color: 'bg-red-100 text-red-800' },
+  { minLevel: 5, label: '우수회원', color: 'bg-purple-100 text-purple-800' },
+  { minLevel: 2, label: '정회원', color: 'bg-blue-100 text-blue-800' },
+  { minLevel: 0, label: '일반회원', color: 'bg-gray-100 text-gray-800' },
 ];
 
 const getStatusColor = (status: string) => {
@@ -80,6 +70,12 @@ const formatDate = (dateString: string) => {
 
 const getLevelLabel = (level: number) => {
   return levelOptions.find((option) => level >= option.minLevel)?.label || '일반회원';
+};
+
+const getLevelColor = (level: number) => {
+  return (
+    levelOptions.find((option) => level >= option.minLevel)?.color || 'bg-gray-100 text-gray-800'
+  );
 };
 
 export default function MemberManagePage() {
@@ -283,16 +279,15 @@ export default function MemberManagePage() {
                         </td>
                         <td className='px-6 py-4 text-center'>
                           <div className='text-sm text-gray-900'>
-                            <span className='inline-flex items-center rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-800'>
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${getLevelColor(member.mb_level)}`}
+                            >
                               {getLevelLabel(member.mb_level)} ({member.mb_level})
                             </span>
                           </div>
                         </td>
                         <td className='px-6 py-4 text-center'>
                           <div className='text-sm text-gray-900'>{member.mb_hp || '-'}</div>
-                        </td>
-                        <td className='px-6 py-4 text-center'>
-                          <div className='text-sm text-gray-900'>{member.mb_tel || '-'}</div>
                         </td>
                         <td className='px-6 py-4 text-center'>
                           <div className='text-sm text-gray-900'>
