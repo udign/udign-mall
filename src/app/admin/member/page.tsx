@@ -144,7 +144,6 @@ export default function MemberManagePage() {
           throw new Error(errorData.error || '상태 변경에 실패했습니다.');
         }
 
-        // API 응답 성공 시 로컬 상태 업데이트
         setMembers((prev) =>
           prev.map((member) =>
             member.mb_id === memberId
