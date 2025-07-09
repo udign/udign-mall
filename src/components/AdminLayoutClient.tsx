@@ -11,6 +11,7 @@ import {
   Store,
   LogOut,
   Users,
+  TrendingUp,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -58,6 +59,11 @@ const menuItems: MenuItem[] = [
     label: '작품관리',
     href: ROUTES.ADMIN_REVIEW,
     icon: <ShoppingBag className='h-4 w-4' />,
+  },
+  {
+    label: '매출현황',
+    href: ROUTES.ADMIN_SALES,
+    icon: <TrendingUp className='h-4 w-4' />,
   },
 ];
 
