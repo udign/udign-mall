@@ -5,7 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primit
 import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
 import { Label } from '@/components/ui/primitives/label';
-import { CalendarDays, TrendingUp, BarChart3, PieChart } from 'lucide-react';
+import { Calendar } from '@/components/ui/primitives/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/primitives/popover';
+import {
+  CalendarDays,
+  TrendingUp,
+  BarChart3,
+  PieChart,
+  Calendar as CalendarIcon,
+} from 'lucide-react';
+import { format } from 'date-fns';
 import { SalesData, SalesQueryParams, SalesResponse, SalesTotals } from '@/types/sales';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import dayjs from 'dayjs';
@@ -63,11 +72,9 @@ export default function SalesPage() {
     monthly: { salesData: [], totals: null },
     yearly: { salesData: [], totals: null },
   });
-  const [dailyDate, setDailyDate] = useState(dayjs().format('YYYY-MM-DD'));
-  const [periodStartDate, setPeriodStartDate] = useState(
-    dayjs().startOf('month').format('YYYY-MM-DD'),
-  );
-  const [periodEndDate, setPeriodEndDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const [dailyDate, setDailyDate] = useState<Date>(new Date());
+  const [periodStartDate, setPeriodStartDate] = useState<Date>(dayjs().startOf('month').toDate());
+  const [periodEndDate, setPeriodEndDate] = useState<Date>(new Date());
   const [monthlyStartMonth, setMonthlyStartMonth] = useState(
     dayjs().startOf('year').format('YYYY-MM'),
   );
@@ -129,15 +136,15 @@ export default function SalesPage() {
   const handleDailySearch = () => {
     fetchSalesData({
       type: 'daily',
-      date: dailyDate,
+      date: format(dailyDate, 'yyyy-MM-dd'),
     });
   };
 
   const handlePeriodSearch = () => {
     fetchSalesData({
       type: 'period',
-      startDate: periodStartDate,
-      endDate: periodEndDate,
+      startDate: format(periodStartDate, 'yyyy-MM-dd'),
+      endDate: format(periodEndDate, 'yyyy-MM-dd'),
     });
   };
 
@@ -191,13 +198,26 @@ export default function SalesPage() {
               <div className='flex items-end gap-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='daily-date'>조회일</Label>
-                  <Input
-                    id='daily-date'
-                    type='date'
-                    value={dailyDate}
-                    onChange={(e) => setDailyDate(e.target.value)}
-                    max={dayjs().format('YYYY-MM-DD')}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        className='w-40 justify-start text-left font-normal'
+                      >
+                        <CalendarIcon className='h-4 w-4' />
+                        {dailyDate ? format(dailyDate, 'yyyy년 MM월 dd일') : '날짜를 선택하세요'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0'>
+                      <Calendar
+                        mode='single'
+                        selected={dailyDate}
+                        onSelect={(date) => date && setDailyDate(date)}
+                        disabled={(date) => date > new Date()}
+                        captionLayout='dropdown'
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <Button onClick={handleDailySearch} disabled={loading}>
                   {loading ? '조회 중...' : '조회'}
@@ -216,23 +236,53 @@ export default function SalesPage() {
               <div className='flex items-end gap-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='period-start'>시작일</Label>
-                  <Input
-                    id='period-start'
-                    type='date'
-                    value={periodStartDate}
-                    onChange={(e) => setPeriodStartDate(e.target.value)}
-                    max={dayjs().format('YYYY-MM-DD')}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        className='w-40 justify-start text-left font-normal'
+                      >
+                        <CalendarIcon className='h-4 w-4' />
+                        {periodStartDate
+                          ? format(periodStartDate, 'yyyy년 MM월 dd일')
+                          : '시작일을 선택하세요'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0'>
+                      <Calendar
+                        mode='single'
+                        selected={periodStartDate}
+                        onSelect={(date) => date && setPeriodStartDate(date)}
+                        disabled={(date) => date > new Date()}
+                        captionLayout='dropdown'
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='period-end'>종료일</Label>
-                  <Input
-                    id='period-end'
-                    type='date'
-                    value={periodEndDate}
-                    onChange={(e) => setPeriodEndDate(e.target.value)}
-                    max={dayjs().format('YYYY-MM-DD')}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        className='w-40 justify-start text-left font-normal'
+                      >
+                        <CalendarIcon className='h-4 w-4' />
+                        {periodEndDate
+                          ? format(periodEndDate, 'yyyy년 MM월 dd일')
+                          : '종료일을 선택하세요'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0'>
+                      <Calendar
+                        mode='single'
+                        selected={periodEndDate}
+                        onSelect={(date) => date && setPeriodEndDate(date)}
+                        disabled={(date) => date > new Date()}
+                        captionLayout='dropdown'
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <Button onClick={handlePeriodSearch} disabled={loading}>
                   {loading ? '조회 중...' : '조회'}
