@@ -2,15 +2,33 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { AdminUser, MemberListResponse } from '@/types/user';
 import CommonPagination from '@/components/CommonPagination';
 import { ROUTES } from '@/lib/routes';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface MemberStatusSelectProps {
   memberId: string;
   currentStatus: 'normal' | 'leave' | 'blocked';
   onStatusChange: (memberId: string, newStatus: 'normal' | 'leave' | 'blocked') => void;
 }
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-';
+  return dayjs(dateString).tz('Asia/Seoul').format('YYYY-MM-DD');
+};
+
+const getLevelLabel = (level: number) => {
+  if (level >= 10) return '관리자';
+  if (level >= 5) return '우수회원';
+  if (level >= 2) return '정회원';
+  return '일반회원';
+};
 
 function MemberStatusSelect({ memberId, currentStatus, onStatusChange }: MemberStatusSelectProps) {
   const getStatusColor = (status: string) => {
@@ -117,24 +135,6 @@ export default function MemberManagePage() {
       fetchData();
     }
   }, [searchParams, router, fetchData]);
-
-  // 날짜 포맷 함수
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-  };
-
-  // 권한 레벨 표시
-  const getLevelLabel = (level: number) => {
-    if (level >= 10) return '관리자';
-    if (level >= 5) return '우수회원';
-    if (level >= 2) return '정회원';
-    return '일반회원';
-  };
 
   return (
     <div className='p-6'>
