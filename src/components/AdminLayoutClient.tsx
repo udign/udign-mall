@@ -43,29 +43,29 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
+const menuItems: MenuItem[] = [
+  {
+    label: '대시보드',
+    href: ROUTES.ADMIN,
+    icon: <LayoutDashboard className='h-4 w-4' />,
+  },
+  {
+    label: '회원 관리',
+    href: ROUTES.ADMIN_MEMBER,
+    icon: <Users className='h-4 w-4' />,
+  },
+  {
+    label: '작품관리',
+    href: ROUTES.ADMIN_REVIEW,
+    icon: <ShoppingBag className='h-4 w-4' />,
+  },
+];
+
 export default function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const router = useRouter();
   const pathname = usePathname();
-
-  const menuItems: MenuItem[] = [
-    {
-      label: '대시보드',
-      href: ROUTES.ADMIN,
-      icon: <LayoutDashboard className='h-4 w-4' />,
-    },
-    {
-      label: '회원 관리',
-      href: ROUTES.ADMIN_MEMBER,
-      icon: <Users className='h-4 w-4' />,
-    },
-    {
-      label: '작품관리',
-      href: ROUTES.ADMIN_REVIEW,
-      icon: <ShoppingBag className='h-4 w-4' />,
-    },
-  ];
 
   const toggleMenu = (label: string) => {
     setExpandedMenus((prev) =>
@@ -101,7 +101,7 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
         </SidebarHeader>
 
         <SidebarContent>
-          <SidebarMenu>
+          <SidebarMenu className='px-2'>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.label}>
                 {item.children ? (
@@ -134,7 +134,7 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
                     )}
                   </>
                 ) : (
-                  <SidebarMenuButton asChild isActive={isActive(item.href)}>
+                  <SidebarMenuButton className='h-10' asChild isActive={isActive(item.href)}>
                     <Link href={item.href}>
                       {item.icon}
                       <span>{item.label}</span>
