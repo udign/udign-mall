@@ -10,6 +10,7 @@ import CommonPagination from '@/components/CommonPagination';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { ROUTES } from '@/lib/routes';
 import { Button } from '@/components/ui/primitives/button';
+import MessageDialog from '@/components/ui/MessageDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,6 +88,15 @@ export default function MemberManagePage() {
   const [statusLoading, setStatusLoading] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [messageDialog, setMessageDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+  }>({
+    open: false,
+    title: '',
+    description: '',
+  });
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -110,7 +120,11 @@ export default function MemberManagePage() {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error('회원 목록 조회 오류:', error);
-      alert('회원 목록을 가져오는데 실패했습니다.');
+      setMessageDialog({
+        open: true,
+        title: '데이터 로드 실패',
+        description: '회원 목록을 가져오는데 실패했습니다.',
+      });
     } finally {
       setLoading(false);
     }
@@ -155,10 +169,18 @@ export default function MemberManagePage() {
           ),
         );
 
-        alert('회원 상태가 성공적으로 변경되었습니다.');
+        setMessageDialog({
+          open: true,
+          title: '상태 변경 완료',
+          description: '회원 상태가 성공적으로 변경되었습니다.',
+        });
       } catch (error) {
         console.error('상태 변경 오류:', error);
-        alert(error instanceof Error ? error.message : '상태 변경에 실패했습니다.');
+        setMessageDialog({
+          open: true,
+          title: '상태 변경 실패',
+          description: error instanceof Error ? error.message : '상태 변경에 실패했습니다.',
+        });
       } finally {
         setStatusLoading(null);
       }
@@ -301,6 +323,13 @@ export default function MemberManagePage() {
           )}
         </div>
       </div>
+
+      <MessageDialog
+        open={messageDialog.open}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+        title={messageDialog.title}
+        description={messageDialog.description}
+      />
     </div>
   );
 }
