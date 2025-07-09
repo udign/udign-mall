@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { getCurrentUser } from '@/lib/auth';
+import { MEMBER_LEVELS, PERMISSION_CHECKS } from '@/lib/constants';
 
 interface MemberStats {
   totalMembers: number;
@@ -14,7 +15,7 @@ export const GET = async () => {
   try {
     // 현재 사용자 인증 및 권한 확인
     const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.mb_level < 10) {
+    if (!currentUser || !PERMISSION_CHECKS.isAdmin(currentUser.mb_level)) {
       return NextResponse.json(
         { success: false, message: '관리자 권한이 필요합니다.' },
         { status: 403 },
@@ -25,10 +26,10 @@ export const GET = async () => {
     const statsQuery = `
       SELECT 
         COUNT(*) as total_members,
-        SUM(CASE WHEN mb_level >= 10 THEN 1 ELSE 0 END) as admin_members,
-        SUM(CASE WHEN mb_level >= 5 AND mb_level < 10 THEN 1 ELSE 0 END) as excellent_members,
-        SUM(CASE WHEN mb_level >= 2 AND mb_level < 5 THEN 1 ELSE 0 END) as regular_members,
-        SUM(CASE WHEN mb_level < 2 THEN 1 ELSE 0 END) as basic_members
+        SUM(CASE WHEN mb_level >= ${MEMBER_LEVELS.ADMIN} THEN 1 ELSE 0 END) as admin_members,
+        SUM(CASE WHEN mb_level >= ${MEMBER_LEVELS.EXCELLENT} AND mb_level < ${MEMBER_LEVELS.ADMIN} THEN 1 ELSE 0 END) as excellent_members,
+        SUM(CASE WHEN mb_level >= ${MEMBER_LEVELS.REGULAR} AND mb_level < ${MEMBER_LEVELS.EXCELLENT} THEN 1 ELSE 0 END) as regular_members,
+        SUM(CASE WHEN mb_level < ${MEMBER_LEVELS.REGULAR} THEN 1 ELSE 0 END) as basic_members
       FROM g5_member
     `;
 

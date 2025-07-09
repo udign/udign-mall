@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { verifyToken } from '@/lib/auth';
+import { PERMISSION_CHECKS } from '@/lib/constants';
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -20,7 +21,7 @@ export const POST = async (request: NextRequest) => {
       mb_name: string;
     } | null;
 
-    if (!decoded || decoded.mb_level < 10) {
+    if (!decoded || !PERMISSION_CHECKS.isAdmin(decoded.mb_level)) {
       return NextResponse.json(
         { success: false, message: '관리자 권한이 필요합니다.' },
         { status: 403 },

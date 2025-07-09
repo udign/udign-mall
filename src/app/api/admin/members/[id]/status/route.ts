@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { getCurrentUser } from '@/lib/auth';
 import { UpdateMemberStatusRequest } from '@/types/user';
+import { PERMISSION_CHECKS } from '@/lib/constants';
 
 interface RouteParams {
   params: Promise<{
@@ -13,7 +14,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
   try {
     // 현재 사용자 인증 및 권한 확인
     const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.mb_level < 10) {
+    if (!currentUser || !PERMISSION_CHECKS.isAdmin(currentUser.mb_level)) {
       return NextResponse.json(
         { success: false, message: '관리자 권한이 필요합니다.' },
         { status: 403 },
@@ -49,7 +50,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     const targetMember = memberResult[0];
 
     // 권한 확인: 자신보다 높은 레벨의 회원은 수정할 수 없음 (슈퍼 관리자 제외)
-    if (currentUser.mb_level < 10 && targetMember.mb_level >= currentUser.mb_level) {
+    if (!PERMISSION_CHECKS.canManageUser(currentUser.mb_level, targetMember.mb_level)) {
       return NextResponse.json(
         { success: false, message: '해당 회원을 수정할 권한이 없습니다.' },
         { status: 403 },

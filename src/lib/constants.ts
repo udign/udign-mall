@@ -36,3 +36,47 @@ export const CATEGORY_IDS = {
   SHOES: '20', // 신발 카테고리
   OTHERS: '30', // 기타 카테고리
 } as const;
+
+// 회원 권한 레벨 상수
+export const MEMBER_LEVELS = {
+  SUPER_ADMIN: 100, // 슈퍼 관리자 (모든 관리자 관리 가능)
+  ADMIN: 10, // 관리자 (관리자 페이지 접근 가능)
+  EXCELLENT: 5, // 우수회원
+  REGULAR: 2, // 정회원 (신규 가입 기본값)
+  BASIC: 1, // 일반회원
+  GUEST: 0, // 게스트
+} as const;
+
+// 회원 권한 분류 옵션
+export const LEVEL_OPTIONS = [
+  {
+    minLevel: MEMBER_LEVELS.ADMIN,
+    label: '관리자',
+    color: 'bg-red-100 text-red-800',
+  },
+  {
+    minLevel: MEMBER_LEVELS.EXCELLENT,
+    label: '우수회원',
+    color: 'bg-purple-100 text-purple-800',
+  },
+  {
+    minLevel: MEMBER_LEVELS.REGULAR,
+    label: '정회원',
+    color: 'bg-blue-100 text-blue-800',
+  },
+  {
+    minLevel: MEMBER_LEVELS.BASIC,
+    label: '일반회원',
+    color: 'bg-gray-100 text-gray-800',
+  },
+] as const;
+
+// 권한 체크 유틸리티 함수
+export const PERMISSION_CHECKS = {
+  isAdmin: (level: number) => level >= MEMBER_LEVELS.ADMIN,
+  isSuperAdmin: (level: number) => level >= MEMBER_LEVELS.SUPER_ADMIN,
+  isExcellent: (level: number) => level >= MEMBER_LEVELS.EXCELLENT,
+  isRegular: (level: number) => level >= MEMBER_LEVELS.REGULAR,
+  canManageUser: (currentLevel: number, targetLevel: number) =>
+    currentLevel >= MEMBER_LEVELS.SUPER_ADMIN || currentLevel > targetLevel,
+} as const;

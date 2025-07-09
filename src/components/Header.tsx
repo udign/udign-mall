@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import { ROUTES } from '@/lib/routes';
 import { NAV_MENU_ITEMS } from '@/lib/navigation';
+import { PERMISSION_CHECKS } from '@/lib/constants';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -131,7 +132,7 @@ export default function Header() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end' className='w-36 p-0'>
-                      {user.mb_level >= 10 && (
+                      {PERMISSION_CHECKS.isAdmin(user.mb_level) && (
                         <DropdownMenuItem
                           onClick={() => router.push(ROUTES.ADMIN)}
                           className='cursor-pointer'

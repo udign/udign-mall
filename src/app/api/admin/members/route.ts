@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { getCurrentUser } from '@/lib/auth';
 import { AdminUser, MemberListParams } from '@/types/user';
-import { PAGINATION_CONFIG } from '@/lib/constants';
+import { PAGINATION_CONFIG, PERMISSION_CHECKS } from '@/lib/constants';
 
 export const GET = async (request: NextRequest) => {
   try {
     // 현재 사용자 인증 및 권한 확인
     const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.mb_level < 10) {
+    if (!currentUser || !PERMISSION_CHECKS.isAdmin(currentUser.mb_level)) {
       return NextResponse.json(
         { success: false, message: '관리자 권한이 필요합니다.' },
         { status: 403 },
@@ -64,8 +64,7 @@ export const GET = async (request: NextRequest) => {
     const queryParams: (string | number)[] = [];
 
     // 권한에 따른 추가 제한 (슈퍼 관리자가 아닌 경우)
-    // 레벨 10은 관리자, 더 높은 레벨(예: 100)은 슈퍼 관리자로 가정
-    if (currentUser.mb_level < 100) {
+    if (!PERMISSION_CHECKS.isSuperAdmin(currentUser.mb_level)) {
       whereConditions.push('mb_level <= ?');
       queryParams.push(currentUser.mb_level);
     }

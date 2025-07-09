@@ -91,8 +91,6 @@ function ReviewManagement() {
 
       const itemsResult = await itemsResponse.json();
 
-      console.log(itemsResult);
-
       if (itemsResult.success) {
         setItems(itemsResult.data.items);
         if (itemsResult.data.pagination) {
