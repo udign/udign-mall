@@ -258,7 +258,6 @@ function ReviewManagement() {
   return (
     <>
       <div className='space-y-4'>
-        {/* 헤더 */}
         <div className='flex items-center justify-between'>
           <div>
             <h1 className='text-2xl font-bold text-gray-900'>작품 관리</h1>
@@ -268,9 +267,7 @@ function ReviewManagement() {
           </div>
         </div>
 
-        {/* 통계 카드 */}
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-          {/* 전체 작품 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -285,7 +282,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 디자인 검수 승인 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -300,7 +296,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 디자인 검수 반려 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -315,7 +310,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 제작 검토 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -330,7 +324,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 구매 진행 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -346,7 +339,6 @@ function ReviewManagement() {
           </div>
         </div>
 
-        {/* 검수 목록 테이블 */}
         <div className='rounded-lg bg-white'>
           <div>
             <div className='mb-4 flex items-center justify-between'>
@@ -503,7 +495,6 @@ function ReviewManagement() {
                                   )}
                                 </Button>
 
-                                {/* 제작 검토 버튼 */}
                                 <Button
                                   onClick={() =>
                                     showConfirmDialog(item.it_id, 'review', item.it_name)
@@ -552,7 +543,6 @@ function ReviewManagement() {
                   </table>
                 </div>
 
-                {/* 페이지네이션 */}
                 <div className='mt-6 flex justify-center'>
                   <CommonPagination
                     currentPageNumber={currentPage}
@@ -567,7 +557,6 @@ function ReviewManagement() {
         </div>
       </div>
 
-      {/* 확인 다이얼로그 */}
       <ConfirmDialog
         open={confirmDialog.open}
         onOpenChange={(open) => setConfirmDialog((prev) => ({ ...prev, open }))}

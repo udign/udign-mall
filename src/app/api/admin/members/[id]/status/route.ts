@@ -4,9 +4,9 @@ import { getCurrentUser } from '@/lib/auth';
 import { UpdateMemberStatusRequest } from '@/types/user';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export const PUT = async (request: NextRequest, { params }: RouteParams) => {
@@ -17,7 +17,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body: UpdateMemberStatusRequest = await request.json();
     const { status } = body;
 
@@ -48,14 +48,15 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     let updateQuery: string;
     let updateParams: (string | null)[];
 
-    const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    // 현재 날짜를 YYYYMMDD 형식으로 생성 (데이터베이스 컬럼 varchar(8) 형식에 맞춤)
+    const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
 
     switch (status) {
       case 'normal':
         // 정상 상태로 변경 (탈퇴일, 차단일 모두 초기화)
         updateQuery = `
           UPDATE g5_member 
-          SET mb_leave_date = NULL, mb_intercept_date = NULL 
+          SET mb_leave_date = '', mb_intercept_date = '' 
           WHERE mb_id = ?
         `;
         updateParams = [id];
@@ -65,7 +66,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
         // 탈퇴 상태로 변경
         updateQuery = `
           UPDATE g5_member 
-          SET mb_leave_date = ?, mb_intercept_date = NULL 
+          SET mb_leave_date = ?, mb_intercept_date = '' 
           WHERE mb_id = ?
         `;
         updateParams = [currentDate, id];
@@ -75,7 +76,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
         // 차단 상태로 변경
         updateQuery = `
           UPDATE g5_member 
-          SET mb_intercept_date = ?, mb_leave_date = NULL 
+          SET mb_intercept_date = ?, mb_leave_date = '' 
           WHERE mb_id = ?
         `;
         updateParams = [currentDate, id];
@@ -97,8 +98,8 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
         mb_leave_date,
         mb_intercept_date,
         CASE 
-          WHEN mb_leave_date IS NOT NULL AND mb_leave_date != '' THEN 'leave'
-          WHEN mb_intercept_date IS NOT NULL AND mb_intercept_date != '' THEN 'blocked'
+          WHEN mb_leave_date != '' THEN 'leave'
+          WHEN mb_intercept_date != '' THEN 'blocked'
           ELSE 'normal'
         END as mb_status
       FROM g5_member 
@@ -109,8 +110,8 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
       mb_id: string;
       mb_name: string;
       mb_nick: string;
-      mb_leave_date: string | null;
-      mb_intercept_date: string | null;
+      mb_leave_date: string;
+      mb_intercept_date: string;
       mb_status: string;
     }[];
 

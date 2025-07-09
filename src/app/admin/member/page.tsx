@@ -7,16 +7,70 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { AdminUser, MemberListResponse } from '@/types/user';
 import CommonPagination from '@/components/CommonPagination';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { ROUTES } from '@/lib/routes';
+import { Button } from '@/components/ui/primitives/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/primitives/dropdown-menu';
+import { ChevronDownIcon } from 'lucide-react';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-interface MemberStatusSelectProps {
-  memberId: string;
-  currentStatus: 'normal' | 'leave' | 'blocked';
-  onStatusChange: (memberId: string, newStatus: 'normal' | 'leave' | 'blocked') => void;
-}
+const statusOptions = [
+  {
+    value: 'normal' as const,
+    label: '정상',
+    color: 'text-green-600',
+    bgColor: 'text-green-600 bg-green-50 border-green-200',
+  },
+  {
+    value: 'leave' as const,
+    label: '탈퇴',
+    color: 'text-gray-600',
+    bgColor: 'text-gray-600 bg-gray-50 border-gray-200',
+  },
+  {
+    value: 'blocked' as const,
+    label: '차단',
+    color: 'text-red-600',
+    bgColor: 'text-red-600 bg-red-50 border-red-200',
+  },
+];
+
+const tableHeaders = [
+  '아이디',
+  '이름',
+  '닉네임',
+  '상태',
+  '권한',
+  '휴대폰',
+  '전화번호',
+  '최종접속',
+  '가입일',
+];
+
+const levelOptions = [
+  { minLevel: 10, label: '관리자' },
+  { minLevel: 5, label: '우수회원' },
+  { minLevel: 2, label: '정회원' },
+  { minLevel: 0, label: '일반회원' },
+];
+
+const getStatusColor = (status: string) => {
+  return (
+    statusOptions.find((option) => option.value === status)?.bgColor ||
+    'text-gray-600 bg-gray-50 border-gray-200'
+  );
+};
+
+const getStatusLabel = (status: string) => {
+  return statusOptions.find((option) => option.value === status)?.label || '정상';
+};
 
 const formatDate = (dateString: string) => {
   if (!dateString) return '-';
@@ -24,42 +78,13 @@ const formatDate = (dateString: string) => {
 };
 
 const getLevelLabel = (level: number) => {
-  if (level >= 10) return '관리자';
-  if (level >= 5) return '우수회원';
-  if (level >= 2) return '정회원';
-  return '일반회원';
+  return levelOptions.find((option) => level >= option.minLevel)?.label || '일반회원';
 };
-
-function MemberStatusSelect({ memberId, currentStatus, onStatusChange }: MemberStatusSelectProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'normal':
-        return 'text-green-600 bg-green-50';
-      case 'leave':
-        return 'text-gray-600 bg-gray-50';
-      case 'blocked':
-        return 'text-red-600 bg-red-50';
-      default:
-        return 'text-gray-600 bg-gray-50';
-    }
-  };
-
-  return (
-    <select
-      value={currentStatus}
-      onChange={(e) => onStatusChange(memberId, e.target.value as 'normal' | 'leave' | 'blocked')}
-      className={`rounded-full border-0 px-3 py-1 text-sm font-medium focus:ring-2 focus:ring-blue-500 ${getStatusColor(currentStatus)}`}
-    >
-      <option value='normal'>정상</option>
-      <option value='leave'>탈퇴</option>
-      <option value='blocked'>차단</option>
-    </select>
-  );
-}
 
 export default function MemberManagePage() {
   const [members, setMembers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [statusLoading, setStatusLoading] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -90,10 +115,22 @@ export default function MemberManagePage() {
     }
   }, [currentPage]);
 
+  useEffect(() => {
+    if (!searchParams.get('page')) {
+      const params = new URLSearchParams();
+      params.set('page', '1');
+      router.replace(`${ROUTES.ADMIN_MEMBER}?${params.toString()}`);
+    } else {
+      fetchData();
+    }
+  }, [searchParams, router, fetchData]);
+
   // 회원 상태 변경
   const handleStatusChange = useCallback(
     async (memberId: string, newStatus: 'normal' | 'leave' | 'blocked') => {
       try {
+        setStatusLoading(memberId);
+
         const response = await fetch(`/api/admin/members/${memberId}/status`, {
           method: 'PUT',
           headers: {
@@ -107,34 +144,34 @@ export default function MemberManagePage() {
           throw new Error(errorData.error || '상태 변경에 실패했습니다.');
         }
 
-        // 성공 시 목록 새로고침
-        await fetchData();
+        // API 응답 성공 시 로컬 상태 업데이트
+        setMembers((prev) =>
+          prev.map((member) =>
+            member.mb_id === memberId
+              ? {
+                  ...member,
+                  mb_status: newStatus,
+                }
+              : member,
+          ),
+        );
+
         alert('회원 상태가 성공적으로 변경되었습니다.');
       } catch (error) {
         console.error('상태 변경 오류:', error);
         alert(error instanceof Error ? error.message : '상태 변경에 실패했습니다.');
+      } finally {
+        setStatusLoading(null);
       }
     },
-    [fetchData],
+    [],
   );
 
-  // 페이지 변경 처리
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
     router.push(`${ROUTES.ADMIN_MEMBER}?${params.toString()}`);
   };
-
-  useEffect(() => {
-    // 초기 로드 시 URL 파라미터가 없으면 기본값으로 설정
-    if (!searchParams.get('page')) {
-      const params = new URLSearchParams();
-      params.set('page', '1');
-      router.replace(`${ROUTES.ADMIN_MEMBER}?${params.toString()}`);
-    } else {
-      fetchData();
-    }
-  }, [searchParams, router, fetchData]);
 
   return (
     <div className='p-6'>
@@ -146,47 +183,30 @@ export default function MemberManagePage() {
       <div className='overflow-hidden rounded-lg bg-white shadow'>
         {loading ? (
           <div className='p-8 text-center'>
-            <div className='inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600'></div>
-            <p className='mt-2 text-gray-600'>로딩 중...</p>
+            <LoadingSpinner size='md' message='로딩 중...' />
           </div>
         ) : (
           <div className='overflow-x-auto'>
             <table className='min-w-full divide-y divide-gray-200'>
               <thead className='bg-gray-50'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    아이디
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    이름
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    닉네임
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    상태
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    권한
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    휴대폰
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    전화번호
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    최종접속
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                    가입일
-                  </th>
+                  {tableHeaders.map((header, index) => (
+                    <th
+                      key={index}
+                      className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'
+                    >
+                      {header}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-200 bg-white'>
                 {members.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className='px-6 py-4 text-center text-gray-500'>
+                    <td
+                      colSpan={tableHeaders.length}
+                      className='px-6 py-4 text-center text-gray-500'
+                    >
                       조회된 회원이 없습니다.
                     </td>
                   </tr>
@@ -203,11 +223,37 @@ export default function MemberManagePage() {
                         {member.mb_nick}
                       </td>
                       <td className='px-6 py-4 text-sm whitespace-nowrap'>
-                        <MemberStatusSelect
-                          memberId={member.mb_id}
-                          currentStatus={member.mb_status}
-                          onStatusChange={handleStatusChange}
-                        />
+                        {statusLoading === member.mb_id ? (
+                          <div className='flex items-center justify-center'>
+                            <LoadingSpinner size='sm' className='mb-0' />
+                            <span className='ml-2 text-sm text-gray-600'>변경 중...</span>
+                          </div>
+                        ) : (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                className={`h-8 rounded-full border px-3 text-sm font-medium ${getStatusColor(member.mb_status)}`}
+                                disabled={statusLoading !== null}
+                              >
+                                {getStatusLabel(member.mb_status)}
+                                <ChevronDownIcon className='ml-2 h-4 w-4' />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align='end'>
+                              {statusOptions.map((option) => (
+                                <DropdownMenuItem
+                                  key={option.value}
+                                  onClick={() => handleStatusChange(member.mb_id, option.value)}
+                                  disabled={statusLoading !== null}
+                                >
+                                  <span className={option.color}>{option.label}</span>
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </td>
                       <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
                         <span className='inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800'>
