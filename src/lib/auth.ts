@@ -5,6 +5,7 @@ import pbkdf2 from 'pbkdf2';
 import { cookies, headers } from 'next/headers';
 import { executeQuery } from '@/lib/database';
 import { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/user';
+import { MEMBER_LEVELS } from '@/lib/constants';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -166,7 +167,7 @@ export const registerUser = async (userData: RegisterRequest): Promise<AuthRespo
         as_per, as_noti, as_msg, as_exp, as_level, as_max, as_chadan
       ) VALUES (
         ?, ?, ?, ?, ?, ?, '',
-        2, '', '', '', ?, '', 0, '',
+        ${MEMBER_LEVELS.REGULAR}, '', '', '', ?, '', 0, '',
         '', '', '', '', '', '', '',
         '', '', 0, ?, '', ?, ?,
         '', '', ?, '', '', '',

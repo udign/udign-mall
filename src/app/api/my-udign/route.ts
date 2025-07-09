@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getArtworksByUser } from '@/lib/artwork-service';
 import { verifyToken } from '@/lib/auth';
+import { PERMISSION_CHECKS } from '@/lib/constants';
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -21,7 +22,7 @@ export const GET = async (request: NextRequest) => {
     }
 
     const userId = decoded.mb_id;
-    const isAdmin = decoded.mb_level >= 10;
+    const isAdmin = PERMISSION_CHECKS.isAdmin(decoded.mb_level);
 
     // URL 파라미터에서 페이지네이션 정보 추출
     const searchParams = request.nextUrl.searchParams;

@@ -5,6 +5,7 @@ export const ROUTES = {
 
   // 관리자 페이지
   ADMIN: '/admin',
+  ADMIN_MEMBER: '/admin/member',
   ADMIN_REVIEW: '/admin/review',
 
   // 인증 관련

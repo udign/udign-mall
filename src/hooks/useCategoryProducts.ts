@@ -4,7 +4,7 @@ import { Product, ProductListResponse } from '@/types/product';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 
 interface UseCategoryProductsProps {
-  categoryId: string; // 필터링 및 표시할 카테고리 ID (빈 문자열이면 모든 카테고리)
+  categoryId: string;
   pathname: string;
 }
 

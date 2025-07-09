@@ -9,6 +9,7 @@ import { STATUS_GROUPS } from '@/lib/constants';
 import CommonPagination from '@/components/CommonPagination';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import MessageDialog from '@/components/ui/MessageDialog';
 import { Button } from '@/components/ui/primitives/button';
 import { Checkbox } from '@/components/ui/primitives/checkbox';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
@@ -45,6 +46,15 @@ function ReviewManagement() {
     action: 'payment',
     itemName: '',
   });
+  const [messageDialog, setMessageDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+  }>({
+    open: false,
+    title: '',
+    description: '',
+  });
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -54,7 +64,6 @@ function ReviewManagement() {
     try {
       setLoading(true);
 
-      // 검수 통계와 목록을 병렬로 가져오기
       const [statsResponse, itemsResponse] = await Promise.all([
         fetch('/api/admin/review/stats'),
         fetch(
@@ -63,34 +72,46 @@ function ReviewManagement() {
       ]);
 
       // 통계 데이터 처리
-      if (statsResponse.ok) {
-        const statsResult = await statsResponse.json();
-        if (statsResult.success) {
-          setStats(statsResult.data);
-        }
+      if (!statsResponse.ok) {
+        const errorData = await statsResponse.json();
+        throw new Error(errorData.error || '통계 데이터를 가져오는데 실패했습니다.');
+      }
+
+      const statsResult = await statsResponse.json();
+
+      if (statsResult.success) {
+        setStats(statsResult.data);
       }
 
       // 검수 목록 데이터 처리
-      if (itemsResponse.ok) {
-        const itemsResult = await itemsResponse.json();
-        if (itemsResult.success) {
-          setItems(itemsResult.data.items);
-          // 페이지네이션 정보 업데이트
-          if (itemsResult.data.pagination) {
-            setTotalPages(itemsResult.data.pagination.totalPages);
-            setTotalItems(itemsResult.data.pagination.totalItems);
-          }
+      if (!itemsResponse.ok) {
+        const errorData = await itemsResponse.json();
+        throw new Error(errorData.error || '검수 목록을 가져오는데 실패했습니다.');
+      }
+
+      const itemsResult = await itemsResponse.json();
+
+      if (itemsResult.success) {
+        setItems(itemsResult.data.items);
+        if (itemsResult.data.pagination) {
+          setTotalPages(itemsResult.data.pagination.totalPages);
+          setTotalItems(itemsResult.data.pagination.totalItems);
         }
       }
     } catch (error) {
       console.error('검수 데이터 로드 실패:', error);
+      setMessageDialog({
+        open: true,
+        title: '데이터 로드 실패',
+        description:
+          error instanceof Error ? error.message : '검수 데이터를 가져오는데 실패했습니다.',
+      });
     } finally {
       setLoading(false);
     }
   }, [currentPage]);
 
   useEffect(() => {
-    // 초기 로드 시 URL 파라미터가 없으면 기본값으로 설정
     if (!searchParams.get('page')) {
       const params = new URLSearchParams();
       params.set('page', '1');
@@ -124,6 +145,11 @@ function ReviewManagement() {
           action,
         }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '작품 상태 변경에 실패했습니다.');
+      }
 
       const result = await response.json();
 
@@ -171,11 +197,19 @@ function ReviewManagement() {
           return newStats;
         });
       } else {
-        alert(result.message || '처리 중 오류가 발생했습니다.');
+        setMessageDialog({
+          open: true,
+          title: '작업 처리 실패',
+          description: result.message || '처리 중 오류가 발생했습니다.',
+        });
       }
     } catch (error) {
       console.error('작품 상태 변경 실패:', error);
-      alert('서버 통신 중 오류가 발생했습니다.');
+      setMessageDialog({
+        open: true,
+        title: '상태 변경 실패',
+        description: error instanceof Error ? error.message : '작품 상태 변경에 실패했습니다.',
+      });
     } finally {
       setActionLoading(null);
     }
@@ -200,6 +234,11 @@ function ReviewManagement() {
           visibility: newVisibility,
         }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '디자인 검수 상태 변경에 실패했습니다.');
+      }
 
       const result = await response.json();
 
@@ -235,11 +274,20 @@ function ReviewManagement() {
           };
         });
       } else {
-        alert(result.message || '디자인 검수 상태 변경 중 오류가 발생했습니다.');
+        setMessageDialog({
+          open: true,
+          title: '검수 상태 변경 실패',
+          description: result.message || '디자인 검수 상태 변경 중 오류가 발생했습니다.',
+        });
       }
     } catch (error) {
       console.error('디자인 검수 상태 변경 실패:', error);
-      alert('서버 통신 중 오류가 발생했습니다.');
+      setMessageDialog({
+        open: true,
+        title: '검수 상태 변경 실패',
+        description:
+          error instanceof Error ? error.message : '디자인 검수 상태 변경에 실패했습니다.',
+      });
     } finally {
       setVisibilityLoading(null);
     }
@@ -258,7 +306,6 @@ function ReviewManagement() {
   return (
     <>
       <div className='space-y-4'>
-        {/* 헤더 */}
         <div className='flex items-center justify-between'>
           <div>
             <h1 className='text-2xl font-bold text-gray-900'>작품 관리</h1>
@@ -268,9 +315,7 @@ function ReviewManagement() {
           </div>
         </div>
 
-        {/* 통계 카드 */}
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-          {/* 전체 작품 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -285,7 +330,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 디자인 검수 승인 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -300,7 +344,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 디자인 검수 반려 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -315,7 +358,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 제작 검토 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -330,7 +372,6 @@ function ReviewManagement() {
             </div>
           </div>
 
-          {/* 구매 진행 */}
           <div className='rounded-lg bg-white p-2'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
@@ -346,7 +387,6 @@ function ReviewManagement() {
           </div>
         </div>
 
-        {/* 검수 목록 테이블 */}
         <div className='rounded-lg bg-white'>
           <div>
             <div className='mb-4 flex items-center justify-between'>
@@ -503,7 +543,6 @@ function ReviewManagement() {
                                   )}
                                 </Button>
 
-                                {/* 제작 검토 버튼 */}
                                 <Button
                                   onClick={() =>
                                     showConfirmDialog(item.it_id, 'review', item.it_name)
@@ -552,7 +591,6 @@ function ReviewManagement() {
                   </table>
                 </div>
 
-                {/* 페이지네이션 */}
                 <div className='mt-6 flex justify-center'>
                   <CommonPagination
                     currentPageNumber={currentPage}
@@ -567,7 +605,6 @@ function ReviewManagement() {
         </div>
       </div>
 
-      {/* 확인 다이얼로그 */}
       <ConfirmDialog
         open={confirmDialog.open}
         onOpenChange={(open) => setConfirmDialog((prev) => ({ ...prev, open }))}
@@ -580,6 +617,13 @@ function ReviewManagement() {
         variant={confirmDialog.action === 'payment' ? 'default' : 'destructive'}
         onConfirm={() => handleItemAction(confirmDialog.itemId, confirmDialog.action)}
         onCancel={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
+      />
+
+      <MessageDialog
+        open={messageDialog.open}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+        title={messageDialog.title}
+        description={messageDialog.description}
       />
     </>
   );
