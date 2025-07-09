@@ -104,6 +104,7 @@ export default function MemberManagePage() {
       }
 
       const data: MemberListResponse = await response.json();
+
       setMembers(data.members);
       setTotalCount(data.totalCount);
       setTotalPages(data.totalPages);
@@ -125,8 +126,7 @@ export default function MemberManagePage() {
     }
   }, [searchParams, router, fetchData]);
 
-  // 회원 상태 변경
-  const handleStatusChange = useCallback(
+  const handleMemberStatusChange = useCallback(
     async (memberId: string, newStatus: 'normal' | 'leave' | 'blocked') => {
       try {
         setStatusLoading(memberId);
@@ -180,115 +180,127 @@ export default function MemberManagePage() {
         <p className='text-gray-600'>전체 회원 {totalCount.toLocaleString()}명</p>
       </div>
 
-      <div className='overflow-hidden rounded-lg bg-white shadow'>
-        {loading ? (
-          <div className='p-8 text-center'>
-            <LoadingSpinner size='md' message='로딩 중...' />
+      <div className='rounded-lg bg-white'>
+        <div>
+          <div className='mb-4 flex items-center justify-between'>
+            <h3 className='text-lg font-semibold text-gray-900'>전체 회원 목록</h3>
+            <p className='text-sm text-gray-600'>
+              총 {totalCount}명 회원 (페이지 {currentPage}/{totalPages})
+            </p>
           </div>
-        ) : (
-          <div className='overflow-x-auto'>
-            <table className='min-w-full divide-y divide-gray-200'>
-              <thead className='bg-gray-50'>
-                <tr>
-                  {tableHeaders.map((header, index) => (
-                    <th
-                      key={index}
-                      className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-gray-200 bg-white'>
-                {members.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={tableHeaders.length}
-                      className='px-6 py-4 text-center text-gray-500'
-                    >
-                      조회된 회원이 없습니다.
-                    </td>
-                  </tr>
-                ) : (
-                  members.map((member) => (
-                    <tr key={member.mb_id} className='hover:bg-gray-50'>
-                      <td className='px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900'>
-                        {member.mb_id}
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                        {member.mb_name}
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                        {member.mb_nick}
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap'>
-                        {statusLoading === member.mb_id ? (
-                          <div className='flex items-center justify-center'>
-                            <LoadingSpinner size='sm' className='mb-0' />
-                            <span className='ml-2 text-sm text-gray-600'>변경 중...</span>
-                          </div>
-                        ) : (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant='outline'
-                                size='sm'
-                                className={`h-8 rounded-full border px-3 text-sm font-medium ${getStatusColor(member.mb_status)}`}
-                                disabled={statusLoading !== null}
-                              >
-                                {getStatusLabel(member.mb_status)}
-                                <ChevronDownIcon className='ml-2 h-4 w-4' />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align='end'>
-                              {statusOptions.map((option) => (
-                                <DropdownMenuItem
-                                  key={option.value}
-                                  onClick={() => handleStatusChange(member.mb_id, option.value)}
-                                  disabled={statusLoading !== null}
-                                >
-                                  <span className={option.color}>{option.label}</span>
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                        <span className='inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800'>
-                          {getLevelLabel(member.mb_level)} ({member.mb_level})
-                        </span>
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                        {member.mb_hp || '-'}
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                        {member.mb_tel || '-'}
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                        {formatDate(member.mb_today_login)}
-                      </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                        {formatDate(member.mb_datetime)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
 
-      <div className='mt-6 flex justify-center'>
-        <CommonPagination
-          currentPageNumber={currentPage}
-          totalPageCount={totalPages}
-          pathname={ROUTES.ADMIN_MEMBER}
-          queryParams={{}}
-          onPageChange={handlePageChange}
-        />
+          {loading ? (
+            <div className='mt-50'>
+              <LoadingSpinner size='md' message='로딩 중...' />
+            </div>
+          ) : members.length === 0 ? (
+            <div className='py-8 text-center text-gray-500'>조회된 회원이 없습니다.</div>
+          ) : (
+            <>
+              <div className='overflow-x-auto'>
+                <table className='min-w-full divide-y divide-gray-200'>
+                  <thead className='bg-gray-50'>
+                    <tr>
+                      {tableHeaders.map((header, index) => (
+                        <th
+                          key={index}
+                          className='px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase'
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className='divide-y divide-gray-200 bg-white'>
+                    {members.map((member) => (
+                      <tr key={member.mb_id} className='hover:bg-gray-50'>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm font-medium text-gray-900'>{member.mb_id}</div>
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm text-gray-900'>{member.mb_name}</div>
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm text-gray-900'>{member.mb_nick}</div>
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          {statusLoading === member.mb_id ? (
+                            <div className='flex items-center justify-center'>
+                              <LoadingSpinner size='sm' className='mb-0' />
+                              <span className='ml-2 text-sm text-gray-600'>변경 중...</span>
+                            </div>
+                          ) : (
+                            <div className='flex justify-center'>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant='outline'
+                                    size='sm'
+                                    className={`h-8 rounded-full border px-3 text-sm font-medium ${getStatusColor(member.mb_status)}`}
+                                    disabled={statusLoading !== null}
+                                  >
+                                    {getStatusLabel(member.mb_status)}
+                                    <ChevronDownIcon className='ml-2 h-4 w-4' />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align='end'>
+                                  {statusOptions.map((option) => (
+                                    <DropdownMenuItem
+                                      key={option.value}
+                                      onClick={() =>
+                                        handleMemberStatusChange(member.mb_id, option.value)
+                                      }
+                                      disabled={statusLoading !== null}
+                                    >
+                                      <span className={option.color}>{option.label}</span>
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          )}
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm text-gray-900'>
+                            <span className='inline-flex items-center rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-800'>
+                              {getLevelLabel(member.mb_level)} ({member.mb_level})
+                            </span>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm text-gray-900'>{member.mb_hp || '-'}</div>
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm text-gray-900'>{member.mb_tel || '-'}</div>
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm text-gray-900'>
+                            {formatDate(member.mb_today_login)}
+                          </div>
+                        </td>
+                        <td className='px-6 py-4 text-center'>
+                          <div className='text-sm text-gray-900'>
+                            {formatDate(member.mb_datetime)}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className='mt-6 flex justify-center'>
+                <CommonPagination
+                  currentPageNumber={currentPage}
+                  totalPageCount={totalPages}
+                  pathname={ROUTES.ADMIN_MEMBER}
+                  queryParams={{}}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
