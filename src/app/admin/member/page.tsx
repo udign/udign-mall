@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { AdminUser, MemberListResponse } from '@/types/user';
+import { AdminUser } from '@/types/user';
 import CommonPagination from '@/components/CommonPagination';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { ROUTES } from '@/lib/routes';
@@ -17,10 +17,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/primitives/dropdown-menu';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Users, UserCheck, Crown, Shield, User } from 'lucide-react';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+interface MemberStats {
+  totalMembers: number;
+  adminMembers: number;
+  excellentMembers: number;
+  regularMembers: number;
+  basicMembers: number;
+}
 
 const statusOptions = [
   {
@@ -84,6 +92,7 @@ export default function MemberManagePage() {
   const [statusLoading, setStatusLoading] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [stats, setStats] = useState<MemberStats | null>(null);
   const [messageDialog, setMessageDialog] = useState<{
     open: boolean;
     title: string;
@@ -103,23 +112,47 @@ export default function MemberManagePage() {
     try {
       setLoading(true);
 
-      const response = await fetch(`/api/admin/members?page=${currentPage}`);
+      const [statsResponse, membersResponse] = await Promise.all([
+        fetch('/api/admin/members/stats'),
+        fetch(`/api/admin/members?page=${currentPage}`),
+      ]);
 
-      if (!response.ok) {
-        throw new Error('회원 목록을 가져오는데 실패했습니다.');
+      // 통계 데이터 처리
+      if (!statsResponse.ok) {
+        const errorData = await statsResponse.json();
+        throw new Error(
+          errorData.message || errorData.error || '통계 데이터를 가져오는데 실패했습니다.',
+        );
       }
 
-      const data: MemberListResponse = await response.json();
+      const statsResult = await statsResponse.json();
 
-      setMembers(data.members);
-      setTotalCount(data.totalCount);
-      setTotalPages(data.totalPages);
+      if (statsResult.success) {
+        setStats(statsResult.data);
+      }
+
+      // 회원 목록 데이터 처리
+      if (!membersResponse.ok) {
+        const errorData = await membersResponse.json();
+        throw new Error(errorData.message || '회원 목록을 가져오는데 실패했습니다.');
+      }
+
+      const membersResult = await membersResponse.json();
+
+      if (membersResult.success) {
+        setMembers(membersResult.data.members);
+        if (membersResult.data.pagination) {
+          setTotalPages(membersResult.data.pagination.totalPages);
+          setTotalCount(membersResult.data.pagination.totalItems);
+        }
+      }
     } catch (error) {
-      console.error('회원 목록 조회 오류:', error);
+      console.error('회원 데이터 로드 실패:', error);
       setMessageDialog({
         open: true,
         title: '데이터 로드 실패',
-        description: '회원 목록을 가져오는데 실패했습니다.',
+        description:
+          error instanceof Error ? error.message : '회원 데이터를 가져오는데 실패했습니다.',
       });
     } finally {
       setLoading(false);
@@ -151,7 +184,7 @@ export default function MemberManagePage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || '상태 변경에 실패했습니다.');
+          throw new Error(errorData.message || errorData.error || '상태 변경에 실패했습니다.');
         }
 
         setMembers((prev) =>
@@ -190,11 +223,88 @@ export default function MemberManagePage() {
     router.push(`${ROUTES.ADMIN_MEMBER}?${params.toString()}`);
   };
 
+  console.log(totalCount);
+
   return (
-    <div className='p-6'>
+    <div>
       <div className='mb-6'>
         <h1 className='mb-2 text-2xl font-bold text-gray-900'>회원 관리</h1>
-        <p className='text-gray-600'>전체 회원 {totalCount.toLocaleString()}명</p>
+        <p className='mt-1 text-gray-600'>
+          모든 회원의 상태를 확인하고 회원 권한 및 상태 관리를 할 수 있습니다.
+        </p>
+        <p className='mt-2 text-gray-600'>전체 회원 {totalCount.toLocaleString()}명</p>
+      </div>
+
+      <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5'>
+        <div className='rounded-lg bg-white p-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center'>
+              <div className='rounded-lg bg-blue-100 p-3'>
+                <Users className='h-6 w-6 text-blue-600' />
+              </div>
+              <div className='ml-4'>
+                <p className='text-sm font-medium text-gray-600'>전체 회원</p>
+                <p className='text-2xl font-bold text-blue-600'>{stats?.totalMembers || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='rounded-lg bg-white p-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center'>
+              <div className='rounded-lg bg-red-100 p-3'>
+                <Crown className='h-6 w-6 text-red-600' />
+              </div>
+              <div className='ml-4'>
+                <p className='text-sm font-medium text-gray-600'>관리자</p>
+                <p className='text-2xl font-bold text-red-600'>{stats?.adminMembers || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='rounded-lg bg-white p-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center'>
+              <div className='rounded-lg bg-purple-100 p-3'>
+                <Shield className='h-6 w-6 text-purple-600' />
+              </div>
+              <div className='ml-4'>
+                <p className='text-sm font-medium text-gray-600'>우수회원</p>
+                <p className='text-2xl font-bold text-purple-600'>{stats?.excellentMembers || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='rounded-lg bg-white p-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center'>
+              <div className='rounded-lg bg-blue-100 p-3'>
+                <UserCheck className='h-6 w-6 text-blue-600' />
+              </div>
+              <div className='ml-4'>
+                <p className='text-sm font-medium text-gray-600'>정회원</p>
+                <p className='text-2xl font-bold text-blue-600'>{stats?.regularMembers || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='rounded-lg bg-white p-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center'>
+              <div className='rounded-lg bg-gray-100 p-3'>
+                <User className='h-6 w-6 text-gray-600' />
+              </div>
+              <div className='ml-4'>
+                <p className='text-sm font-medium text-gray-600'>일반회원</p>
+                <p className='text-2xl font-bold text-gray-600'>{stats?.basicMembers || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className='rounded-lg bg-white'>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
 import { getCurrentUser } from '@/lib/auth';
-import { AdminUser, MemberListResponse, MemberListParams } from '@/types/user';
+import { AdminUser, MemberListParams } from '@/types/user';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 
 export const GET = async (request: NextRequest) => {
@@ -9,7 +9,10 @@ export const GET = async (request: NextRequest) => {
     // 현재 사용자 인증 및 권한 확인
     const currentUser = await getCurrentUser();
     if (!currentUser || currentUser.mb_level < 10) {
-      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: '관리자 권한이 필요합니다.' },
+        { status: 403 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -98,18 +101,22 @@ export const GET = async (request: NextRequest) => {
     const members = (await executeQuery(finalQuery, queryParams)) as AdminUser[];
 
     // 응답 데이터 구성
-    const response: MemberListResponse = {
-      members,
-      totalCount,
-      currentPage: page,
-      totalPages,
-    };
-
-    return NextResponse.json(response);
+    return NextResponse.json({
+      success: true,
+      data: {
+        members,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalItems: totalCount,
+          itemsPerPage: limit,
+        },
+      },
+    });
   } catch (error) {
     console.error('회원 목록 조회 오류:', error);
     return NextResponse.json(
-      { error: '회원 목록을 가져오는 중 오류가 발생했습니다.' },
+      { success: false, message: '회원 목록을 가져오는 중 오류가 발생했습니다.' },
       { status: 500 },
     );
   }

@@ -91,9 +91,10 @@ function ReviewManagement() {
 
       const itemsResult = await itemsResponse.json();
 
+      console.log(itemsResult);
+
       if (itemsResult.success) {
         setItems(itemsResult.data.items);
-        // 페이지네이션 정보 업데이트
         if (itemsResult.data.pagination) {
           setTotalPages(itemsResult.data.pagination.totalPages);
           setTotalItems(itemsResult.data.pagination.totalItems);
