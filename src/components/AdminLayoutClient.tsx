@@ -13,6 +13,7 @@ import {
   TrendingUp,
   Palette,
   UserCheck,
+  PieChart,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -70,7 +71,7 @@ const menuItems: MenuItem[] = [
     icon: <ShoppingBag className='h-4 w-4' />,
     subMenus: [
       {
-        label: '작품관리',
+        label: '작품 관리',
         href: ROUTES.ADMIN_REVIEW,
         icon: <Palette className='h-4 w-4' />,
       },
@@ -81,12 +82,12 @@ const menuItems: MenuItem[] = [
     icon: <BarChart3 className='h-4 w-4' />,
     subMenus: [
       {
-        label: '매출현황',
+        label: '매출 현황',
         href: ROUTES.ADMIN_SALES,
-        icon: <TrendingUp className='h-4 w-4' />,
+        icon: <PieChart className='h-4 w-4' />,
       },
       {
-        label: '상품판매순위',
+        label: '상품 판매 순위',
         href: ROUTES.ADMIN_SALES_RANKING,
         icon: <TrendingUp className='h-4 w-4' />,
       },
