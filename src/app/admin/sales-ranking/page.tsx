@@ -44,29 +44,24 @@ const getCategoryDepth = (categoryId: string): number => {
 };
 
 export default function SalesRankingPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1');
+  const startDateStr = searchParams.get('startDate');
+  const endDateStr = searchParams.get('endDate');
+  const categoryId = searchParams.get('categoryId') || 'all';
+
   const [data, setData] = useState<ProductRankingItem[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [filters, setFilters] = useState({
-    startDate: undefined as Date | undefined,
-    endDate: undefined as Date | undefined,
-    categoryId: 'all',
+  const [formFilters, setFormFilters] = useState({
+    startDate: startDateStr ? new Date(startDateStr) : undefined,
+    endDate: endDateStr ? new Date(endDateStr) : undefined,
+    categoryId,
   });
-  const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
-  const [searchFilters, setSearchFilters] = useState<typeof filters>(filters);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
-
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentPage = parseInt(searchParams.get('page') || '1');
-
-  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.target as HTMLImageElement;
-    const imageUrl = target.src;
-    setFailedImages((prev) => new Set(prev).add(imageUrl));
-  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -86,126 +81,82 @@ export default function SalesRankingPage() {
     fetchCategories();
   }, []);
 
-  const fetchInitialData = useCallback(async () => {
-    setLoading(true);
-
-    try {
-      const queryParams: ProductRankingQueryParams = {
-        page: currentPage,
-        limit: PAGINATION_CONFIG.ITEMS_PER_PAGE,
-      };
-
-      const response = await fetch('/api/admin/sales-ranking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(queryParams),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setData(result.data.rankingData || []);
-        if (result.data.pagination) {
-          setTotalCount(result.data.pagination.totalItems);
-          setTotalPages(result.data.pagination.totalPages);
-        }
-      } else {
-        console.error('데이터 조회 실패:', result.error);
-      }
-    } catch (error) {
-      console.error('API 호출 실패:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage]);
-
-  const fetchFilteredData = useCallback(async (searchFilters: typeof filters, page: number = 1) => {
-    setLoading(true);
-
-    try {
-      const queryParams: ProductRankingQueryParams = {
-        page,
-        limit: PAGINATION_CONFIG.ITEMS_PER_PAGE,
-        startDate: searchFilters.startDate
-          ? dayjs(searchFilters.startDate).format('YYYY-MM-DD')
-          : undefined,
-        endDate: searchFilters.endDate
-          ? dayjs(searchFilters.endDate).format('YYYY-MM-DD')
-          : undefined,
-        categoryId: searchFilters.categoryId === 'all' ? undefined : searchFilters.categoryId,
-      };
-
-      const response = await fetch('/api/admin/sales-ranking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(queryParams),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setData(result.data.rankingData || []);
-        if (result.data.pagination) {
-          setTotalCount(result.data.pagination.totalItems);
-          setTotalPages(result.data.pagination.totalPages);
-        }
-      } else {
-        console.error('데이터 조회 실패:', result.error);
-      }
-    } catch (error) {
-      console.error('API 호출 실패:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const fetchData = async (page: number = 1) => {
+      setLoading(true);
+
+      try {
+        const queryParams: ProductRankingQueryParams = {
+          page,
+          limit: PAGINATION_CONFIG.ITEMS_PER_PAGE,
+          startDate: startDateStr ? dayjs(startDateStr).format('YYYY-MM-DD') : undefined,
+          endDate: endDateStr ? dayjs(endDateStr).format('YYYY-MM-DD') : undefined,
+          categoryId: categoryId === 'all' ? undefined : categoryId,
+        };
+
+        const response = await fetch('/api/admin/sales-ranking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(queryParams),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          setData(result.data.rankingData || []);
+          if (result.data.pagination) {
+            setTotalCount(result.data.pagination.totalItems);
+            setTotalPages(result.data.pagination.totalPages);
+          }
+        } else {
+          console.error('데이터 조회 실패:', result.error);
+        }
+      } catch (error) {
+        console.error('API 호출 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (!searchParams.get('page')) {
       const params = new URLSearchParams();
       params.set('page', '1');
       router.replace(`${ROUTES.ADMIN_SALES_RANKING}?${params.toString()}`);
-    } else if (!isSearchMode) {
-      fetchInitialData();
+    } else {
+      fetchData(currentPage);
     }
-  }, [currentPage, searchParams, router, fetchInitialData, isSearchMode]);
-
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    router.push(`${ROUTES.ADMIN_SALES_RANKING}?${params.toString()}`);
-
-    // 검색 모드인 경우 검색 조건을 유지하여 페이지 변경
-    if (isSearchMode) fetchFilteredData(searchFilters, page);
-  };
+  }, [currentPage, searchParams, router, startDateStr, endDateStr, categoryId]);
 
   const handleSearch = () => {
-    setIsSearchMode(true);
-    setSearchFilters(filters);
-
-    // 페이지를 1로 리셋하고 필터 조건으로 검색
-    fetchFilteredData(filters, 1);
-
-    // URL도 1페이지로 업데이트
     const params = new URLSearchParams();
     params.set('page', '1');
+
+    const { startDate, endDate, categoryId } = formFilters;
+
+    if (startDate) params.set('startDate', dayjs(startDate).format('YYYY-MM-DD'));
+    if (endDate) params.set('endDate', dayjs(endDate).format('YYYY-MM-DD'));
+    if (categoryId !== 'all') params.set('categoryId', categoryId);
+
     router.replace(`${ROUTES.ADMIN_SALES_RANKING}?${params.toString()}`);
   };
 
   const handleReset = () => {
-    setIsSearchMode(false);
-    setFilters({
+    setFormFilters({
       startDate: undefined,
       endDate: undefined,
       categoryId: 'all',
     });
-    // 페이지를 1로 리셋하고 전체 데이터 로드
-    fetchInitialData();
 
-    // URL도 1페이지로 업데이트
     const params = new URLSearchParams();
     params.set('page', '1');
     router.replace(`${ROUTES.ADMIN_SALES_RANKING}?${params.toString()}`);
   };
+
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    const imageUrl = target.src;
+    setFailedImages((prev) => new Set(prev).add(imageUrl));
+  }, []);
 
   return (
     <div className='space-y-6'>
@@ -230,8 +181,10 @@ export default function SalesRankingPage() {
             <div className='space-y-2'>
               <Label className='text-sm font-medium'>카테고리</Label>
               <Select
-                value={filters.categoryId}
-                onValueChange={(value) => setFilters((prev) => ({ ...prev, categoryId: value }))}
+                value={formFilters.categoryId}
+                onValueChange={(value) =>
+                  setFormFilters((prev) => ({ ...prev, categoryId: value }))
+                }
               >
                 <SelectTrigger className='w-48'>
                   <SelectValue placeholder='전체분류' />
@@ -258,16 +211,16 @@ export default function SalesRankingPage() {
                 <PopoverTrigger asChild>
                   <Button variant='outline' className='w-48 justify-start text-left font-normal'>
                     <CalendarIcon className='h-4 w-4' />
-                    {filters.startDate
-                      ? dayjs(filters.startDate).format('YYYY년 MM월 DD일')
+                    {formFilters.startDate
+                      ? dayjs(formFilters.startDate).format('YYYY년 MM월 DD일')
                       : '시작일을 선택하세요'}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className='w-auto p-0'>
                   <Calendar
                     mode='single'
-                    selected={filters.startDate}
-                    onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date }))}
+                    selected={formFilters.startDate}
+                    onSelect={(date) => setFormFilters((prev) => ({ ...prev, startDate: date }))}
                     disabled={(date) => date > new Date()}
                     captionLayout='dropdown'
                   />
@@ -281,16 +234,16 @@ export default function SalesRankingPage() {
                 <PopoverTrigger asChild>
                   <Button variant='outline' className='w-48 justify-start text-left font-normal'>
                     <CalendarIcon className='h-4 w-4' />
-                    {filters.endDate
-                      ? dayjs(filters.endDate).format('YYYY년 MM월 DD일')
+                    {formFilters.endDate
+                      ? dayjs(formFilters.endDate).format('YYYY년 MM월 DD일')
                       : '종료일을 선택하세요'}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className='w-auto p-0'>
                   <Calendar
                     mode='single'
-                    selected={filters.endDate}
-                    onSelect={(date) => setFilters((prev) => ({ ...prev, endDate: date }))}
+                    selected={formFilters.endDate}
+                    onSelect={(date) => setFormFilters((prev) => ({ ...prev, endDate: date }))}
                     disabled={(date) => date > new Date()}
                     captionLayout='dropdown'
                   />
@@ -406,7 +359,11 @@ export default function SalesRankingPage() {
         currentPageNumber={currentPage}
         totalPageCount={totalPages}
         pathname={ROUTES.ADMIN_SALES_RANKING}
-        onPageChange={handlePageChange}
+        queryParams={{
+          ...(startDateStr && { startDate: startDateStr }),
+          ...(endDateStr && { endDate: endDateStr }),
+          ...(categoryId !== 'all' && { categoryId }),
+        }}
       />
     </div>
   );

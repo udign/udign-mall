@@ -213,12 +213,6 @@ export default function MemberManagePage() {
     [],
   );
 
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    router.push(`${ROUTES.ADMIN_MEMBER}?${params.toString()}`);
-  };
-
   return (
     <>
       <div className='space-y-4'>
@@ -416,8 +410,6 @@ export default function MemberManagePage() {
                     currentPageNumber={currentPage}
                     totalPageCount={totalPages}
                     pathname={ROUTES.ADMIN_MEMBER}
-                    queryParams={{}}
-                    onPageChange={handlePageChange}
                   />
                 </div>
               </>

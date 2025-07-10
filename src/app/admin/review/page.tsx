@@ -293,12 +293,6 @@ function ReviewManagement() {
     }
   };
 
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    router.push(`${ROUTES.ADMIN_REVIEW}?${params.toString()}`);
-  };
-
   const handleImageError = (itemId: string) => {
     setImageErrors((prev) => new Set(prev).add(itemId));
   };
@@ -596,7 +590,6 @@ function ReviewManagement() {
                     currentPageNumber={currentPage}
                     totalPageCount={totalPages}
                     pathname={ROUTES.ADMIN_REVIEW}
-                    onPageChange={handlePageChange}
                   />
                 </div>
               </>
