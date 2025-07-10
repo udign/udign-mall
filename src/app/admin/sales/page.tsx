@@ -14,7 +14,6 @@ import {
   PieChart,
   Calendar as CalendarIcon,
 } from 'lucide-react';
-import { format } from 'date-fns';
 import { SalesData, SalesQueryParams, SalesResponse, SalesTotals } from '@/types/sales';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import dayjs from 'dayjs';
@@ -136,15 +135,15 @@ export default function SalesPage() {
   const handleDailySearch = () => {
     fetchSalesData({
       type: 'daily',
-      date: format(dailyDate, 'yyyy-MM-dd'),
+      date: dayjs(dailyDate).format('YYYY-MM-DD'),
     });
   };
 
   const handlePeriodSearch = () => {
     fetchSalesData({
       type: 'period',
-      startDate: format(periodStartDate, 'yyyy-MM-dd'),
-      endDate: format(periodEndDate, 'yyyy-MM-dd'),
+      startDate: dayjs(periodStartDate).format('YYYY-MM-DD'),
+      endDate: dayjs(periodEndDate).format('YYYY-MM-DD'),
     });
   };
 
@@ -206,7 +205,9 @@ export default function SalesPage() {
                         className='w-40 justify-start text-left font-normal'
                       >
                         <CalendarIcon className='h-4 w-4' />
-                        {dailyDate ? format(dailyDate, 'yyyy년 MM월 dd일') : '날짜를 선택하세요'}
+                        {dailyDate
+                          ? dayjs(dailyDate).format('YYYY년 MM월 DD일')
+                          : '날짜를 선택하세요'}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className='w-auto p-0'>
@@ -245,7 +246,7 @@ export default function SalesPage() {
                       >
                         <CalendarIcon className='h-4 w-4' />
                         {periodStartDate
-                          ? format(periodStartDate, 'yyyy년 MM월 dd일')
+                          ? dayjs(periodStartDate).format('YYYY년 MM월 DD일')
                           : '시작일을 선택하세요'}
                       </Button>
                     </PopoverTrigger>
@@ -270,7 +271,7 @@ export default function SalesPage() {
                       >
                         <CalendarIcon className='h-4 w-4' />
                         {periodEndDate
-                          ? format(periodEndDate, 'yyyy년 MM월 dd일')
+                          ? dayjs(periodEndDate).format('YYYY년 MM월 DD일')
                           : '종료일을 선택하세요'}
                       </Button>
                     </PopoverTrigger>
