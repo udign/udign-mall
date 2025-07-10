@@ -85,3 +85,58 @@ export interface SalesSummary {
   avgOrderValue: number;
   statusBreakdown: SalesStatus;
 }
+
+// 상품판매순위 관련 타입 추가
+export interface ProductRankingItem {
+  it_id: string;
+  it_name: string;
+  it_img1?: string;
+  ca_id?: string;
+  ca_name?: string;
+  rank: number;
+  shopping: number; // 쇼핑(장바구니)
+  ordered: number; // 주문
+  paid: number; // 입금
+  preparing: number; // 준비
+  shipped: number; // 배송
+  completed: number; // 완료
+  cancelled: number; // 취소
+  returned: number; // 반품
+  outOfStock: number; // 품절
+  totalQty: number; // 합계
+}
+
+export interface ProductRankingQueryParams {
+  page?: number;
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+  categoryId?: string;
+  sortBy?:
+    | 'shopping'
+    | 'ordered'
+    | 'paid'
+    | 'preparing'
+    | 'shipped'
+    | 'completed'
+    | 'cancelled'
+    | 'returned'
+    | 'outOfStock'
+    | 'totalQty';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface ProductRankingResponse {
+  success: boolean;
+  data?: ProductRankingItem[];
+  totalCount?: number;
+  totalPages?: number;
+  currentPage?: number;
+  error?: string;
+}
+
+export interface ProductCategory {
+  ca_id: string;
+  ca_name: string;
+  ca_order: number;
+}

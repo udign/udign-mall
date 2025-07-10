@@ -85,6 +85,11 @@ const menuItems: MenuItem[] = [
         href: ROUTES.ADMIN_SALES,
         icon: <TrendingUp className='h-4 w-4' />,
       },
+      {
+        label: '상품판매순위',
+        href: ROUTES.ADMIN_SALES_RANKING,
+        icon: <TrendingUp className='h-4 w-4' />,
+      },
     ],
   },
 ];
