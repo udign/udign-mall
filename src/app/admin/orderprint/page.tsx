@@ -69,6 +69,15 @@ export default function OrderPrintPage() {
       if (result.success) {
         setOrderData(result.data);
         setShowPreview(true);
+
+        // 조회 결과가 없을 때 알림
+        if (result.data.length === 0) {
+          setMessageDialog({
+            open: true,
+            title: '조회 결과',
+            description: '입력하신 조건에 해당하는 주문내역이 없습니다.',
+          });
+        }
       } else {
         setMessageDialog({
           open: true,
@@ -204,8 +213,67 @@ export default function OrderPrintPage() {
         });
         return false;
       }
+
+      // 주문번호 형식 검증
+      if (!validateOrderIdFormat(searchFilter.fr_od_id)) {
+        setMessageDialog({
+          open: true,
+          title: '입력 오류',
+          description: '시작 주문번호는 16자리 숫자여야 합니다.\n(예: 2025032723404022)',
+        });
+        return false;
+      }
+
+      if (!validateOrderIdFormat(searchFilter.to_od_id)) {
+        setMessageDialog({
+          open: true,
+          title: '입력 오류',
+          description: '종료 주문번호는 16자리 숫자여야 합니다.\n(예: 2025032723404022)',
+        });
+        return false;
+      }
+
+      // 주문번호 범위 검증
+      const rangeValidation = validateOrderIdRange(searchFilter.fr_od_id, searchFilter.to_od_id);
+      if (!rangeValidation.valid) {
+        setMessageDialog({
+          open: true,
+          title: '입력 오류',
+          description: rangeValidation.message,
+        });
+        return false;
+      }
     }
     return true;
+  };
+
+  // 주문번호 형식 검증 함수
+  const validateOrderIdFormat = (orderId: string): boolean => {
+    const cleaned = orderId.replace(/[^0-9]/g, '');
+    // 16자리 (YYYYMMDDHHMMSS00) 숫자만 허용
+    return cleaned.length === 16;
+  };
+
+  // 주문번호 범위 검증 함수
+  const validateOrderIdRange = (
+    fromId: string,
+    toId: string,
+  ): { valid: boolean; message: string } => {
+    const fromCleaned = fromId.replace(/[^0-9]/g, '');
+    const toCleaned = toId.replace(/[^0-9]/g, '');
+
+    // 숫자 비교
+    const fromNum = parseInt(fromCleaned);
+    const toNum = parseInt(toCleaned);
+
+    if (fromNum > toNum) {
+      return {
+        valid: false,
+        message: '시작 주문번호가 종료 주문번호보다 클 수 없습니다.',
+      };
+    }
+
+    return { valid: true, message: '' };
   };
 
   const handleDateSearch = () => {
@@ -395,9 +463,13 @@ export default function OrderPrintPage() {
                 <Input
                   type='text'
                   value={filter.fr_od_id}
-                  onChange={(e) => setFilter((prev) => ({ ...prev, fr_od_id: e.target.value }))}
-                  placeholder='예: 202401010001'
-                  className='w-40'
+                  onChange={(e) => {
+                    const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                    setFilter((prev) => ({ ...prev, fr_od_id: cleaned }));
+                  }}
+                  placeholder='16자리: 2025032723404022'
+                  className='w-60'
+                  maxLength={16}
                 />
               </div>
 
@@ -406,9 +478,13 @@ export default function OrderPrintPage() {
                 <Input
                   type='text'
                   value={filter.to_od_id}
-                  onChange={(e) => setFilter((prev) => ({ ...prev, to_od_id: e.target.value }))}
-                  placeholder='예: 202401310999'
-                  className='w-40'
+                  onChange={(e) => {
+                    const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                    setFilter((prev) => ({ ...prev, to_od_id: cleaned }));
+                  }}
+                  placeholder='16자리: 2025032723404022'
+                  className='w-60'
+                  maxLength={16}
                 />
               </div>
 
