@@ -26,6 +26,7 @@ export const ROUTES = {
   // 기능 페이지
   UPLOAD: '/shop/upload',
   MY_UDIGN: '/shop/my-udign',
+  SEARCH: '/shop/search',
 
   // 정보 페이지
   COMPANY: '/shop/company',
