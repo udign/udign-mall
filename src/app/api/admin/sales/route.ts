@@ -5,6 +5,38 @@ import { SalesQueryParams, SalesResponse, SalesData, SalesTotals } from '@/types
 import { executeQuery } from '@/lib/database';
 import dayjs from 'dayjs';
 
+// 데이터베이스 쿼리 결과 타입 정의
+interface DailySalesQueryResult {
+  date: string;
+  orderCount: number;
+  orderprice: number;
+  couponPrice: number;
+  receiptBank: number;
+  receiptVbank: number;
+  receiptIche: number;
+  receiptCard: number;
+  receiptEasy: number;
+  receiptHp: number;
+  receiptPoint: number;
+  orderCancel: number;
+  misu: number;
+}
+
+interface YearlySalesQueryResult {
+  od_id: string;
+  od_date: string;
+  od_settle_case: string;
+  od_receipt_price: number;
+  od_receipt_point: number;
+  od_cart_price: number;
+  od_cancel_price: number;
+  od_misu: number;
+  od_send_cost: number;
+  od_send_cost2: number;
+  orderprice: number;
+  couponprice: number;
+}
+
 export const POST = async (request: NextRequest) => {
   try {
     const user = await getCurrentUser();
@@ -138,14 +170,14 @@ const getDailySales = async (date: string): Promise<SalesData[]> => {
     ORDER BY date
   `;
 
-  const results = (await executeQuery(sql, [date])) as any[];
+  const results = (await executeQuery(sql, [date])) as DailySalesQueryResult[];
 
   // 데이터가 없으면 빈 데이터 반환
   if (results.length === 0) {
     return [createEmptySalesData(date)];
   }
 
-  return results.map((row: any) => ({
+  return results.map((row) => ({
     date: row.date,
     orderCount: Number(row.orderCount) || 0,
     orderprice: Number(row.orderprice) || 0,
@@ -184,11 +216,11 @@ const getPeriodSales = async (startDate: string, endDate: string): Promise<Sales
     ORDER BY date
   `;
 
-  const results = (await executeQuery(sql, [startDate, endDate])) as any[];
+  const results = (await executeQuery(sql, [startDate, endDate])) as DailySalesQueryResult[];
   const salesMap = new Map<string, SalesData>();
 
   // 실제 데이터를 맵에 저장
-  results.forEach((row: any) => {
+  results.forEach((row) => {
     salesMap.set(row.date, {
       date: row.date,
       orderCount: Number(row.orderCount) || 0,
@@ -244,11 +276,11 @@ const getMonthlySales = async (startMonth: string, endMonth: string): Promise<Sa
     ORDER BY date
   `;
 
-  const results = (await executeQuery(sql, [startMonth, endMonth])) as any[];
+  const results = (await executeQuery(sql, [startMonth, endMonth])) as DailySalesQueryResult[];
   const salesMap = new Map<string, SalesData>();
 
   // 실제 데이터를 맵에 저장
-  results.forEach((row: any) => {
+  results.forEach((row) => {
     salesMap.set(row.date, {
       date: row.date,
       orderCount: Number(row.orderCount) || 0,
@@ -303,11 +335,7 @@ const getYearlySales = async (startYear: string, endYear: string): Promise<Sales
     ORDER BY od_time DESC
   `;
 
-  const results = (await executeQuery(sql, [startYear, endYear])) as any[];
-
-  // 디버깅을 위한 로그
-  console.log('Total records found:', results.length);
-  console.log('Sample records:', results.slice(0, 5));
+  const results = (await executeQuery(sql, [startYear, endYear])) as YearlySalesQueryResult[];
 
   // 설정한 기간의 모든 연도 생성
   const salesData: SalesData[] = [];
@@ -319,7 +347,7 @@ const getYearlySales = async (startYear: string, endYear: string): Promise<Sales
   }
 
   // 실제 데이터로 업데이트
-  results.forEach((row: any) => {
+  results.forEach((row) => {
     const year = row.od_date;
     const yearIndex = parseInt(year) - start;
 

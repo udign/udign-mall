@@ -5,6 +5,35 @@ import { ProductRankingQueryParams, ProductRankingItem, ProductCategory } from '
 import { executeQuery } from '@/lib/database';
 import { getImageUrl } from '@/lib/utils';
 
+// 데이터베이스 쿼리 결과 타입 정의
+interface RankingQueryResult {
+  it_id: string;
+  it_name: string;
+  it_img1: string | null;
+  ca_id: string;
+  ca_name: string;
+  shopping: number;
+  ordered: number;
+  paid: number;
+  preparing: number;
+  shipped: number;
+  completed: number;
+  cancelled: number;
+  returned: number;
+  outOfStock: number;
+  totalQty: number;
+}
+
+interface CountQueryResult {
+  totalCount: number;
+}
+
+interface CategoryQueryResult {
+  ca_id: string;
+  ca_name: string;
+  ca_order: number;
+}
+
 export const POST = async (request: NextRequest) => {
   try {
     const user = await getCurrentUser();
@@ -89,8 +118,8 @@ export const POST = async (request: NextRequest) => {
       executeQuery(countSql, queryParams),
     ]);
 
-    const countData = countResults as any[];
-    const mainData = mainResults as any[];
+    const countData = countResults as CountQueryResult[];
+    const mainData = mainResults as RankingQueryResult[];
 
     const totalCount = countData[0]?.totalCount || 0;
     const totalPages = Math.ceil(totalCount / limit);
@@ -155,9 +184,9 @@ export const GET = async () => {
       ORDER BY ca_order, ca_id
     `;
 
-    const results = (await executeQuery(sql)) as any[];
+    const results = (await executeQuery(sql)) as CategoryQueryResult[];
 
-    const categories: ProductCategory[] = results.map((row: any) => ({
+    const categories: ProductCategory[] = results.map((row) => ({
       ca_id: row.ca_id,
       ca_name: row.ca_name,
       ca_order: Number(row.ca_order) || 0,
