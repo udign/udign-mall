@@ -14,6 +14,7 @@ import {
   Palette,
   UserCheck,
   PieChart,
+  FileText,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -90,6 +91,11 @@ const menuItems: MenuItem[] = [
         label: '상품 판매 순위',
         href: ROUTES.ADMIN_SALES_RANKING,
         icon: <TrendingUp className='h-4 w-4' />,
+      },
+      {
+        label: '주문내역 출력',
+        href: ROUTES.ADMIN_ORDERPRINT,
+        icon: <FileText className='h-4 w-4' />,
       },
     ],
   },

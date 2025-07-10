@@ -9,6 +9,7 @@ export const ROUTES = {
   ADMIN_REVIEW: '/admin/review',
   ADMIN_SALES: '/admin/sales',
   ADMIN_SALES_RANKING: '/admin/sales-ranking',
+  ADMIN_ORDERPRINT: '/admin/orderprint',
 
   // 인증 관련
   LOGIN: '/shop/login',
