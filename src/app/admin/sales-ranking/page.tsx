@@ -56,10 +56,17 @@ export default function SalesRankingPage() {
   });
   const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
   const [searchFilters, setSearchFilters] = useState<typeof filters>(filters);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1');
+
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    const imageUrl = target.src;
+    setFailedImages((prev) => new Set(prev).add(imageUrl));
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -347,16 +354,28 @@ export default function SalesRankingPage() {
                     <td className='p-3 text-center font-medium'>{item.rank}</td>
                     <td className='p-3'>
                       <div className='flex items-center gap-3'>
-                        {item.it_img1 && (
-                          <div className='relative h-12 w-12 flex-shrink-0'>
+                        <div className='relative h-12 w-12 flex-shrink-0'>
+                          {!item.it_img1 ||
+                          item.it_img1.trim() === '' ||
+                          failedImages.has(item.it_img1) ? (
+                            <div className='flex h-full w-full items-center justify-center rounded bg-gray-200'>
+                              <span className='text-center text-xs text-gray-400'>
+                                이미지
+                                <br />
+                                없음
+                              </span>
+                            </div>
+                          ) : (
                             <Image
                               src={item.it_img1}
                               alt={item.it_name}
                               fill
                               className='rounded object-cover'
+                              onError={handleImageError}
+                              sizes='48px'
                             />
-                          </div>
-                        )}
+                          )}
+                        </div>
                         <div>
                           <div className='line-clamp-2 font-medium'>{item.it_name}</div>
                           {item.ca_name && (
