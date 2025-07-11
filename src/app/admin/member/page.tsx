@@ -213,17 +213,11 @@ export default function MemberManagePage() {
     [],
   );
 
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    router.push(`${ROUTES.ADMIN_MEMBER}?${params.toString()}`);
-  };
-
   return (
     <>
       <div className='space-y-4'>
         <div className='mb-6'>
-          <h1 className='mb-2 text-2xl font-bold text-gray-900'>회원 관리</h1>
+          <h1 className='text-2xl font-bold text-gray-900'>회원 관리</h1>
           <p className='mt-1 text-gray-600'>
             모든 회원의 상태를 확인하고 회원 권한 및 상태 관리를 할 수 있습니다.
           </p>
@@ -416,8 +410,6 @@ export default function MemberManagePage() {
                     currentPageNumber={currentPage}
                     totalPageCount={totalPages}
                     pathname={ROUTES.ADMIN_MEMBER}
-                    queryParams={{}}
-                    onPageChange={handlePageChange}
                   />
                 </div>
               </>

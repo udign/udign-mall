@@ -39,18 +39,13 @@ export default function CommonPagination({
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPageCount) {
-      // URL 파라미터 생성
       const params = new URLSearchParams();
-      // 기존 쿼리 파라미터 추가
-      Object.entries(queryParams).forEach(([key, value]) => params.set(key, value));
-      // 페이지 파라미터 설정
       params.set('page', newPage.toString());
-      // URL 업데이트
+      // queryParams props로 전달받은 추가 쿼리 파라미터 추가
+      Object.entries(queryParams).forEach(([key, value]) => params.set(key, value));
+
       router.push(`${pathname}?${params.toString()}`);
-      // 추가 처리 함수 호출
       if (onPageChange) onPageChange(newPage);
-      // 페이지 상단으로 스크롤
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

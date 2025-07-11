@@ -1,16 +1,20 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   ShoppingBag,
-  ChevronDown,
-  ChevronRight,
   Store,
+  BarChart3,
   LogOut,
   Users,
+  TrendingUp,
+  Palette,
+  UserCheck,
+  PieChart,
+  FileText,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -21,12 +25,15 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/primitives/sidebar';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/primitives/accordion';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
 import { User } from '@/types/user';
@@ -38,9 +45,9 @@ interface AdminLayoutClientProps {
 
 interface MenuItem {
   label: string;
-  href: string;
+  href?: string;
   icon: ReactNode;
-  children?: MenuItem[];
+  subMenus?: MenuItem[];
 }
 
 const menuItems: MenuItem[] = [
@@ -50,30 +57,64 @@ const menuItems: MenuItem[] = [
     icon: <LayoutDashboard className='h-4 w-4' />,
   },
   {
-    label: '회원 관리',
-    href: ROUTES.ADMIN_MEMBER,
+    label: '사용자 관리',
     icon: <Users className='h-4 w-4' />,
+    subMenus: [
+      {
+        label: '회원 관리',
+        href: ROUTES.ADMIN_MEMBER,
+        icon: <UserCheck className='h-4 w-4' />,
+      },
+    ],
   },
   {
-    label: '작품관리',
-    href: ROUTES.ADMIN_REVIEW,
+    label: '쇼핑몰 관리',
     icon: <ShoppingBag className='h-4 w-4' />,
+    subMenus: [
+      {
+        label: '작품 관리',
+        href: ROUTES.ADMIN_REVIEW,
+        icon: <Palette className='h-4 w-4' />,
+      },
+    ],
+  },
+  {
+    label: '쇼핑몰 현황/기타',
+    icon: <BarChart3 className='h-4 w-4' />,
+    subMenus: [
+      {
+        label: '매출 현황',
+        href: ROUTES.ADMIN_SALES,
+        icon: <PieChart className='h-4 w-4' />,
+      },
+      {
+        label: '상품 판매 순위',
+        href: ROUTES.ADMIN_SALES_RANKING,
+        icon: <TrendingUp className='h-4 w-4' />,
+      },
+      {
+        label: '주문내역 출력',
+        href: ROUTES.ADMIN_ORDERPRINT,
+        icon: <FileText className='h-4 w-4' />,
+      },
+    ],
   },
 ];
 
 export default function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-
   const router = useRouter();
   const pathname = usePathname();
 
-  const toggleMenu = (label: string) => {
-    setExpandedMenus((prev) =>
-      prev.includes(label) ? prev.filter((item) => item !== label) : [...prev, label],
-    );
+  const isActive = (href: string) => pathname === href;
+
+  const isParentActive = (item: MenuItem) => {
+    if (item.href) return isActive(item.href);
+    return item.subMenus?.some((subMenu) => subMenu.href && isActive(subMenu.href)) || false;
   };
 
-  const isActive = (href: string) => pathname === href;
+  const handleNavigation = (href: string) => {
+    router.push(href);
+  };
 
   const handleLogout = async () => {
     try {
@@ -104,38 +145,53 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
           <SidebarMenu className='px-2'>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.label}>
-                {item.children ? (
-                  <>
-                    <SidebarMenuButton
-                      onClick={() => toggleMenu(item.label)}
-                      isActive={pathname.startsWith(item.href)}
-                    >
-                      {item.icon}
-                      <span>{item.label}</span>
-                      {expandedMenus.includes(item.label) ? (
-                        <ChevronDown className='ml-auto h-4 w-4' />
-                      ) : (
-                        <ChevronRight className='ml-auto h-4 w-4' />
-                      )}
-                    </SidebarMenuButton>
-                    {expandedMenus.includes(item.label) && (
-                      <SidebarMenuSub>
-                        {item.children.map((child) => (
-                          <SidebarMenuSubItem key={child.href}>
-                            <SidebarMenuSubButton asChild isActive={isActive(child.href)}>
-                              <Link href={child.href}>
-                                {child.icon}
-                                <span>{child.label}</span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    )}
-                  </>
+                {item.subMenus ? (
+                  <div className='mb-2'>
+                    <Accordion type='multiple' className='w-full'>
+                      <AccordionItem value={item.label} className='border-0'>
+                        <AccordionTrigger
+                          className={`hover:text-primary-hover rounded-md px-2 py-3 text-sm font-medium hover:no-underline ${
+                            isParentActive(item)
+                              ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                              : 'text-sidebar-foreground'
+                          }`}
+                        >
+                          <div className='flex items-center gap-2'>
+                            {item.icon}
+                            <span>{item.label}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className='pb-0'>
+                          <div className='space-y-1'>
+                            {item.subMenus.map((subMenu) => (
+                              <Button
+                                key={subMenu.label}
+                                variant='ghost'
+                                className={`hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-9 w-full justify-start pl-8 text-left text-sm font-medium ${
+                                  subMenu.href && isActive(subMenu.href)
+                                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                                    : 'text-sidebar-foreground'
+                                }`}
+                                onClick={() => subMenu.href && handleNavigation(subMenu.href)}
+                              >
+                                <div className='flex items-center gap-2'>
+                                  {subMenu.icon}
+                                  <span>{subMenu.label}</span>
+                                </div>
+                              </Button>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
                 ) : (
-                  <SidebarMenuButton className='h-10' asChild isActive={isActive(item.href)}>
-                    <Link href={item.href}>
+                  <SidebarMenuButton
+                    className='h-10'
+                    asChild
+                    isActive={item.href ? isActive(item.href) : false}
+                  >
+                    <Link href={item.href!}>
                       {item.icon}
                       <span>{item.label}</span>
                     </Link>

@@ -227,6 +227,7 @@ function CheckoutContent() {
     };
 
     renderPaymentWidget();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgets, amount.value]);
 
   const cleanupWidgets = useCallback(async () => {

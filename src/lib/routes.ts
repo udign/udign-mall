@@ -7,6 +7,9 @@ export const ROUTES = {
   ADMIN: '/admin',
   ADMIN_MEMBER: '/admin/member',
   ADMIN_REVIEW: '/admin/review',
+  ADMIN_SALES: '/admin/sales',
+  ADMIN_SALES_RANKING: '/admin/sales-ranking',
+  ADMIN_ORDERPRINT: '/admin/orderprint',
 
   // 인증 관련
   LOGIN: '/shop/login',
@@ -24,6 +27,7 @@ export const ROUTES = {
   // 기능 페이지
   UPLOAD: '/shop/upload',
   MY_UDIGN: '/shop/my-udign',
+  SEARCH: '/shop/search',
 
   // 정보 페이지
   COMPANY: '/shop/company',

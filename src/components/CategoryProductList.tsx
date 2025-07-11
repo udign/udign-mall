@@ -64,7 +64,6 @@ export default function CategoryProductList({
             currentPageNumber={currentPage}
             totalPageCount={totalPages}
             pathname={pathname}
-            queryParams={{}}
           />
         </>
       )}

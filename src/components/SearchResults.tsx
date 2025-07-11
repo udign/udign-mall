@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import ErrorState from '@/components/states/ErrorState';
 import CommonPagination from '@/components/CommonPagination';
 import ProductGrid from '@/components/ProductGrid';
+import { PAGINATION_CONFIG } from '@/lib/constants';
+import { ROUTES } from '@/lib/routes';
 
 interface SearchProduct {
   it_id: string;
@@ -54,7 +57,10 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
   const [searchData, setSearchData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1');
 
   const fetchSearchResults = async (query: string, page: number = 1) => {
     try {
@@ -62,7 +68,7 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
       setError(null);
 
       const response = await fetch(
-        `/api/search?q=${encodeURIComponent(query)}&page=${page}&limit=12`,
+        `/api/search?q=${encodeURIComponent(query)}&page=${page}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
       );
       const data: SearchResponse = await response.json();
 
@@ -81,15 +87,16 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
 
   useEffect(() => {
     if (searchQuery?.trim()) {
-      setCurrentPage(1);
-      fetchSearchResults(searchQuery.trim(), 1);
+      if (!searchParams.get('page')) {
+        const params = new URLSearchParams();
+        params.set('q', searchQuery);
+        params.set('page', '1');
+        router.replace(`${ROUTES.SEARCH}?${params.toString()}`);
+      } else {
+        fetchSearchResults(searchQuery.trim(), currentPage);
+      }
     }
-  }, [searchQuery]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    fetchSearchResults(searchQuery, page);
-  };
+  }, [searchQuery, currentPage, searchParams, router]);
 
   return (
     <div className='px-6 py-8 sm:px-10'>
@@ -130,9 +137,8 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
             <CommonPagination
               currentPageNumber={currentPage}
               totalPageCount={searchData.pagination.totalPages}
-              pathname='/shop/search'
+              pathname={ROUTES.SEARCH}
               queryParams={{ q: searchQuery }}
-              onPageChange={handlePageChange}
             />
           </div>
         </>
