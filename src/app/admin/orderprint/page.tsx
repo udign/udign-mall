@@ -321,16 +321,12 @@ export default function OrderPrintPage() {
   return (
     <>
       <div className='space-y-6'>
-        <div className='flex items-center justify-between'>
+        <div className='flex items-center'>
           <div>
             <h1 className='text-2xl font-bold text-gray-900'>주문내역 출력</h1>
             <p className='mt-1 text-gray-600'>
               기간별 또는 주문번호구간별 주문내역을 조회하고 출력할 수 있습니다.
             </p>
-          </div>
-          <div className='flex items-center gap-2'>
-            <FileText className='h-5 w-5 text-gray-500' />
-            <span className='text-sm text-gray-500'>주문내역 관리</span>
           </div>
         </div>
 
@@ -629,28 +625,127 @@ export default function OrderPrintPage() {
 
 // 새창 출력용 HTML 생성
 function generatePrintHTML(data: OrderPrintData[], filter: OrderFilter): string {
-  const title =
-    filter.case === 1
-      ? `${filter.fr_date} 부터 ${filter.to_date} 까지 ${filter.ct_status || '전체'} 내역`
-      : `${filter.fr_od_id} 부터 ${filter.to_od_id} 까지 ${filter.ct_status || '전체'} 내역`;
+  // 날짜 형식 변환 함수
+  const formatDateRange = () => {
+    if (filter.case === 1) {
+      const frDate = filter.fr_date;
+      const toDate = filter.to_date;
+      const frFormatted = `${frDate.substring(0, 4)}-${frDate.substring(4, 6)}-${frDate.substring(6, 8)}`;
+      const toFormatted = `${toDate.substring(0, 4)}-${toDate.substring(4, 6)}-${toDate.substring(6, 8)}`;
+      return `${frFormatted} 부터 ${toFormatted} 까지`;
+    } else {
+      return `${filter.fr_od_id} 부터 ${filter.to_od_id} 까지`;
+    }
+  };
 
-  const tableRows = data
-    .map(
-      (item) => `
-    <tr>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.od_id}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.od_b_name}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.full_address}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.formatted_phone1}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.formatted_phone2}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.it_name}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.ct_qty}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.ct_send_cost_text}</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">${item.od_invoice || '-'}</td>
-    </tr>
-  `,
-    )
+  // 주문번호별로 데이터 그룹화
+  const groupedOrders = data.reduce(
+    (acc, item) => {
+      if (!acc[item.od_id]) {
+        acc[item.od_id] = {
+          orderInfo: item,
+          items: [],
+        };
+      }
+      acc[item.od_id].items.push(item);
+      return acc;
+    },
+    {} as Record<string, { orderInfo: OrderPrintData; items: OrderPrintData[] }>,
+  );
+
+  // 각 주문의 HTML 생성
+  const orderHtmlBlocks = Object.values(groupedOrders)
+    .map(({ orderInfo, items }) => {
+      const itemRows = items
+        .map(
+          (item) => `
+        <tr>
+          <td style="padding: 4px 8px; border-bottom: 1px solid #eee;">${item.it_name}${item.ct_option ? ` (${item.ct_option})` : ''}</td>
+          <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: right;">-</td>
+          <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: center;">${item.ct_qty}</td>
+          <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: right;">-</td>
+          <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: center;">${item.ct_send_cost_text}</td>
+        </tr>
+     `,
+        )
+        .join('');
+
+      const deliveryRows = `
+      <tr>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee;">배송비</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: right;">0</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: center;">1</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: right;">0</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: center;"></td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee;">추가 배송비</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: right;">0</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: center;">1</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: right;">0</td>
+        <td style="padding: 4px 8px; border-bottom: 1px solid #eee; text-align: center;"></td>
+      </tr>
+    `;
+
+      const totalQuantity = items.reduce((sum, item) => sum + Number(item.ct_qty), 0) + 2; // +2 for 배송비, 추가배송비
+
+      const summaryRow = `
+       <tr style="background-color: #f5f5f5; font-weight: bold;">
+         <td style="padding: 8px; border-top: 2px solid #333;">합계</td>
+         <td style="padding: 8px; border-top: 2px solid #333;"></td>
+         <td style="padding: 8px; border-top: 2px solid #333; text-align: center;">${totalQuantity}</td>
+         <td style="padding: 8px; border-top: 2px solid #333; text-align: right;">-</td>
+         <td style="padding: 8px; border-top: 2px solid #333;"></td>
+       </tr>
+     `;
+
+      return `
+      <div style="margin-bottom: 40px; page-break-inside: avoid;">
+        <h3 style="color: #e74c3c; margin-bottom: 15px;">주문번호 ${orderInfo.od_id}</h3>
+        
+        <div style="margin-bottom: 15px;">
+          <strong>보내는 사람 : ${orderInfo.od_b_name}</strong>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+          <strong>주소</strong><br>
+          ${orderInfo.full_address}
+        </div>
+        
+        <div style="margin-bottom: 5px;">
+          <strong>휴대폰</strong><br>
+          ${orderInfo.formatted_phone1}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <strong>전화번호</strong><br>
+          ${orderInfo.formatted_phone2}
+        </div>
+        
+        <h4 style="margin-bottom: 10px;">주문 목록</h4>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <thead>
+            <tr style="background-color: #f8f9fa;">
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">상품명(선택사항)</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">판매가</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">수량</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">소계</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">배송비</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemRows}
+            ${deliveryRows}
+            ${summaryRow}
+          </tbody>
+        </table>
+      </div>
+    `;
+    })
     .join('');
+
+  // 전체 통계 계산
+  const totalItems = data.reduce((sum, item) => sum + Number(item.ct_qty), 0);
 
   return `
     <!DOCTYPE html>
@@ -659,42 +754,74 @@ function generatePrintHTML(data: OrderPrintData[], filter: OrderFilter): string 
       <meta charset="UTF-8">
       <title>주문내역 출력</title>
       <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background-color: #f5f5f5; border: 1px solid #ddd; padding: 8px; text-align: left; }
-        td { border: 1px solid #ddd; padding: 8px; }
-        .print-info { margin-bottom: 20px; color: #666; }
+        body { 
+          font-family: 'Malgun Gothic', Arial, sans-serif; 
+          margin: 20px; 
+          line-height: 1.6;
+          color: #333;
+        }
+        h1 { 
+          color: #333; 
+          margin-bottom: 30px; 
+          border-bottom: 2px solid #333;
+          padding-bottom: 10px;
+        }
+        h3 { 
+          color: #e74c3c; 
+          margin-top: 30px; 
+          margin-bottom: 15px; 
+        }
+        h4 { 
+          margin-bottom: 10px; 
+          color: #333;
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin-bottom: 20px; 
+        }
+        th { 
+          background-color: #f8f9fa; 
+          border: 1px solid #ddd; 
+          padding: 8px; 
+          text-align: left; 
+          font-weight: bold;
+        }
+        td { 
+          border: 1px solid #ddd; 
+          padding: 8px; 
+        }
+        .total-summary {
+          margin-top: 30px;
+          padding: 15px;
+          background-color: #f8f9fa;
+          border: 1px solid #ddd;
+          text-align: center;
+          font-weight: bold;
+          font-size: 16px;
+        }
+        .print-end {
+          margin-top: 30px;
+          text-align: center;
+          color: #666;
+          font-style: italic;
+        }
+        @media print {
+          body { margin: 10px; }
+          .page-break { page-break-before: always; }
+        }
       </style>
     </head>
     <body>
-      <h1>주문내역</h1>
-      <div class="print-info">
-        <p><strong>조회 조건:</strong> ${title}</p>
-        <p><strong>출력 일시:</strong> ${new Date().toLocaleString('ko-KR')}</p>
-        <p><strong>총 건수:</strong> ${data.length}건</p>
-      </div>
+      <h1>${formatDateRange()} 주문 내역</h1>
       
-      <table>
-        <thead>
-          <tr>
-            <th>주문번호</th>
-            <th>수령인</th>
-            <th>주소</th>
-            <th>전화번호1</th>
-            <th>전화번호2</th>
-            <th>상품명</th>
-            <th>수량</th>
-            <th>배송비</th>
-            <th>운송장번호</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableRows}
-        </tbody>
-      </table>
+      ${orderHtmlBlocks}
       
-      <div style="margin-top: 30px; text-align: center; color: #666;">
+             <div class="total-summary">
+         전체 ${totalItems}개
+       </div>
+      
+      <div class="print-end">
         &lt;출력 끝&gt;
       </div>
     </body>
