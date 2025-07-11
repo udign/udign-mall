@@ -380,7 +380,9 @@ export default function ArtworkEditPage() {
             <CardContent className='space-y-4'>
               <div className='grid grid-cols-3 gap-4'>
                 <div className='space-y-2'>
-                  <Label htmlFor='ca_id'>기본분류 *</Label>
+                  <Label htmlFor='ca_id'>
+                    기본분류<span className='text-red-500'>*</span>
+                  </Label>
                   <Select
                     value={formData.ca_id}
                     onValueChange={(value) => handleCategoryChange('ca_id', value)}
@@ -452,7 +454,9 @@ export default function ArtworkEditPage() {
             <CardContent className='space-y-4'>
               <div className='grid grid-cols-3 gap-4'>
                 <div className='space-y-2'>
-                  <Label htmlFor='it_name'>작품명 *</Label>
+                  <Label htmlFor='it_name'>
+                    작품명<span className='text-red-500'>*</span>
+                  </Label>
                   <Input
                     id='it_name'
                     value={formData.it_name}
