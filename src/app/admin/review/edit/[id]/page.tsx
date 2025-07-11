@@ -352,7 +352,6 @@ export default function ArtworkEditPage() {
   ) : (
     <div className='min-h-screen'>
       <div>
-        {/* 헤더 */}
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center space-x-4'>
             <Link href='/admin/review'>
@@ -366,7 +365,6 @@ export default function ArtworkEditPage() {
         </div>
 
         <form onSubmit={handleSubmit} className='space-y-6'>
-          {/* 작품분류 섹션 */}
           <Card>
             <CardHeader>
               <CardTitle>작품분류</CardTitle>
@@ -447,7 +445,6 @@ export default function ArtworkEditPage() {
             </CardContent>
           </Card>
 
-          {/* 기본정보 섹션 */}
           <Card>
             <CardHeader>
               <CardTitle>기본정보</CardTitle>
@@ -559,7 +556,6 @@ export default function ArtworkEditPage() {
             </CardContent>
           </Card>
 
-          {/* 가격 및 재고 섹션 */}
           <Card>
             <CardHeader>
               <CardTitle>가격 및 재고</CardTitle>
@@ -750,7 +746,6 @@ export default function ArtworkEditPage() {
             </CardContent>
           </Card>
 
-          {/* 배송비 섹션 */}
           <Card>
             <CardHeader>
               <CardTitle>배송비</CardTitle>
@@ -863,7 +858,6 @@ export default function ArtworkEditPage() {
             </CardContent>
           </Card>
 
-          {/* 이미지 섹션 */}
           <Card>
             <CardHeader>
               <CardTitle>작품 이미지</CardTitle>
@@ -962,7 +956,6 @@ export default function ArtworkEditPage() {
             </CardContent>
           </Card>
 
-          {/* 저장 버튼 */}
           <div className='flex justify-end space-x-4'>
             <Link href='/admin/review'>
               <Button type='button' variant='outline'>
