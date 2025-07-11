@@ -23,10 +23,8 @@ import Image from 'next/image';
 export default function ArtworkEditPage() {
   const [artwork, setArtwork] = useState<ArtworkDetail | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  // 이미지 관련 상태
+  const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
   const [imageFiles, setImageFiles] = useState<{ [key: string]: File | null }>({});
   const [imagePreview, setImagePreview] = useState<{ [key: string]: string }>({});
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
@@ -187,15 +185,9 @@ export default function ArtworkEditPage() {
   // 이미지 핸들러 함수들
   const handleImageUpload = (imageIndex: number, file: File | null) => {
     const key = `it_img${imageIndex}`;
-    console.log(`=== 이미지 업로드 핸들러 ${key} ===`);
-    console.log('File:', file);
-    console.log('File size:', file?.size);
-    console.log('File type:', file?.type);
-    console.log('File name:', file?.name);
 
     setImageFiles((prev) => {
       const newFiles = { ...prev, [key]: file };
-      console.log('Updated imageFiles state:', newFiles);
       return newFiles;
     });
 
@@ -261,10 +253,6 @@ export default function ArtworkEditPage() {
     try {
       setSaving(true);
 
-      console.log('=== 저장 시작 전 상태 확인 ===');
-      console.log('Current imageFiles state:', imageFiles);
-      console.log('Images to delete:', imagesToDelete);
-
       // FormData를 사용하여 파일과 데이터를 함께 전송
       const submitData = new FormData();
 
@@ -273,34 +261,16 @@ export default function ArtworkEditPage() {
         submitData.append(key, String(value));
       });
 
-      // 이미지 파일들 추가 - 디버깅 정보 포함
-      console.log('=== 이미지 파일 전송 정보 ===');
+      // 이미지 파일들 추가
       Object.entries(imageFiles).forEach(([key, file]) => {
         if (file) {
-          console.log(`Adding ${key}:`, {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            lastModified: file.lastModified,
-          });
           submitData.append(key, file);
         }
       });
 
       // 삭제할 이미지들 추가
       if (imagesToDelete.length > 0) {
-        console.log('삭제할 이미지들:', imagesToDelete);
         submitData.append('imagesToDelete', JSON.stringify(imagesToDelete));
-      }
-
-      // FormData 내용 확인
-      console.log('=== FormData 내용 확인 ===');
-      for (const [key, value] of submitData.entries()) {
-        if (value instanceof File) {
-          console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
-        } else {
-          console.log(`${key}: ${value}`);
-        }
       }
 
       const response = await fetch(`/api/admin/artwork/${artworkId}`, {
@@ -313,7 +283,7 @@ export default function ArtworkEditPage() {
       }
 
       alert('작품 정보가 성공적으로 수정되었습니다.');
-      router.push('/admin/reviews');
+      router.push('/admin/review');
     } catch (error) {
       console.error('Error updating artwork:', error);
       alert('작품 정보 수정 중 오류가 발생했습니다.');
@@ -371,29 +341,21 @@ export default function ArtworkEditPage() {
       ));
   };
 
-  if (loading) {
-    return (
-      <div className='flex min-h-screen items-center justify-center bg-gray-50'>
-        <div className='text-lg'>로딩 중...</div>
-      </div>
-    );
-  }
-
-  if (!artwork) {
-    return (
-      <div className='flex min-h-screen items-center justify-center bg-gray-50'>
-        <div className='text-lg text-red-600'>작품을 찾을 수 없습니다.</div>
-      </div>
-    );
-  }
-
-  return (
+  return loading ? (
+    <div className='flex min-h-screen items-center justify-center bg-gray-50'>
+      <div className='text-lg'>로딩 중...</div>
+    </div>
+  ) : !artwork ? (
+    <div className='flex min-h-screen items-center justify-center bg-gray-50'>
+      <div className='text-lg text-red-600'>작품을 찾을 수 없습니다.</div>
+    </div>
+  ) : (
     <div className='min-h-screen'>
       <div>
         {/* 헤더 */}
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center space-x-4'>
-            <Link href='/admin/reviews'>
+            <Link href='/admin/review'>
               <Button variant='outline' size='sm'>
                 <ArrowLeft className='mr-2 h-4 w-4' />
                 목록으로
@@ -1002,7 +964,7 @@ export default function ArtworkEditPage() {
 
           {/* 저장 버튼 */}
           <div className='flex justify-end space-x-4'>
-            <Link href='/admin/reviews'>
+            <Link href='/admin/review'>
               <Button type='button' variant='outline'>
                 취소
               </Button>

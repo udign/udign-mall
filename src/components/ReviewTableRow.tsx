@@ -115,7 +115,7 @@ export function ReviewTableRow({
       <td className='px-6 py-4 text-center'>
         <div className='flex justify-center'>
           <div className='flex space-x-2'>
-            <Link href={`/admin/artwork/${item.it_id}/edit`}>
+            <Link href={`/admin/review/edit/${item.it_id}`}>
               <Button
                 variant='outline'
                 size='sm'
