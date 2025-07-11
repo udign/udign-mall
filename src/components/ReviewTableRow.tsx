@@ -1,9 +1,11 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/primitives/button';
 import { Checkbox } from '@/components/ui/primitives/checkbox';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { ReviewItem } from '@/types/review';
+import { Settings } from 'lucide-react';
 
 interface ReviewTableRowProps {
   item: ReviewItem;
@@ -113,6 +115,18 @@ export function ReviewTableRow({
       <td className='px-6 py-4 text-center'>
         <div className='flex justify-center'>
           <div className='flex space-x-2'>
+            <Link href={`/admin/artwork/${item.it_id}/edit`}>
+              <Button
+                variant='outline'
+                size='sm'
+                className='border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                title='작품 설정'
+              >
+                <Settings className='mr-1 h-4 w-4' />
+                설정
+              </Button>
+            </Link>
+
             <Button
               onClick={() => onShowConfirmDialog(item.it_id, 'payment', item.it_name)}
               disabled={actionLoading === item.it_id || item.review_status === 'approved'}
