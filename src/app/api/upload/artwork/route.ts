@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { verifyToken } from '@/lib/auth';
 import { executeQuery } from '@/lib/database';
+import { getFileExtension, getFilenameFromUrl } from '@/lib/utils';
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -242,19 +243,4 @@ export const POST = async (request: NextRequest) => {
       { status: 500 },
     );
   }
-};
-
-// 파일 확장자 추출 함수
-const getFileExtension = (filename: string): string => {
-  return filename.split('.').pop()?.toLowerCase() || 'jpg';
-};
-// URL에서 item/ 이후의 경로를 추출하는 함수 (예: item/1737134574/main.jpg → 1737134574/main.jpg)
-const getFilenameFromUrl = (url: string): string => {
-  const itemIndex = url.indexOf('/item/');
-  if (itemIndex !== -1) {
-    return url.substring(itemIndex + 6); // '/item/' 이후 부분 반환
-  }
-  // fallback: 기존 방식
-  const urlParts = url.split('/');
-  return urlParts[urlParts.length - 1];
 };

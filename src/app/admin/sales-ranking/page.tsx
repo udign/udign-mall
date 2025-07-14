@@ -356,8 +356,8 @@ export default function SalesRankingPage() {
       </Card>
 
       <CommonPagination
-        currentPageNumber={currentPage}
-        totalPageCount={totalPages}
+        currentPage={currentPage}
+        totalPages={totalPages}
         pathname={ROUTES.ADMIN_SALES_RANKING}
         queryParams={{
           ...(startDateStr && { startDate: startDateStr }),

@@ -407,8 +407,8 @@ export default function MemberManagePage() {
 
                 <div className='mt-6 flex justify-center'>
                   <CommonPagination
-                    currentPageNumber={currentPage}
-                    totalPageCount={totalPages}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
                     pathname={ROUTES.ADMIN_MEMBER}
                   />
                 </div>

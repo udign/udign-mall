@@ -60,11 +60,7 @@ export default function CategoryProductList({
         <>
           <ProductGrid products={products} className='mb-8' />
 
-          <CommonPagination
-            currentPageNumber={currentPage}
-            totalPageCount={totalPages}
-            pathname={pathname}
-          />
+          <CommonPagination currentPage={currentPage} totalPages={totalPages} pathname={pathname} />
         </>
       )}
     </div>

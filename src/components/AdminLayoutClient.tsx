@@ -15,6 +15,7 @@ import {
   UserCheck,
   PieChart,
   FileText,
+  ShoppingCart,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -75,6 +76,11 @@ const menuItems: MenuItem[] = [
         label: '작품 관리',
         href: ROUTES.ADMIN_REVIEW,
         icon: <Palette className='h-4 w-4' />,
+      },
+      {
+        label: '주문내역',
+        href: ROUTES.ADMIN_ORDERLIST,
+        icon: <ShoppingCart className='h-4 w-4' />,
       },
     ],
   },
@@ -256,7 +262,7 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
           </div>
         </header>
 
-        <main className='flex-1 space-y-4 p-4 md:p-6'>{children}</main>
+        <main className='mb-20 flex-1 space-y-4 p-4 md:p-6'>{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

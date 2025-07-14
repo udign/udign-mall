@@ -135,8 +135,8 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
 
           <div className='mt-12 flex justify-center'>
             <CommonPagination
-              currentPageNumber={currentPage}
-              totalPageCount={searchData.pagination.totalPages}
+              currentPage={currentPage}
+              totalPages={searchData.pagination.totalPages}
               pathname={ROUTES.SEARCH}
               queryParams={{ q: searchQuery }}
             />
