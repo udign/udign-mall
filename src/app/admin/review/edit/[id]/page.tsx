@@ -368,7 +368,7 @@ export default function ArtworkEditPage() {
   }, [categories, ca_id2, ca_id3]);
 
   return loading ? (
-    <div className='flex min-h-[calc(100vh-64px)] items-center justify-center'>
+    <div className='flex min-h-screen items-center justify-center'>
       <LoadingSpinner size='lg' message='작품 정보를 불러오는 중...' />
     </div>
   ) : !artwork ? (
@@ -376,7 +376,7 @@ export default function ArtworkEditPage() {
       <div className='text-lg text-red-600'>작품을 찾을 수 없습니다.</div>
     </div>
   ) : (
-    <div className='mb-20 min-h-screen'>
+    <div className='min-h-screen'>
       <div>
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center space-x-4'>
