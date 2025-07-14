@@ -39,9 +39,9 @@ export default function CommonPagination({
     (newPage: number) => {
       if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
         const params = new URLSearchParams();
-        params.set('page', newPage.toString());
-        // queryParams props로 전달받은 추가 쿼리 파라미터 추가
+        // queryParams props로 전달받은 추가 쿼리 파라미터를 먼저 추가
         Object.entries(queryParams).forEach(([key, value]) => params.set(key, value));
+        params.set('page', newPage.toString());
 
         router.push(`${pathname}?${params.toString()}`);
         if (onPageChange) onPageChange(newPage);
