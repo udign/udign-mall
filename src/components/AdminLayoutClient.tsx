@@ -78,7 +78,7 @@ const menuItems: MenuItem[] = [
         icon: <Palette className='h-4 w-4' />,
       },
       {
-        label: '주문내역 관리',
+        label: '주문내역',
         href: ROUTES.ADMIN_ORDERLIST,
         icon: <ShoppingCart className='h-4 w-4' />,
       },
