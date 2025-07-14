@@ -16,9 +16,11 @@ import {
 } from '@/components/ui/primitives/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
 import { ArtworkDetail, Category, UpdateArtworkRequest } from '@/types/artwork';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import LoadingSpinner from '@/components/states/LoadingSpinner';
+import { ROUTES } from '@/lib/routes';
 
 export default function ArtworkEditPage() {
   const [artwork, setArtwork] = useState<ArtworkDetail | null>(null);
@@ -283,7 +285,7 @@ export default function ArtworkEditPage() {
       }
 
       alert('작품 정보가 성공적으로 수정되었습니다.');
-      router.push('/admin/review');
+      router.push(ROUTES.ADMIN_REVIEW);
     } catch (error) {
       console.error('Error updating artwork:', error);
       alert('작품 정보 수정 중 오류가 발생했습니다.');
@@ -342,22 +344,21 @@ export default function ArtworkEditPage() {
   };
 
   return loading ? (
-    <div className='flex min-h-screen items-center justify-center bg-gray-50'>
-      <div className='text-lg'>로딩 중...</div>
+    <div className='flex min-h-[calc(100vh-64px)] items-center justify-center'>
+      <LoadingSpinner size='lg' message='작품 정보를 불러오는 중...' />
     </div>
   ) : !artwork ? (
     <div className='flex min-h-screen items-center justify-center bg-gray-50'>
       <div className='text-lg text-red-600'>작품을 찾을 수 없습니다.</div>
     </div>
   ) : (
-    <div className='min-h-screen'>
+    <div className='mb-20 min-h-screen'>
       <div>
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center space-x-4'>
-            <Link href='/admin/review'>
+            <Link href={ROUTES.ADMIN_REVIEW}>
               <Button variant='outline' size='sm'>
-                <ArrowLeft className='mr-2 h-4 w-4' />
-                목록으로
+                <ArrowLeft className='h-4 w-4' />
               </Button>
             </Link>
             <h1 className='text-2xl font-bold text-gray-900'>작품 설정</h1>
@@ -690,7 +691,7 @@ export default function ArtworkEditPage() {
                 </div>
               </div>
 
-              <div className='grid grid-cols-2 gap-4'>
+              <div className='grid grid-cols-3 gap-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='it_buy_min_qty'>최소구매수량</Label>
                   <div className='flex items-center space-x-2'>
@@ -729,23 +730,24 @@ export default function ArtworkEditPage() {
                     작품 구매 시 최대 구매 수량을 설정합니다. (0은 제한 없음)
                   </p>
                 </div>
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='it_notax'>과세 유형</Label>
-                <Select
-                  value={formData.it_notax.toString()}
-                  onValueChange={(value) => handleInputChange('it_notax', parseInt(value))}
-                >
-                  <SelectTrigger className='w-48'>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='0'>과세</SelectItem>
-                    <SelectItem value='1'>비과세</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className='text-xs text-gray-500'>작품의 과세유형(과세, 비과세)을 설정합니다.</p>
+                <div className='space-y-2'>
+                  <Label htmlFor='it_notax'>과세 유형</Label>
+                  <Select
+                    value={formData.it_notax.toString()}
+                    onValueChange={(value) => handleInputChange('it_notax', parseInt(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='0'>과세</SelectItem>
+                      <SelectItem value='1'>비과세</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className='text-xs text-gray-500'>
+                    작품의 과세유형(과세, 비과세)을 설정합니다.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -899,7 +901,7 @@ export default function ArtworkEditPage() {
                           const file = e.target.files?.[0] || null;
                           handleImageUpload(imageIndex, file);
                         }}
-                        className='file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100'
+                        className='cursor-pointer file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100'
                       />
 
                       {hasExistingImage && (
@@ -909,7 +911,10 @@ export default function ArtworkEditPage() {
                             checked={imagesToDelete.includes(key)}
                             onCheckedChange={(checked) => handleImageDelete(imageIndex, checked)}
                           />
-                          <Label htmlFor={`delete_${key}`} className='text-sm text-red-600'>
+                          <Label
+                            htmlFor={`delete_${key}`}
+                            className='cursor-pointer text-sm text-red-600'
+                          >
                             기존 이미지 삭제
                           </Label>
                         </div>
@@ -939,7 +944,6 @@ export default function ArtworkEditPage() {
                       {isImageDeleted && hasExistingImage && (
                         <div className='mt-3 rounded-lg border border-red-200 bg-red-50 p-3'>
                           <div className='flex items-center space-x-2 text-sm text-red-600'>
-                            <span>🗑️</span>
                             <span>이 이미지는 저장 시 삭제됩니다</span>
                           </div>
                         </div>
@@ -948,7 +952,6 @@ export default function ArtworkEditPage() {
                       {!shouldShowImage && !isImageDeleted && (
                         <div className='mt-3 rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-3'>
                           <div className='flex items-center justify-center space-x-2 text-sm text-gray-500'>
-                            <span>📁</span>
                             <span>이미지를 선택해주세요</span>
                           </div>
                         </div>
@@ -960,21 +963,14 @@ export default function ArtworkEditPage() {
             </CardContent>
           </Card>
 
-          <div className='flex justify-end space-x-4'>
-            <Link href='/admin/review'>
+          <div className='flex justify-end space-x-3'>
+            <Link href={ROUTES.ADMIN_REVIEW}>
               <Button type='button' variant='outline'>
                 취소
               </Button>
             </Link>
             <Button type='submit' disabled={saving}>
-              {saving ? (
-                <>저장 중...</>
-              ) : (
-                <>
-                  <Save className='mr-2 h-4 w-4' />
-                  저장
-                </>
-              )}
+              {saving ? '저장 중' : '저장'}
             </Button>
           </div>
         </form>
