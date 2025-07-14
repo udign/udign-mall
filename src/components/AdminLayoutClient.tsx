@@ -15,6 +15,7 @@ import {
   UserCheck,
   PieChart,
   FileText,
+  ShoppingCart,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -79,7 +80,7 @@ const menuItems: MenuItem[] = [
       {
         label: '주문내역 관리',
         href: ROUTES.ADMIN_ORDERLIST,
-        icon: <FileText className='h-4 w-4' />,
+        icon: <ShoppingCart className='h-4 w-4' />,
       },
     ],
   },
