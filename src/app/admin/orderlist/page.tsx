@@ -60,30 +60,6 @@ const getPaymentMethodDisplay = (settleCase: string): string => {
   return paymentMethods[settleCase] || settleCase || '결제수단없음';
 };
 
-// 주문상태별 배경색 클래스
-const getStatusBgClass = (status: string, cancelPrice: number): string => {
-  if (cancelPrice > 0) {
-    return 'bg-red-50';
-  }
-
-  switch (status) {
-    case '주문':
-      return 'bg-blue-50';
-    case '입금':
-      return 'bg-green-50';
-    case '준비':
-      return 'bg-yellow-50';
-    case '배송':
-      return 'bg-purple-50';
-    case '완료':
-      return 'bg-gray-50';
-    case '취소':
-      return 'bg-red-50';
-    default:
-      return 'bg-white';
-  }
-};
-
 export default function OrderListPage() {
   const [orderData, setOrderData] = useState<OrderListData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -242,10 +218,7 @@ export default function OrderListPage() {
                 </thead>
                 <tbody className='divide-y divide-gray-200 bg-white'>
                   {orders.map((order) => (
-                    <tr
-                      key={order.od_id}
-                      className={`transition-colors hover:bg-gray-50 ${getStatusBgClass(order.od_status, order.od_cancel_price)}`}
-                    >
+                    <tr key={order.od_id} className='transition-colors hover:bg-gray-50'>
                       <td className='px-4 py-4'>
                         <div className='flex max-w-48 flex-col space-y-1'>
                           {order.items.map((item, index) => (
@@ -417,15 +390,13 @@ export default function OrderListPage() {
             )}
           </div>
 
-          {pagination.totalPages > 1 && (
-            <div className='mt-6 flex justify-center'>
-              <CommonPagination
-                currentPageNumber={pagination.page}
-                totalPageCount={pagination.totalPages}
-                pathname={ROUTES.ADMIN_ORDERLIST}
-              />
-            </div>
-          )}
+          <div className='mt-6 flex justify-center'>
+            <CommonPagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              pathname={ROUTES.ADMIN_ORDERLIST}
+            />
+          </div>
         </>
       )}
     </div>

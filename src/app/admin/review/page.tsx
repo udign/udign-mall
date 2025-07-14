@@ -429,8 +429,8 @@ function ReviewManagement() {
 
                 <div className='mt-6 flex justify-center'>
                   <CommonPagination
-                    currentPageNumber={currentPage}
-                    totalPageCount={totalPages}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
                     pathname={ROUTES.ADMIN_REVIEW}
                   />
                 </div>
