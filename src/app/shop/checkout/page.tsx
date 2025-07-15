@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { PaymentItem, PaymentRequest, PaymentMethodType } from '@/types/payment';
 import { Button } from '@/components/ui/primitives/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/primitives/radio-group';
+import { Label } from '@/components/ui/primitives/label';
+import { Checkbox } from '@/components/ui/primitives/checkbox';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import MessageDialog from '@/components/ui/MessageDialog';
@@ -55,6 +58,10 @@ function CheckoutContent() {
   const [isPaymentSystemLoading, setIsPaymentSystemLoading] = useState<boolean>(true);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState<boolean>(false);
   const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
+  const [termsAgreed, setTermsAgreed] = useState({
+    finance: true,
+    privacy: true,
+  });
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -71,7 +78,9 @@ function CheckoutContent() {
     !customerInfo.detailAddress ||
     !customerInfo.zipCode ||
     !payment ||
-    isPaymentProcessing;
+    isPaymentProcessing ||
+    !termsAgreed.finance ||
+    !termsAgreed.privacy;
 
   // 인증 상태 체크, 상품 정보 가져오기 및 구매자 정보 설정
   useEffect(() => {
@@ -441,41 +450,39 @@ function CheckoutContent() {
           <div className='space-y-6'>
             <div className='rounded-lg border border-gray-200 p-6'>
               <h2 className='mb-4 text-lg font-semibold text-gray-900'>결제 수단</h2>
-              <div className='space-y-3'>
-                <label className='flex cursor-pointer items-center space-x-3'>
-                  <input
-                    type='radio'
-                    name='paymentMethod'
-                    value='CARD'
-                    checked={selectedPaymentMethod === 'CARD'}
-                    onChange={(e) => setSelectedPaymentMethod(e.target.value as PaymentMethodType)}
-                    className='text-primary focus:ring-primary h-4 w-4 border-gray-300'
-                  />
-                  <span className='text-sm font-medium text-gray-900'>신용/체크카드</span>
-                </label>
-                <label className='flex cursor-pointer items-center space-x-3'>
-                  <input
-                    type='radio'
-                    name='paymentMethod'
-                    value='TRANSFER'
-                    checked={selectedPaymentMethod === 'TRANSFER'}
-                    onChange={(e) => setSelectedPaymentMethod(e.target.value as PaymentMethodType)}
-                    className='text-primary focus:ring-primary h-4 w-4 border-gray-300'
-                  />
-                  <span className='text-sm font-medium text-gray-900'>계좌이체</span>
-                </label>
-                <label className='flex cursor-pointer items-center space-x-3'>
-                  <input
-                    type='radio'
-                    name='paymentMethod'
-                    value='VIRTUAL_ACCOUNT'
-                    checked={selectedPaymentMethod === 'VIRTUAL_ACCOUNT'}
-                    onChange={(e) => setSelectedPaymentMethod(e.target.value as PaymentMethodType)}
-                    className='text-primary focus:ring-primary h-4 w-4 border-gray-300'
-                  />
-                  <span className='text-sm font-medium text-gray-900'>가상계좌</span>
-                </label>
-              </div>
+              <RadioGroup
+                value={selectedPaymentMethod}
+                onValueChange={(value) => setSelectedPaymentMethod(value as PaymentMethodType)}
+                className='space-y-3'
+              >
+                <div className='flex items-center space-x-3'>
+                  <RadioGroupItem value='CARD' id='card' />
+                  <Label
+                    htmlFor='card'
+                    className='cursor-pointer text-sm font-medium text-gray-900'
+                  >
+                    신용/체크카드
+                  </Label>
+                </div>
+                <div className='flex items-center space-x-3'>
+                  <RadioGroupItem value='TRANSFER' id='transfer' />
+                  <Label
+                    htmlFor='transfer'
+                    className='cursor-pointer text-sm font-medium text-gray-900'
+                  >
+                    계좌이체
+                  </Label>
+                </div>
+                <div className='flex items-center space-x-3'>
+                  <RadioGroupItem value='VIRTUAL_ACCOUNT' id='virtual-account' />
+                  <Label
+                    htmlFor='virtual-account'
+                    className='cursor-pointer text-sm font-medium text-gray-900'
+                  >
+                    가상계좌
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
 
             <div className='rounded-lg border border-gray-200 p-6'>
@@ -500,34 +507,46 @@ function CheckoutContent() {
             <div className='rounded-lg border border-gray-200 p-6'>
               <h2 className='mb-4 text-lg font-semibold text-gray-900'>이용약관 동의</h2>
               <div className='space-y-3'>
-                <label className='flex cursor-pointer items-start space-x-3'>
-                  <input
-                    type='checkbox'
-                    checked={true}
-                    readOnly
-                    className='text-primary focus:ring-primary mt-1 h-4 w-4 rounded border-gray-300'
+                <div className='flex cursor-pointer items-start space-x-3'>
+                  <Checkbox
+                    id='terms-finance'
+                    checked={termsAgreed.finance}
+                    onCheckedChange={(checked) =>
+                      setTermsAgreed((prev) => ({ ...prev, finance: !!checked }))
+                    }
+                    className='mt-1'
                   />
-                  <div className='text-sm'>
-                    <span className='font-medium text-gray-900'>[필수] 전자금융거래 이용약관</span>
-                    <p className='mt-1 text-gray-600'>
-                      전자금융거래법에 따른 이용약관에 동의합니다.
-                    </p>
-                  </div>
-                </label>
-                <label className='flex cursor-pointer items-start space-x-3'>
-                  <input
-                    type='checkbox'
-                    checked={true}
-                    readOnly
-                    className='text-primary focus:ring-primary mt-1 h-4 w-4 rounded border-gray-300'
+                  <Label htmlFor='terms-finance' className='cursor-pointer'>
+                    <div className='text-sm'>
+                      <span className='font-medium text-gray-900'>
+                        [필수] 전자금융거래 이용약관
+                      </span>
+                      <p className='mt-1 text-gray-600'>
+                        전자금융거래법에 따른 이용약관에 동의합니다.
+                      </p>
+                    </div>
+                  </Label>
+                </div>
+                <div className='flex cursor-pointer items-start space-x-3'>
+                  <Checkbox
+                    id='terms-privacy'
+                    checked={termsAgreed.privacy}
+                    onCheckedChange={(checked) =>
+                      setTermsAgreed((prev) => ({ ...prev, privacy: !!checked }))
+                    }
+                    className='mt-1'
                   />
-                  <div className='text-sm'>
-                    <span className='font-medium text-gray-900'>[필수] 개인정보 수집 및 이용</span>
-                    <p className='mt-1 text-gray-600'>
-                      결제 처리를 위한 개인정보 수집 및 이용에 동의합니다.
-                    </p>
-                  </div>
-                </label>
+                  <Label htmlFor='terms-privacy' className='cursor-pointer'>
+                    <div className='text-sm'>
+                      <span className='font-medium text-gray-900'>
+                        [필수] 개인정보 수집 및 이용
+                      </span>
+                      <p className='mt-1 text-gray-600'>
+                        결제 처리를 위한 개인정보 수집 및 이용에 동의합니다.
+                      </p>
+                    </div>
+                  </Label>
+                </div>
               </div>
             </div>
 
