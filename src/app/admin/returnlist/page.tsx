@@ -15,6 +15,16 @@ import {
 import { ROUTES } from '@/lib/routes';
 import { formatOrderId, formatDate, truncateText } from '@/lib/utils';
 
+const statusCards = [
+  { label: '전체', key: 'total', color: 'text-gray-900' },
+  { label: '대기', key: 'pending', color: 'text-yellow-600' },
+  { label: '승인', key: 'approved', color: 'text-blue-600' },
+  { label: '완료', key: 'completed', color: 'text-green-600' },
+  { label: '거부', key: 'rejected', color: 'text-red-600' },
+];
+
+const tableHeaders = ['번호', '신청일시', '주문번호', '신청자', '유형', '사유', '상태'];
+
 const getStatusBadgeColor = (status: string) => {
   switch (status) {
     case 'pending':
@@ -139,57 +149,30 @@ export default function ReturnListPage() {
         </p>
       </div>
 
-      {/* 상태별 통계 */}
       <div className='grid grid-cols-2 gap-4 md:grid-cols-5'>
-        <div className='rounded-lg border bg-white p-4'>
-          <div className='text-sm text-gray-600'>전체</div>
-          <div className='text-xl font-bold text-gray-900'>{data.statusCounts.total}</div>
-        </div>
-        <div className='rounded-lg border bg-white p-4'>
-          <div className='text-sm text-gray-600'>대기</div>
-          <div className='text-xl font-bold text-yellow-600'>{data.statusCounts.pending}</div>
-        </div>
-        <div className='rounded-lg border bg-white p-4'>
-          <div className='text-sm text-gray-600'>승인</div>
-          <div className='text-xl font-bold text-blue-600'>{data.statusCounts.approved}</div>
-        </div>
-        <div className='rounded-lg border bg-white p-4'>
-          <div className='text-sm text-gray-600'>완료</div>
-          <div className='text-xl font-bold text-green-600'>{data.statusCounts.completed}</div>
-        </div>
-        <div className='rounded-lg border bg-white p-4'>
-          <div className='text-sm text-gray-600'>거부</div>
-          <div className='text-xl font-bold text-red-600'>{data.statusCounts.rejected}</div>
-        </div>
+        {statusCards.map((card) => (
+          <div key={card.key} className='rounded-lg border bg-white p-4'>
+            <div className='text-sm text-gray-600'>{card.label}</div>
+            <div className={`text-xl font-bold ${card.color}`}>
+              {data.statusCounts[card.key as keyof typeof data.statusCounts]}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* 테이블 */}
       <div className='overflow-hidden rounded-lg border bg-white'>
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y divide-gray-200'>
             <thead className='bg-gray-50'>
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                  번호
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                  신청일시
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                  주문번호
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                  신청자
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                  유형
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                  사유
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                  상태
-                </th>
+                {tableHeaders.map((header) => (
+                  <th
+                    key={header}
+                    className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-200 bg-white'>
@@ -253,9 +236,7 @@ export default function ReturnListPage() {
         <CommonPagination
           currentPage={data.pagination.page}
           totalPages={data.pagination.totalPages}
-          pathname='/admin/returnlist'
-          showFirstButton={true}
-          showLastButton={true}
+          pathname={ROUTES.ADMIN_RETURNLIST}
         />
       </div>
     </div>

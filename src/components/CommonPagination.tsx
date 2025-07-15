@@ -22,6 +22,32 @@ interface CommonPaginationProps {
   showLastButton?: boolean; // "마지막" 버튼 표시 여부 (기본값: false)
 }
 
+const getButtonText = (type: string) => {
+  switch (type) {
+    case 'first':
+      return '처음';
+    case 'previous':
+      return '이전';
+    case 'next':
+      return '다음';
+    case 'last':
+      return '마지막';
+    default:
+      return type;
+  }
+};
+
+const getButtonIcon = (type: string) => {
+  switch (type) {
+    case 'previous':
+      return <ChevronLeftIcon className='h-4 w-4' />;
+    case 'next':
+      return <ChevronRightIcon className='h-4 w-4' />;
+    default:
+      return null;
+  }
+};
+
 export default function CommonPagination({
   currentPage,
   totalPages,
@@ -60,87 +86,48 @@ export default function CommonPagination({
     onChange: (e, page) => handlePageChange(page),
   });
 
-  const getButtonText = (type: string) => {
-    switch (type) {
-      case 'first':
-        return '처음';
-      case 'previous':
-        return '이전';
-      case 'next':
-        return '다음';
-      case 'last':
-        return '마지막';
-      default:
-        return type;
-    }
-  };
-
-  const getButtonIcon = (type: string) => {
-    switch (type) {
-      case 'previous':
-        return <ChevronLeftIcon className='h-4 w-4' />;
-      case 'next':
-        return <ChevronRightIcon className='h-4 w-4' />;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <>
-      {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            {items.map(({ page, type, selected, disabled, onClick, ...item }, index) => {
-              if (type === 'start-ellipsis' || type === 'end-ellipsis') {
-                return (
-                  <PaginationItem key={index}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              }
+    <Pagination>
+      <PaginationContent>
+        {items.map(({ page, type, selected, disabled, onClick, ...item }, index) => {
+          const icon = getButtonIcon(type);
+          const text = getButtonText(type);
+          const isNavButton = type === 'previous' || type === 'next';
 
-              if (type === 'page') {
-                return (
-                  <PaginationItem key={index}>
-                    <Button
-                      variant={selected ? 'outline' : 'ghost'}
-                      size='icon'
-                      onClick={onClick}
-                      disabled={disabled}
-                      {...item}
-                    >
-                      {page}
-                    </Button>
-                  </PaginationItem>
-                );
-              }
-
-              // first, previous, next, last buttons
-              const icon = getButtonIcon(type);
-              const text = getButtonText(type);
-              const isNavButton = type === 'previous' || type === 'next';
-
-              return (
-                <PaginationItem key={index}>
-                  <Button
-                    variant='ghost'
-                    size={isNavButton ? 'default' : 'icon'}
-                    onClick={onClick}
-                    disabled={disabled}
-                    className={isNavButton ? 'gap-1 px-2.5 sm:pl-2.5' : ''}
-                    {...item}
-                  >
-                    {type === 'previous' && icon}
-                    <span className={isNavButton ? 'hidden sm:block' : ''}>{text}</span>
-                    {type === 'next' && icon}
-                  </Button>
-                </PaginationItem>
-              );
-            })}
-          </PaginationContent>
-        </Pagination>
-      )}
-    </>
+          return type === 'start-ellipsis' || type === 'end-ellipsis' ? (
+            <PaginationItem key={index}>
+              <PaginationEllipsis />
+            </PaginationItem>
+          ) : type === 'page' ? (
+            <PaginationItem key={index}>
+              <Button
+                variant={selected ? 'outline' : 'ghost'}
+                size='icon'
+                onClick={onClick}
+                disabled={disabled}
+                {...item}
+              >
+                {page}
+              </Button>
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={index}>
+              <Button
+                variant='ghost'
+                size={isNavButton ? 'default' : 'icon'}
+                onClick={onClick}
+                disabled={disabled}
+                className={isNavButton ? 'gap-1 px-2.5 sm:pl-2.5' : ''}
+                {...item}
+              >
+                {type === 'previous' && icon}
+                <span className={isNavButton ? 'hidden sm:block' : ''}>{text}</span>
+                {type === 'next' && icon}
+              </Button>
+            </PaginationItem>
+          );
+        })}
+      </PaginationContent>
+    </Pagination>
   );
 }
