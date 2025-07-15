@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 
 export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
@@ -26,4 +28,34 @@ export const getFilenameFromUrl = (url: string): string => {
   // fallback: 기존 방식
   const urlParts = url.split('/');
   return urlParts[urlParts.length - 1];
+};
+
+// 주문번호 포맷팅 함수
+export const formatOrderId = (odId: string | number): string => {
+  const odIdStr = String(odId);
+  if (odIdStr.length === 16) {
+    return `${odIdStr.substring(0, 8)}-${odIdStr.substring(8)}`;
+  }
+  return `${odIdStr.substring(0, 6)}-${odIdStr.substring(6)}`;
+};
+
+// 날짜 포맷팅 함수 (YYYY-MM-DD HH:mm 형태)
+export const formatDate = (dateString: string): string => {
+  return dayjs(dateString).locale('ko').format('YYYY-MM-DD HH:mm');
+};
+
+// 날짜만 포맷팅 함수 (YYYY-MM-DD 형태)
+export const formatDateOnly = (dateString: string): string => {
+  return dayjs(dateString).locale('ko').format('YYYY-MM-DD');
+};
+
+// 시간만 포맷팅 함수 (HH:mm 형태)
+export const formatTimeOnly = (dateString: string): string => {
+  return dayjs(dateString).locale('ko').format('HH:mm');
+};
+
+// 텍스트 자르기 함수
+export const truncateText = (text: string, maxLength: number): string => {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
 };

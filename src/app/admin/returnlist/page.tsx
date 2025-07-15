@@ -13,8 +13,7 @@ import {
   RETURN_TYPE_LABELS,
 } from '@/types/return';
 import { ROUTES } from '@/lib/routes';
-import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
+import { formatOrderId, formatDate, truncateText } from '@/lib/utils';
 
 const getStatusBadgeColor = (status: string) => {
   switch (status) {
@@ -29,11 +28,6 @@ const getStatusBadgeColor = (status: string) => {
     default:
       return 'bg-gray-100 text-gray-800';
   }
-};
-
-const truncateText = (text: string, maxLength: number) => {
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + '...';
 };
 
 export default function ReturnListPage() {
@@ -94,20 +88,6 @@ export default function ReturnListPage() {
       fetchData(currentPage);
     }
   }, [currentPage, user, searchParams, router]);
-
-  // 날짜 포맷팅
-  const formatDate = (dateString: string) => {
-    return dayjs(dateString).locale('ko').format('YYYY-MM-DD HH:mm');
-  };
-
-  // 주문번호 포맷팅
-  const formatOrderId = (odId: string | number): string => {
-    const odIdStr = String(odId);
-    if (odIdStr.length === 16) {
-      return `${odIdStr.substring(0, 8)}-${odIdStr.substring(8)}`;
-    }
-    return `${odIdStr.substring(0, 6)}-${odIdStr.substring(6)}`;
-  };
 
   return authLoading ? (
     <div className='flex min-h-screen items-center justify-center'>
