@@ -1,4 +1,12 @@
-export type PaymentMethodType = 'CARD' | 'NAVERPAY' | 'TOSSPAY';
+export type PaymentMethodType =
+  | 'CARD'
+  | 'VIRTUAL_ACCOUNT'
+  | 'TRANSFER'
+  | 'MOBILE_PHONE'
+  | 'CULTURE_GIFT_CERTIFICATE'
+  | 'BOOK_GIFT_CERTIFICATE'
+  | 'GAME_GIFT_CERTIFICATE'
+  | 'FOREIGN_EASY_PAY';
 
 export interface PaymentInfo {
   orderId: string;

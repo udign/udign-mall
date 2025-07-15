@@ -1,21 +1,19 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { PaymentItem, PaymentRequest, PaymentMethodType } from '@/types/payment';
 import { Button } from '@/components/ui/primitives/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/primitives/radio-group';
+import { Label } from '@/components/ui/primitives/label';
+import { Checkbox } from '@/components/ui/primitives/checkbox';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import MessageDialog from '@/components/ui/MessageDialog';
 import Image from 'next/image';
 import { loadTossPayments } from '@tosspayments/tosspayments-sdk';
-import type {
-  WidgetSelectedPaymentMethod,
-  WidgetPaymentMethodWidget,
-  WidgetAgreementWidget,
-  TossPaymentsWidgets,
-} from '@tosspayments/tosspayments-sdk';
+import type { TossPaymentsPayment } from '@tosspayments/tosspayments-sdk';
 import { ROUTES } from '@/lib/routes';
 
 const CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY;
@@ -35,10 +33,7 @@ interface MessageDialogState {
 }
 
 function CheckoutContent() {
-  const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
-  const [paymentMethodsWidget, setPaymentMethodsWidget] =
-    useState<WidgetPaymentMethodWidget | null>(null);
-  const [agreementWidget, setAgreementWidget] = useState<WidgetAgreementWidget | null>(null);
+  const [payment, setPayment] = useState<TossPaymentsPayment | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodType>('CARD');
   const [amount, setAmount] = useState({
     currency: 'KRW',
@@ -61,10 +56,12 @@ function CheckoutContent() {
   const [error, setError] = useState<string | null>(null);
 
   const [isPaymentSystemLoading, setIsPaymentSystemLoading] = useState<boolean>(true);
-  const [isPaymentWidgetReady, setIsPaymentWidgetReady] = useState<boolean>(false);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState<boolean>(false);
-  const [isAgreementAccepted, setIsAgreementAccepted] = useState<boolean>(true);
   const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
+  const [termsAgreed, setTermsAgreed] = useState({
+    finance: true,
+    privacy: true,
+  });
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -80,9 +77,10 @@ function CheckoutContent() {
     !customerInfo.address ||
     !customerInfo.detailAddress ||
     !customerInfo.zipCode ||
-    !isPaymentWidgetReady ||
-    !isAgreementAccepted ||
-    isPaymentProcessing;
+    !payment ||
+    isPaymentProcessing ||
+    !termsAgreed.finance ||
+    !termsAgreed.privacy;
 
   // 인증 상태 체크, 상품 정보 가져오기 및 구매자 정보 설정
   useEffect(() => {
@@ -143,11 +141,11 @@ function CheckoutContent() {
     }
   }, [authLoading, user, searchParams, router]);
 
-  // 결제 위젯 인스턴스 생성
+  // 결제 인스턴스 생성
   useEffect(() => {
     if (!user) return;
 
-    const initializePaymentWidget = async () => {
+    const initializePayment = async () => {
       try {
         if (!CLIENT_KEY) {
           throw new Error('토스페이먼츠 클라이언트 키가 설정되지 않았습니다.');
@@ -155,11 +153,11 @@ function CheckoutContent() {
 
         const tossPayments = await loadTossPayments(CLIENT_KEY);
 
-        const widgetInstance = tossPayments.widgets({
+        const paymentInstance = tossPayments.payment({
           customerKey: 'By2OIT0GcNVub6nYuallA',
         });
 
-        setWidgets(widgetInstance);
+        setPayment(paymentInstance);
         setIsPaymentSystemLoading(false);
       } catch (err) {
         console.error('토스페이먼츠 초기화 실패:', err);
@@ -168,84 +166,8 @@ function CheckoutContent() {
       }
     };
 
-    initializePaymentWidget();
+    initializePayment();
   }, [user]);
-
-  // 결제 위젯 렌더링
-  useEffect(() => {
-    if (!widgets || amount.value <= 0) return;
-
-    const renderPaymentWidget = async () => {
-      try {
-        // 기존 위젯이 있다면 먼저 정리
-        if (paymentMethodsWidget) {
-          await paymentMethodsWidget.destroy();
-          setPaymentMethodsWidget(null);
-        }
-        if (agreementWidget) {
-          await agreementWidget.destroy();
-          setAgreementWidget(null);
-        }
-
-        // 위젯 상태 초기화
-        setIsPaymentWidgetReady(false);
-
-        // 주문의 결제 금액 설정
-        await widgets.setAmount(amount);
-
-        // 결제 UI 렌더링
-        const paymentMethodWidgetInstance = await widgets.renderPaymentMethods({
-          selector: '#payment-methods',
-          variantKey: 'DEFAULT',
-        });
-
-        // 이용약관 UI 렌더링
-        const agreementWidgetInstance = await widgets.renderAgreement({
-          selector: '#agreement',
-          variantKey: 'AGREEMENT',
-        });
-
-        paymentMethodWidgetInstance.on(
-          'paymentMethodSelect',
-          (selectedPaymentMethod: WidgetSelectedPaymentMethod) => {
-            const method = selectedPaymentMethod.code as PaymentMethodType;
-            setSelectedPaymentMethod(method);
-          },
-        );
-
-        agreementWidgetInstance.on('agreementStatusChange', (agreementStatus) => {
-          setIsAgreementAccepted(agreementStatus.agreedRequiredTerms);
-        });
-
-        setPaymentMethodsWidget(paymentMethodWidgetInstance);
-        setAgreementWidget(agreementWidgetInstance);
-        setIsPaymentWidgetReady(true);
-      } catch (err) {
-        console.error('결제 위젯 렌더링 실패:', err);
-        setError('결제 위젯 렌더링에 실패했습니다.');
-      }
-    };
-
-    renderPaymentWidget();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [widgets, amount.value]);
-
-  const cleanupWidgets = useCallback(async () => {
-    if (paymentMethodsWidget) {
-      await paymentMethodsWidget.destroy();
-      setPaymentMethodsWidget(null);
-    }
-    if (agreementWidget) {
-      await agreementWidget.destroy();
-      setAgreementWidget(null);
-    }
-  }, [paymentMethodsWidget, agreementWidget]);
-
-  useEffect(() => {
-    return () => {
-      cleanupWidgets();
-    };
-  }, [cleanupWidgets]);
 
   const getTotalAmount = () => {
     return orderItems.reduce((total, item) => total + item.totalPrice, 0);
@@ -253,7 +175,7 @@ function CheckoutContent() {
 
   // 결제 요청
   const handlePayment = async () => {
-    if (!widgets || orderItems.length === 0 || isPaymentProcessing || !isAgreementAccepted) return;
+    if (!payment || orderItems.length === 0 || isPaymentProcessing) return;
 
     setIsPaymentProcessing(true);
     let orderCreated = false;
@@ -293,8 +215,8 @@ function CheckoutContent() {
 
       orderCreated = true;
 
-      // 토스페이먼츠 결제 요청
-      await widgets.requestPayment({
+      // 토스페이먼츠 결제창 요청
+      const basePaymentData = {
         orderId: currentOrderId,
         orderName:
           orderItems.length === 1
@@ -305,7 +227,45 @@ function CheckoutContent() {
         customerEmail: customerInfo.email,
         customerName: customerInfo.name,
         customerMobilePhone: customerInfo.phone,
-      });
+      };
+
+      if (selectedPaymentMethod === 'CARD') {
+        await payment.requestPayment({
+          ...basePaymentData,
+          method: 'CARD',
+          amount: amount,
+          card: {
+            useEscrow: false,
+            useCardPoint: false,
+            useAppCardOnly: false,
+          },
+        });
+      } else if (selectedPaymentMethod === 'TRANSFER') {
+        await payment.requestPayment({
+          ...basePaymentData,
+          method: 'TRANSFER',
+          amount: amount,
+          transfer: {
+            cashReceipt: {
+              type: '소득공제',
+            },
+            useEscrow: false,
+          },
+        });
+      } else if (selectedPaymentMethod === 'VIRTUAL_ACCOUNT') {
+        await payment.requestPayment({
+          ...basePaymentData,
+          method: 'VIRTUAL_ACCOUNT',
+          amount: amount,
+          virtualAccount: {
+            cashReceipt: {
+              type: '소득공제',
+            },
+            useEscrow: false,
+            validHours: 24,
+          },
+        });
+      }
     } catch (err) {
       console.error('결제 요청 실패:', err);
 
@@ -490,7 +450,39 @@ function CheckoutContent() {
           <div className='space-y-6'>
             <div className='rounded-lg border border-gray-200 p-6'>
               <h2 className='mb-4 text-lg font-semibold text-gray-900'>결제 수단</h2>
-              <div id='payment-methods' />
+              <RadioGroup
+                value={selectedPaymentMethod}
+                onValueChange={(value) => setSelectedPaymentMethod(value as PaymentMethodType)}
+                className='space-y-3'
+              >
+                <div className='flex items-center space-x-3'>
+                  <RadioGroupItem value='CARD' id='card' />
+                  <Label
+                    htmlFor='card'
+                    className='cursor-pointer text-sm font-medium text-gray-900'
+                  >
+                    신용/체크카드
+                  </Label>
+                </div>
+                <div className='flex items-center space-x-3'>
+                  <RadioGroupItem value='TRANSFER' id='transfer' />
+                  <Label
+                    htmlFor='transfer'
+                    className='cursor-pointer text-sm font-medium text-gray-900'
+                  >
+                    계좌이체
+                  </Label>
+                </div>
+                <div className='flex items-center space-x-3'>
+                  <RadioGroupItem value='VIRTUAL_ACCOUNT' id='virtual-account' />
+                  <Label
+                    htmlFor='virtual-account'
+                    className='cursor-pointer text-sm font-medium text-gray-900'
+                  >
+                    가상계좌
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
 
             <div className='rounded-lg border border-gray-200 p-6'>
@@ -514,7 +506,48 @@ function CheckoutContent() {
 
             <div className='rounded-lg border border-gray-200 p-6'>
               <h2 className='mb-4 text-lg font-semibold text-gray-900'>이용약관 동의</h2>
-              <div id='agreement' />
+              <div className='space-y-3'>
+                <div className='flex cursor-pointer items-start space-x-3'>
+                  <Checkbox
+                    id='terms-finance'
+                    checked={termsAgreed.finance}
+                    onCheckedChange={(checked) =>
+                      setTermsAgreed((prev) => ({ ...prev, finance: !!checked }))
+                    }
+                    className='mt-1'
+                  />
+                  <Label htmlFor='terms-finance' className='cursor-pointer'>
+                    <div className='text-sm'>
+                      <span className='font-medium text-gray-900'>
+                        [필수] 전자금융거래 이용약관
+                      </span>
+                      <p className='mt-1 text-gray-600'>
+                        전자금융거래법에 따른 이용약관에 동의합니다.
+                      </p>
+                    </div>
+                  </Label>
+                </div>
+                <div className='flex cursor-pointer items-start space-x-3'>
+                  <Checkbox
+                    id='terms-privacy'
+                    checked={termsAgreed.privacy}
+                    onCheckedChange={(checked) =>
+                      setTermsAgreed((prev) => ({ ...prev, privacy: !!checked }))
+                    }
+                    className='mt-1'
+                  />
+                  <Label htmlFor='terms-privacy' className='cursor-pointer'>
+                    <div className='text-sm'>
+                      <span className='font-medium text-gray-900'>
+                        [필수] 개인정보 수집 및 이용
+                      </span>
+                      <p className='mt-1 text-gray-600'>
+                        결제 처리를 위한 개인정보 수집 및 이용에 동의합니다.
+                      </p>
+                    </div>
+                  </Label>
+                </div>
+              </div>
             </div>
 
             <div className='space-y-3'>
