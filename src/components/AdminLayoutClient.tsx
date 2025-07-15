@@ -16,6 +16,7 @@ import {
   PieChart,
   FileText,
   ShoppingCart,
+  RefreshCw,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -81,6 +82,11 @@ const menuItems: MenuItem[] = [
         label: '주문내역',
         href: ROUTES.ADMIN_ORDERLIST,
         icon: <ShoppingCart className='h-4 w-4' />,
+      },
+      {
+        label: '교환/반품내역',
+        href: ROUTES.ADMIN_RETURNLIST,
+        icon: <RefreshCw className='h-4 w-4' />,
       },
     ],
   },
