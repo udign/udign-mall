@@ -10,6 +10,7 @@ import CommonPagination from '@/components/CommonPagination';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/primitives/tabs';
 import { OrderListItem } from '@/app/api/admin/order-list/route';
 import { ROUTES } from '@/lib/routes';
+import { formatOrderId, formatDateOnly } from '@/lib/utils';
 
 interface OrderListData {
   orders: OrderListItem[];
@@ -34,15 +35,6 @@ interface ApiResponse {
   data?: OrderListData;
   error?: string;
 }
-
-// 주문번호 포맷팅 유틸 함수
-const formatOrderId = (odId: string | number): string => {
-  const odIdStr = String(odId);
-  if (odIdStr.length === 16) {
-    return `${odIdStr.substring(0, 8)}-${odIdStr.substring(8)}`;
-  }
-  return `${odIdStr.substring(0, 6)}-${odIdStr.substring(6)}`;
-};
 
 // 결제수단 표시명 변환 유틸 함수
 const getPaymentMethodDisplay = (settleCase: string): string => {
@@ -271,7 +263,7 @@ export default function OrderListPage() {
                                 {formatOrderId(order.od_id)}
                               </div>
                               <div className='text-xs text-gray-500'>
-                                {new Date(order.od_time).toLocaleDateString('ko-KR')}
+                                {formatDateOnly(order.od_time)}
                               </div>
                               {order.od_mobile === 1 && (
                                 <span className='inline-block rounded bg-green-100 px-1 text-xs text-green-800'>
@@ -368,7 +360,7 @@ export default function OrderListPage() {
                                 {formatOrderId(order.od_id)}
                               </div>
                               <div className='text-xs text-gray-500'>
-                                {new Date(order.od_time).toLocaleDateString('ko-KR')}
+                                {formatDateOnly(order.od_time)}
                               </div>
                             </div>
                           </td>
@@ -487,7 +479,7 @@ export default function OrderListPage() {
                                 {formatOrderId(order.od_id)}
                               </div>
                               <div className='text-xs text-gray-500'>
-                                {new Date(order.od_time).toLocaleDateString('ko-KR')}
+                                {formatDateOnly(order.od_time)}
                               </div>
                             </div>
                           </td>
@@ -583,7 +575,7 @@ export default function OrderListPage() {
                                 {formatOrderId(order.od_id)}
                               </div>
                               <div className='text-xs text-gray-500'>
-                                {new Date(order.od_time).toLocaleDateString('ko-KR')}
+                                {formatDateOnly(order.od_time)}
                               </div>
                             </div>
                           </td>

@@ -9,6 +9,7 @@ import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import { CheckCircleIcon } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
+import { formatDateOnly, formatTimeOnly } from '@/lib/utils';
 
 interface PaymentData {
   orderId: string;
@@ -86,8 +87,8 @@ function PaymentSuccessContent() {
               orderId: paymentData.orderId,
               amount: paymentData.amount,
               customerName: user?.mb_name || '',
-              orderDate: new Date(paymentData.approvedAt).toLocaleDateString('ko-KR'),
-              orderTime: new Date(paymentData.approvedAt).toLocaleTimeString('ko-KR'),
+              orderDate: formatDateOnly(paymentData.approvedAt),
+              orderTime: formatTimeOnly(paymentData.approvedAt),
               paymentMethod: getPaymentMethodName(paymentData.method),
               paymentKey: paymentData.paymentKey,
             });
