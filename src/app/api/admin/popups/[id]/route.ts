@@ -1,5 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/database';
+import { del } from '@vercel/blob';
+
+// HTML 내용에서 이미지 URL을 추출하는 함수
+export const extractImageUrls = (htmlContent: string): string[] => {
+  if (!htmlContent) return [];
+
+  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+  const urls: string[] = [];
+  let match;
+
+  while ((match = imgRegex.exec(htmlContent)) !== null) {
+    const url = match[1];
+    // Vercel Storage URL만 추출 (blob.vercel-storage.com 포함)
+    if (url.includes('blob.vercel-storage.com') && url.includes('/popup/')) {
+      urls.push(url);
+    }
+  }
+
+  return urls;
+};
+
+// Vercel Storage에서 이미지 삭제
+const deleteImageFromStorage = async (imageUrl: string): Promise<void> => {
+  try {
+    await del(imageUrl, {
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    console.log(`이미지 삭제 완료: ${imageUrl}`);
+  } catch (error) {
+    console.error(`이미지 삭제 실패: ${imageUrl}`, error);
+  }
+};
 
 export const DELETE = async (request: NextRequest, { params }: { params: { id: string } }) => {
   try {
@@ -61,14 +93,25 @@ export const PUT = async (request: NextRequest, { params }: { params: { id: stri
 
     const data = await request.json();
 
-    // 팝업 존재 여부 확인
-    const existingPopup = await executeQuery('SELECT nw_id FROM g5_new_win WHERE nw_id = ?', [
-      popupId,
-    ]);
+    // 기존 팝업 내용 조회 (이미지 비교용)
+    const existingPopupResult = await executeQuery(
+      'SELECT nw_content FROM g5_new_win WHERE nw_id = ?',
+      [popupId],
+    );
 
-    if (!Array.isArray(existingPopup) || existingPopup.length === 0) {
+    if (!Array.isArray(existingPopupResult) || existingPopupResult.length === 0) {
       return NextResponse.json({ error: '팝업을 찾을 수 없습니다.' }, { status: 404 });
     }
+
+    const existingContent = (existingPopupResult[0] as { nw_content: string }).nw_content || '';
+    const newContent = data.nw_content || '';
+
+    // 기존 이미지 URL과 새로운 이미지 URL 추출
+    const existingImageUrls = extractImageUrls(existingContent);
+    const newImageUrls = extractImageUrls(newContent);
+
+    // 삭제된 이미지 URL 찾기
+    const deletedImageUrls = existingImageUrls.filter((url) => !newImageUrls.includes(url));
 
     // 팝업 정보 업데이트
     await executeQuery(
@@ -103,7 +146,19 @@ export const PUT = async (request: NextRequest, { params }: { params: { id: stri
       ],
     );
 
-    return NextResponse.json({ success: true, message: '팝업이 성공적으로 수정되었습니다.' });
+    // 삭제된 이미지들을 Vercel Storage에서 제거
+    if (deletedImageUrls.length > 0) {
+      console.log(`삭제할 이미지 ${deletedImageUrls.length}개:`, deletedImageUrls);
+
+      // 이미지 삭제를 병렬로 처리
+      await Promise.allSettled(deletedImageUrls.map((url) => deleteImageFromStorage(url)));
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: '팝업이 성공적으로 수정되었습니다.',
+      deletedImages: deletedImageUrls.length,
+    });
   } catch (error) {
     console.error('팝업 수정 오류:', error);
     return NextResponse.json({ error: '팝업 수정 중 오류가 발생했습니다.' }, { status: 500 });

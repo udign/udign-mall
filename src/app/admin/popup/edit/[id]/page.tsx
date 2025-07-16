@@ -560,6 +560,7 @@ export default function PopupEditPage() {
                             content={field.value || ''}
                             onChange={field.onChange}
                             placeholder='팝업 내용을 입력하세요'
+                            popupId={popupId}
                           />
                         </FormControl>
                         <p className='text-xs text-gray-500'>

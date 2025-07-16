@@ -91,7 +91,7 @@ export default function PopupDisplay() {
                 onClick={() => handleDontShowAgain(popup.nw_id, popup.nw_disable_hours)}
                 className='text-xs'
               >
-                <strong>{popup.nw_disable_hours}</strong>시간 동안 다시 열람하지 않습니다
+                <p>{popup.nw_disable_hours} 시간 동안 열지 않기</p>
               </Button>
 
               <Button
