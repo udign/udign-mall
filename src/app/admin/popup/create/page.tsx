@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CalendarIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { PERMISSION_CHECKS } from '@/lib/constants';
 import { POPUP_DEVICE_LABELS, POPUP_DIVISION_LABELS } from '@/types/popup';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
-import { formatDateTime } from '@/lib/utils';
 import dayjs from 'dayjs';
 import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
@@ -34,6 +33,9 @@ import {
   FormMessage,
 } from '@/components/ui/primitives/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/primitives/popover';
+import { Calendar } from '@/components/ui/primitives/calendar';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 type PopupFormData = z.infer<typeof popupFormSchema>;
 
@@ -54,8 +56,13 @@ const popupFormSchema = z.object({
 
 export default function PopupCreatePage() {
   const router = useRouter();
-
   const { user, isLoading: authLoading } = useAuth();
+
+  // MessageDialog 상태 관리
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [dialogMessage, setDialogMessage] = useState('');
+  const [dialogConfirm, setDialogConfirm] = useState<(() => void) | undefined>(undefined);
 
   const form = useForm<PopupFormData>({
     resolver: zodResolver(popupFormSchema),
@@ -91,16 +98,37 @@ export default function PopupCreatePage() {
 
   const handleTodayStart = (checked: boolean) => {
     if (checked) {
-      const today = dayjs().startOf('day').toDate();
-      form.setValue('nw_begin_time', formatDateTime(today));
+      const today = dayjs().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+      form.setValue('nw_begin_time', today);
     }
   };
 
   const handleWeekLaterEnd = (checked: boolean) => {
     if (checked) {
-      const weekLater = dayjs().add(7, 'day').endOf('day').toDate();
-      form.setValue('nw_end_time', formatDateTime(weekLater));
+      const weekLater = dayjs().add(7, 'day').endOf('day').format('YYYY-MM-DD HH:mm:ss');
+      form.setValue('nw_end_time', weekLater);
     }
+  };
+
+  const handleStartDateSelect = (date: Date | undefined) => {
+    if (date) {
+      const startTime = dayjs(date).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+      form.setValue('nw_begin_time', startTime);
+    }
+  };
+
+  const handleEndDateSelect = (date: Date | undefined) => {
+    if (date) {
+      const endTime = dayjs(date).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+      form.setValue('nw_end_time', endTime);
+    }
+  };
+
+  const showDialog = (title: string, message: string, onConfirm?: () => void) => {
+    setDialogTitle(title);
+    setDialogMessage(message);
+    setDialogConfirm(() => onConfirm);
+    setDialogOpen(true);
   };
 
   const onSubmit = async (data: PopupFormData) => {
@@ -118,10 +146,11 @@ export default function PopupCreatePage() {
         throw new Error(errorData.error || '팝업 생성에 실패했습니다.');
       }
 
-      alert('팝업이 성공적으로 생성되었습니다.');
-      router.push(ROUTES.ADMIN_POPUP);
+      showDialog('성공', '팝업이 성공적으로 생성되었습니다.', () => {
+        router.push(ROUTES.ADMIN_POPUP);
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : '팝업 생성 중 오류가 발생했습니다.');
+      showDialog('오류', err instanceof Error ? err.message : '팝업 생성 중 오류가 발생했습니다.');
     }
   };
 
@@ -254,14 +283,29 @@ export default function PopupCreatePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>시작일시 *</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='datetime-local'
-                          {...field}
-                          value={field.value ? field.value.replace(' ', 'T') : ''}
-                          onChange={(e) => field.onChange(e.target.value.replace('T', ' '))}
-                        />
-                      </FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant='outline'
+                              className='w-full justify-start text-left font-normal'
+                            >
+                              <CalendarIcon className='mr-2 h-4 w-4' />
+                              {field.value
+                                ? dayjs(field.value).format('YYYY년 MM월 DD일 (00:00)')
+                                : '시작일을 선택하세요'}
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-auto p-0'>
+                          <Calendar
+                            mode='single'
+                            selected={field.value ? dayjs(field.value).toDate() : undefined}
+                            onSelect={handleStartDateSelect}
+                            captionLayout='dropdown'
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <div className='flex items-center space-x-2 pt-2'>
                         <Checkbox onCheckedChange={handleTodayStart} />
                         <span className='text-sm text-gray-600'>오늘 00:00으로 설정</span>
@@ -277,14 +321,29 @@ export default function PopupCreatePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>종료일시 *</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='datetime-local'
-                          {...field}
-                          value={field.value ? field.value.replace(' ', 'T') : ''}
-                          onChange={(e) => field.onChange(e.target.value.replace('T', ' '))}
-                        />
-                      </FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant='outline'
+                              className='w-full justify-start text-left font-normal'
+                            >
+                              <CalendarIcon className='mr-2 h-4 w-4' />
+                              {field.value
+                                ? dayjs(field.value).format('YYYY년 MM월 DD일 (23:59)')
+                                : '종료일을 선택하세요'}
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-auto p-0'>
+                          <Calendar
+                            mode='single'
+                            selected={field.value ? dayjs(field.value).toDate() : undefined}
+                            onSelect={handleEndDateSelect}
+                            captionLayout='dropdown'
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <div className='flex items-center space-x-2 pt-2'>
                         <Checkbox onCheckedChange={handleWeekLaterEnd} />
                         <span className='text-sm text-gray-600'>일주일 후 23:59으로 설정</span>
@@ -472,6 +531,14 @@ export default function PopupCreatePage() {
           </div>
         </form>
       </Form>
+
+      <MessageDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={dialogTitle}
+        description={dialogMessage}
+        onConfirm={dialogConfirm}
+      />
     </div>
   );
 }
