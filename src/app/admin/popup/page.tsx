@@ -9,6 +9,7 @@ import { PopupListResponse, PopupListItem, POPUP_DEVICE_LABELS } from '@/types/p
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import CommonPagination from '@/components/CommonPagination';
 import { Button } from '@/components/ui/primitives/button';
+import MessageDialog from '@/components/ui/MessageDialog';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 import { formatDate, truncateText } from '@/lib/utils';
 
@@ -29,6 +30,11 @@ export default function PopupListPage() {
   const [data, setData] = useState<PopupListResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogMessage, setDialogMessage] = useState<string>('');
+  const [dialogConfirm, setDialogConfirm] = useState<(() => void) | undefined>(undefined);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -84,15 +90,18 @@ export default function PopupListPage() {
     }
   }, [currentPage, user, searchParams, router]);
 
+  const showDialog = (title: string, message: string, onConfirm?: () => void) => {
+    setDialogTitle(title);
+    setDialogMessage(message);
+    setDialogConfirm(() => onConfirm);
+    setDialogOpen(true);
+  };
+
   const handleEdit = (popupId: number) => {
     router.push(`${ROUTES.ADMIN_POPUP_EDIT}/${popupId}`);
   };
 
-  const handleDelete = async (popupId: number, popupTitle: string) => {
-    if (!confirm(`'${popupTitle}' 팝업을 삭제하시겠습니까?`)) {
-      return;
-    }
-
+  const performDelete = async (popupId: number) => {
     try {
       const response = await fetch(`/api/admin/popups/${popupId}`, {
         method: 'DELETE',
@@ -102,11 +111,18 @@ export default function PopupListPage() {
         throw new Error('삭제에 실패했습니다.');
       }
 
-      alert('팝업이 삭제되었습니다.');
-      fetchData(currentPage);
+      showDialog('성공', '팝업이 삭제되었습니다.', () => {
+        fetchData(currentPage);
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : '삭제 중 오류가 발생했습니다.');
+      showDialog('오류', err instanceof Error ? err.message : '삭제 중 오류가 발생했습니다.');
     }
+  };
+
+  const handleDelete = (popupId: number, popupTitle: string) => {
+    showDialog('삭제 확인', `'${popupTitle}' 팝업을 삭제하시겠습니까?`, () =>
+      performDelete(popupId),
+    );
   };
 
   return authLoading ? (
@@ -117,12 +133,7 @@ export default function PopupListPage() {
     <div className='flex min-h-screen items-center justify-center'>
       <div className='text-center'>
         <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
-        <button
-          onClick={() => router.push(ROUTES.LOGIN)}
-          className='rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
-        >
-          로그인하기
-        </button>
+        <Button onClick={() => router.push(ROUTES.LOGIN)}>로그인하기</Button>
       </div>
     </div>
   ) : loading ? (
@@ -133,12 +144,7 @@ export default function PopupListPage() {
     <div className='flex min-h-96 items-center justify-center'>
       <div className='text-center'>
         <p className='mb-4 text-red-600'>{error}</p>
-        <button
-          onClick={() => fetchData(currentPage)}
-          className='rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
-        >
-          다시 시도
-        </button>
+        <Button onClick={() => fetchData(currentPage)}>다시 시도</Button>
       </div>
     </div>
   ) : !data ? (
@@ -170,7 +176,7 @@ export default function PopupListPage() {
                 {tableHeaders.map((header) => (
                   <th
                     key={header}
-                    className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'
+                    className='px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase'
                   >
                     {header}
                   </th>
@@ -217,18 +223,22 @@ export default function PopupListPage() {
                   </td>
                   <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
                     <div className='flex space-x-2'>
-                      <button
+                      <Button
+                        variant='ghost'
+                        size='sm'
                         onClick={() => handleEdit(popup.nw_id)}
                         className='text-blue-600 hover:text-blue-900'
                       >
                         수정
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        size='sm'
                         onClick={() => handleDelete(popup.nw_id, popup.nw_subject)}
                         className='text-red-600 hover:text-red-900'
                       >
                         삭제
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -251,6 +261,14 @@ export default function PopupListPage() {
           pathname={ROUTES.ADMIN_POPUP}
         />
       </div>
+
+      <MessageDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={dialogTitle}
+        description={dialogMessage}
+        onConfirm={dialogConfirm}
+      />
     </div>
   );
 }

@@ -55,14 +55,14 @@ const popupFormSchema = z.object({
 });
 
 export default function PopupCreatePage() {
-  const router = useRouter();
-  const { user, isLoading: authLoading } = useAuth();
-
-  // MessageDialog 상태 관리
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogTitle, setDialogTitle] = useState('');
-  const [dialogMessage, setDialogMessage] = useState('');
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogMessage, setDialogMessage] = useState<string>('');
   const [dialogConfirm, setDialogConfirm] = useState<(() => void) | undefined>(undefined);
+
+  const router = useRouter();
+
+  const { user, isLoading: authLoading } = useAuth();
 
   const form = useForm<PopupFormData>({
     resolver: zodResolver(popupFormSchema),

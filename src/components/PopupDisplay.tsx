@@ -11,9 +11,6 @@ export default function PopupDisplay() {
   const [popups, setPopups] = useState<DisplayPopup[]>([]);
   const [hiddenPopups, setHiddenPopups] = useState<Set<number>>(new Set());
 
-  console.log('popups', popups);
-  console.log('hiddenPopups', hiddenPopups);
-
   const isMobile = useIsMobile();
 
   const visiblePopups = popups.filter((popup) => !hiddenPopups.has(popup.nw_id));

@@ -10,7 +10,7 @@ import { ArrowLeft, CalendarIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { PERMISSION_CHECKS } from '@/lib/constants';
-import { POPUP_DEVICE_LABELS, POPUP_DIVISION_LABELS } from '@/types/popup';
+import { POPUP_DEVICE_LABELS, POPUP_DIVISION_LABELS, Popup } from '@/types/popup';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import dayjs from 'dayjs';
 import { Button } from '@/components/ui/primitives/button';
@@ -55,17 +55,18 @@ const popupFormSchema = z.object({
 });
 
 export default function PopupEditPage() {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [popup, setPopup] = useState<Popup | null>(null);
+
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogMessage, setDialogMessage] = useState<string>('');
+  const [dialogConfirm, setDialogConfirm] = useState<(() => void) | undefined>(undefined);
+
   const router = useRouter();
   const params = useParams();
+
   const { user, isLoading: authLoading } = useAuth();
-
-  const [loading, setLoading] = useState(true);
-  const [popup, setPopup] = useState(null);
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogTitle, setDialogTitle] = useState('');
-  const [dialogMessage, setDialogMessage] = useState('');
-  const [dialogConfirm, setDialogConfirm] = useState<(() => void) | undefined>(undefined);
 
   const popupId = params.id as string;
 
@@ -101,7 +102,6 @@ export default function PopupEditPage() {
     }
   }, [user, authLoading, router]);
 
-  // 팝업 데이터 불러오기
   useEffect(() => {
     const fetchPopup = async () => {
       if (!popupId) return;
