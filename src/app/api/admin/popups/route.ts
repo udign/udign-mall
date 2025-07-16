@@ -3,6 +3,54 @@ import { executeQuery } from '@/lib/database';
 import { getCurrentUser } from '@/lib/auth';
 import { PopupListResponse, PopupListItem, CreatePopupRequest } from '@/types/popup';
 import { PERMISSION_CHECKS } from '@/lib/constants';
+import { put, del, list } from '@vercel/blob';
+
+// 임시 폴더의 이미지를 정식 팝업 폴더로 이동하는 함수
+const moveImagesFromTempToPopup = async (tempPopupId: string, popupId: number, content: string) => {
+  try {
+    // 임시 폴더의 이미지 목록 조회
+    const { blobs } = await list({
+      prefix: `popup/${tempPopupId}/`,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+
+    let updatedContent = content;
+
+    // 각 이미지를 새로운 경로로 복사하고 HTML 내용 업데이트
+    for (const blob of blobs) {
+      const oldUrl = blob.url;
+      const fileName = blob.pathname.split('/').pop();
+
+      if (fileName) {
+        // 이미지 데이터 가져오기
+        const response = await fetch(oldUrl);
+        const imageData = await response.blob();
+
+        // 새로운 경로로 업로드
+        const newBlob = await put(`popup/${popupId}/${fileName}`, imageData, {
+          access: 'public',
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+
+        // HTML 내용에서 이미지 URL 교체
+        updatedContent = updatedContent.replace(
+          new RegExp(oldUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+          newBlob.url,
+        );
+
+        // 임시 이미지 삭제
+        await del(oldUrl, {
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+      }
+    }
+
+    return updatedContent;
+  } catch (error) {
+    console.error('이미지 이동 중 오류:', error);
+    return content; // 오류 시 원본 내용 반환
+  }
+};
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -97,7 +145,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    const body: CreatePopupRequest = await request.json();
+    const body: CreatePopupRequest & { tempPopupId?: string } = await request.json();
 
     // 필수 필드 검증
     if (!body.nw_subject || !body.nw_begin_time || !body.nw_end_time) {
@@ -130,9 +178,24 @@ export const POST = async (request: NextRequest) => {
     );
 
     const insertResult = result as { insertId: number };
+    const popupId = insertResult.insertId;
+
+    // 임시 폴더의 이미지를 정식 폴더로 이동
+    let finalContent = body.nw_content;
+    if (body.tempPopupId && body.nw_content) {
+      finalContent = await moveImagesFromTempToPopup(body.tempPopupId, popupId, body.nw_content);
+
+      // 이미지 경로가 변경된 경우 팝업 내용 업데이트
+      if (finalContent !== body.nw_content) {
+        await executeQuery('UPDATE g5_new_win SET nw_content = ? WHERE nw_id = ?', [
+          finalContent,
+          popupId,
+        ]);
+      }
+    }
 
     return NextResponse.json(
-      { message: '팝업이 성공적으로 생성되었습니다.', nw_id: insertResult.insertId },
+      { message: '팝업이 성공적으로 생성되었습니다.', nw_id: popupId },
       { status: 201 },
     );
   } catch (error) {

@@ -75,7 +75,7 @@ export default function PopupDisplay() {
               {popup.nw_content ? (
                 <div
                   dangerouslySetInnerHTML={{ __html: popup.nw_content }}
-                  className='prose prose-sm max-w-none'
+                  className='prose prose-sm max-w-none [&_img]:h-auto [&_img]:max-w-full'
                 />
               ) : (
                 <div className='flex h-full items-center justify-center'>

@@ -59,6 +59,11 @@ export default function PopupCreatePage() {
   const [dialogMessage, setDialogMessage] = useState<string>('');
   const [dialogConfirm, setDialogConfirm] = useState<(() => void) | undefined>(undefined);
 
+  // 임시 팝업 ID 생성 (이미지 업로드용)
+  const [tempPopupId] = useState<string>(() => {
+    return `temp_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  });
+
   const router = useRouter();
 
   const { user, isLoading: authLoading } = useAuth();
@@ -79,6 +84,8 @@ export default function PopupCreatePage() {
       nw_content: '',
     },
   });
+
+  console.log('폼', form);
 
   useEffect(() => {
     if (authLoading) return;
@@ -131,8 +138,8 @@ export default function PopupCreatePage() {
 
   const onSubmit = async (data: PopupFormData) => {
     try {
-      // HTML이 기본적으로 사용되므로 nw_content_html: 1을 추가
-      const submitData = { ...data, nw_content_html: 1 };
+      // HTML이 기본적으로 사용되므로 nw_content_html: 1을 추가하고 tempPopupId도 포함
+      const submitData = { ...data, nw_content_html: 1, tempPopupId };
 
       const response = await fetch('/api/admin/popups', {
         method: 'POST',
@@ -494,6 +501,7 @@ export default function PopupCreatePage() {
                             content={field.value || ''}
                             onChange={field.onChange}
                             placeholder='팝업 내용을 입력하세요'
+                            popupId={tempPopupId}
                           />
                         </FormControl>
                         <p className='text-xs text-gray-500'>
