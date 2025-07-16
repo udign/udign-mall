@@ -54,6 +54,11 @@ export const formatTimeOnly = (dateString: string): string => {
   return dayjs(dateString).locale('ko').format('HH:mm');
 };
 
+// Date 객체를 YYYY-MM-DD HH:MM:SS 형식으로 포맷
+export const formatDateTime = (date: Date): string => {
+  return dayjs(date).locale('ko').format('YYYY-MM-DD HH:mm:ss');
+};
+
 // 텍스트 자르기 함수
 export const truncateText = (text: string, maxLength: number): string => {
   if (text.length <= maxLength) return text;

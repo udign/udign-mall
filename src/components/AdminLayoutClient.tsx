@@ -17,6 +17,8 @@ import {
   FileText,
   ShoppingCart,
   RefreshCw,
+  Settings,
+  Monitor,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -108,6 +110,17 @@ const menuItems: MenuItem[] = [
         label: '주문내역 출력',
         href: ROUTES.ADMIN_ORDERPRINT,
         icon: <FileText className='h-4 w-4' />,
+      },
+    ],
+  },
+  {
+    label: '쇼핑몰 설정',
+    icon: <Settings className='h-4 w-4' />,
+    subMenus: [
+      {
+        label: '팝업 관리',
+        href: ROUTES.ADMIN_POPUP,
+        icon: <Monitor className='h-4 w-4' />,
       },
     ],
   },
