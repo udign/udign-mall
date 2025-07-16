@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/primitives/select';
-import { Textarea } from '@/components/ui/primitives/textarea';
+import { TiptapEditor } from '@/components/ui/TiptapEditor';
 import { Checkbox } from '@/components/ui/primitives/checkbox';
 import {
   Form,
@@ -51,7 +51,6 @@ const popupFormSchema = z.object({
   nw_width: z.number().min(200, '너비는 200px 이상이어야 합니다'),
   nw_subject: z.string().min(1, '팝업 제목을 입력해주세요'),
   nw_content: z.string().min(1, '팝업 내용을 입력해주세요'),
-  nw_content_html: z.number(),
 });
 
 export default function PopupCreatePage() {
@@ -78,7 +77,6 @@ export default function PopupCreatePage() {
       nw_width: 450,
       nw_subject: '',
       nw_content: '',
-      nw_content_html: 1,
     },
   });
 
@@ -133,12 +131,15 @@ export default function PopupCreatePage() {
 
   const onSubmit = async (data: PopupFormData) => {
     try {
+      // HTML이 기본적으로 사용되므로 nw_content_html: 1을 추가
+      const submitData = { ...data, nw_content_html: 1 };
+
       const response = await fetch('/api/admin/popups', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submitData),
       });
 
       if (!response.ok) {
@@ -154,391 +155,379 @@ export default function PopupCreatePage() {
     }
   };
 
-  return authLoading ? (
-    <div className='flex min-h-screen items-center justify-center'>
-      <LoadingSpinner size='lg' message='권한을 확인하는 중...' />
-    </div>
-  ) : !user || !PERMISSION_CHECKS.isAdmin(user.mb_level) ? (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='text-center'>
-        <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
-        <Button onClick={() => router.push(ROUTES.LOGIN)}>로그인하기</Button>
-      </div>
-    </div>
-  ) : (
-    <div className='min-h-screen'>
-      <div className='mb-6 flex items-center justify-between'>
-        <div className='flex items-center space-x-4'>
-          <Link href={ROUTES.ADMIN_POPUP}>
-            <Button variant='outline' size='sm'>
-              <ArrowLeft className='h-4 w-4' />
-            </Button>
-          </Link>
-          <h1 className='text-2xl font-bold text-gray-900'>팝업 생성</h1>
+  return (
+    <>
+      {authLoading && (
+        <div className='flex min-h-screen items-center justify-center'>
+          <LoadingSpinner size='lg' message='권한을 확인하는 중...' />
         </div>
-      </div>
+      )}
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-          <Card>
-            <CardHeader>
-              <CardTitle>기본 설정</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='nw_device'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>접속기기 *</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder='접속기기를 선택하세요' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.entries(POPUP_DEVICE_LABELS).map(([value, label]) => (
-                            <SelectItem key={value} value={value}>
-                              {label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className='text-xs text-gray-500'>
-                        팝업레이어가 표시될 접속기기를 설정합니다.
-                      </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='nw_division'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>구분 *</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder='구분을 선택하세요' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.entries(POPUP_DIVISION_LABELS).map(([value, label]) => (
-                            <SelectItem key={value} value={value}>
-                              {label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className='text-xs text-gray-500'>팝업이 표시될 영역을 설정합니다.</p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name='nw_disable_hours'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>비활성화 시간 *</FormLabel>
-                    <div className='flex items-center space-x-2'>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          min='1'
-                          placeholder='24'
-                          className='w-24'
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                      <span className='text-sm text-gray-600'>시간</span>
-                    </div>
-                    <p className='text-xs text-gray-500'>
-                      고객이 다시 보지 않음을 선택할 시 몇 시간동안 팝업레이어를 보여주지 않을지
-                      설정합니다.
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>시간 설정</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='nw_begin_time'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>시작일시 *</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant='outline'
-                              className='w-full justify-start text-left font-normal'
-                            >
-                              <CalendarIcon className='mr-2 h-4 w-4' />
-                              {field.value
-                                ? dayjs(field.value).format('YYYY년 MM월 DD일 (00:00)')
-                                : '시작일을 선택하세요'}
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className='w-auto p-0'>
-                          <Calendar
-                            mode='single'
-                            selected={field.value ? dayjs(field.value).toDate() : undefined}
-                            onSelect={handleStartDateSelect}
-                            captionLayout='dropdown'
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <div className='flex items-center space-x-2 pt-2'>
-                        <Checkbox onCheckedChange={handleTodayStart} />
-                        <span className='text-sm text-gray-600'>오늘 00:00으로 설정</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='nw_end_time'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>종료일시 *</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant='outline'
-                              className='w-full justify-start text-left font-normal'
-                            >
-                              <CalendarIcon className='mr-2 h-4 w-4' />
-                              {field.value
-                                ? dayjs(field.value).format('YYYY년 MM월 DD일 (23:59)')
-                                : '종료일을 선택하세요'}
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className='w-auto p-0'>
-                          <Calendar
-                            mode='single'
-                            selected={field.value ? dayjs(field.value).toDate() : undefined}
-                            onSelect={handleEndDateSelect}
-                            captionLayout='dropdown'
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <div className='flex items-center space-x-2 pt-2'>
-                        <Checkbox onCheckedChange={handleWeekLaterEnd} />
-                        <span className='text-sm text-gray-600'>일주일 후 23:59으로 설정</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>위치 및 크기</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <div className='grid grid-cols-4 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='nw_left'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>좌측위치</FormLabel>
-                      <div className='flex items-center space-x-2'>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            min='0'
-                            placeholder='10'
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <span className='text-sm text-gray-500'>px</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='nw_top'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>상단위치</FormLabel>
-                      <div className='flex items-center space-x-2'>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            min='0'
-                            placeholder='10'
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <span className='text-sm text-gray-500'>px</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='nw_width'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>가로크기</FormLabel>
-                      <div className='flex items-center space-x-2'>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            min='200'
-                            placeholder='450'
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <span className='text-sm text-gray-500'>px</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='nw_height'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>세로크기</FormLabel>
-                      <div className='flex items-center space-x-2'>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            min='100'
-                            placeholder='500'
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <span className='text-sm text-gray-500'>px</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>팝업 내용</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <FormField
-                control={form.control}
-                name='nw_subject'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>팝업 제목 *</FormLabel>
-                    <FormControl>
-                      <Input placeholder='팝업 제목을 입력하세요' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='nw_content'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>팝업 내용 *</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder='팝업 내용을 입력하세요 (HTML 태그 사용 가능)'
-                        rows={10}
-                        {...field}
-                      />
-                    </FormControl>
-                    <p className='text-xs text-gray-500'>
-                      HTML 태그를 사용하여 내용을 꾸밀 수 있습니다.
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='nw_content_html'
-                render={({ field }) => (
-                  <FormItem>
-                    <div className='flex items-center space-x-2'>
-                      <Checkbox
-                        checked={field.value === 1}
-                        onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
-                      />
-                      <FormLabel>HTML 사용</FormLabel>
-                    </div>
-                    <p className='text-xs text-gray-500'>
-                      체크 시 HTML 태그가 해석되어 표시됩니다.
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          <div className='flex justify-end space-x-3'>
-            <Link href={ROUTES.ADMIN_POPUP}>
-              <Button type='button' variant='outline'>
-                취소
-              </Button>
-            </Link>
-            <Button type='submit' disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? '생성 중...' : '팝업 생성'}
-            </Button>
+      {!authLoading && (!user || !PERMISSION_CHECKS.isAdmin(user.mb_level)) && (
+        <div className='flex min-h-screen items-center justify-center'>
+          <div className='text-center'>
+            <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
+            <Button onClick={() => router.push(ROUTES.LOGIN)}>로그인하기</Button>
           </div>
-        </form>
-      </Form>
+        </div>
+      )}
 
-      <MessageDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        title={dialogTitle}
-        description={dialogMessage}
-        onConfirm={dialogConfirm}
-      />
-    </div>
+      {!authLoading && user && PERMISSION_CHECKS.isAdmin(user.mb_level) && (
+        <div className='min-h-screen'>
+          <div className='mb-6 flex items-center justify-between'>
+            <div className='flex items-center space-x-4'>
+              <Link href={ROUTES.ADMIN_POPUP}>
+                <Button variant='outline' size='sm'>
+                  <ArrowLeft className='h-4 w-4' />
+                </Button>
+              </Link>
+              <h1 className='text-2xl font-bold text-gray-900'>팝업 생성</h1>
+            </div>
+          </div>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+              <Card>
+                <CardHeader>
+                  <CardTitle>기본 설정</CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-4'>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <FormField
+                      control={form.control}
+                      name='nw_device'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>접속기기 *</FormLabel>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder='접속기기를 선택하세요' />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {Object.entries(POPUP_DEVICE_LABELS).map(([value, label]) => (
+                                <SelectItem key={value} value={value}>
+                                  {label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <p className='text-xs text-gray-500'>
+                            팝업레이어가 표시될 접속기기를 설정합니다.
+                          </p>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='nw_division'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>구분 *</FormLabel>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder='구분을 선택하세요' />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {Object.entries(POPUP_DIVISION_LABELS).map(([value, label]) => (
+                                <SelectItem key={value} value={value}>
+                                  {label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <p className='text-xs text-gray-500'>팝업이 표시될 영역을 설정합니다.</p>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name='nw_disable_hours'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>비활성화 시간 *</FormLabel>
+                        <div className='flex items-center space-x-2'>
+                          <FormControl>
+                            <Input
+                              type='number'
+                              min='1'
+                              placeholder='24'
+                              className='w-24'
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <span className='text-sm text-gray-600'>시간</span>
+                        </div>
+                        <p className='text-xs text-gray-500'>
+                          고객이 다시 보지 않음을 선택할 시 몇 시간동안 팝업레이어를 보여주지 않을지
+                          설정합니다.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>시간 설정</CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-4'>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <FormField
+                      control={form.control}
+                      name='nw_begin_time'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>시작일시 *</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  className='w-full justify-start text-left font-normal'
+                                >
+                                  <CalendarIcon className='mr-2 h-4 w-4' />
+                                  {field.value
+                                    ? dayjs(field.value).format('YYYY년 MM월 DD일 (00:00)')
+                                    : '시작일을 선택하세요'}
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-auto p-0'>
+                              <Calendar
+                                mode='single'
+                                selected={field.value ? dayjs(field.value).toDate() : undefined}
+                                onSelect={handleStartDateSelect}
+                                captionLayout='dropdown'
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <div className='flex items-center space-x-2 pt-2'>
+                            <Checkbox onCheckedChange={handleTodayStart} />
+                            <span className='text-sm text-gray-600'>오늘 00:00으로 설정</span>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='nw_end_time'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>종료일시 *</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  className='w-full justify-start text-left font-normal'
+                                >
+                                  <CalendarIcon className='mr-2 h-4 w-4' />
+                                  {field.value
+                                    ? dayjs(field.value).format('YYYY년 MM월 DD일 (23:59)')
+                                    : '종료일을 선택하세요'}
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-auto p-0'>
+                              <Calendar
+                                mode='single'
+                                selected={field.value ? dayjs(field.value).toDate() : undefined}
+                                onSelect={handleEndDateSelect}
+                                captionLayout='dropdown'
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <div className='flex items-center space-x-2 pt-2'>
+                            <Checkbox onCheckedChange={handleWeekLaterEnd} />
+                            <span className='text-sm text-gray-600'>일주일 후 23:59으로 설정</span>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>위치 및 크기</CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-4'>
+                  <div className='grid grid-cols-4 gap-4'>
+                    <FormField
+                      control={form.control}
+                      name='nw_left'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>좌측위치</FormLabel>
+                          <div className='flex items-center space-x-2'>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                min='0'
+                                placeholder='10'
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <span className='text-sm text-gray-500'>px</span>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='nw_top'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>상단위치</FormLabel>
+                          <div className='flex items-center space-x-2'>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                min='0'
+                                placeholder='10'
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <span className='text-sm text-gray-500'>px</span>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='nw_width'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>가로크기</FormLabel>
+                          <div className='flex items-center space-x-2'>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                min='200'
+                                placeholder='450'
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <span className='text-sm text-gray-500'>px</span>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='nw_height'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>세로크기</FormLabel>
+                          <div className='flex items-center space-x-2'>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                min='100'
+                                placeholder='500'
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <span className='text-sm text-gray-500'>px</span>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>팝업 내용</CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-4'>
+                  <FormField
+                    control={form.control}
+                    name='nw_subject'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>팝업 제목 *</FormLabel>
+                        <FormControl>
+                          <Input placeholder='팝업 제목을 입력하세요' {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='nw_content'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>팝업 내용 *</FormLabel>
+                        <FormControl>
+                          <TiptapEditor
+                            content={field.value || ''}
+                            onChange={field.onChange}
+                            placeholder='팝업 내용을 입력하세요'
+                          />
+                        </FormControl>
+                        <p className='text-xs text-gray-500'>
+                          리치 텍스트 에디터를 사용하여 다양한 서식을 적용할 수 있습니다.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              <div className='flex justify-end space-x-3'>
+                <Link href={ROUTES.ADMIN_POPUP}>
+                  <Button type='button' variant='outline'>
+                    취소
+                  </Button>
+                </Link>
+                <Button type='submit' disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? '생성 중...' : '팝업 생성'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+
+          <MessageDialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            title={dialogTitle}
+            description={dialogMessage}
+            onConfirm={dialogConfirm}
+          />
+        </div>
+      )}
+    </>
   );
 }
