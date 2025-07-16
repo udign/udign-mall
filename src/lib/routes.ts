@@ -13,6 +13,8 @@ export const ROUTES = {
   ADMIN_ORDERLIST: '/admin/orderlist',
   ADMIN_RETURNLIST: '/admin/returnlist',
   ADMIN_POPUP: '/admin/popup',
+  ADMIN_POPUP_CREATE: '/admin/popup/create',
+  ADMIN_POPUP_EDIT: '/admin/popup/edit',
 
   // 인증 관련
   LOGIN: '/shop/login',

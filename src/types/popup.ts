@@ -88,3 +88,39 @@ export const POPUP_DIVISION_LABELS: Record<PopupDivision, string> = {
   shop: '쇼핑몰',
   both: '커뮤니티와 쇼핑몰',
 };
+
+// 사용자 화면 팝업 표시용 타입
+export interface DisplayPopup {
+  nw_id: number;
+  nw_subject: string;
+  nw_content: string;
+  nw_left: number;
+  nw_top: number;
+  nw_width: number;
+  nw_height: number;
+  nw_disable_hours: number;
+}
+
+// 데이터베이스 조회 결과 타입 (시간 유효성 포함)
+export interface PopupQueryResult {
+  nw_id: number;
+  nw_subject: string;
+  nw_content: string;
+  nw_left: number;
+  nw_top: number;
+  nw_width: number;
+  nw_height: number;
+  nw_disable_hours: number;
+  nw_begin_time: string;
+  nw_end_time: string;
+  nw_device: PopupDevice;
+  nw_division: PopupDivision;
+  is_time_valid: number; // 0 or 1
+}
+
+// 팝업 조회 응답 타입
+export interface PopupDisplayResponse {
+  success: boolean;
+  popups: DisplayPopup[];
+  error?: string;
+}

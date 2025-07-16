@@ -5,22 +5,16 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { PERMISSION_CHECKS } from '@/lib/constants';
-import {
-  PopupListResponse,
-  PopupListItem,
-  POPUP_DEVICE_LABELS,
-  POPUP_DIVISION_LABELS,
-} from '@/types/popup';
+import { PopupListResponse, PopupListItem, POPUP_DEVICE_LABELS } from '@/types/popup';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import CommonPagination from '@/components/CommonPagination';
 import { Button } from '@/components/ui/primitives/button';
 import { PAGINATION_CONFIG } from '@/lib/constants';
-import { formatDate } from '@/lib/utils';
+import { formatDate, truncateText } from '@/lib/utils';
 
 const tableHeaders = [
   'ID',
   '제목',
-  '구분',
   '접속기기',
   '시작일시',
   '종료일시',
@@ -30,10 +24,6 @@ const tableHeaders = [
   '상태',
   '관리',
 ];
-
-const truncateText = (text: string, maxLength: number) => {
-  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-};
 
 export default function PopupListPage() {
   const [data, setData] = useState<PopupListResponse | null>(null);
@@ -95,7 +85,7 @@ export default function PopupListPage() {
   }, [currentPage, user, searchParams, router]);
 
   const handleEdit = (popupId: number) => {
-    router.push(`${ROUTES.ADMIN_POPUP}/edit/${popupId}`);
+    router.push(`${ROUTES.ADMIN_POPUP_EDIT}/${popupId}`);
   };
 
   const handleDelete = async (popupId: number, popupTitle: string) => {
@@ -162,7 +152,7 @@ export default function PopupListPage() {
           <h1 className='text-2xl font-bold text-gray-900'>팝업 관리</h1>
           <p className='mt-1 text-gray-600'>사이트에 표시될 팝업을 관리할 수 있습니다.</p>
         </div>
-        <Button onClick={() => router.push(`${ROUTES.ADMIN_POPUP}/create`)}>새 팝업 추가</Button>
+        <Button onClick={() => router.push(ROUTES.ADMIN_POPUP_CREATE)}>새 팝업 추가</Button>
       </div>
 
       <div className='mb-4 flex items-center justify-between'>
@@ -197,11 +187,6 @@ export default function PopupListPage() {
                     <div className='truncate font-medium' title={popup.nw_subject}>
                       {truncateText(popup.nw_subject, 30)}
                     </div>
-                  </td>
-                  <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
-                    <span className='inline-flex rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800'>
-                      {POPUP_DIVISION_LABELS[popup.nw_division]}
-                    </span>
                   </td>
                   <td className='px-6 py-4 text-sm whitespace-nowrap text-gray-900'>
                     <span className='inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800'>
