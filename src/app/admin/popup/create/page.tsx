@@ -1,16 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { PERMISSION_CHECKS } from '@/lib/constants';
-import { CreatePopupRequest, POPUP_DEVICE_LABELS } from '@/types/popup';
+import { POPUP_DEVICE_LABELS, POPUP_DIVISION_LABELS } from '@/types/popup';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { formatDateTime } from '@/lib/utils';
+import dayjs from 'dayjs';
 import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
-import { Label } from '@/components/ui/primitives/label';
 import {
   Select,
   SelectContent,
@@ -20,30 +25,55 @@ import {
 } from '@/components/ui/primitives/select';
 import { Textarea } from '@/components/ui/primitives/textarea';
 import { Checkbox } from '@/components/ui/primitives/checkbox';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/primitives/form';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
 
-const DEFAULT_VALUES: CreatePopupRequest = {
-  nw_division: 'shop',
-  nw_device: 'both',
-  nw_begin_time: '',
-  nw_end_time: '',
-  nw_disable_hours: 24,
-  nw_left: 10,
-  nw_top: 10,
-  nw_height: 500,
-  nw_width: 450,
-  nw_subject: '',
-  nw_content: '',
-  nw_content_html: 1,
-};
+type PopupFormData = z.infer<typeof popupFormSchema>;
+
+const popupFormSchema = z.object({
+  nw_division: z.enum(['comm', 'shop', 'both']),
+  nw_device: z.enum(['pc', 'mobile', 'both']),
+  nw_begin_time: z.string().min(1, '시작 시간을 선택해주세요'),
+  nw_end_time: z.string().min(1, '종료 시간을 선택해주세요'),
+  nw_disable_hours: z.number().min(1, '다시 보지 않기 시간은 1시간 이상이어야 합니다'),
+  nw_left: z.number().min(0, '좌측 위치는 0 이상이어야 합니다'),
+  nw_top: z.number().min(0, '상단 위치는 0 이상이어야 합니다'),
+  nw_height: z.number().min(100, '높이는 100px 이상이어야 합니다'),
+  nw_width: z.number().min(200, '너비는 200px 이상이어야 합니다'),
+  nw_subject: z.string().min(1, '팝업 제목을 입력해주세요'),
+  nw_content: z.string().min(1, '팝업 내용을 입력해주세요'),
+  nw_content_html: z.number(),
+});
 
 export default function PopupCreatePage() {
-  const [formData, setFormData] = useState<CreatePopupRequest>(DEFAULT_VALUES);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
   const router = useRouter();
 
   const { user, isLoading: authLoading } = useAuth();
+
+  const form = useForm<PopupFormData>({
+    resolver: zodResolver(popupFormSchema),
+    defaultValues: {
+      nw_division: 'shop',
+      nw_device: 'both',
+      nw_begin_time: '',
+      nw_end_time: '',
+      nw_disable_hours: 24,
+      nw_left: 10,
+      nw_top: 10,
+      nw_height: 500,
+      nw_width: 450,
+      nw_subject: '',
+      nw_content: '',
+      nw_content_html: 1,
+    },
+  });
 
   useEffect(() => {
     if (authLoading) return;
@@ -59,59 +89,28 @@ export default function PopupCreatePage() {
     }
   }, [user, authLoading, router]);
 
-  const handleInputChange = (field: keyof CreatePopupRequest, value: string | number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const handleTodayStart = (checked: boolean) => {
     if (checked) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      handleInputChange('nw_begin_time', formatDateTime(today));
+      const today = dayjs().startOf('day').toDate();
+      form.setValue('nw_begin_time', formatDateTime(today));
     }
   };
 
   const handleWeekLaterEnd = (checked: boolean) => {
     if (checked) {
-      const weekLater = new Date();
-      weekLater.setDate(weekLater.getDate() + 7);
-      weekLater.setHours(23, 59, 59, 999);
-      handleInputChange('nw_end_time', formatDateTime(weekLater));
+      const weekLater = dayjs().add(7, 'day').endOf('day').toDate();
+      form.setValue('nw_end_time', formatDateTime(weekLater));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // 폼 검증
-    if (!formData.nw_subject.trim()) {
-      setError('제목은 필수 입력 항목입니다.');
-      return;
-    }
-
-    if (!formData.nw_begin_time) {
-      setError('시작일시는 필수 입력 항목입니다.');
-      return;
-    }
-
-    if (!formData.nw_end_time) {
-      setError('종료일시는 필수 입력 항목입니다.');
-      return;
-    }
-
+  const onSubmit = async (data: PopupFormData) => {
     try {
-      setLoading(true);
-      setError(null);
-
       const response = await fetch('/api/admin/popups', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -122,9 +121,7 @@ export default function PopupCreatePage() {
       alert('팝업이 성공적으로 생성되었습니다.');
       router.push(ROUTES.ADMIN_POPUP);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '팝업 생성 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
+      alert(err instanceof Error ? err.message : '팝업 생성 중 오류가 발생했습니다.');
     }
   };
 
@@ -140,203 +137,341 @@ export default function PopupCreatePage() {
       </div>
     </div>
   ) : (
-    <div className='space-y-6'>
-      <div className='mb-6'>
-        <h1 className='text-2xl font-bold text-gray-900'>팝업 생성</h1>
-        <p className='mt-1 text-gray-600'>새로운 팝업을 생성합니다.</p>
+    <div className='min-h-screen'>
+      <div className='mb-6 flex items-center justify-between'>
+        <div className='flex items-center space-x-4'>
+          <Link href={ROUTES.ADMIN_POPUP}>
+            <Button variant='outline' size='sm'>
+              <ArrowLeft className='h-4 w-4' />
+            </Button>
+          </Link>
+          <h1 className='text-2xl font-bold text-gray-900'>팝업 생성</h1>
+        </div>
       </div>
 
-      {error && (
-        <div className='rounded-md border border-red-300 bg-red-50 p-4'>
-          <p className='text-sm text-red-600'>{error}</p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className='space-y-6'>
-        <div className='rounded-lg border bg-white p-6'>
-          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-            {/* 접속기기 */}
-            <div className='space-y-2'>
-              <Label htmlFor='nw_device'>접속기기 *</Label>
-              <Select
-                value={formData.nw_device}
-                onValueChange={(value) => handleInputChange('nw_device', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(POPUP_DEVICE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className='text-sm text-gray-500'>팝업레이어가 표시될 접속기기를 설정합니다.</p>
-            </div>
-
-            {/* 비활성화 시간 */}
-            <div className='space-y-2'>
-              <Label htmlFor='nw_disable_hours'>비활성화 시간 *</Label>
-              <div className='flex items-center space-x-2'>
-                <Input
-                  id='nw_disable_hours'
-                  type='number'
-                  min='1'
-                  value={formData.nw_disable_hours}
-                  onChange={(e) =>
-                    handleInputChange('nw_disable_hours', parseInt(e.target.value) || 0)
-                  }
-                  className='w-20'
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          <Card>
+            <CardHeader>
+              <CardTitle>기본 설정</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='nw_device'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>접속기기 *</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='접속기기를 선택하세요' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.entries(POPUP_DEVICE_LABELS).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className='text-xs text-gray-500'>
+                        팝업레이어가 표시될 접속기기를 설정합니다.
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <span className='text-sm text-gray-600'>시간</span>
-              </div>
-              <p className='text-sm text-gray-500'>
-                고객이 다시 보지 않음을 선택할 시 몇 시간동안 팝업레이어를 보여주지 않을지
-                설정합니다.
-              </p>
-            </div>
 
-            {/* 시작일시 */}
-            <div className='space-y-2'>
-              <Label htmlFor='nw_begin_time'>시작일시 *</Label>
-              <Input
-                id='nw_begin_time'
-                type='datetime-local'
-                value={formData.nw_begin_time ? formData.nw_begin_time.slice(0, 16) : ''}
-                onChange={(e) =>
-                  handleInputChange('nw_begin_time', e.target.value ? e.target.value + ':00' : '')
-                }
-                required
+                <FormField
+                  control={form.control}
+                  name='nw_division'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>구분 *</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='구분을 선택하세요' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.entries(POPUP_DIVISION_LABELS).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className='text-xs text-gray-500'>팝업이 표시될 영역을 설정합니다.</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name='nw_disable_hours'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>비활성화 시간 *</FormLabel>
+                    <div className='flex items-center space-x-2'>
+                      <FormControl>
+                        <Input
+                          type='number'
+                          min='1'
+                          placeholder='24'
+                          className='w-24'
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <span className='text-sm text-gray-600'>시간</span>
+                    </div>
+                    <p className='text-xs text-gray-500'>
+                      고객이 다시 보지 않음을 선택할 시 몇 시간동안 팝업레이어를 보여주지 않을지
+                      설정합니다.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <div className='flex items-center space-x-2'>
-                <Checkbox id='begin_today' onCheckedChange={handleTodayStart} />
-                <Label htmlFor='begin_today' className='text-sm text-gray-600'>
-                  시작일시를 오늘로
-                </Label>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* 종료일시 */}
-            <div className='space-y-2'>
-              <Label htmlFor='nw_end_time'>종료일시 *</Label>
-              <Input
-                id='nw_end_time'
-                type='datetime-local'
-                value={formData.nw_end_time ? formData.nw_end_time.slice(0, 16) : ''}
-                onChange={(e) =>
-                  handleInputChange('nw_end_time', e.target.value ? e.target.value + ':00' : '')
-                }
-                required
+          <Card>
+            <CardHeader>
+              <CardTitle>시간 설정</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='nw_begin_time'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>시작일시 *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='datetime-local'
+                          {...field}
+                          value={field.value ? field.value.replace(' ', 'T') : ''}
+                          onChange={(e) => field.onChange(e.target.value.replace('T', ' '))}
+                        />
+                      </FormControl>
+                      <div className='flex items-center space-x-2 pt-2'>
+                        <Checkbox onCheckedChange={handleTodayStart} />
+                        <span className='text-sm text-gray-600'>오늘 00:00으로 설정</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='nw_end_time'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>종료일시 *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='datetime-local'
+                          {...field}
+                          value={field.value ? field.value.replace(' ', 'T') : ''}
+                          onChange={(e) => field.onChange(e.target.value.replace('T', ' '))}
+                        />
+                      </FormControl>
+                      <div className='flex items-center space-x-2 pt-2'>
+                        <Checkbox onCheckedChange={handleWeekLaterEnd} />
+                        <span className='text-sm text-gray-600'>일주일 후 23:59으로 설정</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>위치 및 크기</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <div className='grid grid-cols-4 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='nw_left'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>좌측위치</FormLabel>
+                      <div className='flex items-center space-x-2'>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            min='0'
+                            placeholder='10'
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <span className='text-sm text-gray-500'>px</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='nw_top'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>상단위치</FormLabel>
+                      <div className='flex items-center space-x-2'>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            min='0'
+                            placeholder='10'
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <span className='text-sm text-gray-500'>px</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='nw_width'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>가로크기</FormLabel>
+                      <div className='flex items-center space-x-2'>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            min='200'
+                            placeholder='450'
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <span className='text-sm text-gray-500'>px</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='nw_height'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>세로크기</FormLabel>
+                      <div className='flex items-center space-x-2'>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            min='100'
+                            placeholder='500'
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <span className='text-sm text-gray-500'>px</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>팝업 내용</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <FormField
+                control={form.control}
+                name='nw_subject'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>팝업 제목 *</FormLabel>
+                    <FormControl>
+                      <Input placeholder='팝업 제목을 입력하세요' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <div className='flex items-center space-x-2'>
-                <Checkbox id='end_week_later' onCheckedChange={handleWeekLaterEnd} />
-                <Label htmlFor='end_week_later' className='text-sm text-gray-600'>
-                  종료일시를 오늘로부터 7일 후로
-                </Label>
-              </div>
-            </div>
 
-            {/* 위치 설정 */}
-            <div className='space-y-2'>
-              <Label>팝업 위치</Label>
-              <div className='grid grid-cols-2 gap-2'>
-                <div>
-                  <Label htmlFor='nw_left' className='text-sm'>
-                    좌측 위치 (px)
-                  </Label>
-                  <Input
-                    id='nw_left'
-                    type='number'
-                    min='0'
-                    value={formData.nw_left}
-                    onChange={(e) => handleInputChange('nw_left', parseInt(e.target.value) || 0)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor='nw_top' className='text-sm'>
-                    상단 위치 (px)
-                  </Label>
-                  <Input
-                    id='nw_top'
-                    type='number'
-                    min='0'
-                    value={formData.nw_top}
-                    onChange={(e) => handleInputChange('nw_top', parseInt(e.target.value) || 0)}
-                  />
-                </div>
-              </div>
-            </div>
+              <FormField
+                control={form.control}
+                name='nw_content'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>팝업 내용 *</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder='팝업 내용을 입력하세요 (HTML 태그 사용 가능)'
+                        rows={10}
+                        {...field}
+                      />
+                    </FormControl>
+                    <p className='text-xs text-gray-500'>
+                      HTML 태그를 사용하여 내용을 꾸밀 수 있습니다.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* 크기 설정 */}
-            <div className='space-y-2'>
-              <Label>팝업 크기</Label>
-              <div className='grid grid-cols-2 gap-2'>
-                <div>
-                  <Label htmlFor='nw_width' className='text-sm'>
-                    너비 (px)
-                  </Label>
-                  <Input
-                    id='nw_width'
-                    type='number'
-                    min='100'
-                    value={formData.nw_width}
-                    onChange={(e) => handleInputChange('nw_width', parseInt(e.target.value) || 0)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor='nw_height' className='text-sm'>
-                    높이 (px)
-                  </Label>
-                  <Input
-                    id='nw_height'
-                    type='number'
-                    min='100'
-                    value={formData.nw_height}
-                    onChange={(e) => handleInputChange('nw_height', parseInt(e.target.value) || 0)}
-                  />
-                </div>
-              </div>
-            </div>
+              <FormField
+                control={form.control}
+                name='nw_content_html'
+                render={({ field }) => (
+                  <FormItem>
+                    <div className='flex items-center space-x-2'>
+                      <Checkbox
+                        checked={field.value === 1}
+                        onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
+                      />
+                      <FormLabel>HTML 사용</FormLabel>
+                    </div>
+                    <p className='text-xs text-gray-500'>
+                      체크 시 HTML 태그가 해석되어 표시됩니다.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          <div className='flex justify-end space-x-3'>
+            <Link href={ROUTES.ADMIN_POPUP}>
+              <Button type='button' variant='outline'>
+                취소
+              </Button>
+            </Link>
+            <Button type='submit' disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? '생성 중...' : '팝업 생성'}
+            </Button>
           </div>
-
-          {/* 제목 */}
-          <div className='mt-6 space-y-2'>
-            <Label htmlFor='nw_subject'>팝업 제목 *</Label>
-            <Input
-              id='nw_subject'
-              type='text'
-              value={formData.nw_subject}
-              onChange={(e) => handleInputChange('nw_subject', e.target.value)}
-              placeholder='팝업 제목을 입력하세요'
-              required
-            />
-          </div>
-
-          {/* 내용 */}
-          <div className='mt-6 space-y-2'>
-            <Label htmlFor='nw_content'>팝업 내용</Label>
-            <Textarea
-              id='nw_content'
-              value={formData.nw_content}
-              onChange={(e) => handleInputChange('nw_content', e.target.value)}
-              placeholder='팝업 내용을 입력하세요 (HTML 태그 사용 가능)'
-              rows={10}
-            />
-          </div>
-        </div>
-
-        {/* 버튼 */}
-        <div className='flex justify-between'>
-          <Button type='button' variant='outline' onClick={() => router.push(ROUTES.ADMIN_POPUP)}>
-            목록으로
-          </Button>
-          <Button type='submit' disabled={loading}>
-            {loading ? '생성 중...' : '팝업 생성'}
-          </Button>
-        </div>
-      </form>
+        </form>
+      </Form>
     </div>
   );
 }
