@@ -133,12 +133,26 @@ export const getArtworksByUser = async (
       const iCount = countResult[0]?.cnt || 0;
       const goalAttainment = iCount >= row.it_4;
 
+      // 사용자의 좋아요 순번 조회 (해당 사용자가 좋아요를 눌렀을 때만)
+      let orderNumber: number | undefined;
+      if (row.ir_id) {
+        const orderQuery = `
+          SELECT COUNT(*) as order_number 
+          FROM g5_shop_interrest 
+          WHERE it_id = ? AND ir_time <= ?
+        `;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const orderResult = (await executeQuery(orderQuery, [row.it_id, row.ir_time])) as any[];
+        orderNumber = orderResult[0]?.order_number || 1;
+      }
+
       // 상태 결정 로직
       const statusInfo = determineStatus(row, goalAttainment);
 
       const artworkStatus: ArtworkStatus = {
         ...row,
         it_img1: getImageUrl(row.it_img1) || '',
+        orderNumber: orderNumber,
         _goalAttainment: goalAttainment,
         _status_text: statusInfo.statusText,
         _status_key: statusInfo.statusKey,

@@ -373,7 +373,7 @@ export default function ProductDetailPage() {
               variant='ghost'
               size='icon'
               disabled={likingInProgress}
-              className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90 disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
+              className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
             >
               {likingInProgress ? (
                 <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
