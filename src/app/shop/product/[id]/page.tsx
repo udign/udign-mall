@@ -8,7 +8,8 @@ import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import { Progress } from '@/components/ui/primitives/progress';
 import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
@@ -125,7 +126,7 @@ function MainImage({
   onImageError,
 }: MainImageProps) {
   return (
-    <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-200 ${className}`}>
+    <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${className}`}>
       {selectedImage && !isImageFailed ? (
         <Image
           src={selectedImage}
@@ -377,9 +378,9 @@ export default function ProductDetailPage() {
               {likingInProgress ? (
                 <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
               ) : product.is_liked ? (
-                <FcLike />
+                <AiFillHeart className='text-red-500' />
               ) : (
-                <FcLikePlaceholder />
+                <AiOutlineHeart />
               )}
             </Button>
 
@@ -473,42 +474,29 @@ export default function ProductDetailPage() {
             ) : (
               /* 구매 불가능한 상품 - 작품 정보 및 진행 상황 표시 */
               <div className='space-y-6'>
-                <div>
-                  <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
-                  <div className='space-y-2 leading-relaxed text-gray-700'>
-                    {product.description && <p>{product.description}</p>}
-                    {product.creator_name && (
-                      <p className='text-sm text-gray-600'>
-                        디자이너: <span className='font-medium'>{product.creator_name}</span>
-                      </p>
-                    )}
+                <div className='flex gap-6'>
+                  <div className='flex-1'>
+                    <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
+                    <div className='space-y-2 leading-relaxed text-gray-700'>
+                      {product.description && <p>{product.description}</p>}
+                      {product.creator_name && (
+                        <p className='text-sm text-gray-600'>
+                          디자이너: <span className='font-medium'>{product.creator_name}</span>
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className='rounded-lg bg-gray-50 p-4'>
-                  <div className='mb-2 flex items-center justify-between'>
-                    <span className='text-sm text-gray-600'>현재 좋아요</span>
-                    <span className='text-lg font-bold text-gray-600'>
-                      {product.current_likes}명
-                    </span>
+                  <div className='flex w-8 flex-col items-center'>
+                    <div className='relative h-40 w-3'>
+                      <div className='absolute top-1/2 left-1/2 h-3 w-40 origin-center -translate-x-1/2 -translate-y-1/2 -rotate-90 transform'>
+                        <Progress
+                          value={Math.min((product.current_likes / product.it_4) * 100, 100)}
+                          className='h-3 w-40 bg-gray-100'
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className='mb-3 flex items-center justify-between'>
-                    <span className='text-sm text-gray-600'>목표 인원</span>
-                    <span className='text-primary text-lg font-bold'>{product.it_4}명</span>
-                  </div>
-                  <div className='h-2 w-full rounded-full bg-gray-200'>
-                    <div
-                      className='bg-primary h-2 rounded-full transition-all duration-300'
-                      style={{
-                        width: `${Math.min((product.current_likes / product.it_4) * 100, 100)}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <p className='mt-2 text-xs text-gray-500'>
-                    {product.goal_attainment
-                      ? '목표 달성!'
-                      : `목표까지 ${product.it_4 - product.current_likes}명 남았습니다.`}
-                  </p>
                 </div>
 
                 <div>
