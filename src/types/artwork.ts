@@ -69,6 +69,7 @@ export interface ArtworkStatus {
   return_id?: string;
   admin_memo?: string;
   return_updated?: string;
+  orderNumber?: number; // 좋아요 순번
   _goalAttainment: boolean;
   _status_text: string;
   _status_key: string;

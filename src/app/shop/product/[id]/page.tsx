@@ -7,14 +7,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import { Progress } from '@/components/ui/primitives/progress';
 import { Button } from '@/components/ui/primitives/button';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import NotFoundState from '@/components/states/NotFoundState';
 import { LikeResponse } from '@/types/product';
 import MessageDialog from '@/components/ui/MessageDialog';
+import ImageMagnifierModal from '@/components/ImageMagnifierModal';
 
 interface ProductDetail {
   it_id: string;
@@ -114,6 +116,7 @@ interface MainImageProps {
   sizes?: string;
   isImageFailed: boolean;
   onImageError: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  onMagnifierClick: () => void;
 }
 
 function MainImage({
@@ -123,9 +126,10 @@ function MainImage({
   sizes = '(max-width: 768px) 100vw, 50vw',
   isImageFailed,
   onImageError,
+  onMagnifierClick,
 }: MainImageProps) {
   return (
-    <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-200 ${className}`}>
+    <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${className}`}>
       {selectedImage && !isImageFailed ? (
         <Image
           src={selectedImage}
@@ -139,6 +143,19 @@ function MainImage({
         <div className='flex h-full w-full items-center justify-center bg-gray-200'>
           <span className='text-gray-400'>이미지 없음</span>
         </div>
+      )}
+
+      {/* 돋보기 버튼 */}
+      {selectedImage && !isImageFailed && (
+        <Button
+          onClick={onMagnifierClick}
+          variant='secondary'
+          size='sm'
+          className='absolute right-3 bottom-3 h-8 w-8 rounded-full bg-white/80 p-0 shadow-lg backdrop-blur-sm transition-all duration-200 hover:bg-white/90'
+        >
+          <SearchIcon className='h-4 w-4' />
+          <span className='sr-only'>이미지 확대보기</span>
+        </Button>
       )}
     </div>
   );
@@ -159,6 +176,7 @@ export default function ProductDetailPage() {
   const [orderInfo, setOrderInfo] = useState<{ orderNumber: number; productName: string } | null>(
     null,
   );
+  const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
 
   const params = useParams();
   const router = useRouter();
@@ -228,6 +246,19 @@ export default function ProductDetailPage() {
     fetchProductDetail();
   }, [productId, user, authLoading, addViewedProduct]);
 
+  // 목표 달성했지만 좋아요를 누르지 않은 작품 접근 차단
+  useEffect(() => {
+    if (!product) return;
+
+    const isGoalAchieved = product.current_likes >= product.it_4;
+    const isNotLiked = !product.is_liked;
+
+    // 목표 달성 + 좋아요 안 누른 상태면 이전 페이지로 이동
+    if (isGoalAchieved && isNotLiked) {
+      router.back();
+    }
+  }, [product, router]);
+
   const handleLikeToggle = async () => {
     if (!user || !product) return;
 
@@ -294,6 +325,14 @@ export default function ProductDetailPage() {
     setFailedImages((prev) => new Set(prev).add(imageUrl));
   }, []);
 
+  const handleMagnifierClick = () => {
+    setShowMagnifierModal(true);
+  };
+
+  const handleMagnifierModalClose = () => {
+    setShowMagnifierModal(false);
+  };
+
   const handleQuantityIncrease = () => {
     setQuantity((prev) => prev + 1);
   };
@@ -349,6 +388,7 @@ export default function ProductDetailPage() {
                 sizes='(max-width: 640px) 100vw, 50vw'
                 isImageFailed={selectedImage ? failedImages.has(selectedImage) : false}
                 onImageError={handleImageError}
+                onMagnifierClick={handleMagnifierClick}
               />
             </div>
           </div>
@@ -359,14 +399,14 @@ export default function ProductDetailPage() {
               variant='ghost'
               size='icon'
               disabled={likingInProgress}
-              className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90 disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
+              className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
             >
               {likingInProgress ? (
                 <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
               ) : product.is_liked ? (
-                <FcLike />
+                <AiFillHeart className='text-red-500' />
               ) : (
-                <FcLikePlaceholder />
+                <AiOutlineHeart />
               )}
             </Button>
 
@@ -460,42 +500,29 @@ export default function ProductDetailPage() {
             ) : (
               /* 구매 불가능한 상품 - 작품 정보 및 진행 상황 표시 */
               <div className='space-y-6'>
-                <div>
-                  <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
-                  <div className='space-y-2 leading-relaxed text-gray-700'>
-                    {product.description && <p>{product.description}</p>}
-                    {product.creator_name && (
-                      <p className='text-sm text-gray-600'>
-                        디자이너: <span className='font-medium'>{product.creator_name}</span>
-                      </p>
-                    )}
+                <div className='flex gap-6'>
+                  <div className='flex-1'>
+                    <h2 className='mb-4 text-lg font-semibold text-gray-900'>작품 설명</h2>
+                    <div className='space-y-2 leading-relaxed text-gray-700'>
+                      {product.description && <p>{product.description}</p>}
+                      {product.creator_name && (
+                        <p className='text-sm text-gray-600'>
+                          디자이너: <span className='font-medium'>{product.creator_name}</span>
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className='rounded-lg bg-gray-50 p-4'>
-                  <div className='mb-2 flex items-center justify-between'>
-                    <span className='text-sm text-gray-600'>현재 좋아요</span>
-                    <span className='text-lg font-bold text-gray-600'>
-                      {product.current_likes}명
-                    </span>
+                  <div className='flex w-8 flex-col items-center'>
+                    <div className='relative h-40 w-3'>
+                      <div className='absolute top-1/2 left-1/2 h-3 w-40 origin-center -translate-x-1/2 -translate-y-1/2 -rotate-90 transform'>
+                        <Progress
+                          value={Math.min((product.current_likes / product.it_4) * 100, 100)}
+                          className='h-3 w-40 bg-gray-100'
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className='mb-3 flex items-center justify-between'>
-                    <span className='text-sm text-gray-600'>목표 인원</span>
-                    <span className='text-primary text-lg font-bold'>{product.it_4}명</span>
-                  </div>
-                  <div className='h-2 w-full rounded-full bg-gray-200'>
-                    <div
-                      className='bg-primary h-2 rounded-full transition-all duration-300'
-                      style={{
-                        width: `${Math.min((product.current_likes / product.it_4) * 100, 100)}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <p className='mt-2 text-xs text-gray-500'>
-                    {product.goal_attainment
-                      ? '목표 달성!'
-                      : `목표까지 ${product.it_4 - product.current_likes}명 남았습니다.`}
-                  </p>
                 </div>
 
                 <div>
@@ -599,6 +626,14 @@ export default function ProductDetailPage() {
             : ''
         }
         confirmText='확인'
+      />
+
+      {/* 이미지 확대보기 모달 */}
+      <ImageMagnifierModal
+        open={showMagnifierModal}
+        onOpenChange={handleMagnifierModalClose}
+        imageUrl={selectedImage || ''}
+        productName={product.it_name}
       />
     </div>
   );

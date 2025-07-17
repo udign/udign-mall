@@ -28,6 +28,7 @@ interface ProductRow extends RowDataPacket {
   creator_id: string;
   creator_name: string;
   description: string;
+  target_likes: number;
   current_likes: number;
   is_liked: number;
 }
@@ -129,6 +130,7 @@ export const GET = async (request: NextRequest) => {
         i.it_1 as creator_id,
         i.it_2 as creator_name,
         i.it_3 as description,
+        i.it_4 as target_likes,
         COALESCE(like_count.cnt, 0) as current_likes,
         CASE WHEN user_like.it_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
       FROM g5_shop_item i
@@ -172,6 +174,7 @@ export const GET = async (request: NextRequest) => {
       likes_count: (item.current_likes || 0).toString(),
       is_liked: Boolean(item.is_liked),
       current_likes: item.current_likes || 0,
+      target_likes: item.target_likes || 100, // 기본값 100으로 설정
     }));
 
     return NextResponse.json({

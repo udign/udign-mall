@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { ArtworkStatus } from '@/types/artwork';
 import ProgressBar from '@/components/ProgressBar';
 import ReturnModal from '@/components/ReturnModal';
@@ -112,7 +112,7 @@ export default function ArtworkCard({
   return (
     <>
       <div
-        className={`rounded-lg border border-gray-200 bg-white p-4 ${isClickable && 'cursor-pointer transition-transform duration-400 ease-out hover:scale-101'}`}
+        className={`rounded-lg border border-gray-200 bg-white p-4 ${isClickable && 'cursor-pointer'}`}
         onClick={isClickable ? () => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`) : undefined}
       >
         <div className='relative'>
@@ -151,7 +151,7 @@ export default function ArtworkCard({
               {isAdmin && (
                 <div className='mt-2 flex flex-row items-center space-x-4'>
                   <div className='flex items-center text-sm text-gray-600'>
-                    <FcLike className='mr-1' size={16} />
+                    <AiFillHeart className='mr-1 text-red-500' size={16} />
                     <span>{artwork._iCount}</span>
                     {artwork.it_4 > 0 && <span className='text-gray-400'>/{artwork.it_4}</span>}
                   </div>
@@ -297,17 +297,28 @@ export default function ArtworkCard({
 
               {/* 좋아요 버튼 */}
               {!artwork._goalAttainment && artwork._status_text === '컬렉션' && (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleInterestClick();
-                  }}
-                  variant='ghost'
-                  className='flex-shrink-0 transition-transform duration-400 ease-out hover:scale-110'
-                  size='icon'
-                >
-                  {artwork.ir_id ? <FcLike size={20} /> : <FcLikePlaceholder size={20} />}
-                </Button>
+                <div className='flex flex-shrink-0 items-center space-x-2'>
+                  {artwork.orderNumber && (
+                    <span className='text-sm font-medium text-gray-600'>
+                      No. {artwork.orderNumber}
+                    </span>
+                  )}
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleInterestClick();
+                    }}
+                    variant='ghost'
+                    className='transition-transform duration-400 ease-out hover:scale-110 hover:bg-transparent'
+                    size='icon'
+                  >
+                    {artwork.ir_id ? (
+                      <AiFillHeart className='text-red-500' size={20} />
+                    ) : (
+                      <AiOutlineHeart size={20} />
+                    )}
+                  </Button>
+                </div>
               )}
             </div>
           </div>

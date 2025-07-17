@@ -185,6 +185,7 @@ export const GET = async (request: NextRequest) => {
       likes_count: item.current_likes.toString(), // current_likes를 likes_count로 매핑
       is_liked: Boolean(item.is_liked), // 사용자별 좋아요 상태 추가
       current_likes: item.current_likes, // 현재 좋아요 수 추가
+      target_likes: item.target_likes, // 목표 좋아요 수 추가
     }));
 
     return NextResponse.json({
