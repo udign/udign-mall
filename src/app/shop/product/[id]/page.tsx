@@ -228,6 +228,19 @@ export default function ProductDetailPage() {
     fetchProductDetail();
   }, [productId, user, authLoading, addViewedProduct]);
 
+  // 목표 달성했지만 좋아요를 누르지 않은 작품 접근 차단
+  useEffect(() => {
+    if (!product) return;
+
+    const isGoalAchieved = product.current_likes >= product.it_4;
+    const isNotLiked = !product.is_liked;
+
+    // 목표 달성 + 좋아요 안 누른 상태면 이전 페이지로 이동
+    if (isGoalAchieved && isNotLiked) {
+      router.back();
+    }
+  }, [product, router]);
+
   const handleLikeToggle = async () => {
     if (!user || !product) return;
 
