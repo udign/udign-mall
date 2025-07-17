@@ -9,6 +9,7 @@ import { LikeResponse } from '@/types/product';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { Button } from '@/components/ui/primitives/button';
+import { Progress } from '@/components/ui/primitives/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 
@@ -38,6 +39,7 @@ interface SearchProduct {
   likes_count: string;
   is_liked: boolean;
   current_likes: number;
+  target_likes?: number;
 }
 
 type ProductType = Product | SearchProduct;
@@ -151,6 +153,10 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
     };
   };
 
+  const getLikeTarget = (product: ProductType) => {
+    return product.target_likes || 100;
+  };
+
   return (
     <>
       <div
@@ -158,12 +164,14 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
       >
         {products.map((product) => {
           const likeInfo = getLikeInfo(product);
+          const likeTarget = getLikeTarget(product);
+          const progressValue = Math.min((likeInfo.count / likeTarget) * 100, 100);
 
           return (
             <div
               key={product.it_id}
               onClick={(e) => handleProductClick(e, product.it_id)}
-              className='block cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform duration-400 ease-out hover:scale-101'
+              className='flex cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform duration-400 ease-out hover:scale-101'
             >
               <div className='relative aspect-square'>
                 <Button
@@ -198,15 +206,13 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                 )}
               </div>
 
-              <div className='p-4'>
+              <div className='mb-2 flex-1 px-4 py-2'>
                 <h3 className='flex overflow-hidden font-medium text-gray-900'>
                   {product.it_name}
                 </h3>
-                <div className='flex items-center gap-1'>
-                  <FcLike />
-                  <p className='mt-1 text-sm text-gray-500'>{likeInfo.count}명이 좋아합니다</p>
-                </div>
               </div>
+
+              <Progress value={progressValue} className='h-2 rounded-none rounded-b-lg' />
             </div>
           );
         })}
