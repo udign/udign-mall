@@ -3,7 +3,7 @@ import { executeQuery } from '@/lib/database';
 import { del } from '@vercel/blob';
 
 // HTML 내용에서 이미지 URL을 추출하는 함수
-export const extractImageUrls = (htmlContent: string): string[] => {
+const extractImageUrls = (htmlContent: string): string[] => {
   if (!htmlContent) return [];
 
   const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
@@ -33,7 +33,10 @@ const deleteImageFromStorage = async (imageUrl: string): Promise<void> => {
   }
 };
 
-export const DELETE = async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   try {
     const popupId = parseInt((await params).id, 10);
 
@@ -61,7 +64,10 @@ export const DELETE = async (request: NextRequest, { params }: { params: { id: s
 };
 
 // 개별 팝업 조회 (편집용)
-export const GET = async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   try {
     const popupId = parseInt((await params).id, 10);
 
@@ -83,7 +89,10 @@ export const GET = async (request: NextRequest, { params }: { params: { id: stri
 };
 
 // 개별 팝업 수정
-export const PUT = async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const PUT = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   try {
     const popupId = parseInt((await params).id, 10);
 
