@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Progress } from '@/components/ui/primitives/progress';
 import { Button } from '@/components/ui/primitives/button';
@@ -16,6 +16,7 @@ import ErrorState from '@/components/states/ErrorState';
 import NotFoundState from '@/components/states/NotFoundState';
 import { LikeResponse } from '@/types/product';
 import MessageDialog from '@/components/ui/MessageDialog';
+import ImageMagnifierModal from '@/components/ImageMagnifierModal';
 
 interface ProductDetail {
   it_id: string;
@@ -115,6 +116,7 @@ interface MainImageProps {
   sizes?: string;
   isImageFailed: boolean;
   onImageError: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  onMagnifierClick: () => void;
 }
 
 function MainImage({
@@ -124,6 +126,7 @@ function MainImage({
   sizes = '(max-width: 768px) 100vw, 50vw',
   isImageFailed,
   onImageError,
+  onMagnifierClick,
 }: MainImageProps) {
   return (
     <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${className}`}>
@@ -140,6 +143,19 @@ function MainImage({
         <div className='flex h-full w-full items-center justify-center bg-gray-200'>
           <span className='text-gray-400'>이미지 없음</span>
         </div>
+      )}
+
+      {/* 돋보기 버튼 */}
+      {selectedImage && !isImageFailed && (
+        <Button
+          onClick={onMagnifierClick}
+          variant='secondary'
+          size='sm'
+          className='absolute right-3 bottom-3 h-8 w-8 rounded-full bg-white/80 p-0 shadow-lg backdrop-blur-sm transition-all duration-200 hover:bg-white/90'
+        >
+          <SearchIcon className='h-4 w-4' />
+          <span className='sr-only'>이미지 확대보기</span>
+        </Button>
       )}
     </div>
   );
@@ -160,6 +176,7 @@ export default function ProductDetailPage() {
   const [orderInfo, setOrderInfo] = useState<{ orderNumber: number; productName: string } | null>(
     null,
   );
+  const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
 
   const params = useParams();
   const router = useRouter();
@@ -308,6 +325,14 @@ export default function ProductDetailPage() {
     setFailedImages((prev) => new Set(prev).add(imageUrl));
   }, []);
 
+  const handleMagnifierClick = () => {
+    setShowMagnifierModal(true);
+  };
+
+  const handleMagnifierModalClose = () => {
+    setShowMagnifierModal(false);
+  };
+
   const handleQuantityIncrease = () => {
     setQuantity((prev) => prev + 1);
   };
@@ -363,6 +388,7 @@ export default function ProductDetailPage() {
                 sizes='(max-width: 640px) 100vw, 50vw'
                 isImageFailed={selectedImage ? failedImages.has(selectedImage) : false}
                 onImageError={handleImageError}
+                onMagnifierClick={handleMagnifierClick}
               />
             </div>
           </div>
@@ -600,6 +626,14 @@ export default function ProductDetailPage() {
             : ''
         }
         confirmText='확인'
+      />
+
+      {/* 이미지 확대보기 모달 */}
+      <ImageMagnifierModal
+        open={showMagnifierModal}
+        onOpenChange={handleMagnifierModalClose}
+        imageUrl={selectedImage || ''}
+        productName={product.it_name}
       />
     </div>
   );

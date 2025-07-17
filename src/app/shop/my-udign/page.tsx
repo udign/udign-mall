@@ -11,10 +11,8 @@ import LoadingSpinner from '@/components/states/LoadingSpinner';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { Button } from '@/components/ui/primitives/button';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import Link from 'next/link';
 import { FiInbox, FiAlertCircle } from 'react-icons/fi';
 import { BsLightbulb } from 'react-icons/bs';
-import { IoIosList } from 'react-icons/io';
 import { ROUTES } from '@/lib/routes';
 
 interface MyUdignData {
@@ -739,15 +737,8 @@ export default function MyUdignPage() {
           </div>
 
           <div className='rounded-lg border border-gray-100 p-6'>
-            <div className='mb-6 flex items-center justify-between'>
+            <div className='mb-6 flex items-center'>
               <h2 className='text-xl font-semibold'>나의 작품 현황</h2>
-              <Link
-                href='/order-history'
-                className='flex items-center gap-1 text-sm font-semibold text-gray-700'
-              >
-                <IoIosList className='h-4 w-4' />
-                전체 주문내역
-              </Link>
             </div>
 
             <div className='border-b border-gray-100'>
