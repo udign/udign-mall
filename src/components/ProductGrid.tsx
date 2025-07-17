@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Product } from '@/types/product';
 import { LikeResponse } from '@/types/product';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
@@ -166,30 +166,17 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
           const likeInfo = getLikeInfo(product);
           const likeTarget = getLikeTarget(product);
           const progressValue = Math.min((likeInfo.count / likeTarget) * 100, 100);
+          const isGoalAchieved = likeInfo.count >= likeTarget;
 
           return (
             <div
               key={product.it_id}
-              onClick={(e) => handleProductClick(e, product.it_id)}
-              className='flex cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-transform duration-400 ease-out hover:scale-101'
+              onClick={isGoalAchieved ? undefined : (e) => handleProductClick(e, product.it_id)}
+              className={`flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white ${
+                isGoalAchieved ? 'cursor-default' : 'cursor-pointer'
+              }`}
             >
               <div className='relative aspect-square'>
-                <Button
-                  onClick={(e) => handleLikeToggle(e, product.it_id)}
-                  variant='ghost'
-                  size='icon'
-                  disabled={likingInProgress.has(product.it_id)}
-                  className='absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-white/80 p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-white/90 disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
-                >
-                  {likingInProgress.has(product.it_id) ? (
-                    <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
-                  ) : likeInfo.isLiked ? (
-                    <FcLike />
-                  ) : (
-                    <FcLikePlaceholder />
-                  )}
-                </Button>
-
                 {product.it_img1 && !failedImages.has(product.it_img1) ? (
                   <Image
                     src={product.it_img1}
@@ -204,12 +191,46 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                     <span className='text-gray-400'>이미지 없음</span>
                   </div>
                 )}
+
+                {isGoalAchieved && (
+                  <div className='absolute inset-0 z-10 flex items-center justify-center rounded-t-lg bg-black/50'>
+                    <span className='text-sm text-white'>full & under review</span>
+                  </div>
+                )}
               </div>
 
-              <div className='mb-2 flex-1 px-4 py-2'>
-                <h3 className='flex overflow-hidden font-medium text-gray-900'>
-                  {product.it_name}
-                </h3>
+              <div className='mb-1 flex-1 px-4 py-2'>
+                <div className='flex items-center justify-between'>
+                  <h3 className='mr-2 flex overflow-hidden font-medium text-gray-900'>
+                    {product.it_name}
+                  </h3>
+                  {isGoalAchieved ? (
+                    <div className='relative h-7 w-7 flex-shrink-0'>
+                      <Image
+                        src='/images/logo.png'
+                        alt='목표 달성'
+                        fill
+                        className='object-contain'
+                      />
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={(e) => handleLikeToggle(e, product.it_id)}
+                      variant='ghost'
+                      size='icon'
+                      disabled={likingInProgress.has(product.it_id)}
+                      className='h-7 w-7 flex-shrink-0 rounded-full p-1 text-lg transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
+                    >
+                      {likingInProgress.has(product.it_id) ? (
+                        <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+                      ) : likeInfo.isLiked ? (
+                        <AiFillHeart className='text-red-500' />
+                      ) : (
+                        <AiOutlineHeart />
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <Progress value={progressValue} className='h-2 rounded-none rounded-b-lg' />
