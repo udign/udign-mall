@@ -1,12 +1,15 @@
 import { Calendar } from 'lucide-react';
-import { getDesignStats, type DesignStats } from '@/lib/dashboard/designStats';
+import { getDesignStats } from '@/lib/dashboard/designStats';
+import { getOrderStats } from '@/lib/dashboard/orderStats';
 import DesignStatsSection from '@/components/admin/DesignStatsSection';
+import OrderStatsSection from '@/components/admin/OrderStatsSection';
 
 export default async function AdminDashboard() {
-  const designStats: DesignStats = await getDesignStats();
+  const [designStats, orderStats] = await Promise.all([getDesignStats(), getOrderStats()]);
 
   return (
     <div className='space-y-6'>
+      {/* 헤더 */}
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-bold text-gray-900'>관리자 대시보드</h1>
@@ -18,47 +21,12 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
+      {/* 대시보드 그리드 */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
         <DesignStatsSection initialStats={designStats} />
 
         {/* 주문 현황 */}
-        <div className='rounded-lg border border-gray-200 bg-white p-6'>
-          <div className='mb-4 flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>주문 현황</h2>
-          </div>
-          <div className='space-y-3'>
-            <div className='flex justify-between'>
-              <span className='text-sm text-gray-600'>입금 대기 중</span>
-              <span className='font-semibold text-gray-900'>35 건</span>
-            </div>
-            <div className='flex justify-between'>
-              <span className='text-sm text-gray-600'>검제완료</span>
-              <span className='font-semibold text-gray-900'>348 건</span>
-            </div>
-            <div className='flex justify-between'>
-              <span className='text-sm text-gray-600'>배송중</span>
-              <span className='font-semibold text-gray-900'>793 건</span>
-            </div>
-            <div className='flex justify-between'>
-              <span className='text-sm text-gray-600'>배송완료</span>
-              <span className='font-semibold text-gray-900'>3975 건</span>
-            </div>
-            <div className='grid grid-cols-3 gap-4 pt-2'>
-              <div className='text-center'>
-                <div className='text-xs text-gray-600'>취소주문</div>
-                <div className='text-lg font-bold text-gray-900'>1 건</div>
-              </div>
-              <div className='text-center'>
-                <div className='text-xs text-gray-600'>교환주문</div>
-                <div className='text-lg font-bold text-gray-900'>0 건</div>
-              </div>
-              <div className='text-center'>
-                <div className='text-xs text-gray-600'>반품주문</div>
-                <div className='text-lg font-bold text-gray-900'>2 건</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <OrderStatsSection initialStats={orderStats} />
 
         {/* 회원 현황 */}
         <div className='rounded-lg border border-gray-200 bg-white p-6'>
