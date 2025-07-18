@@ -59,14 +59,6 @@ export const GET = async (
 
     const artwork = rows[0] as Record<string, unknown>;
 
-    // 디버깅: 원본 이미지 데이터 로그
-    console.log('=== 원본 이미지 데이터 ===');
-    console.log('it_img1:', artwork.it_img1);
-    console.log('it_img2:', artwork.it_img2);
-    console.log('it_img3:', artwork.it_img3);
-    console.log('it_img4:', artwork.it_img4);
-    console.log('VERCEL_BLOB_BASE_URL:', process.env.VERCEL_BLOB_BASE_URL);
-
     // 이미지 URL들을 완전한 URL로 변환
     const artworkWithFullUrls = {
       ...artwork,
@@ -75,13 +67,6 @@ export const GET = async (
       it_img3: getImageUrl(artwork.it_img3 as string | null),
       it_img4: getImageUrl(artwork.it_img4 as string | null),
     };
-
-    // 디버깅: 변환된 URL들 로그
-    console.log('=== 변환된 이미지 URL들 ===');
-    console.log('it_img1:', artworkWithFullUrls.it_img1);
-    console.log('it_img2:', artworkWithFullUrls.it_img2);
-    console.log('it_img3:', artworkWithFullUrls.it_img3);
-    console.log('it_img4:', artworkWithFullUrls.it_img4);
 
     return NextResponse.json(artworkWithFullUrls);
   } catch (error) {
@@ -101,18 +86,6 @@ export const PUT = async (
   try {
     const { id } = await params;
     const formData = await request.formData();
-
-    // FormData 내용 디버깅
-    console.log('=== API에서 받은 FormData 내용 ===');
-    for (const [key, value] of formData.entries()) {
-      // Node.js 환경에서 파일 객체 확인
-      if (typeof value === 'object' && value !== null && 'name' in value && 'size' in value) {
-        const fileObj = value as { name: string; size: number; type: string };
-        console.log(`${key}: File(${fileObj.name}, ${fileObj.size} bytes, ${fileObj.type})`);
-      } else {
-        console.log(`${key}: ${value}`);
-      }
-    }
 
     // 기본 폼 데이터 추출
     const it_name = formData.get('it_name') as string;
@@ -176,11 +149,6 @@ export const PUT = async (
         (imageFile as { size: number }).size > 0
       ) {
         const file = imageFile as File;
-        console.log(`Processing ${imageKey}:`, {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-        });
 
         // 파일 크기 검증
         if (file.size > maxSize) {
@@ -201,7 +169,6 @@ export const PUT = async (
         try {
           const savedFilename = await saveImageFile(file, id, i - 1);
           imageUpdates[imageKey] = savedFilename;
-          console.log(`Successfully saved ${imageKey}:`, savedFilename);
         } catch (error) {
           console.error(`Error saving image ${i}:`, error);
           return NextResponse.json(
@@ -212,7 +179,6 @@ export const PUT = async (
       } else if (imagesToDelete.includes(imageKey)) {
         // 이미지 삭제 요청인 경우
         imageUpdates[imageKey] = '';
-        console.log(`Deleting ${imageKey}`);
       }
     }
 
@@ -281,24 +247,13 @@ export const PUT = async (
     Object.entries(imageUpdates).forEach(([key, value]) => {
       updateFields.push(`${key} = ?`);
       updateValues.push(value);
-      console.log(`Adding image update field: ${key} = ${value}`);
     });
-
-    console.log('=== 최종 업데이트 쿼리 정보 ===');
-    console.log('Update Fields:', updateFields);
-    console.log('Update Values:', updateValues);
-    console.log(
-      'Final Query:',
-      `UPDATE g5_shop_item SET ${updateFields.join(', ')} WHERE it_id = ?`,
-    );
 
     // 작품 정보 업데이트
     const result = await executeQuery(
       `UPDATE g5_shop_item SET ${updateFields.join(', ')} WHERE it_id = ?`,
       [...updateValues, id],
     );
-
-    console.log('Update result:', result);
 
     // @ts-expect-error mysql2 result type doesn't include affectedRows property
     if (result.affectedRows === 0) {
