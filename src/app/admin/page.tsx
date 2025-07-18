@@ -1,11 +1,18 @@
 import { Calendar } from 'lucide-react';
 import { getDesignStats } from '@/lib/dashboard/designStats';
 import { getOrderStats } from '@/lib/dashboard/orderStats';
+import { getMemberStats } from '@/lib/dashboard/memberStats';
 import DesignStatsSection from '@/components/admin/DesignStatsSection';
 import OrderStatsSection from '@/components/admin/OrderStatsSection';
+import MemberStatsSection from '@/components/admin/MemberStatsSection';
 
 export default async function AdminDashboard() {
-  const [designStats, orderStats] = await Promise.all([getDesignStats(), getOrderStats()]);
+  // 통계 데이터 조회
+  const [designStats, orderStats, memberStats] = await Promise.all([
+    getDesignStats(),
+    getOrderStats(),
+    getMemberStats(),
+  ]);
 
   return (
     <div className='space-y-6'>
@@ -23,31 +30,14 @@ export default async function AdminDashboard() {
 
       {/* 대시보드 그리드 */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        {/* 디자인 현황 */}
         <DesignStatsSection initialStats={designStats} />
 
         {/* 주문 현황 */}
         <OrderStatsSection initialStats={orderStats} />
 
         {/* 회원 현황 */}
-        <div className='rounded-lg border border-gray-200 bg-white p-6'>
-          <div className='mb-4 flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>회원 현황</h2>
-          </div>
-          <div className='grid grid-cols-3 gap-4'>
-            <div className='text-center'>
-              <div className='text-sm text-gray-600'>전체</div>
-              <div className='text-2xl font-bold text-green-600'>26578</div>
-            </div>
-            <div className='text-center'>
-              <div className='text-sm text-gray-600'>신규</div>
-              <div className='text-2xl font-bold text-gray-900'>139</div>
-            </div>
-            <div className='text-center'>
-              <div className='text-sm text-gray-600'>디자인등록회원</div>
-              <div className='text-2xl font-bold text-gray-900'>357</div>
-            </div>
-          </div>
-        </div>
+        <MemberStatsSection initialStats={memberStats} />
 
         {/* 문의 현황 */}
         <div className='rounded-lg border border-gray-200 bg-white p-6'>

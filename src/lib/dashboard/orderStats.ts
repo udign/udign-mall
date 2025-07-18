@@ -12,8 +12,6 @@ export interface OrderStats {
 
 // 주문 통계를 가져오는 함수
 export const getOrderStats = async (): Promise<OrderStats> => {
-  console.log('🔄 주문 통계 조회 중...', new Date().toISOString());
-
   try {
     // 1. 입금 대기 중 ('주문' 상태)
     const waitingPaymentQuery = `
