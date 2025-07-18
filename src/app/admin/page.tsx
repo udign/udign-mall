@@ -1,4 +1,5 @@
 import { Calendar } from 'lucide-react';
+import dayjs from 'dayjs';
 import { getDesignStats } from '@/lib/dashboard/designStats';
 import { getOrderStats } from '@/lib/dashboard/orderStats';
 import { getMemberStats } from '@/lib/dashboard/memberStats';
@@ -13,7 +14,6 @@ import LikeStatsSection from '@/components/admin/LikeStatsSection';
 import SalesStatsSection from '@/components/admin/SalesStatsSection';
 
 export default async function AdminDashboard() {
-  // 통계 데이터 조회
   const [designStats, orderStats, memberStats, inquiryStats, likeStats, salesStats] =
     await Promise.all([
       getDesignStats(),
@@ -21,12 +21,11 @@ export default async function AdminDashboard() {
       getMemberStats(),
       getInquiryStats(),
       getLikeStats(),
-      getSalesStats(),
+      getSalesStats(dayjs().year()),
     ]);
 
   return (
     <div className='space-y-6'>
-      {/* 헤더 */}
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-bold text-gray-900'>관리자 대시보드</h1>
@@ -34,28 +33,16 @@ export default async function AdminDashboard() {
         </div>
         <div className='flex items-center text-sm text-gray-500'>
           <Calendar className='mr-2 h-4 w-4' />
-          2025년 7월 7일
+          {dayjs().format('YYYY년 M월 D일')}
         </div>
       </div>
 
-      {/* 대시보드 그리드 */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-        {/* 디자인 현황 */}
         <DesignStatsSection initialStats={designStats} />
-
-        {/* 주문 현황 */}
         <OrderStatsSection initialStats={orderStats} />
-
-        {/* 회원 현황 */}
         <MemberStatsSection initialStats={memberStats} />
-
-        {/* 문의 현황 */}
         <InquiryStatsSection initialStats={inquiryStats} />
-
-        {/* 좋아요 현황 */}
         <LikeStatsSection initialStats={likeStats} />
-
-        {/* 매출 현황 */}
         <SalesStatsSection initialStats={salesStats} />
       </div>
     </div>

@@ -1,10 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
 import dayjs from 'dayjs';
 import { SalesStats } from '@/lib/dashboard/salesStats';
 import { Button } from '@/components/ui/primitives/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/primitives/select';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 // Chart.js 컴포넌트 등록
@@ -14,38 +21,32 @@ interface SalesStatsSectionProps {
   initialStats: SalesStats;
 }
 
+const getYearOptions = (currentYear: number) => {
+  const yearOptions = [];
+  for (let year = currentYear; year >= currentYear - 4; year--) {
+    yearOptions.push(year);
+  }
+  return yearOptions;
+};
+
 export default function SalesStatsSection({ initialStats }: SalesStatsSectionProps) {
   const [stats, setStats] = useState<SalesStats>(initialStats);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [selectedYear, setSelectedYear] = useState<number>(dayjs().year());
 
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
-  // 실제 매출 데이터가 있는지 확인 (useMemo로 메모이제이션)
-  const hasValidData = useMemo(() => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = dayjs().year();
+  const yearOptions = getYearOptions(currentYear);
 
-    return stats.monthly_data.some((item) => {
-      const [year, month] = item.month.split('-');
-      const itemYear = parseInt(year);
-      const itemMonth = parseInt(month);
-
-      // 현재 월까지의 데이터 중에서 매출이 0보다 큰 것이 있는지 확인
-      return (
-        (itemYear < currentYear || (itemYear === currentYear && itemMonth <= currentMonth)) &&
-        item.total_sales > 0
-      );
-    });
-  }, [stats.monthly_data]);
-
-  const fetchStats = async () => {
+  const fetchStats = async (year?: number) => {
     try {
       setIsLoading(true);
 
-      const response = await fetch('/api/admin/sales-stats');
+      const targetYear = year || selectedYear;
+      const response = await fetch(`/api/admin/sales-stats?year=${targetYear}`);
       const result = await response.json();
 
       if (result.success) {
@@ -61,6 +62,17 @@ export default function SalesStatsSection({ initialStats }: SalesStatsSectionPro
     }
   };
 
+  // 새로고침 버튼 핸들러
+  const handleRefresh = () => {
+    fetchStats();
+  };
+
+  // 연도 변경 핸들러
+  const handleYearChange = (year: number) => {
+    setSelectedYear(year);
+    fetchStats(year);
+  };
+
   // 차트 생성/업데이트
   useEffect(() => {
     if (!chartRef.current) return;
@@ -74,11 +86,11 @@ export default function SalesStatsSection({ initialStats }: SalesStatsSectionPro
     }
 
     // 현재 날짜 정보
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // 0부터 시작하므로 +1
+    const currentDate = dayjs();
+    const currentActualYear = currentDate.year();
+    const currentMonth = currentDate.month() + 1; // 0부터 시작하므로 +1
 
-    // 차트 데이터 준비 - x축에는 모든 월 표시, 데이터는 현재 월까지만
+    // 차트 데이터 준비 - x축에는 모든 월 표시, 데이터는 적절한 월까지만
     const labels = stats.monthly_data.map((item) => item.month_name); // 1월~12월 모두 표시
 
     const salesData = stats.monthly_data.map((item) => {
@@ -86,12 +98,23 @@ export default function SalesStatsSection({ initialStats }: SalesStatsSectionPro
       const itemYear = parseInt(year);
       const itemMonth = parseInt(month);
 
-      // 현재 년도보다 이전이거나, 현재 년도의 현재 월 이하만 실제 데이터 반환
-      // 그 외에는 null 반환 (Chart.js에서 null 이후로는 선을 그리지 않음)
-      if (itemYear < currentYear || (itemYear === currentYear && itemMonth <= currentMonth)) {
-        return item.total_sales;
+      // 선택된 연도가 현재 연도인 경우 현재 월까지만, 과거 연도인 경우 모든 월
+      if (selectedYear === currentActualYear) {
+        // 현재 연도: 현재 월까지만 실제 데이터 반환
+        if (
+          itemYear < currentActualYear ||
+          (itemYear === currentActualYear && itemMonth <= currentMonth)
+        ) {
+          return item.total_sales;
+        }
+        return null;
+      } else if (selectedYear < currentActualYear) {
+        // 과거 연도: 모든 월의 데이터 반환
+        return itemYear === selectedYear ? item.total_sales : null;
+      } else {
+        // 미래 연도: 데이터 없음
+        return null;
       }
-      return null;
     });
 
     const validSalesData = salesData.filter((sale): sale is number => sale !== null && sale > 0); // null이 아니고 0보다 큰 값만 필터링 (타입 가드 적용)
@@ -186,14 +209,32 @@ export default function SalesStatsSection({ initialStats }: SalesStatsSectionPro
         chartInstanceRef.current.destroy();
       }
     };
-  }, [stats]);
+  }, [stats, selectedYear]);
 
   return (
     <div className='rounded-lg border border-gray-200 bg-white p-6'>
       <div className='mb-4 flex items-center justify-between'>
-        <h2 className='text-lg font-semibold text-gray-900'>매출 현황</h2>
+        <div className='flex items-center gap-4'>
+          <h2 className='text-lg font-semibold text-gray-900'>매출 현황</h2>
+          <Select
+            value={selectedYear.toString()}
+            onValueChange={(value) => handleYearChange(parseInt(value))}
+          >
+            <SelectTrigger className='w-fit'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {yearOptions.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}년
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <Button
-          onClick={fetchStats}
+          onClick={handleRefresh}
           disabled={isLoading}
           variant='ghost'
           size='sm'
@@ -224,13 +265,7 @@ export default function SalesStatsSection({ initialStats }: SalesStatsSectionPro
       </div>
 
       <div className='relative h-64'>
-        {hasValidData ? (
-          <canvas ref={chartRef} className='h-full w-full'></canvas>
-        ) : (
-          <div className='flex h-full items-center justify-center text-gray-500'>
-            <p>아직 표시할 매출 데이터가 없습니다.</p>
-          </div>
-        )}
+        <canvas ref={chartRef} className='h-full w-full'></canvas>
       </div>
     </div>
   );

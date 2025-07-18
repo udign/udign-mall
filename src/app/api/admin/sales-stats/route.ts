@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { PERMISSION_CHECKS } from '@/lib/constants';
 import { getSalesStats } from '@/lib/dashboard/salesStats';
 
-export const GET = async () => {
+export const GET = async (request: NextRequest) => {
   try {
     // 현재 사용자 인증 및 권한 확인
     const currentUser = await getCurrentUser();
@@ -14,8 +14,21 @@ export const GET = async () => {
       );
     }
 
+    // URL 파라미터에서 연도 추출 (기본값: 현재 연도)
+    const { searchParams } = new URL(request.url);
+    const yearParam = searchParams.get('year');
+    const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
+
+    // 연도 유효성 검사
+    if (isNaN(year) || year < 2020 || year > new Date().getFullYear() + 1) {
+      return NextResponse.json(
+        { success: false, message: '유효하지 않은 연도입니다.' },
+        { status: 400 },
+      );
+    }
+
     // 매출 통계 조회
-    const salesStats = await getSalesStats();
+    const salesStats = await getSalesStats(year);
 
     return NextResponse.json({
       success: true,

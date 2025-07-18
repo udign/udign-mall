@@ -1,4 +1,5 @@
 import { executeQuery } from '@/lib/database';
+import dayjs from 'dayjs';
 
 export interface MonthlySalesData {
   month: string; // '2025-01' 형식
@@ -23,10 +24,10 @@ export interface SalesStats {
   };
 }
 
-// 매출 통계를 가져오는 함수 (올해 1월~12월)
-export const getSalesStats = async (): Promise<SalesStats> => {
+// 매출 통계를 가져오는 함수 (지정된 연도의 1월~12월)
+export const getSalesStats = async (year?: number): Promise<SalesStats> => {
   try {
-    const currentYear = new Date().getFullYear();
+    const currentYear = year || dayjs().year();
 
     // 월별 매출 데이터 조회
     const monthlySalesQuery = `
