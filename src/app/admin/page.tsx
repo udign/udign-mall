@@ -3,18 +3,21 @@ import { getDesignStats } from '@/lib/dashboard/designStats';
 import { getOrderStats } from '@/lib/dashboard/orderStats';
 import { getMemberStats } from '@/lib/dashboard/memberStats';
 import { getInquiryStats } from '@/lib/dashboard/inquiryStats';
+import { getLikeStats } from '@/lib/dashboard/likeStats';
 import DesignStatsSection from '@/components/admin/DesignStatsSection';
 import OrderStatsSection from '@/components/admin/OrderStatsSection';
 import MemberStatsSection from '@/components/admin/MemberStatsSection';
 import InquiryStatsSection from '@/components/admin/InquiryStatsSection';
+import LikeStatsSection from '@/components/admin/LikeStatsSection';
 
 export default async function AdminDashboard() {
   // 통계 데이터 조회
-  const [designStats, orderStats, memberStats, inquiryStats] = await Promise.all([
+  const [designStats, orderStats, memberStats, inquiryStats, likeStats] = await Promise.all([
     getDesignStats(),
     getOrderStats(),
     getMemberStats(),
     getInquiryStats(),
+    getLikeStats(),
   ]);
 
   return (
@@ -46,16 +49,7 @@ export default async function AdminDashboard() {
         <InquiryStatsSection initialStats={inquiryStats} />
 
         {/* 좋아요 현황 */}
-        <div className='rounded-lg border border-gray-200 bg-white p-6'>
-          <div className='mb-4 flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>좋아요 현황</h2>
-          </div>
-          <div className='flex h-24 items-center justify-center text-gray-400'>
-            <div className='text-center'>
-              <div className='text-sm'>데이터 준비 중</div>
-            </div>
-          </div>
-        </div>
+        <LikeStatsSection initialStats={likeStats} />
 
         {/* 매출 현황 */}
         <div className='rounded-lg border border-gray-200 bg-white p-6'>
