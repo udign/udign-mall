@@ -2,16 +2,19 @@ import { Calendar } from 'lucide-react';
 import { getDesignStats } from '@/lib/dashboard/designStats';
 import { getOrderStats } from '@/lib/dashboard/orderStats';
 import { getMemberStats } from '@/lib/dashboard/memberStats';
+import { getInquiryStats } from '@/lib/dashboard/inquiryStats';
 import DesignStatsSection from '@/components/admin/DesignStatsSection';
 import OrderStatsSection from '@/components/admin/OrderStatsSection';
 import MemberStatsSection from '@/components/admin/MemberStatsSection';
+import InquiryStatsSection from '@/components/admin/InquiryStatsSection';
 
 export default async function AdminDashboard() {
   // 통계 데이터 조회
-  const [designStats, orderStats, memberStats] = await Promise.all([
+  const [designStats, orderStats, memberStats, inquiryStats] = await Promise.all([
     getDesignStats(),
     getOrderStats(),
     getMemberStats(),
+    getInquiryStats(),
   ]);
 
   return (
@@ -40,25 +43,7 @@ export default async function AdminDashboard() {
         <MemberStatsSection initialStats={memberStats} />
 
         {/* 문의 현황 */}
-        <div className='rounded-lg border border-gray-200 bg-white p-6'>
-          <div className='mb-4 flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>문의 현황</h2>
-          </div>
-          <div className='grid grid-cols-3 gap-4'>
-            <div className='text-center'>
-              <div className='text-sm text-gray-600'>미처리 답변</div>
-              <div className='text-2xl font-bold text-red-600'>2</div>
-            </div>
-            <div className='text-center'>
-              <div className='text-sm text-gray-600'>재품의</div>
-              <div className='text-2xl font-bold text-orange-600'>1</div>
-            </div>
-            <div className='text-center'>
-              <div className='text-sm text-gray-600'>일반 답변</div>
-              <div className='text-2xl font-bold text-green-600'>10</div>
-            </div>
-          </div>
-        </div>
+        <InquiryStatsSection initialStats={inquiryStats} />
 
         {/* 좋아요 현황 */}
         <div className='rounded-lg border border-gray-200 bg-white p-6'>
