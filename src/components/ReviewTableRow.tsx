@@ -2,10 +2,10 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/primitives/button';
-import { Checkbox } from '@/components/ui/primitives/checkbox';
+import { Switch } from '@/components/ui/primitives/switch';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/primitives/popover';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import { ReviewItem } from '@/types/review';
-import { Settings } from 'lucide-react';
 
 interface ReviewTableRowProps {
   item: ReviewItem;
@@ -28,7 +28,12 @@ export function ReviewTableRow({
 }: ReviewTableRowProps) {
   return (
     <tr key={item.it_id} className='hover:bg-gray-50'>
-      <td className='px-6 py-4 text-center'>
+      <td className='px-4 py-3 text-center'>
+        <div className='text-sm text-gray-900'>
+          <p className='text-gray-600'>{item.it_id}</p>
+        </div>
+      </td>
+      <td className='px-4 py-3 text-center'>
         <div className='flex justify-center'>
           {imageErrors.has(item.it_id) ? (
             <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-gray-200 text-center'>
@@ -50,83 +55,91 @@ export function ReviewTableRow({
           )}
         </div>
       </td>
-      <td className='px-6 py-4 text-center'>
+      <td className='px-4 py-3 text-center'>
         <div className='text-sm text-gray-900'>
           <p className='font-medium'>{item.it_name}</p>
+          <p className='mt-1 text-xs text-gray-500'>{item.it_1}</p>
         </div>
       </td>
-      <td className='px-6 py-4 text-center'>
-        <div className='text-sm text-gray-900'>
-          <p className='text-gray-600'>{item.it_id}</p>
-        </div>
-      </td>
-      <td className='px-6 py-4 text-center'>
-        <div className='text-sm text-gray-900'>
-          <div className='font-medium'>{item.it_1}</div>
-        </div>
-      </td>
-      <td className='px-6 py-4 text-center'>
+      <td className='px-4 py-3 text-center'>
         <div className='text-sm text-gray-900'>
           <div className='font-medium'>{item.it_price?.toLocaleString() || 0}원</div>
         </div>
       </td>
-      <td className='px-6 py-4 text-center'>
+      <td className='px-4 py-3 text-center'>
         <div className='text-sm text-gray-900'>
-          <div>
-            <span className='font-medium'>{item.interest_count}</span>
-            <span className='text-gray-400'> / </span>
-            <span>{item.it_4}</span>
-            {!item.goal_achieved && item.review_status === 'in_review' && (
-              <span className='ml-2 inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800'>
-                ⚠️ 수동 설정
-              </span>
-            )}
-          </div>
-          <div className='mt-1 h-1.5 w-full rounded-full bg-gray-200'>
-            <div
-              className='bg-primary h-1.5 rounded-full'
-              style={{
-                width: `${Math.min((item.interest_count / item.it_4) * 100, 100)}%`,
-              }}
-            />
-          </div>
+          <div className='font-medium'>{item.it_stock_qty}개</div>
         </div>
       </td>
-      <td className='px-6 py-4 text-center'>
+      <td className='px-4 py-3 text-center'>
+        <div className='text-sm text-gray-900'>
+          {item.options && item.options.length > 0 ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='h-8 text-xs font-medium text-blue-600 hover:text-blue-700'
+                >
+                  {item.options.length}개 옵션
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className='w-80 p-3' side='left' align='center'>
+                <div className='space-y-2'>
+                  <h4 className='text-sm font-medium text-gray-900'>옵션별 재고</h4>
+                  <div className='max-h-32 space-y-2 overflow-y-auto'>
+                    {item.options.map((option, index) => (
+                      <div
+                        key={index}
+                        className='flex items-center justify-between rounded bg-gray-50 p-2'
+                      >
+                        <span className='flex-1 text-xs text-gray-700'>
+                          {option.option_display}
+                        </span>
+                        <div className='ml-2 text-right'>
+                          <div className='text-xs text-gray-600'>
+                            {option.io_price > 0
+                              ? `+${option.io_price.toLocaleString()}원`
+                              : '기본'}
+                          </div>
+                          <div className='text-xs font-medium text-gray-500'>
+                            재고 {option.io_stock_qty}개
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <div className='text-xs text-gray-500'>옵션 없음</div>
+          )}
+        </div>
+      </td>
+      <td className='px-4 py-3 text-center'>
+        <div className='text-sm text-gray-900'>
+          <div className='font-medium'>{item.it_4 > 0 ? item.it_4 : '미설정'}</div>
+        </div>
+      </td>
+      <td className='px-4 py-3 text-center'>
         <div className='flex justify-center'>
           <div className='flex items-center space-x-2'>
-            {visibilityLoading === item.it_id ? (
-              <LoadingSpinner size='sm' className='mb-0' />
-            ) : (
-              <label className='flex cursor-pointer items-center space-x-2'>
-                <Checkbox
-                  checked={Number(item.it_use) === 1}
-                  onCheckedChange={() => onToggleVisibility(item.it_id, item.it_use)}
-                  disabled={visibilityLoading === item.it_id}
-                />
-                <span className='text-sm text-gray-700'>
-                  {Number(item.it_use) === 1 ? '승인' : '반려'}
-                </span>
-              </label>
-            )}
+            <Switch
+              checked={Number(item.it_use) === 1}
+              onCheckedChange={() => onToggleVisibility(item.it_id, item.it_use)}
+              disabled={visibilityLoading === item.it_id}
+              className='cursor-pointer'
+            />
+            <span className='text-sm text-gray-700'>
+              {Number(item.it_use) === 1 ? '승인' : '반려'}
+            </span>
           </div>
         </div>
       </td>
-      <td className='px-6 py-4 text-center'>
+      <td className='px-4 py-3 text-center'>
         <div className='flex justify-center'>
           <div className='flex space-x-2'>
-            <Link href={`/admin/review/edit/${item.it_id}`}>
-              <Button
-                variant='outline'
-                size='sm'
-                className='border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
-                title='작품 설정'
-              >
-                <Settings className='mr-1 h-4 w-4' />
-                설정
-              </Button>
-            </Link>
-
             <Button
               onClick={() => onShowConfirmDialog(item.it_id, 'payment', item.it_name)}
               disabled={actionLoading === item.it_id || item.review_status === 'approved'}
@@ -179,6 +192,17 @@ export function ReviewTableRow({
                 '제작 검토'
               )}
             </Button>
+
+            <Link href={`/admin/review/edit/${item.it_id}`}>
+              <Button
+                variant='outline'
+                size='sm'
+                className='border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                title='작품 설정'
+              >
+                설정
+              </Button>
+            </Link>
           </div>
         </div>
       </td>

@@ -9,6 +9,14 @@ export interface OrderInfo {
   all_orders_cancelled: boolean;
 }
 
+export interface ItemOption {
+  io_id: string;
+  io_price: number;
+  io_stock_qty: number;
+  io_use: number;
+  option_display: string;
+}
+
 export interface ReviewItem {
   it_id: string;
   it_name: string;
@@ -23,10 +31,12 @@ export interface ReviewItem {
   it_time: string; // 등록일시
   it_use: '1' | '0'; // 사용 여부
   it_price: number; // 판매가격
+  it_stock_qty: number; // 재고수량
   interest_count: number; // 현재 좋아요 수
   days_since_created: number; // 등록 후 경과일
   goal_achieved: boolean; // 목표 달성 여부
   review_status: ReviewStatus;
+  options: ItemOption[]; // 작품 옵션 목록
   order_info?: OrderInfo; // 주문 정보
 }
 
