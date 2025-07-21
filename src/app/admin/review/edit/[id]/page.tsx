@@ -27,13 +27,176 @@ import {
   FormMessage,
 } from '@/components/ui/primitives/form';
 import { ArtworkDetail, Category } from '@/types/artwork';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/primitives/dropdown-menu';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import ArtworkImageUploadItem from '@/components/ArtworkImageUploadItem';
 import { ROUTES } from '@/lib/routes';
 
 type ArtworkFormData = z.infer<typeof artworkFormSchema>;
+
+interface OptionItem {
+  id: string;
+  value: string;
+  stock_qty: number;
+  price_add: number;
+  use_yn: 'Y' | 'N';
+}
+
+interface OptionGroup {
+  id: string;
+  option_name: string;
+  items: OptionItem[];
+}
+
+const OptionGroupComponent = React.memo(
+  ({
+    group,
+    groupIndex,
+    onRemoveGroup,
+    onUpdateGroupName,
+    onAddOptionItem,
+    onRemoveOptionItem,
+    onUpdateOptionItem,
+  }: {
+    group: OptionGroup;
+    groupIndex: number;
+    onRemoveGroup: (index: number) => void;
+    onUpdateGroupName: (groupIndex: number, name: string) => void;
+    onAddOptionItem: (groupIndex: number) => void;
+    onRemoveOptionItem: (groupIndex: number, itemIndex: number) => void;
+    onUpdateOptionItem: (
+      groupIndex: number,
+      itemIndex: number,
+      field: keyof OptionItem,
+      value: string | number,
+    ) => void;
+  }) => {
+    return (
+      <div className='rounded-lg border border-gray-200 p-4'>
+        <div className='mb-4 flex items-center justify-between'>
+          <div className='flex items-center space-x-4'>
+            <Input
+              value={group.option_name}
+              onChange={(e) => onUpdateGroupName(groupIndex, e.target.value)}
+              placeholder='옵션명 (예: 사이즈, 색상)'
+              className='w-48'
+            />
+            <Button
+              type='button'
+              onClick={() => onAddOptionItem(groupIndex)}
+              size='sm'
+              variant='outline'
+            >
+              <Plus className='mr-1 h-3 w-3' />
+              옵션 추가
+            </Button>
+          </div>
+          <Button
+            type='button'
+            onClick={() => onRemoveGroup(groupIndex)}
+            size='sm'
+            variant='outline'
+            className='text-red-600 hover:text-red-700'
+          >
+            <Trash2 className='h-4 w-4' />
+          </Button>
+        </div>
+
+        {group.items.length === 0 ? (
+          <div className='py-4 text-center text-sm text-gray-500'>
+            옵션이 없습니다. &ldquo;옵션 추가&rdquo; 버튼을 클릭해주세요.
+          </div>
+        ) : (
+          <div className='space-y-3'>
+            <div className='grid grid-cols-5 gap-4 rounded bg-gray-50 p-2 text-xs font-medium text-gray-600'>
+              <div>옵션값</div>
+              <div>판매수량</div>
+              <div>추가금액</div>
+              <div>사용여부</div>
+              <div>관리</div>
+            </div>
+            {group.items.map((item, itemIndex) => (
+              <div key={item.id} className='grid grid-cols-5 gap-4 rounded border bg-white p-2'>
+                <Input
+                  value={item.value}
+                  onChange={(e) =>
+                    onUpdateOptionItem(groupIndex, itemIndex, 'value', e.target.value)
+                  }
+                  placeholder='옵션값 (예: S, 빨강)'
+                />
+                <Input
+                  type='number'
+                  value={item.stock_qty}
+                  onChange={(e) =>
+                    onUpdateOptionItem(
+                      groupIndex,
+                      itemIndex,
+                      'stock_qty',
+                      parseInt(e.target.value) || 0,
+                    )
+                  }
+                  placeholder='수량'
+                />
+                <Input
+                  type='number'
+                  value={item.price_add}
+                  onChange={(e) =>
+                    onUpdateOptionItem(
+                      groupIndex,
+                      itemIndex,
+                      'price_add',
+                      parseInt(e.target.value) || 0,
+                    )
+                  }
+                  placeholder='추가금액'
+                />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant='outline' size='sm' className='w-full justify-between text-xs'>
+                      {item.use_yn === 'Y' ? '사용함' : '사용안함'}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => onUpdateOptionItem(groupIndex, itemIndex, 'use_yn', 'Y')}
+                    >
+                      사용함
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onUpdateOptionItem(groupIndex, itemIndex, 'use_yn', 'N')}
+                    >
+                      사용안함
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <div>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() => onRemoveOptionItem(groupIndex, itemIndex)}
+                    className='text-red-600 hover:text-red-700'
+                  >
+                    <Trash2 className='h-3 w-3' />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  },
+);
+
+OptionGroupComponent.displayName = 'OptionGroupComponent';
 
 const ARTWORK_IMAGE_INDICES = [1, 2, 3, 4] as const;
 
@@ -75,6 +238,7 @@ export default function ArtworkEditPage() {
   const [imageFiles, setImageFiles] = useState<{ [key: string]: File | null }>({});
   const [imagePreview, setImagePreview] = useState<{ [key: string]: string }>({});
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [optionGroups, setOptionGroups] = useState<OptionGroup[]>([]);
 
   const params = useParams();
   const router = useRouter();
@@ -134,6 +298,9 @@ export default function ArtworkEditPage() {
         const artworkData = await artworkRes.json();
         const categoriesData = categoriesRes.ok ? await categoriesRes.json() : [];
 
+        console.log('작품 데이터 조회 결과:', artworkData);
+        console.log('옵션 그룹 데이터:', artworkData.optionGroups);
+
         setArtwork(artworkData);
         setCategories(categoriesData);
 
@@ -162,31 +329,35 @@ export default function ArtworkEditPage() {
           it_name: artworkData.it_name || '',
           it_1: artworkData.it_1 || '',
           it_3: artworkData.it_3 || '',
-          it_4: artworkData.it_4 || 0,
-          it_price: artworkData.it_price || 0,
-          it_order: artworkData.it_order || 0,
-          it_use: artworkData.it_use || 1,
-          it_soldout: artworkData.it_soldout || 0,
-          it_point: artworkData.it_point || 0,
-          it_point_type: artworkData.it_point_type || 0,
-          it_supply_point: artworkData.it_supply_point || 0,
-          it_stock_qty: artworkData.it_stock_qty || 0,
-          it_stock_sms: artworkData.it_stock_sms || 0,
-          it_noti_qty: artworkData.it_noti_qty || 0,
-          it_buy_min_qty: artworkData.it_buy_min_qty || 0,
-          it_buy_max_qty: artworkData.it_buy_max_qty || 0,
-          it_notax: artworkData.it_notax || 0,
+          it_4: parseInt(artworkData.it_4) || 0,
+          it_price: parseInt(artworkData.it_price) || 0,
+          it_order: parseInt(artworkData.it_order) || 0,
+          it_use: parseInt(artworkData.it_use) || 1,
+          it_soldout: parseInt(artworkData.it_soldout) || 0,
+          it_point: parseInt(artworkData.it_point) || 0,
+          it_point_type: parseInt(artworkData.it_point_type) || 0,
+          it_supply_point: parseInt(artworkData.it_supply_point) || 0,
+          it_stock_qty: parseInt(artworkData.it_stock_qty) || 0,
+          it_stock_sms: parseInt(artworkData.it_stock_sms) || 0,
+          it_noti_qty: parseInt(artworkData.it_noti_qty) || 0,
+          it_buy_min_qty: parseInt(artworkData.it_buy_min_qty) || 0,
+          it_buy_max_qty: parseInt(artworkData.it_buy_max_qty) || 0,
+          it_notax: parseInt(artworkData.it_notax) || 0,
           it_sell_email: artworkData.it_sell_email || '',
-          it_nocoupon: artworkData.it_nocoupon || 0,
+          it_nocoupon: parseInt(artworkData.it_nocoupon) || 0,
           ca_id: finalCaId,
           ca_id2: finalCaId2,
           ca_id3: finalCaId3,
-          it_sc_type: artworkData.it_sc_type || 0,
-          it_sc_method: artworkData.it_sc_method || 0,
-          it_sc_price: artworkData.it_sc_price || 0,
-          it_sc_minimum: artworkData.it_sc_minimum || 0,
-          it_sc_qty: artworkData.it_sc_qty || 0,
+          it_sc_type: parseInt(artworkData.it_sc_type) || 0,
+          it_sc_method: parseInt(artworkData.it_sc_method) || 0,
+          it_sc_price: parseInt(artworkData.it_sc_price) || 0,
+          it_sc_minimum: parseInt(artworkData.it_sc_minimum) || 0,
+          it_sc_qty: parseInt(artworkData.it_sc_qty) || 0,
         });
+
+        // 옵션 그룹을 별도 state로 설정
+        console.log('옵션 그룹 설정:', artworkData.optionGroups || []);
+        setOptionGroups(artworkData.optionGroups || []);
       } catch (error) {
         console.error('Error fetching data:', error);
         alert('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -249,6 +420,74 @@ export default function ArtworkEditPage() {
     [],
   );
 
+  // 옵션 그룹 추가
+  const addOptionGroup = useCallback(() => {
+    const newGroup: OptionGroup = {
+      id: Date.now().toString(),
+      option_name: '',
+      items: [],
+    };
+    setOptionGroups((prev) => [...prev, newGroup]);
+  }, []);
+
+  // 옵션 그룹 제거
+  const removeOptionGroup = useCallback((index: number) => {
+    setOptionGroups((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  // 옵션 그룹 이름 변경
+  const updateOptionGroupName = useCallback((groupIndex: number, name: string) => {
+    setOptionGroups((prev) =>
+      prev.map((group, i) => (i === groupIndex ? { ...group, option_name: name } : group)),
+    );
+  }, []);
+
+  // 옵션 아이템 추가
+  const addOptionItem = useCallback((groupIndex: number) => {
+    const newItem: OptionItem = {
+      id: Date.now().toString(),
+      value: '',
+      stock_qty: 0,
+      price_add: 0,
+      use_yn: 'Y',
+    };
+    setOptionGroups((prev) =>
+      prev.map((group, i) =>
+        i === groupIndex ? { ...group, items: [...group.items, newItem] } : group,
+      ),
+    );
+  }, []);
+
+  // 옵션 아이템 제거
+  const removeOptionItem = useCallback((groupIndex: number, itemIndex: number) => {
+    setOptionGroups((prev) =>
+      prev.map((group, i) =>
+        i === groupIndex
+          ? { ...group, items: group.items.filter((_, j) => j !== itemIndex) }
+          : group,
+      ),
+    );
+  }, []);
+
+  // 옵션 아이템 업데이트
+  const updateOptionItem = useCallback(
+    (groupIndex: number, itemIndex: number, field: keyof OptionItem, value: string | number) => {
+      setOptionGroups((prev) =>
+        prev.map((group, i) =>
+          i === groupIndex
+            ? {
+                ...group,
+                items: group.items.map((item, j) =>
+                  j === itemIndex ? { ...item, [field]: value } : item,
+                ),
+              }
+            : group,
+        ),
+      );
+    },
+    [],
+  );
+
   const getImageSrc = useCallback(
     (imageIndex: number) => {
       const key = `it_img${imageIndex}`;
@@ -300,6 +539,13 @@ export default function ArtworkEditPage() {
       // 삭제할 이미지들 추가
       if (imagesToDelete.length > 0) {
         submitData.append('imagesToDelete', JSON.stringify(imagesToDelete));
+      }
+
+      // 옵션 데이터 추가
+      console.log('저장할 옵션 그룹:', optionGroups);
+      if (optionGroups && optionGroups.length > 0) {
+        console.log('옵션 그룹 JSON:', JSON.stringify(optionGroups));
+        submitData.append('optionGroups', JSON.stringify(optionGroups));
       }
 
       const response = await fetch(`/api/admin/artwork/${artworkId}`, {
@@ -395,7 +641,7 @@ export default function ArtworkEditPage() {
               <CardHeader>
                 <CardTitle>작품분류</CardTitle>
                 <p className='text-sm text-gray-600'>
-                  기본분류는 반드시 선택하셔야 합니다. 하나의 작품에 최대 3개의 다른 분류를 지정할
+                  1차 분류는 반드시 선택하셔야 합니다. 하나의 작품에 최대 3개의 다른 분류를 지정할
                   수 있습니다.
                 </p>
                 <p className='text-xs text-gray-500'>
@@ -411,7 +657,7 @@ export default function ArtworkEditPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          기본분류<span className='text-red-500'>*</span>
+                          1차 분류<span className='text-red-500'>*</span>
                         </FormLabel>
                         <Select
                           value={field.value}
@@ -446,7 +692,7 @@ export default function ArtworkEditPage() {
                               <SelectValue
                                 placeholder={
                                   !ca_id && !ca_id2
-                                    ? '먼저 기본분류를 선택해주세요'
+                                    ? '먼저 1차 분류를 선택해주세요'
                                     : '2차 카테고리를 선택하세요'
                                 }
                               />
@@ -479,7 +725,7 @@ export default function ArtworkEditPage() {
                               <SelectValue
                                 placeholder={
                                   !ca_id && !ca_id2 && !ca_id3
-                                    ? '먼저 기본분류를 선택해주세요'
+                                    ? '먼저 1차 분류를 선택해주세요'
                                     : !ca_id2 && !ca_id3
                                       ? '먼저 2차 분류를 선택해주세요'
                                       : '3차 카테고리를 선택하세요'
@@ -1071,6 +1317,49 @@ export default function ArtworkEditPage() {
                         )}
                       />
                     )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>옵션 설정</CardTitle>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <p className='text-sm text-gray-600'>
+                      작품에 옵션을 추가하여 다양한 선택사항을 제공할 수 있습니다.
+                    </p>
+                    <p className='text-xs text-gray-500'>
+                      옵션명별로 여러 옵션값을 설정할 수 있습니다. (예: 사이즈 → S, M, L)
+                    </p>
+                  </div>
+                  <Button type='button' onClick={addOptionGroup} size='sm'>
+                    <Plus className='mr-2 h-4 w-4' />
+                    옵션 그룹 추가
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {optionGroups.length === 0 ? (
+                  <div className='py-8 text-center text-gray-500'>
+                    옵션이 없습니다. 위의 &ldquo;옵션 그룹 추가&rdquo; 버튼을 클릭하여 옵션을
+                    추가해보세요.
+                  </div>
+                ) : (
+                  <div className='space-y-6'>
+                    {optionGroups.map((group, groupIndex) => (
+                      <OptionGroupComponent
+                        key={group.id}
+                        group={group}
+                        groupIndex={groupIndex}
+                        onRemoveGroup={removeOptionGroup}
+                        onUpdateGroupName={updateOptionGroupName}
+                        onAddOptionItem={addOptionItem}
+                        onRemoveOptionItem={removeOptionItem}
+                        onUpdateOptionItem={updateOptionItem}
+                      />
+                    ))}
                   </div>
                 )}
               </CardContent>
