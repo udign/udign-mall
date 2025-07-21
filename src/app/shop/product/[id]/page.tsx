@@ -193,7 +193,7 @@ export default function ProductDetailPage() {
     null,
   );
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: ItemOption }>({});
 
   const params = useParams();
   const router = useRouter();
@@ -358,18 +358,54 @@ export default function ProductDetailPage() {
     setQuantity((prev) => Math.max(1, prev - 1));
   };
 
+  // 옵션을 그룹별로 분리하는 함수
+  const getGroupedOptions = () => {
+    if (!product?.options) return {};
+
+    const grouped: { [groupName: string]: ItemOption[] } = {};
+
+    product.options.forEach((option) => {
+      // option_display에서 그룹명 추출 (예: "색상 > 빨강" -> "색상")
+      const parts = option.option_display.split(' > ');
+      const groupName = parts[0] || '기본 옵션';
+
+      if (!grouped[groupName]) {
+        grouped[groupName] = [];
+      }
+      grouped[groupName].push(option);
+    });
+
+    return grouped;
+  };
+
   const getTotalPrice = () => {
     if (!product) return 0;
     const basePrice = product.it_price;
-    const optionPrice = selectedOption ? selectedOption.io_price : 0;
+    const optionPrice = Object.values(selectedOptions).reduce(
+      (sum, option) => sum + option.io_price,
+      0,
+    );
     return (basePrice + optionPrice) * quantity;
   };
 
-  const handleOptionChange = (optionId: string) => {
+  const handleOptionChange = (groupName: string, optionId: string) => {
     const option = product?.options.find((opt) => opt.io_id === optionId);
     if (option) {
-      setSelectedOption(option);
+      setSelectedOptions((prev) => ({
+        ...prev,
+        [groupName]: option,
+      }));
     }
+  };
+
+  // 모든 필수 옵션이 선택되었는지 확인하는 함수
+  const isAllOptionsSelected = () => {
+    const groupedOptions = getGroupedOptions();
+    const groupNames = Object.keys(groupedOptions);
+
+    if (groupNames.length === 0) return true; // 옵션이 없으면 선택 완료된 것으로 간주
+
+    return groupNames.every((groupName) => selectedOptions[groupName]);
   };
 
   // 이미지 배열 생성 로직
@@ -466,42 +502,71 @@ export default function ProductDetailPage() {
                 {product.options && product.options.length > 0 && (
                   <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
                     <h3 className='mb-3 text-lg font-semibold text-gray-900'>옵션 선택</h3>
-                    <div className='space-y-3'>
-                      <Select
-                        value={selectedOption?.io_id || ''}
-                        onValueChange={handleOptionChange}
-                      >
-                        <SelectTrigger className='w-full'>
-                          <SelectValue placeholder='옵션을 선택해주세요' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {product.options.map((option) => (
-                            <SelectItem key={option.io_id} value={option.io_id}>
-                              <div className='flex w-full items-center justify-between'>
-                                <span>{option.option_display}</span>
-                                <div className='ml-4 text-right'>
+                    <div className='space-y-4'>
+                      {Object.entries(getGroupedOptions()).map(([groupName, options]) => (
+                        <div key={groupName} className='flex flex-col gap-2'>
+                          <label className='text-sm font-medium text-gray-700'>{groupName}</label>
+                          <Select
+                            value={selectedOptions[groupName]?.io_id || ''}
+                            onValueChange={(optionId) => handleOptionChange(groupName, optionId)}
+                          >
+                            <SelectTrigger className='w-full'>
+                              <SelectValue placeholder={`${groupName}을(를) 선택해주세요`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {options.map((option) => {
+                                // option_display에서 옵션값만 추출 (예: "색상 > 빨강" -> "빨강")
+                                const optionValue =
+                                  option.option_display.split(' > ')[1] || option.option_display;
+                                return (
+                                  <SelectItem key={option.io_id} value={option.io_id}>
+                                    <div className='flex w-full items-center justify-between'>
+                                      <span>{optionValue}</span>
+                                      <div className='ml-4 text-right'>
+                                        {option.io_price > 0 && (
+                                          <span className='text-sm text-blue-600'>
+                                            +{option.io_price.toLocaleString()}원
+                                          </span>
+                                        )}
+                                        <div className='text-xs text-gray-500'>
+                                          재고 {option.io_stock_qty}개
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ))}
+
+                      {/* 선택된 옵션들 요약 */}
+                      {Object.keys(selectedOptions).length > 0 && (
+                        <div className='mt-3 rounded border bg-white p-3'>
+                          <h4 className='mb-2 text-sm font-medium text-gray-900'>선택된 옵션</h4>
+                          <div className='space-y-1'>
+                            {Object.entries(selectedOptions).map(([groupName, option]) => {
+                              const optionValue =
+                                option.option_display.split(' > ')[1] || option.option_display;
+                              return (
+                                <div
+                                  key={groupName}
+                                  className='flex items-center justify-between text-sm'
+                                >
+                                  <span className='text-gray-600'>
+                                    {groupName}:{' '}
+                                    <span className='text-gray-900'>{optionValue}</span>
+                                  </span>
                                   {option.io_price > 0 && (
-                                    <span className='text-sm text-blue-600'>
+                                    <span className='font-medium text-blue-600'>
                                       +{option.io_price.toLocaleString()}원
                                     </span>
                                   )}
-                                  <div className='text-xs text-gray-500'>
-                                    재고 {option.io_stock_qty}개
-                                  </div>
                                 </div>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {selectedOption && (
-                        <div className='text-sm text-gray-600'>
-                          선택된 옵션: {selectedOption.option_display}
-                          {selectedOption.io_price > 0 && (
-                            <span className='ml-2 font-medium text-blue-600'>
-                              (+{selectedOption.io_price.toLocaleString()}원)
-                            </span>
-                          )}
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -542,11 +607,15 @@ export default function ProductDetailPage() {
                         {product.it_price.toLocaleString()}원
                       </span>
                     </div>
-                    {selectedOption && selectedOption.io_price > 0 && (
+                    {Object.values(selectedOptions).some((option) => option.io_price > 0) && (
                       <div className='flex items-center justify-between'>
                         <span className='text-sm text-gray-600'>옵션 추가금액</span>
                         <span className='text-sm text-blue-600'>
-                          +{selectedOption.io_price.toLocaleString()}원
+                          +
+                          {Object.values(selectedOptions)
+                            .reduce((sum, option) => sum + option.io_price, 0)
+                            .toLocaleString()}
+                          원
                         </span>
                       </div>
                     )}
@@ -568,7 +637,7 @@ export default function ProductDetailPage() {
                   <Button
                     className='bg-primary hover:bg-primary/90 w-full text-white'
                     size='lg'
-                    disabled={product.options.length > 0 && !selectedOption}
+                    disabled={product.options.length > 0 && !isAllOptionsSelected()}
                     onClick={() => {
                       alert('장바구니 기능은 개발 중입니다.');
                     }}
@@ -579,11 +648,17 @@ export default function ProductDetailPage() {
                     variant='outline'
                     className='border-primary text-primary hover:bg-primary w-full hover:text-white'
                     size='lg'
-                    disabled={product.options.length > 0 && !selectedOption}
+                    disabled={product.options.length > 0 && !isAllOptionsSelected()}
                     onClick={() => {
-                      const optionParam = selectedOption ? `&optionId=${selectedOption.io_id}` : '';
+                      const selectedOptionIds = Object.values(selectedOptions).map(
+                        (option) => option.io_id,
+                      );
+                      const optionParams =
+                        selectedOptionIds.length > 0
+                          ? `&optionIds=${selectedOptionIds.join(',')}`
+                          : '';
                       router.push(
-                        `/shop/checkout?itemId=${product.it_id}&quantity=${quantity}${optionParam}`,
+                        `/shop/checkout?itemId=${product.it_id}&quantity=${quantity}${optionParams}`,
                       );
                     }}
                   >
@@ -591,9 +666,9 @@ export default function ProductDetailPage() {
                   </Button>
                 </div>
 
-                {product.options.length > 0 && !selectedOption && (
+                {product.options.length > 0 && !isAllOptionsSelected() && (
                   <div className='rounded-lg border border-orange-200 bg-orange-50 p-3'>
-                    <p className='text-sm text-orange-800'>⚠️ 옵션을 선택해주세요</p>
+                    <p className='text-sm text-orange-800'>⚠️ 모든 옵션을 선택해주세요</p>
                   </div>
                 )}
 
