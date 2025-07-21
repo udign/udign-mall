@@ -24,6 +24,7 @@ import NotFoundState from '@/components/states/NotFoundState';
 import { LikeResponse } from '@/types/product';
 import MessageDialog from '@/components/ui/MessageDialog';
 import ImageMagnifierModal from '@/components/ImageMagnifierModal';
+import PopularProducts from '@/components/PopularProducts';
 
 interface ItemOption {
   io_id: string;
@@ -786,6 +787,9 @@ export default function ProductDetailPage() {
             />
           </div>
         )}
+
+        {/* 구매 불가능한 상품일 때만 인기 작품 표시 */}
+        {!product.can_purchase && <PopularProducts excludeProductId={product.it_id} />}
       </div>
 
       <LoginRequiredDialog
