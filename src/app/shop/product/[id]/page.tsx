@@ -25,6 +25,7 @@ import { LikeResponse } from '@/types/product';
 import MessageDialog from '@/components/ui/MessageDialog';
 import ImageMagnifierModal from '@/components/ImageMagnifierModal';
 import PopularProducts from '@/components/PopularProducts';
+import SizeGuideDialog from '@/components/SizeGuideDialog';
 
 interface ItemOption {
   io_id: string;
@@ -195,6 +196,7 @@ export default function ProductDetailPage() {
   );
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: ItemOption }>({});
+  const [showSizeGuide, setShowSizeGuide] = useState<boolean>(false);
 
   const params = useParams();
   const router = useRouter();
@@ -634,6 +636,17 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
+                <div className='flex justify-center'>
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => setShowSizeGuide(true)}
+                    className='text-gray-600 underline hover:text-gray-900'
+                  >
+                    사이즈 가이드 보기
+                  </Button>
+                </div>
+
                 <div className='space-y-3'>
                   <Button
                     className='bg-primary hover:bg-primary/90 w-full text-white'
@@ -819,6 +832,9 @@ export default function ProductDetailPage() {
         imageUrl={selectedImage || ''}
         productName={product.it_name}
       />
+
+      {/* 사이즈 가이드 모달 */}
+      <SizeGuideDialog open={showSizeGuide} onOpenChange={setShowSizeGuide} />
     </div>
   );
 }
