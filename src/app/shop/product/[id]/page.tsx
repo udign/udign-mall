@@ -11,12 +11,27 @@ import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Progress } from '@/components/ui/primitives/progress';
 import { Button } from '@/components/ui/primitives/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/primitives/select';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import NotFoundState from '@/components/states/NotFoundState';
 import { LikeResponse } from '@/types/product';
 import MessageDialog from '@/components/ui/MessageDialog';
 import ImageMagnifierModal from '@/components/ImageMagnifierModal';
+
+interface ItemOption {
+  io_id: string;
+  io_price: number;
+  io_stock_qty: number;
+  io_use: number;
+  option_display: string;
+}
 
 interface ProductDetail {
   it_id: string;
@@ -43,6 +58,7 @@ interface ProductDetail {
   has_access: boolean; // 접근 권한 (좋아요한 회원인지)
   can_purchase: boolean; // 구매 가능 여부
   status_message: string; // 상태 메시지
+  options: ItemOption[]; // 상품 옵션 목록
 }
 
 interface ProductDetailResponse {
@@ -177,6 +193,7 @@ export default function ProductDetailPage() {
     null,
   );
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
 
   const params = useParams();
   const router = useRouter();
@@ -342,7 +359,17 @@ export default function ProductDetailPage() {
   };
 
   const getTotalPrice = () => {
-    return product ? product.it_price * quantity : 0;
+    if (!product) return 0;
+    const basePrice = product.it_price;
+    const optionPrice = selectedOption ? selectedOption.io_price : 0;
+    return (basePrice + optionPrice) * quantity;
+  };
+
+  const handleOptionChange = (optionId: string) => {
+    const option = product?.options.find((opt) => opt.io_id === optionId);
+    if (option) {
+      setSelectedOption(option);
+    }
   };
 
   // 이미지 배열 생성 로직
@@ -435,6 +462,52 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
+                {/* 상품 옵션 선택 */}
+                {product.options && product.options.length > 0 && (
+                  <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                    <h3 className='mb-3 text-lg font-semibold text-gray-900'>옵션 선택</h3>
+                    <div className='space-y-3'>
+                      <Select
+                        value={selectedOption?.io_id || ''}
+                        onValueChange={handleOptionChange}
+                      >
+                        <SelectTrigger className='w-full'>
+                          <SelectValue placeholder='옵션을 선택해주세요' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {product.options.map((option) => (
+                            <SelectItem key={option.io_id} value={option.io_id}>
+                              <div className='flex w-full items-center justify-between'>
+                                <span>{option.option_display}</span>
+                                <div className='ml-4 text-right'>
+                                  {option.io_price > 0 && (
+                                    <span className='text-sm text-blue-600'>
+                                      +{option.io_price.toLocaleString()}원
+                                    </span>
+                                  )}
+                                  <div className='text-xs text-gray-500'>
+                                    재고 {option.io_stock_qty}개
+                                  </div>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {selectedOption && (
+                        <div className='text-sm text-gray-600'>
+                          선택된 옵션: {selectedOption.option_display}
+                          {selectedOption.io_price > 0 && (
+                            <span className='ml-2 font-medium text-blue-600'>
+                              (+{selectedOption.io_price.toLocaleString()}원)
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
                   <h3 className='mb-3 text-lg font-semibold text-gray-900'>수량 선택</h3>
                   <div className='flex items-center justify-between'>
@@ -462,11 +535,32 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                  <div className='flex items-center justify-between'>
-                    <span className='text-lg font-semibold text-gray-900'>총 금액</span>
-                    <span className='text-primary text-xl font-bold'>
-                      {getTotalPrice().toLocaleString()}원
-                    </span>
+                  <div className='space-y-2'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm text-gray-600'>기본 가격</span>
+                      <span className='text-sm text-gray-900'>
+                        {product.it_price.toLocaleString()}원
+                      </span>
+                    </div>
+                    {selectedOption && selectedOption.io_price > 0 && (
+                      <div className='flex items-center justify-between'>
+                        <span className='text-sm text-gray-600'>옵션 추가금액</span>
+                        <span className='text-sm text-blue-600'>
+                          +{selectedOption.io_price.toLocaleString()}원
+                        </span>
+                      </div>
+                    )}
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm text-gray-600'>수량</span>
+                      <span className='text-sm text-gray-900'>×{quantity}</span>
+                    </div>
+                    <hr className='my-2' />
+                    <div className='flex items-center justify-between'>
+                      <span className='text-lg font-semibold text-gray-900'>총 금액</span>
+                      <span className='text-primary text-xl font-bold'>
+                        {getTotalPrice().toLocaleString()}원
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -474,6 +568,7 @@ export default function ProductDetailPage() {
                   <Button
                     className='bg-primary hover:bg-primary/90 w-full text-white'
                     size='lg'
+                    disabled={product.options.length > 0 && !selectedOption}
                     onClick={() => {
                       alert('장바구니 기능은 개발 중입니다.');
                     }}
@@ -484,13 +579,23 @@ export default function ProductDetailPage() {
                     variant='outline'
                     className='border-primary text-primary hover:bg-primary w-full hover:text-white'
                     size='lg'
+                    disabled={product.options.length > 0 && !selectedOption}
                     onClick={() => {
-                      router.push(`/shop/checkout?itemId=${product.it_id}&quantity=${quantity}`);
+                      const optionParam = selectedOption ? `&optionId=${selectedOption.io_id}` : '';
+                      router.push(
+                        `/shop/checkout?itemId=${product.it_id}&quantity=${quantity}${optionParam}`,
+                      );
                     }}
                   >
                     구매하기
                   </Button>
                 </div>
+
+                {product.options.length > 0 && !selectedOption && (
+                  <div className='rounded-lg border border-orange-200 bg-orange-50 p-3'>
+                    <p className='text-sm text-orange-800'>⚠️ 옵션을 선택해주세요</p>
+                  </div>
+                )}
 
                 <div className='rounded-lg border border-green-200 bg-green-50 p-4'>
                   <p className='font-medium text-green-800'>✅ 심의가 완료되었습니다</p>

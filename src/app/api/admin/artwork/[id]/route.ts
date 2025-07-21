@@ -333,12 +333,15 @@ export const PUT = async (
         const optionGroups = JSON.parse(optionGroupsStr);
         console.log('파싱된 옵션 그룹:', optionGroups);
 
-        // 기존 옵션 삭제
+        // 기존 옵션 삭제 (항상 실행)
         console.log('기존 옵션 삭제 시작 - 작품 ID:', id);
-        await executeQuery('DELETE FROM g5_shop_item_option WHERE it_id = ?', [id]);
+        const deleteResult = await executeQuery('DELETE FROM g5_shop_item_option WHERE it_id = ?', [
+          id,
+        ]);
+        console.log('기존 옵션 삭제 완료:', deleteResult);
 
-        // 새로운 옵션 추가
-        if (optionGroups && optionGroups.length > 0) {
+        // 새로운 옵션 추가 (옵션이 있는 경우에만)
+        if (optionGroups && Array.isArray(optionGroups) && optionGroups.length > 0) {
           let optionIndex = 0;
 
           for (const group of optionGroups) {
@@ -377,11 +380,15 @@ export const PUT = async (
             }
           }
           console.log('옵션 저장 완료');
+        } else {
+          console.log('새로 추가할 옵션이 없습니다. 기존 옵션만 삭제되었습니다.');
         }
       } catch (optionError) {
         console.error('옵션 처리 오류:', optionError);
         // 옵션 처리 실패해도 작품 정보는 성공적으로 저장된 상태이므로 경고만 표시
       }
+    } else {
+      console.log('옵션 데이터가 전송되지 않았습니다. 기존 옵션은 유지됩니다.');
     }
 
     return NextResponse.json({
