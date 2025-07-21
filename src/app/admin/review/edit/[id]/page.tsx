@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/primitives/dropdown-menu';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import ArtworkImageUploadItem from '@/components/ArtworkImageUploadItem';
+import MessageDialog from '@/components/ui/MessageDialog';
 import { ROUTES } from '@/lib/routes';
 
 type ArtworkFormData = z.infer<typeof artworkFormSchema>;
@@ -240,6 +241,13 @@ export default function ArtworkEditPage() {
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [optionGroups, setOptionGroups] = useState<OptionGroup[]>([]);
 
+  // MessageDialog states
+  const [showRequiredImageDialog, setShowRequiredImageDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [showLoadErrorDialog, setShowLoadErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const params = useParams();
   const router = useRouter();
   const artworkId = params.id as string;
@@ -360,7 +368,8 @@ export default function ArtworkEditPage() {
         setOptionGroups(artworkData.optionGroups || []);
       } catch (error) {
         console.error('Error fetching data:', error);
-        alert('데이터를 불러오는 중 오류가 발생했습니다.');
+        setErrorMessage('데이터를 불러오는 중 오류가 발생했습니다.');
+        setShowLoadErrorDialog(true);
       } finally {
         setLoading(false);
       }
@@ -514,7 +523,7 @@ export default function ArtworkEditPage() {
     const hasNewMainImage = imageFiles['it_img1'];
 
     if (!hasMainImage && !hasNewMainImage) {
-      alert('대표 이미지는 필수입니다. 대표 이미지를 등록해주세요.');
+      setShowRequiredImageDialog(true);
       return;
     }
 
@@ -555,11 +564,11 @@ export default function ArtworkEditPage() {
         throw new Error('작품 정보 수정에 실패했습니다.');
       }
 
-      alert('작품 정보가 성공적으로 수정되었습니다.');
-      router.push(ROUTES.ADMIN_REVIEW);
+      setShowSuccessDialog(true);
     } catch (error) {
       console.error('Error updating artwork:', error);
-      alert('작품 정보 수정 중 오류가 발생했습니다.');
+      setErrorMessage('작품 정보 수정 중 오류가 발생했습니다.');
+      setShowErrorDialog(true);
     } finally {
       setSaving(false);
     }
@@ -1402,6 +1411,43 @@ export default function ArtworkEditPage() {
           </form>
         </Form>
       </div>
+
+      {/* 대표 이미지 필수 Dialog */}
+      <MessageDialog
+        open={showRequiredImageDialog}
+        onOpenChange={setShowRequiredImageDialog}
+        title='대표 이미지 필수'
+        description='대표 이미지는 필수입니다. 대표 이미지를 등록해주세요.'
+        confirmText='확인'
+      />
+
+      {/* 작품 수정 성공 Dialog */}
+      <MessageDialog
+        open={showSuccessDialog}
+        onOpenChange={setShowSuccessDialog}
+        title='수정 완료'
+        description='작품 정보가 성공적으로 수정되었습니다.'
+        confirmText='확인'
+        onConfirm={() => router.push(ROUTES.ADMIN_REVIEW)}
+      />
+
+      {/* 작품 수정 실패 Dialog */}
+      <MessageDialog
+        open={showErrorDialog}
+        onOpenChange={setShowErrorDialog}
+        title='수정 실패'
+        description={errorMessage}
+        confirmText='확인'
+      />
+
+      {/* 데이터 로딩 실패 Dialog */}
+      <MessageDialog
+        open={showLoadErrorDialog}
+        onOpenChange={setShowLoadErrorDialog}
+        title='로딩 실패'
+        description={errorMessage}
+        confirmText='확인'
+      />
     </div>
   );
 }

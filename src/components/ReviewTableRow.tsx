@@ -49,7 +49,7 @@ export function ReviewTableRow({
               alt={item.it_name}
               width={48}
               height={48}
-              className='h-12 w-12 rounded-lg object-cover'
+              className='h-12 min-w-12 rounded-lg object-cover'
               onError={() => onImageError(item.it_id)}
             />
           )}
