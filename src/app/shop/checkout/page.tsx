@@ -49,6 +49,13 @@ function CheckoutContent() {
     zipCode: '',
   });
   const [orderItems, setOrderItems] = useState<PaymentItem[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<
+    Array<{
+      io_id: string;
+      option_display: string;
+      io_price: number;
+    }>
+  >([]);
   const [messageDialogContent, setMessageDialogContent] = useState<MessageDialogState>({
     title: '',
     description: '',
@@ -100,26 +107,49 @@ function CheckoutContent() {
 
     const itemId = searchParams.get('itemId');
     const quantity = parseInt(searchParams.get('quantity') || '1');
+    const optionIds = searchParams.get('optionIds')?.split(',') || [];
 
-    const fetchItemInfo = async (itemId: string, quantity: number) => {
+    const fetchItemInfo = async (itemId: string, quantity: number, optionIds: string[]) => {
       try {
         const response = await fetch(`/api/products/${itemId}`);
         const data = await response.json();
 
         if (data.success) {
           const { product } = data;
-          const { it_id, it_name, it_price, it_img1 } = product;
-          const totalPrice = product.it_price * quantity;
+          const { it_id, it_name, it_price: basePrice, it_img1, options } = product;
+
+          // 선택된 옵션들 찾기
+          const selectedOptionsList = optionIds
+            .map((optionId) =>
+              options?.find(
+                (opt: { io_id: string; option_display: string; io_price: number }) =>
+                  opt.io_id === optionId,
+              ),
+            )
+            .filter(
+              (option): option is { io_id: string; option_display: string; io_price: number } =>
+                option != null,
+            );
+
+          // 옵션 추가 금액 계산
+          const optionTotalPrice = selectedOptionsList.reduce(
+            (sum, option) => sum + option.io_price,
+            0,
+          );
+
+          const totalPrice = (basePrice + optionTotalPrice) * quantity;
+
           const item: PaymentItem = {
             it_id,
             it_name,
-            it_price,
+            it_price: basePrice,
             quantity,
             totalPrice,
             it_img1,
           };
 
           setOrderItems([item]);
+          setSelectedOptions(selectedOptionsList);
           setAmount((prev) => ({
             ...prev,
             value: totalPrice,
@@ -134,7 +164,7 @@ function CheckoutContent() {
     };
 
     if (itemId) {
-      fetchItemInfo(itemId, quantity);
+      fetchItemInfo(itemId, quantity, optionIds);
     } else {
       setError('상품 정보가 없습니다.');
       setIsPaymentSystemLoading(false);
@@ -334,8 +364,37 @@ function CheckoutContent() {
                     </div>
                     <div className='flex-1'>
                       <h3 className='font-medium text-gray-900'>{item.it_name}</h3>
+                      {selectedOptions.length > 0 && (
+                        <div className='mt-1 space-y-1'>
+                          {selectedOptions.map((option, index) => {
+                            const optionValue =
+                              option.option_display.split(' > ')[1] || option.option_display;
+                            const groupName = option.option_display.split(' > ')[0] || '옵션';
+                            return (
+                              <p key={index} className='text-xs text-gray-500'>
+                                {groupName}: {optionValue}
+                                {option.io_price > 0 && (
+                                  <span className='ml-1 text-blue-600'>
+                                    (+{option.io_price.toLocaleString()}원)
+                                  </span>
+                                )}
+                              </p>
+                            );
+                          })}
+                        </div>
+                      )}
                       <p className='text-sm text-gray-600'>
                         {item.it_price.toLocaleString()}원 × {item.quantity}개
+                        {selectedOptions.length > 0 && (
+                          <span className='ml-1 text-blue-600'>
+                            + 옵션{' '}
+                            {(
+                              selectedOptions.reduce((sum, opt) => sum + opt.io_price, 0) *
+                              item.quantity
+                            ).toLocaleString()}
+                            원
+                          </span>
+                        )}
                       </p>
                       <p className='text-primary text-lg font-semibold'>
                         {item.totalPrice.toLocaleString()}원
@@ -490,8 +549,26 @@ function CheckoutContent() {
               <div className='space-y-2'>
                 <div className='flex justify-between'>
                   <span className='text-gray-600'>상품 금액</span>
-                  <span className='font-medium'>{getTotalAmount().toLocaleString()}원</span>
+                  <span className='font-medium'>
+                    {orderItems
+                      .reduce((sum, item) => sum + item.it_price * item.quantity, 0)
+                      .toLocaleString()}
+                    원
+                  </span>
                 </div>
+                {selectedOptions.length > 0 && (
+                  <div className='flex justify-between'>
+                    <span className='text-gray-600'>옵션 추가 금액</span>
+                    <span className='font-medium text-blue-600'>
+                      +
+                      {(
+                        selectedOptions.reduce((sum, opt) => sum + opt.io_price, 0) *
+                        orderItems.reduce((sum, item) => sum + item.quantity, 0)
+                      ).toLocaleString()}
+                      원
+                    </span>
+                  </div>
+                )}
                 <div className='flex justify-between'>
                   <span className='text-gray-600'>배송비</span>
                   <span className='font-medium'>무료</span>
