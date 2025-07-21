@@ -198,6 +198,34 @@ export const GET = async (
       statusMessage = '좋아요 모집 중입니다.';
     }
 
+    // 상품 옵션 조회
+    const optionRows = (await executeQuery(
+      `SELECT io_id, io_price, io_stock_qty, io_use
+       FROM g5_shop_item_option 
+       WHERE it_id = ? AND io_use = 1 
+       ORDER BY io_type ASC, io_no ASC`,
+      [productId],
+    )) as {
+      io_id: string;
+      io_price: number;
+      io_stock_qty: number;
+      io_use: number;
+    }[];
+
+    const options = optionRows.map((option) => {
+      // 옵션 ID를 사람이 읽기 쉬운 형태로 변환 (chr(30) = ASCII 30)
+      const optionValues = option.io_id.split(String.fromCharCode(30));
+      const optionDisplay = optionValues.filter((val) => val.trim()).join(' > ');
+
+      return {
+        io_id: option.io_id,
+        io_price: option.io_price,
+        io_stock_qty: option.io_stock_qty,
+        io_use: option.io_use,
+        option_display: optionDisplay || '기본 옵션',
+      };
+    });
+
     // 조회수 증가
     await executeQuery('UPDATE g5_shop_item SET it_hit = it_hit + 1 WHERE it_id = ?', [productId]);
 
@@ -232,6 +260,7 @@ export const GET = async (
         has_access: hasAccess, // 접근 권한
         can_purchase: canPurchase, // 구매 가능 여부
         status_message: statusMessage, // 상태 메시지
+        options: options, // 상품 옵션 추가
       },
       prev_product: prevProduct || undefined,
       next_product: nextProduct || undefined,

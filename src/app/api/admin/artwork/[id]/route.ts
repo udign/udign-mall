@@ -59,6 +59,70 @@ export const GET = async (
 
     const artwork = rows[0] as Record<string, unknown>;
 
+    // 작품 옵션 조회
+    console.log('옵션 조회 시작 - 작품 ID:', id);
+    const optionRows = (await executeQuery(
+      `SELECT io_id, io_price, io_stock_qty, io_use, io_no
+       FROM g5_shop_item_option 
+       WHERE it_id = ? 
+       ORDER BY io_type ASC, io_no ASC`,
+      [id],
+    )) as {
+      io_id: string;
+      io_price: number;
+      io_stock_qty: number;
+      io_use: number;
+      io_no: number;
+    }[];
+
+    console.log('조회된 옵션 raw 데이터:', optionRows);
+
+    // 옵션을 그룹별로 정리
+    interface OptionGroup {
+      id: string;
+      option_name: string;
+      items: {
+        id: string;
+        value: string;
+        stock_qty: number;
+        price_add: number;
+        use_yn: 'Y' | 'N';
+      }[];
+    }
+
+    const optionGroups: OptionGroup[] = [];
+    const groupMap = new Map<string, OptionGroup>();
+
+    for (const option of optionRows) {
+      // 옵션 ID를 파싱 (chr(30)으로 구분된 형태)
+      const optionParts = option.io_id.split(String.fromCharCode(30));
+      const groupName = optionParts[0] || '';
+      const optionValue = optionParts[1] || '';
+
+      if (!groupMap.has(groupName)) {
+        const newGroup = {
+          id: `group_${optionGroups.length}`,
+          option_name: groupName,
+          items: [],
+        };
+        groupMap.set(groupName, newGroup);
+        optionGroups.push(newGroup);
+      }
+
+      const group = groupMap.get(groupName);
+      if (group) {
+        group.items.push({
+          id: `item_${option.io_no}`,
+          value: optionValue,
+          stock_qty: option.io_stock_qty,
+          price_add: option.io_price,
+          use_yn: option.io_use === 1 ? 'Y' : 'N',
+        });
+      }
+    }
+
+    console.log('정리된 옵션 그룹:', optionGroups);
+
     // 이미지 URL들을 완전한 URL로 변환
     const artworkWithFullUrls = {
       ...artwork,
@@ -66,6 +130,7 @@ export const GET = async (
       it_img2: getImageUrl(artwork.it_img2 as string | null),
       it_img3: getImageUrl(artwork.it_img3 as string | null),
       it_img4: getImageUrl(artwork.it_img4 as string | null),
+      optionGroups: optionGroups, // 옵션 그룹 추가
     };
 
     return NextResponse.json(artworkWithFullUrls);
@@ -258,6 +323,72 @@ export const PUT = async (
     // @ts-expect-error mysql2 result type doesn't include affectedRows property
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: '작품을 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    // 옵션 그룹 처리
+    const optionGroupsStr = formData.get('optionGroups') as string;
+    console.log('받은 옵션 그룹 문자열:', optionGroupsStr);
+    if (optionGroupsStr) {
+      try {
+        const optionGroups = JSON.parse(optionGroupsStr);
+        console.log('파싱된 옵션 그룹:', optionGroups);
+
+        // 기존 옵션 삭제 (항상 실행)
+        console.log('기존 옵션 삭제 시작 - 작품 ID:', id);
+        const deleteResult = await executeQuery('DELETE FROM g5_shop_item_option WHERE it_id = ?', [
+          id,
+        ]);
+        console.log('기존 옵션 삭제 완료:', deleteResult);
+
+        // 새로운 옵션 추가 (옵션이 있는 경우에만)
+        if (optionGroups && Array.isArray(optionGroups) && optionGroups.length > 0) {
+          let optionIndex = 0;
+
+          for (const group of optionGroups) {
+            if (group.items && group.items.length > 0) {
+              for (const item of group.items) {
+                if (item.value && item.value.trim()) {
+                  // 옵션 ID 생성 (chr(30)으로 구분)
+                  const optionId = group.option_name + String.fromCharCode(30) + item.value;
+
+                  console.log('옵션 저장:', {
+                    it_id: id,
+                    io_id: optionId,
+                    io_price: item.price_add || 0,
+                    io_stock_qty: item.stock_qty || 0,
+                    io_use: item.use_yn === 'Y' ? 1 : 0,
+                  });
+
+                  await executeQuery(
+                    `INSERT INTO g5_shop_item_option 
+                     (it_id, io_id, io_type, io_no, io_price, io_stock_qty, io_use) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                    [
+                      id,
+                      optionId,
+                      0, // io_type (기본값 0)
+                      optionIndex, // io_no (순서)
+                      item.price_add || 0,
+                      item.stock_qty || 0,
+                      item.use_yn === 'Y' ? 1 : 0,
+                    ],
+                  );
+
+                  optionIndex++;
+                }
+              }
+            }
+          }
+          console.log('옵션 저장 완료');
+        } else {
+          console.log('새로 추가할 옵션이 없습니다. 기존 옵션만 삭제되었습니다.');
+        }
+      } catch (optionError) {
+        console.error('옵션 처리 오류:', optionError);
+        // 옵션 처리 실패해도 작품 정보는 성공적으로 저장된 상태이므로 경고만 표시
+      }
+    } else {
+      console.log('옵션 데이터가 전송되지 않았습니다. 기존 옵션은 유지됩니다.');
     }
 
     return NextResponse.json({

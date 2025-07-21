@@ -14,12 +14,13 @@ import { ROUTES } from '@/lib/routes';
 import { ReviewTableRow } from '@/components/ReviewTableRow';
 
 const tableHeaders = [
+  '작품 ID',
   '이미지',
   '작품명',
-  '작품 ID',
-  '판매자 ID',
   '판매가격',
-  '좋아요',
+  '재고',
+  '옵션',
+  '목표 좋아요',
   '디자인 검수',
   '관리',
 ];
@@ -403,7 +404,7 @@ function ReviewManagement() {
                         {tableHeaders.map((header, index) => (
                           <th
                             key={index}
-                            className='px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase'
+                            className='px-4 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase'
                           >
                             {header}
                           </th>

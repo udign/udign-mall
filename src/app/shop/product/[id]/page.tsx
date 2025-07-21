@@ -11,12 +11,27 @@ import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Progress } from '@/components/ui/primitives/progress';
 import { Button } from '@/components/ui/primitives/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/primitives/select';
 import LoadingState from '@/components/states/LoadingState';
 import ErrorState from '@/components/states/ErrorState';
 import NotFoundState from '@/components/states/NotFoundState';
 import { LikeResponse } from '@/types/product';
 import MessageDialog from '@/components/ui/MessageDialog';
 import ImageMagnifierModal from '@/components/ImageMagnifierModal';
+
+interface ItemOption {
+  io_id: string;
+  io_price: number;
+  io_stock_qty: number;
+  io_use: number;
+  option_display: string;
+}
 
 interface ProductDetail {
   it_id: string;
@@ -43,6 +58,7 @@ interface ProductDetail {
   has_access: boolean; // 접근 권한 (좋아요한 회원인지)
   can_purchase: boolean; // 구매 가능 여부
   status_message: string; // 상태 메시지
+  options: ItemOption[]; // 상품 옵션 목록
 }
 
 interface ProductDetailResponse {
@@ -177,6 +193,7 @@ export default function ProductDetailPage() {
     null,
   );
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
+  const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: ItemOption }>({});
 
   const params = useParams();
   const router = useRouter();
@@ -341,8 +358,54 @@ export default function ProductDetailPage() {
     setQuantity((prev) => Math.max(1, prev - 1));
   };
 
+  // 옵션을 그룹별로 분리하는 함수
+  const getGroupedOptions = () => {
+    if (!product?.options) return {};
+
+    const grouped: { [groupName: string]: ItemOption[] } = {};
+
+    product.options.forEach((option) => {
+      // option_display에서 그룹명 추출 (예: "색상 > 빨강" -> "색상")
+      const parts = option.option_display.split(' > ');
+      const groupName = parts[0] || '기본 옵션';
+
+      if (!grouped[groupName]) {
+        grouped[groupName] = [];
+      }
+      grouped[groupName].push(option);
+    });
+
+    return grouped;
+  };
+
   const getTotalPrice = () => {
-    return product ? product.it_price * quantity : 0;
+    if (!product) return 0;
+    const basePrice = product.it_price;
+    const optionPrice = Object.values(selectedOptions).reduce(
+      (sum, option) => sum + option.io_price,
+      0,
+    );
+    return (basePrice + optionPrice) * quantity;
+  };
+
+  const handleOptionChange = (groupName: string, optionId: string) => {
+    const option = product?.options.find((opt) => opt.io_id === optionId);
+    if (option) {
+      setSelectedOptions((prev) => ({
+        ...prev,
+        [groupName]: option,
+      }));
+    }
+  };
+
+  // 모든 필수 옵션이 선택되었는지 확인하는 함수
+  const isAllOptionsSelected = () => {
+    const groupedOptions = getGroupedOptions();
+    const groupNames = Object.keys(groupedOptions);
+
+    if (groupNames.length === 0) return true; // 옵션이 없으면 선택 완료된 것으로 간주
+
+    return groupNames.every((groupName) => selectedOptions[groupName]);
   };
 
   // 이미지 배열 생성 로직
@@ -435,6 +498,81 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
+                {/* 상품 옵션 선택 */}
+                {product.options && product.options.length > 0 && (
+                  <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                    <h3 className='mb-3 text-lg font-semibold text-gray-900'>옵션 선택</h3>
+                    <div className='space-y-4'>
+                      {Object.entries(getGroupedOptions()).map(([groupName, options]) => (
+                        <div key={groupName} className='flex flex-col gap-2'>
+                          <label className='text-sm font-medium text-gray-700'>{groupName}</label>
+                          <Select
+                            value={selectedOptions[groupName]?.io_id || ''}
+                            onValueChange={(optionId) => handleOptionChange(groupName, optionId)}
+                          >
+                            <SelectTrigger className='w-full'>
+                              <SelectValue placeholder={`${groupName}을(를) 선택해주세요`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {options.map((option) => {
+                                // option_display에서 옵션값만 추출 (예: "색상 > 빨강" -> "빨강")
+                                const optionValue =
+                                  option.option_display.split(' > ')[1] || option.option_display;
+                                return (
+                                  <SelectItem key={option.io_id} value={option.io_id}>
+                                    <div className='flex w-full items-center justify-between'>
+                                      <span>{optionValue}</span>
+                                      <div className='ml-4 text-right'>
+                                        {option.io_price > 0 && (
+                                          <span className='text-sm text-blue-600'>
+                                            +{option.io_price.toLocaleString()}원
+                                          </span>
+                                        )}
+                                        <div className='text-xs text-gray-500'>
+                                          재고 {option.io_stock_qty}개
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ))}
+
+                      {/* 선택된 옵션들 요약 */}
+                      {Object.keys(selectedOptions).length > 0 && (
+                        <div className='mt-3 rounded border bg-white p-3'>
+                          <h4 className='mb-2 text-sm font-medium text-gray-900'>선택된 옵션</h4>
+                          <div className='space-y-1'>
+                            {Object.entries(selectedOptions).map(([groupName, option]) => {
+                              const optionValue =
+                                option.option_display.split(' > ')[1] || option.option_display;
+                              return (
+                                <div
+                                  key={groupName}
+                                  className='flex items-center justify-between text-sm'
+                                >
+                                  <span className='text-gray-600'>
+                                    {groupName}:{' '}
+                                    <span className='text-gray-900'>{optionValue}</span>
+                                  </span>
+                                  {option.io_price > 0 && (
+                                    <span className='font-medium text-blue-600'>
+                                      +{option.io_price.toLocaleString()}원
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
                   <h3 className='mb-3 text-lg font-semibold text-gray-900'>수량 선택</h3>
                   <div className='flex items-center justify-between'>
@@ -462,11 +600,36 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                  <div className='flex items-center justify-between'>
-                    <span className='text-lg font-semibold text-gray-900'>총 금액</span>
-                    <span className='text-primary text-xl font-bold'>
-                      {getTotalPrice().toLocaleString()}원
-                    </span>
+                  <div className='space-y-2'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm text-gray-600'>기본 가격</span>
+                      <span className='text-sm text-gray-900'>
+                        {product.it_price.toLocaleString()}원
+                      </span>
+                    </div>
+                    {Object.values(selectedOptions).some((option) => option.io_price > 0) && (
+                      <div className='flex items-center justify-between'>
+                        <span className='text-sm text-gray-600'>옵션 추가금액</span>
+                        <span className='text-sm text-blue-600'>
+                          +
+                          {Object.values(selectedOptions)
+                            .reduce((sum, option) => sum + option.io_price, 0)
+                            .toLocaleString()}
+                          원
+                        </span>
+                      </div>
+                    )}
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm text-gray-600'>수량</span>
+                      <span className='text-sm text-gray-900'>×{quantity}</span>
+                    </div>
+                    <hr className='my-2' />
+                    <div className='flex items-center justify-between'>
+                      <span className='text-lg font-semibold text-gray-900'>총 금액</span>
+                      <span className='text-primary text-xl font-bold'>
+                        {getTotalPrice().toLocaleString()}원
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -474,6 +637,7 @@ export default function ProductDetailPage() {
                   <Button
                     className='bg-primary hover:bg-primary/90 w-full text-white'
                     size='lg'
+                    disabled={product.options.length > 0 && !isAllOptionsSelected()}
                     onClick={() => {
                       alert('장바구니 기능은 개발 중입니다.');
                     }}
@@ -484,13 +648,29 @@ export default function ProductDetailPage() {
                     variant='outline'
                     className='border-primary text-primary hover:bg-primary w-full hover:text-white'
                     size='lg'
+                    disabled={product.options.length > 0 && !isAllOptionsSelected()}
                     onClick={() => {
-                      router.push(`/shop/checkout?itemId=${product.it_id}&quantity=${quantity}`);
+                      const selectedOptionIds = Object.values(selectedOptions).map(
+                        (option) => option.io_id,
+                      );
+                      const optionParams =
+                        selectedOptionIds.length > 0
+                          ? `&optionIds=${selectedOptionIds.join(',')}`
+                          : '';
+                      router.push(
+                        `/shop/checkout?itemId=${product.it_id}&quantity=${quantity}${optionParams}`,
+                      );
                     }}
                   >
                     구매하기
                   </Button>
                 </div>
+
+                {product.options.length > 0 && !isAllOptionsSelected() && (
+                  <div className='rounded-lg border border-orange-200 bg-orange-50 p-3'>
+                    <p className='text-sm text-orange-800'>⚠️ 모든 옵션을 선택해주세요</p>
+                  </div>
+                )}
 
                 <div className='rounded-lg border border-green-200 bg-green-50 p-4'>
                   <p className='font-medium text-green-800'>✅ 심의가 완료되었습니다</p>

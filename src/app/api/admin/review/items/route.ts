@@ -17,7 +17,16 @@ interface DatabaseItem {
   it_time: string;
   it_use: '1' | '0';
   it_price: number;
+  it_stock_qty: number;
   interest_count: number;
+}
+
+interface ItemOption {
+  io_id: string;
+  io_price: number;
+  io_stock_qty: number;
+  io_use: number;
+  option_display: string;
 }
 
 // 검수 상태 계산 함수 (udign-php 로직 참고)
@@ -60,6 +69,42 @@ const calculateReviewStatus = (item: DatabaseItem) => {
   }
 
   return 'collection';
+};
+
+// 작품 옵션 조회 함수
+const getItemOptions = async (itemId: string): Promise<ItemOption[]> => {
+  try {
+    const optionQuery = `
+      SELECT io_id, io_price, io_stock_qty, io_use
+      FROM g5_shop_item_option 
+      WHERE it_id = ? AND io_use = 1 
+      ORDER BY io_type ASC, io_no ASC
+    `;
+
+    const optionRows = (await executeQuery(optionQuery, [itemId])) as {
+      io_id: string;
+      io_price: number;
+      io_stock_qty: number;
+      io_use: number;
+    }[];
+
+    return optionRows.map((option) => {
+      // 옵션 ID를 사람이 읽기 쉬운 형태로 변환 (chr(30) = ASCII 30)
+      const optionValues = option.io_id.split(String.fromCharCode(30));
+      const optionDisplay = optionValues.filter((val) => val.trim()).join(' > ');
+
+      return {
+        io_id: option.io_id,
+        io_price: option.io_price,
+        io_stock_qty: option.io_stock_qty,
+        io_use: option.io_use,
+        option_display: optionDisplay || '기본 옵션',
+      };
+    });
+  } catch (error) {
+    console.error(`옵션 조회 실패 (${itemId}):`, error);
+    return [];
+  }
 };
 
 export const GET = async (request: NextRequest) => {
@@ -150,6 +195,7 @@ export const GET = async (request: NextRequest) => {
         it.it_time,
         it.it_use,
         it.it_price,
+        it.it_stock_qty,
         COALESCE(interests.interest_count, 0) as interest_count
       ${baseQuery}
       ORDER BY it.it_time DESC
@@ -158,34 +204,41 @@ export const GET = async (request: NextRequest) => {
 
     const dataRows = (await executeQuery(selectQuery)) as DatabaseItem[];
 
-    // 검수 상태 계산 및 추가 정보 처리
-    const items = dataRows.map((item) => {
-      const goalAttained = item.interest_count >= item.it_4;
-      const daysSinceCreated = Math.floor(
-        (Date.now() - new Date(item.it_time).getTime()) / (1000 * 60 * 60 * 24),
-      );
-      const reviewStatus = calculateReviewStatus(item);
+    // 검수 상태 계산 및 추가 정보 처리 (옵션 정보 포함)
+    const items = await Promise.all(
+      dataRows.map(async (item) => {
+        const goalAttained = item.interest_count >= item.it_4;
+        const daysSinceCreated = Math.floor(
+          (Date.now() - new Date(item.it_time).getTime()) / (1000 * 60 * 60 * 24),
+        );
+        const reviewStatus = calculateReviewStatus(item);
 
-      return {
-        it_id: item.it_id,
-        it_name: item.it_name,
-        it_img1: getImageUrl(item.it_img1) || '', // 완성된 이미지 URL로 변환
-        it_1: item.it_1,
-        it_2: item.it_2,
-        it_3: item.it_3,
-        it_4: item.it_4,
-        it_8: item.it_8,
-        it_9: item.it_9,
-        it_10: item.it_10,
-        it_time: item.it_time,
-        it_use: item.it_use,
-        it_price: item.it_price,
-        interest_count: item.interest_count,
-        days_since_created: daysSinceCreated,
-        goal_achieved: goalAttained,
-        review_status: reviewStatus,
-      };
-    });
+        // 각 작품의 옵션 정보 조회
+        const options = await getItemOptions(item.it_id);
+
+        return {
+          it_id: item.it_id,
+          it_name: item.it_name,
+          it_img1: getImageUrl(item.it_img1) || '', // 완성된 이미지 URL로 변환
+          it_1: item.it_1,
+          it_2: item.it_2,
+          it_3: item.it_3,
+          it_4: item.it_4,
+          it_8: item.it_8,
+          it_9: item.it_9,
+          it_10: item.it_10,
+          it_time: item.it_time,
+          it_use: item.it_use,
+          it_price: item.it_price,
+          it_stock_qty: item.it_stock_qty,
+          interest_count: item.interest_count,
+          days_since_created: daysSinceCreated,
+          goal_achieved: goalAttained,
+          review_status: reviewStatus,
+          options: options,
+        };
+      }),
+    );
 
     return NextResponse.json({
       success: true,
