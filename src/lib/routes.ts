@@ -38,6 +38,10 @@ export const ROUTES = {
   MY_UDIGN: '/shop/my-udign',
   SEARCH: '/shop/search',
 
+  // 회원정보 관련
+  PROFILE_CONFIRM: '/shop/profile/confirm',
+  PROFILE_EDIT: '/shop/profile/edit',
+
   // 정보 페이지
   COMPANY: '/shop/company',
   GUIDE: '/shop/guide',
