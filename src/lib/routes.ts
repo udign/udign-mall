@@ -15,6 +15,7 @@ export const ROUTES = {
   ADMIN_POPUP: '/admin/popup',
   ADMIN_POPUP_CREATE: '/admin/popup/create',
   ADMIN_POPUP_EDIT: '/admin/popup/edit',
+  ADMIN_SIZE_GUIDE: '/admin/size-guide',
 
   // 인증 관련
   LOGIN: '/shop/login',

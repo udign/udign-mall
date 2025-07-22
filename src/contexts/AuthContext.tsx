@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@/types/user';
+import { ROUTES } from '@/lib/routes';
 
 interface AuthContextType {
   user: User | null;
@@ -121,6 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       setUser(null);
+      window.location.href = ROUTES.SHOP;
     } catch (error) {
       console.error('Logout error:', error);
     }

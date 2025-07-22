@@ -27,7 +27,6 @@ const deleteImageFromStorage = async (imageUrl: string): Promise<void> => {
     await del(imageUrl, {
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
-    console.log(`이미지 삭제 완료: ${imageUrl}`);
   } catch (error) {
     console.error(`이미지 삭제 실패: ${imageUrl}`, error);
   }
@@ -157,8 +156,6 @@ export const PUT = async (
 
     // 삭제된 이미지들을 Vercel Storage에서 제거
     if (deletedImageUrls.length > 0) {
-      console.log(`삭제할 이미지 ${deletedImageUrls.length}개:`, deletedImageUrls);
-
       // 이미지 삭제를 병렬로 처리
       await Promise.allSettled(deletedImageUrls.map((url) => deleteImageFromStorage(url)));
     }
