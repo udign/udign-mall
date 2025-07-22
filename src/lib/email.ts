@@ -39,7 +39,7 @@ export const sendEmail = async ({ to, subject, html, from }: EmailConfig): Promi
     }
 
     const mailOptions = {
-      from: from || `"${process.env.ADMIN_NAME || 'UDIGN'}" <${process.env.GMAIL_USER}>`,
+      from: from || `UDIGN <${process.env.GMAIL_USER}>`,
       to,
       subject,
       html,
