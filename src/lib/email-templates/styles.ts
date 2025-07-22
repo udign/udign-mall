@@ -51,4 +51,70 @@ export const emailStyles = `
     text-decoration: none; 
     text-align: center; 
   }
+  
+  /* 주문 메일용 추가 스타일 */
+  .order-info { 
+    margin: 0 auto 20px; 
+    width: 94%; 
+    padding: 15px; 
+    background: #f9f9f9; 
+    border-left: 4px solid #007bff; 
+  }
+  .order-table { 
+    margin: 0 auto 20px; 
+    width: 94%; 
+    border: 0; 
+    border-collapse: collapse; 
+  }
+  .table-caption { 
+    padding: 0 0 5px; 
+    font-weight: bold; 
+    text-align: left; 
+  }
+  .table-th { 
+    padding: 8px; 
+    border-top: 1px solid #e9e9e9; 
+    border-bottom: 1px solid #e9e9e9; 
+    background: #f5f6fa; 
+    text-align: left; 
+    font-weight: bold; 
+  }
+  .table-td { 
+    padding: 8px; 
+    border-top: 1px solid #e9e9e9; 
+    border-bottom: 1px solid #e9e9e9; 
+  }
+  .table-empty { 
+    padding: 30px; 
+    border-top: 1px solid #e9e9e9; 
+    border-bottom: 1px solid #e9e9e9; 
+    text-align: center; 
+    color: #999; 
+  }
+  .product-link { 
+    text-decoration: none; 
+    color: #333; 
+  }
+  .product-link:hover { 
+    text-decoration: underline; 
+  }
+  .price { 
+    font-weight: bold; 
+    color: #007bff; 
+  }
+  .total-price { 
+    font-weight: bold; 
+    color: #dc3545; 
+    font-size: 1.1em; 
+  }
 `;
+
+// 가격 포맷팅 함수
+export const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat('ko-KR').format(price) + '원';
+};
+
+// 포인트 포맷팅 함수
+export const formatPoint = (point: number): string => {
+  return new Intl.NumberFormat('ko-KR').format(point) + 'P';
+};

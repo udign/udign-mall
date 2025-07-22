@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
 import { WelcomeEmailTemplate } from './email-templates/WelcomeEmailTemplate';
 import { NewMemberNotificationTemplate } from './email-templates/NewMemberNotificationTemplate';
+import { OrderCompleteCustomerTemplate } from './email-templates/OrderCompleteCustomerTemplate';
+import { OrderCompleteAdminTemplate } from './email-templates/OrderCompleteAdminTemplate';
+import { OrderCompleteEmailData } from './email-templates/types';
 
 // 이메일 설정 인터페이스
 interface EmailConfig {
@@ -100,6 +103,52 @@ export const sendNewMemberNotification = async (memberData: {
   return await sendEmail({
     to: adminEmail,
     subject: `[${SITE_NAME}] ${memberData.name} 님께서 회원으로 가입하셨습니다.`,
+    html,
+  });
+};
+
+/**
+ * 주문 완료 메일 (주문자용)
+ */
+export const sendOrderCompleteCustomerEmail = async (
+  orderData: OrderCompleteEmailData,
+  customerEmail: string,
+): Promise<boolean> => {
+  const html = OrderCompleteCustomerTemplate({
+    ...orderData,
+    siteName: SITE_NAME,
+    siteUrl: SITE_URL,
+  });
+
+  return await sendEmail({
+    to: customerEmail,
+    subject: `[${SITE_NAME}] 주문이 완료되었습니다 (주문번호: ${orderData.orderId})`,
+    html,
+  });
+};
+
+/**
+ * 주문 완료 알림 메일 (관리자용)
+ */
+export const sendOrderCompleteAdminEmail = async (
+  orderData: OrderCompleteEmailData,
+): Promise<boolean> => {
+  const adminEmail = process.env.ADMIN_EMAIL;
+
+  if (!adminEmail) {
+    console.error('관리자 이메일이 설정되지 않았습니다.');
+    return false;
+  }
+
+  const html = OrderCompleteAdminTemplate({
+    ...orderData,
+    siteName: SITE_NAME,
+    siteUrl: SITE_URL,
+  });
+
+  return await sendEmail({
+    to: adminEmail,
+    subject: `[${SITE_NAME}] 새 주문이 접수되었습니다 (${orderData.ordererInfo.name})`,
     html,
   });
 };
