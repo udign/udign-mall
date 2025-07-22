@@ -3,6 +3,10 @@ import { WelcomeEmailTemplate } from './email-templates/WelcomeEmailTemplate';
 import { NewMemberNotificationTemplate } from './email-templates/NewMemberNotificationTemplate';
 import { OrderCompleteCustomerTemplate } from './email-templates/OrderCompleteCustomerTemplate';
 import { OrderCompleteAdminTemplate } from './email-templates/OrderCompleteAdminTemplate';
+import {
+  PasswordLostTemplate,
+  PasswordLostEmailData,
+} from './email-templates/PasswordLostTemplate';
 import { OrderCompleteEmailData } from './email-templates/types';
 
 // 이메일 설정 인터페이스
@@ -149,6 +153,25 @@ export const sendOrderCompleteAdminEmail = async (
   return await sendEmail({
     to: adminEmail,
     subject: `[${SITE_NAME}] 새 주문이 접수되었습니다 (${orderData.ordererInfo.name})`,
+    html,
+  });
+};
+
+/**
+ * 비밀번호 찾기 메일 발송
+ */
+export const sendPasswordLostEmail = async (
+  passwordLostData: PasswordLostEmailData,
+): Promise<boolean> => {
+  const html = PasswordLostTemplate({
+    ...passwordLostData,
+    siteName: SITE_NAME,
+    siteUrl: SITE_URL,
+  });
+
+  return await sendEmail({
+    to: passwordLostData.memberEmail,
+    subject: `[${SITE_NAME}] 요청하신 회원정보 찾기 안내 메일입니다.`,
     html,
   });
 };

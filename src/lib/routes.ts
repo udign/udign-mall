@@ -22,6 +22,8 @@ export const ROUTES = {
   LOGIN: '/shop/login',
   REGISTER: '/shop/register',
   TERMS: '/shop/terms',
+  FORGOT_PASSWORD: '/shop/forgot-password',
+  RESET_PASSWORD: '/shop/reset-password',
 
   // 카테고리 페이지
   FASHION: '/shop/fashion',

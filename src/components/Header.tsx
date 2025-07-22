@@ -38,7 +38,11 @@ export default function Header() {
   const pathname = usePathname();
 
   const hideHeader =
-    pathname === ROUTES.LOGIN || pathname === ROUTES.REGISTER || pathname === ROUTES.TERMS;
+    pathname === ROUTES.LOGIN ||
+    pathname === ROUTES.REGISTER ||
+    pathname === ROUTES.TERMS ||
+    pathname === ROUTES.FORGOT_PASSWORD ||
+    pathname === ROUTES.RESET_PASSWORD;
 
   const handleLogout = async () => {
     await logout();

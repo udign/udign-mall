@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/primitives/card';
 
-import { Mail, Send, CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
+import { Send, CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 
 interface TestResult {
   success: boolean;
@@ -81,10 +81,7 @@ export default function MailTestPage() {
   return (
     <div>
       <div className='mb-6'>
-        <h1 className='flex items-center gap-2 text-2xl font-bold'>
-          <Mail className='h-6 w-6' />
-          메일 테스트
-        </h1>
+        <h1 className='flex items-center text-2xl font-bold'>메일 테스트</h1>
         <p className='text-muted-foreground mt-2'>
           메일 서버가 정상적으로 동작하는지 확인할 수 있습니다.
         </p>

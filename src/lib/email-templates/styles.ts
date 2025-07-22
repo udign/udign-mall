@@ -44,12 +44,30 @@ export const emailStyles = `
     border-left: 4px solid #007bff; 
   }
   .cta-button { 
-    display: block; 
-    padding: 30px 0; 
-    background: #484848; 
-    color: #fff; 
-    text-decoration: none; 
+    display: inline-block; 
+    padding: 15px 30px; 
+    background: #ff3061 !important; 
+    color: #fff !important; 
+    text-decoration: none !important; 
     text-align: center; 
+    font-weight: bold;
+    font-size: 1.1em;
+    border-radius: 8px;
+    margin: 30px auto;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(255, 48, 97, 0.3);
+    transition: all 0.3s ease;
+  }
+  .cta-button:hover {
+    background: #e02851 !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 48, 97, 0.4);
+  }
+  .cta-container {
+    text-align: center;
+    padding: 20px 30px 30px;
+    background: #f9f9f9;
   }
   
   /* 주문 메일용 추가 스타일 */
