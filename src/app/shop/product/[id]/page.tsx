@@ -262,18 +262,8 @@ export default function ProductDetailPage() {
     fetchProductDetail();
   }, [productId, user, authLoading, addViewedProduct]);
 
-  // 목표 달성했지만 좋아요를 누르지 않은 작품 접근 차단
-  useEffect(() => {
-    if (!product) return;
-
-    const isGoalAchieved = product.current_likes >= product.it_4;
-    const isNotLiked = !product.is_liked;
-
-    // 목표 달성 + 좋아요 안 누른 상태면 이전 페이지로 이동
-    if (isGoalAchieved && isNotLiked) {
-      router.back();
-    }
-  }, [product, router]);
+  // 목표 달성했지만 좋아요를 누르지 않은 작품 접근 차단 로직 제거
+  // 이제 달성 UI로 표시하도록 변경
 
   // Carousel과 thumbnail 동기화
   useEffect(() => {
@@ -468,8 +458,8 @@ export default function ProductDetailPage() {
   ) : (
     <div className='bg-white'>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
-        {/* 좋아요 수 충족된 작품 - 간단한 달성 UI */}
-        {product.current_likes >= product.it_4 && product.is_liked ? (
+        {/* 좋아요 수 충족된 작품 - 좋아요를 누르지 않은 사용자에게만 달성 UI 표시 */}
+        {product.current_likes >= product.it_4 && !product.is_liked ? (
           <div className='text-center'>
             <h1 className='mb-8 text-3xl font-bold text-gray-900'>{product.it_name}</h1>
             <div className='relative mx-auto max-w-md'>
@@ -618,7 +608,7 @@ export default function ProductDetailPage() {
                   onClick={handleLikeToggle}
                   variant='ghost'
                   size='icon'
-                  disabled={likingInProgress}
+                  disabled={likingInProgress || product.is_under_review || product.can_purchase}
                   className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   {likingInProgress ? (
