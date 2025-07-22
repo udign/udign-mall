@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
+import { useIsMobile } from '@/hooks/use-mobile';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
 import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
@@ -26,6 +27,14 @@ import MessageDialog from '@/components/ui/MessageDialog';
 import ImageMagnifierModal from '@/components/ImageMagnifierModal';
 import PopularProducts from '@/components/PopularProducts';
 import SizeGuideDialog from '@/components/SizeGuideDialog';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  type CarouselApi,
+} from '@/components/ui/primitives/carousel';
 
 interface ItemOption {
   io_id: string;
@@ -134,7 +143,6 @@ interface MainImageProps {
   sizes?: string;
   isImageFailed: boolean;
   onImageError: (e: React.SyntheticEvent<HTMLImageElement>) => void;
-  onMagnifierClick: () => void;
 }
 
 function MainImage({
@@ -144,7 +152,6 @@ function MainImage({
   sizes = '(max-width: 768px) 100vw, 50vw',
   isImageFailed,
   onImageError,
-  onMagnifierClick,
 }: MainImageProps) {
   return (
     <div className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${className}`}>
@@ -162,19 +169,6 @@ function MainImage({
           <span className='text-gray-400'>이미지 없음</span>
         </div>
       )}
-
-      {/* 돋보기 버튼 */}
-      {selectedImage && !isImageFailed && (
-        <Button
-          onClick={onMagnifierClick}
-          variant='secondary'
-          size='sm'
-          className='absolute right-3 bottom-3 h-8 w-8 rounded-full bg-white/80 p-0 shadow-lg backdrop-blur-sm transition-all duration-200 hover:bg-white/90'
-        >
-          <SearchIcon className='h-4 w-4' />
-          <span className='sr-only'>이미지 확대보기</span>
-        </Button>
-      )}
     </div>
   );
 }
@@ -189,6 +183,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [quantity, setQuantity] = useState<number>(1);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [likingInProgress, setLikingInProgress] = useState<boolean>(false);
   const [showOrderDialog, setShowOrderDialog] = useState<boolean>(false);
   const [orderInfo, setOrderInfo] = useState<{ orderNumber: number; productName: string } | null>(
@@ -205,6 +200,7 @@ export default function ProductDetailPage() {
   const { addViewedProduct } = useTodayViewedProducts();
 
   const productId = params.id as string;
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // 인증 로딩이 완료된 후에만 체크
@@ -279,6 +275,37 @@ export default function ProductDetailPage() {
     }
   }, [product, router]);
 
+  // Carousel과 thumbnail 동기화
+  useEffect(() => {
+    if (!carouselApi || !product) return;
+
+    const images = [product.it_img1, product.it_img2, product.it_img3].filter(Boolean) as string[];
+
+    const onSelect = () => {
+      const index = carouselApi.selectedScrollSnap();
+      const selectedImg = images[index];
+      if (selectedImg) {
+        setSelectedImage(selectedImg);
+      }
+    };
+
+    carouselApi.on('select', onSelect);
+    onSelect(); // 초기 설정
+
+    return () => {
+      carouselApi.off('select', onSelect);
+    };
+  }, [carouselApi, product]);
+
+  // isMobile 상태 변경 시 carousel 재초기화
+  useEffect(() => {
+    if (carouselApi) {
+      carouselApi.reInit({
+        watchDrag: isMobile,
+      });
+    }
+  }, [isMobile, carouselApi]);
+
   const handleLikeToggle = async () => {
     if (!user || !product) return;
 
@@ -337,7 +364,18 @@ export default function ProductDetailPage() {
     router.push(ROUTES.HOME);
   };
 
-  const handleThumbnailClick = (imageUrl: string) => setSelectedImage(imageUrl);
+  const handleThumbnailClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    if (product && carouselApi) {
+      const images = [product.it_img1, product.it_img2, product.it_img3].filter(
+        Boolean,
+      ) as string[];
+      const imageIndex = images.indexOf(imageUrl);
+      if (imageIndex !== -1) {
+        carouselApi.scrollTo(imageIndex);
+      }
+    }
+  };
 
   const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
@@ -447,15 +485,46 @@ export default function ProductDetailPage() {
                   />
                 ))}
               </div>
-              <MainImage
-                selectedImage={selectedImage}
-                productName={product.it_name}
-                className='order-1 flex-1 sm:order-2'
-                sizes='(max-width: 640px) 100vw, 50vw'
-                isImageFailed={selectedImage ? failedImages.has(selectedImage) : false}
-                onImageError={handleImageError}
-                onMagnifierClick={handleMagnifierClick}
-              />
+              <div className='order-1 flex-1 sm:order-2'>
+                <div className='relative'>
+                  <Carousel
+                    setApi={setCarouselApi}
+                    className='w-full'
+                    opts={{
+                      watchDrag: isMobile, // 모바일에서만 드래그 허용
+                    }}
+                  >
+                    <CarouselContent>
+                      {productImages.map((image) => (
+                        <CarouselItem key={image}>
+                          <MainImage
+                            selectedImage={image}
+                            productName={product.it_name}
+                            className='w-full'
+                            sizes='(max-width: 640px) 100vw, 50vw'
+                            isImageFailed={failedImages.has(image)}
+                            onImageError={handleImageError}
+                          />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className='left-2 hidden sm:flex' />
+                    <CarouselNext className='right-2 hidden sm:flex' />
+                  </Carousel>
+
+                  {selectedImage && !failedImages.has(selectedImage) && (
+                    <Button
+                      onClick={handleMagnifierClick}
+                      variant='secondary'
+                      size='sm'
+                      className='absolute right-3 bottom-3 z-10 h-8 w-8 rounded-full bg-white/80 p-0 shadow-lg backdrop-blur-sm transition-all duration-200 hover:bg-white/90'
+                    >
+                      <SearchIcon className='h-4 w-4' />
+                      <span className='sr-only'>이미지 확대보기</span>
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
