@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { registerUser } from '@/lib/auth';
 import { RegisterRequest } from '@/types/user';
+import { sendWelcomeEmail, sendNewMemberNotification } from '@/lib/email';
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -43,6 +44,29 @@ export const POST = async (request: NextRequest) => {
     const result = await registerUser(body);
 
     if (result.success) {
+      // 회원가입 성공 시 메일 발송
+      try {
+        // 신규 회원에게 축하 메일 발송
+        await sendWelcomeEmail({
+          email: body.mb_email,
+          name: body.mb_name,
+          id: body.mb_id,
+        });
+
+        // 관리자에게 신규 회원 알림 메일 발송
+        await sendNewMemberNotification({
+          email: body.mb_email,
+          name: body.mb_name,
+          id: body.mb_id,
+          nick: body.mb_nick,
+        });
+
+        console.log('회원가입 메일 발송 완료:', body.mb_id);
+      } catch (emailError) {
+        // 메일 발송 실패는 로그만 남기고 회원가입은 정상 처리
+        console.error('회원가입 메일 발송 실패:', emailError);
+      }
+
       return NextResponse.json(result, { status: 201 });
     } else {
       return NextResponse.json(result, { status: 400 });

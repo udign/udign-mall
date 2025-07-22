@@ -38,7 +38,13 @@ export default function Header() {
   const pathname = usePathname();
 
   const hideHeader =
-    pathname === ROUTES.LOGIN || pathname === ROUTES.REGISTER || pathname === ROUTES.TERMS;
+    pathname === ROUTES.LOGIN ||
+    pathname === ROUTES.REGISTER ||
+    pathname === ROUTES.TERMS ||
+    pathname === ROUTES.FORGOT_PASSWORD ||
+    pathname === ROUTES.RESET_PASSWORD ||
+    pathname === ROUTES.PROFILE_CONFIRM ||
+    pathname === ROUTES.PROFILE_EDIT;
 
   const handleLogout = async () => {
     await logout();
@@ -140,6 +146,12 @@ export default function Header() {
                           관리자
                         </DropdownMenuItem>
                       )}
+                      <DropdownMenuItem
+                        onClick={() => router.push(ROUTES.PROFILE_CONFIRM)}
+                        className='cursor-pointer'
+                      >
+                        회원정보 수정
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
                         로그아웃
                       </DropdownMenuItem>

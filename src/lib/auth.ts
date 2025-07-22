@@ -88,14 +88,19 @@ export const verifyPassword = async (
     try {
       // bcrypt와 호환되는 형태로 변환하여 검증
       const compatibleHash = hashedPassword.replace(/^\$2y\$/, '$2a$');
-      return await bcrypt.compare(password, compatibleHash);
+      const phpResult = await bcrypt.compare(password, compatibleHash);
+      if (phpResult) {
+        return phpResult;
+      }
     } catch {
       // PHP password_hash 검증 실패
     }
   }
 
   // 3. 레거시 해시 방식 검증
-  return verifyLegacyPassword(password, hashedPassword);
+  const legacyResult = verifyLegacyPassword(password, hashedPassword);
+
+  return legacyResult;
 };
 
 // 사용자 정보를 기반으로 JWT 토큰을 생성하여 인증에 사용

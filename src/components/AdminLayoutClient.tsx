@@ -20,6 +20,7 @@ import {
   Settings,
   Monitor,
   Ruler,
+  Mail,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -127,6 +128,11 @@ const menuItems: MenuItem[] = [
         label: '사이즈 가이드 관리',
         href: ROUTES.ADMIN_SIZE_GUIDE,
         icon: <Ruler className='h-4 w-4' />,
+      },
+      {
+        label: '메일 테스트',
+        href: ROUTES.ADMIN_MAIL_TEST,
+        icon: <Mail className='h-4 w-4' />,
       },
     ],
   },

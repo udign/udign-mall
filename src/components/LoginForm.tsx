@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { Switch } from '@/components/ui/primitives/switch';
 import { Button } from '@/components/ui/primitives/button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { ROUTES } from '@/lib/routes';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -144,7 +146,9 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
               <span>자동로그인</span>
             </div>
             <div className='text-gray-300'>
-              <span className='cursor-pointer hover:text-white'>아이디/비밀번호 찾기</span>
+              <Link href={ROUTES.FORGOT_PASSWORD} className='cursor-pointer hover:text-white'>
+                아이디/비밀번호 찾기
+              </Link>
               <span className='mx-2'>|</span>
               {onSwitchToRegister && (
                 <Button
