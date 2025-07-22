@@ -19,6 +19,7 @@ import {
   RefreshCw,
   Settings,
   Monitor,
+  Ruler,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -121,6 +122,11 @@ const menuItems: MenuItem[] = [
         label: '팝업 관리',
         href: ROUTES.ADMIN_POPUP,
         icon: <Monitor className='h-4 w-4' />,
+      },
+      {
+        label: '사이즈 가이드 관리',
+        href: ROUTES.ADMIN_SIZE_GUIDE,
+        icon: <Ruler className='h-4 w-4' />,
       },
     ],
   },
