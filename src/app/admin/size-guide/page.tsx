@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
 import { Label } from '@/components/ui/primitives/label';
 import { Switch } from '@/components/ui/primitives/switch';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { MEMBER_LEVELS } from '@/lib/constants';
 import LoadingState from '@/components/states/LoadingState';

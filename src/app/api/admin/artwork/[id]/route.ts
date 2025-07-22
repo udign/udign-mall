@@ -59,8 +59,6 @@ export const GET = async (
 
     const artwork = rows[0] as Record<string, unknown>;
 
-    // 작품 옵션 조회
-    console.log('옵션 조회 시작 - 작품 ID:', id);
     const optionRows = (await executeQuery(
       `SELECT io_id, io_price, io_stock_qty, io_use, io_no
        FROM g5_shop_item_option 
@@ -74,8 +72,6 @@ export const GET = async (
       io_use: number;
       io_no: number;
     }[];
-
-    console.log('조회된 옵션 raw 데이터:', optionRows);
 
     // 옵션을 그룹별로 정리
     interface OptionGroup {
@@ -120,8 +116,6 @@ export const GET = async (
         });
       }
     }
-
-    console.log('정리된 옵션 그룹:', optionGroups);
 
     // 이미지 URL들을 완전한 URL로 변환
     const artworkWithFullUrls = {
@@ -327,18 +321,10 @@ export const PUT = async (
 
     // 옵션 그룹 처리
     const optionGroupsStr = formData.get('optionGroups') as string;
-    console.log('받은 옵션 그룹 문자열:', optionGroupsStr);
+
     if (optionGroupsStr) {
       try {
         const optionGroups = JSON.parse(optionGroupsStr);
-        console.log('파싱된 옵션 그룹:', optionGroups);
-
-        // 기존 옵션 삭제 (항상 실행)
-        console.log('기존 옵션 삭제 시작 - 작품 ID:', id);
-        const deleteResult = await executeQuery('DELETE FROM g5_shop_item_option WHERE it_id = ?', [
-          id,
-        ]);
-        console.log('기존 옵션 삭제 완료:', deleteResult);
 
         // 새로운 옵션 추가 (옵션이 있는 경우에만)
         if (optionGroups && Array.isArray(optionGroups) && optionGroups.length > 0) {
@@ -350,14 +336,6 @@ export const PUT = async (
                 if (item.value && item.value.trim()) {
                   // 옵션 ID 생성 (chr(30)으로 구분)
                   const optionId = group.option_name + String.fromCharCode(30) + item.value;
-
-                  console.log('옵션 저장:', {
-                    it_id: id,
-                    io_id: optionId,
-                    io_price: item.price_add || 0,
-                    io_stock_qty: item.stock_qty || 0,
-                    io_use: item.use_yn === 'Y' ? 1 : 0,
-                  });
 
                   await executeQuery(
                     `INSERT INTO g5_shop_item_option 
@@ -379,16 +357,11 @@ export const PUT = async (
               }
             }
           }
-          console.log('옵션 저장 완료');
-        } else {
-          console.log('새로 추가할 옵션이 없습니다. 기존 옵션만 삭제되었습니다.');
         }
       } catch (optionError) {
         console.error('옵션 처리 오류:', optionError);
         // 옵션 처리 실패해도 작품 정보는 성공적으로 저장된 상태이므로 경고만 표시
       }
-    } else {
-      console.log('옵션 데이터가 전송되지 않았습니다. 기존 옵션은 유지됩니다.');
     }
 
     return NextResponse.json({

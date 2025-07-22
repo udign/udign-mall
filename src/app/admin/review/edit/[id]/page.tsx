@@ -306,9 +306,6 @@ export default function ArtworkEditPage() {
         const artworkData = await artworkRes.json();
         const categoriesData = categoriesRes.ok ? await categoriesRes.json() : [];
 
-        console.log('작품 데이터 조회 결과:', artworkData);
-        console.log('옵션 그룹 데이터:', artworkData.optionGroups);
-
         setArtwork(artworkData);
         setCategories(categoriesData);
 
@@ -363,8 +360,6 @@ export default function ArtworkEditPage() {
           it_sc_qty: parseInt(artworkData.it_sc_qty) || 0,
         });
 
-        // 옵션 그룹을 별도 state로 설정
-        console.log('옵션 그룹 설정:', artworkData.optionGroups || []);
         setOptionGroups(artworkData.optionGroups || []);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -550,9 +545,6 @@ export default function ArtworkEditPage() {
         submitData.append('imagesToDelete', JSON.stringify(imagesToDelete));
       }
 
-      // 옵션 데이터 추가 (빈 배열이어도 항상 전송하여 기존 옵션을 삭제할 수 있도록 함)
-      console.log('저장할 옵션 그룹:', optionGroups);
-      console.log('옵션 그룹 JSON:', JSON.stringify(optionGroups));
       submitData.append('optionGroups', JSON.stringify(optionGroups || []));
 
       const response = await fetch(`/api/admin/artwork/${artworkId}`, {

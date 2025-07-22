@@ -85,8 +85,6 @@ export default function PopupCreatePage() {
     },
   });
 
-  console.log('폼', form);
-
   useEffect(() => {
     if (authLoading) return;
 

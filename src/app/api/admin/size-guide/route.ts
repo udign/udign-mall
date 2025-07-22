@@ -136,7 +136,6 @@ const ensureSizeGuideTable = async () => {
         ADD COLUMN size_l VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'L 사이즈 측정값'
         AFTER size_m
       `);
-      console.log('size_l 컬럼이 성공적으로 추가되었습니다.');
     }
   } catch (error) {
     console.error('사이즈 가이드 테이블 생성 오류:', error);
