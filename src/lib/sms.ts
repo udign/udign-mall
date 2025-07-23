@@ -62,13 +62,77 @@ export const canSendSMS = async (): Promise<boolean> => {
     return false;
   }
 
-  // 토큰키 방식 또는 ID/PW 방식 중 하나라도 설정되어 있으면 발송 가능
+  // 토큰키 방식인 경우 잔액 확인 없이 발송 가능
   if (config.cf_icode_token_key) {
     return true;
   }
 
+  // ID/PW 방식인 경우 아이코드 사용자 정보 확인
   if (config.cf_icode_id && config.cf_icode_pw) {
-    return true;
+    try {
+      // 아이코드 API 호출하여 사용자 정보 조회
+      const icodeApiUrl = `http://www.icodekorea.com/res/userinfo.php?userid=${encodeURIComponent(config.cf_icode_id.trim())}&userpw=${encodeURIComponent(config.cf_icode_pw.trim())}`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(icodeApiUrl, {
+        method: 'GET',
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const responseText = await response.text();
+        const res = responseText.split(';');
+
+        const userInfo = {
+          code: res[0] || '',
+          coin: parseInt(res[1]) || 0,
+          payment: res[3] === 'A' || res[3] === 'C' ? res[3] : '',
+        };
+
+        // 아이코드 API 결과 코드 확인
+        if (userInfo.code !== '0') {
+          console.warn('아이코드 API 오류 코드:', userInfo.code);
+          return false;
+        }
+
+        // 정액제인 경우 잔액과 관계없이 발송 가능
+        if (userInfo.payment === 'C') {
+          return true;
+        }
+
+        // 충전제인 경우 최소 잔액 확인 (기본값: 100원)
+        if (userInfo.payment === 'A') {
+          const minimumCoin = 100; // G5_ICODE_COIN과 동일한 값
+          const hasSufficientBalance = userInfo.coin >= minimumCoin;
+
+          console.log('충전제 잔액 확인:', {
+            currentBalance: userInfo.coin,
+            minimumRequired: minimumCoin,
+            hasSufficientBalance,
+          });
+
+          if (!hasSufficientBalance) {
+            console.warn(
+              `❌ SMS 발송 불가: 잔액 부족 (현재: ${userInfo.coin}원, 필요: ${minimumCoin}원)`,
+            );
+          }
+
+          return hasSufficientBalance;
+        }
+
+        return false;
+      } else {
+        console.error('아이코드 API 호출 실패:', response.status, response.statusText);
+        return false;
+      }
+    } catch (error) {
+      console.error('아이코드 사용자 정보 조회 오류:', error);
+      return false;
+    }
   }
 
   return false;
@@ -204,6 +268,38 @@ export const sendSMS = async (
       return { success: false, message: '회신번호가 설정되지 않았습니다.' };
     }
 
+    // SMS 발송 가능 여부 확인 (잔액 포함)
+    const canSend = await canSendSMS();
+    if (!canSend) {
+      // 더 구체적인 오류 메시지를 위해 추가 확인
+      if (config.cf_icode_id && config.cf_icode_pw && !config.cf_icode_token_key) {
+        try {
+          const icodeApiUrl = `http://www.icodekorea.com/res/userinfo.php?userid=${encodeURIComponent(config.cf_icode_id.trim())}&userpw=${encodeURIComponent(config.cf_icode_pw.trim())}`;
+          const response = await fetch(icodeApiUrl, { method: 'GET' });
+
+          if (response.ok) {
+            const responseText = await response.text();
+            const res = responseText.split(';');
+            const userInfo = {
+              code: res[0] || '',
+              coin: parseInt(res[1]) || 0,
+              payment: res[3] === 'A' || res[3] === 'C' ? res[3] : '',
+            };
+
+            if (userInfo.payment === 'A' && userInfo.coin < 100) {
+              return {
+                success: false,
+                message: `SMS 발송 불가: 잔액 부족 (현재 ${userInfo.coin}원, 최소 100원 필요)`,
+              };
+            }
+          }
+        } catch (error) {
+          console.error('잔액 확인 중 오류:', error);
+        }
+      }
+      return { success: false, message: 'SMS 발송 조건이 충족되지 않습니다.' };
+    }
+
     // 전화번호 검증
     const cleanRecipient = cleanPhoneNumber(recipient);
     if (!validatePhoneNumber(cleanRecipient)) {
@@ -231,6 +327,35 @@ export const sendSMS = async (
     console.error('SMS 발송 오류:', error);
     return { success: false, message: 'SMS 발송 중 오류가 발생했습니다.' };
   }
+};
+
+// 아이코드 오류 코드 해석
+const parseIcodeErrorCode = (responseData: string): { success: boolean; message: string } => {
+  // Error:XX 형식의 오류 코드 추출
+  const errorMatch = responseData.match(/Error:(\d+)/);
+  if (errorMatch) {
+    const errorCode = errorMatch[1];
+
+    switch (errorCode) {
+      case '02':
+        return { success: false, message: '형식이 잘못되어 전송이 실패하였습니다.' };
+      case '23':
+        return { success: false, message: '데이터를 다시 확인해 주시기 바랍니다.' };
+      case '97':
+        return { success: false, message: '잔여코인이 부족합니다.' };
+      case '98':
+        return { success: false, message: '사용기간이 만료되었습니다.' };
+      case '99':
+        return { success: false, message: '인증 받지 못하였습니다. 계정을 다시 확인해 주세요.' };
+      default:
+        return {
+          success: false,
+          message: `알 수 없는 오류로 전송이 실패하였습니다. (오류코드: ${errorCode})`,
+        };
+    }
+  }
+
+  return { success: false, message: '전송에 실패하였습니다.' };
 };
 
 // 토큰키 방식 SMS 발송
@@ -294,10 +419,11 @@ const sendSMSWithToken = async (
               result: `${recipient.trim()}:${resultCode}`,
             });
           } else {
+            const errorResult = parseIcodeErrorCode(responseData);
             socket.destroy();
             resolve({
               success: false,
-              message: `SMS 발송 실패: ${responseData}`,
+              message: errorResult.message,
               result: `${recipient.trim()}:실패`,
             });
           }
@@ -400,10 +526,11 @@ const sendSMSWithCredentials = async (
               result: `${recipient.trim()}:${resultCode}`,
             });
           } else {
+            const errorResult = parseIcodeErrorCode(responseData);
             socket.destroy();
             resolve({
               success: false,
-              message: `SMS 발송 실패: ${responseData}`,
+              message: errorResult.message,
               result: `${recipient.trim()}:실패`,
             });
           }
