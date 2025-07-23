@@ -74,6 +74,84 @@ export const canSendSMS = async (): Promise<boolean> => {
   return false;
 };
 
+// SMS 사용 설정 확인 (PHP의 de_sms_use2, de_sms_use3과 동일)
+export const getSMSSettings = async (): Promise<{
+  de_sms_use2: boolean; // 무통장입금 SMS 사용 여부
+  de_sms_use3: boolean; // 일반주문 SMS 사용 여부
+  de_admin_company_name: string; // 회사명
+  de_admin_company_tel: string; // 회사 전화번호
+  de_sms_hp: string; // SMS 수신 전화번호
+  bank_account?: string; // 무통장입금 계좌번호
+} | null> => {
+  try {
+    // g5_config 테이블에서 기본 설정 조회 (컬럼이 없는 경우를 대비해 안전하게 조회)
+    let config: Record<string, any> = {};
+
+    try {
+      const configRows = (await executeQuery(`
+        SELECT de_sms_use2, de_sms_use3, de_admin_company_name, 
+               de_admin_company_tel, de_sms_hp
+        FROM g5_config
+        LIMIT 1
+      `)) as RowDataPacket[];
+
+      if (configRows.length > 0) {
+        config = configRows[0] as Record<string, any>;
+      }
+    } catch (columnError) {
+      console.log('SMS 설정 컬럼이 존재하지 않습니다. 기본값을 사용합니다:', columnError);
+
+      // SMS 관련 컬럼이 없는 경우 기본 설정 사용
+      // SMS 기능을 사용하려면 최소한 아이코드 설정이 되어있어야 함
+      const smsConfig = await getSMSConfig();
+      if (!smsConfig || smsConfig.cf_sms_use !== 'icode') {
+        return null;
+      }
+
+      // 기본값으로 SMS 사용 활성화
+      config = {
+        de_sms_use2: '1', // 무통장입금 SMS 기본 활성화
+        de_sms_use3: '1', // 일반주문 SMS 기본 활성화
+        de_admin_company_name: 'UDIGN',
+        de_admin_company_tel: '',
+        de_sms_hp: '',
+      };
+    }
+
+    // g5_shop_default 테이블에서 계좌번호 조회
+    let bankAccount = '';
+    try {
+      const defaultRows = (await executeQuery(`
+        SELECT de_bank_account
+        FROM g5_shop_default
+        LIMIT 1
+      `)) as RowDataPacket[];
+
+      if (defaultRows.length > 0) {
+        // PHP와 동일하게 첫 번째 계좌를 사용 (줄바꿈으로 구분된 경우)
+        const accounts = defaultRows[0].de_bank_account?.split('\n') || [];
+        bankAccount = accounts[0]?.trim() || '계좌정보를 설정해주세요';
+      }
+    } catch (error) {
+      console.log('계좌번호 조회 중 오류:', error);
+      bankAccount = '계좌정보를 설정해주세요';
+    }
+
+    // 기본값 설정 및 타입 변환
+    return {
+      de_sms_use2: config.de_sms_use2 === '1',
+      de_sms_use3: config.de_sms_use3 === '1',
+      de_admin_company_name: config.de_admin_company_name || 'UDIGN',
+      de_admin_company_tel: config.de_admin_company_tel || '',
+      de_sms_hp: config.de_sms_hp || '',
+      bank_account: bankAccount,
+    };
+  } catch (error) {
+    console.error('SMS 설정 조회 실패:', error);
+    return null;
+  }
+};
+
 // 전화번호 형식 검증
 export const validatePhoneNumber = (phone: string): boolean => {
   const phoneRegex = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
@@ -418,5 +496,53 @@ export const sendWelcomeSMS = async (userData: {
   } catch (error) {
     console.error('회원가입 SMS 발송 오류:', error);
     return { success: false, message: '회원가입 SMS 발송 중 오류가 발생했습니다.' };
+  }
+};
+
+// 주문 접수 SMS 발송
+export const sendOrderReceivedSMS = async (orderData: {
+  name: string;
+  phone: string;
+  orderId: string;
+  totalAmount: number;
+  companyName?: string;
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    const template = SMS_DEFAULT_TEMPLATES.ORDER_RECEIVED;
+    const message = replaceTemplateVariables(template, {
+      이름: orderData.name,
+      주문번호: orderData.orderId,
+      주문금액: orderData.totalAmount.toLocaleString(),
+      회사명: orderData.companyName || 'UDIGN',
+    });
+
+    return await sendSMS(orderData.phone, message);
+  } catch (error) {
+    console.error('주문접수 SMS 발송 오류:', error);
+    return { success: false, message: '주문접수 SMS 발송 중 오류가 발생했습니다.' };
+  }
+};
+
+// 무통장입금 계좌정보 SMS 발송
+export const sendBankTransferInfoSMS = async (orderData: {
+  name: string;
+  phone: string;
+  amount: number;
+  bankAccount: string;
+  companyName?: string;
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    const template = SMS_DEFAULT_TEMPLATES.BANK_TRANSFER_INFO;
+    const message = replaceTemplateVariables(template, {
+      이름: orderData.name,
+      입금액: orderData.amount.toLocaleString(),
+      계좌번호: orderData.bankAccount,
+      회사명: orderData.companyName || 'UDIGN',
+    });
+
+    return await sendSMS(orderData.phone, message);
+  } catch (error) {
+    console.error('무통장입금 SMS 발송 오류:', error);
+    return { success: false, message: '무통장입금 SMS 발송 중 오류가 발생했습니다.' };
   }
 };

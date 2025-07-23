@@ -9,6 +9,7 @@ import {
   DeliveryInfo,
 } from '@/lib/email-templates/types';
 import { RowDataPacket, Connection, FieldPacket } from 'mysql2/promise';
+import { canSendSMS, getSMSSettings, sendOrderReceivedSMS } from '@/lib/sms';
 
 const SECRET_KEY = process.env.TOSS_PAYMENTS_SECRET_KEY;
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
 
       await connection.commit();
 
-      // 결제 완료 후 메일 발송을 위한 주문 정보 조회 (새로운 연결 사용)
+      // 결제 완료 후 메일 및 SMS 발송을 위한 주문 정보 조회 (새로운 연결 사용)
       try {
         const emailConnection = await getConnection();
         try {
@@ -84,17 +85,57 @@ export async function POST(request: NextRequest) {
           if (orderEmailData) {
             // 주문자에게 메일 발송 (주문자 이메일 사용)
             const [orderRows] = (await emailConnection.execute(
-              'SELECT od_email FROM g5_shop_order WHERE od_tno = ?',
+              'SELECT od_email, od_name, od_hp FROM g5_shop_order WHERE od_tno = ?',
               [orderId],
             )) as [RowDataPacket[], FieldPacket[]];
 
             if (orderRows && orderRows.length > 0) {
               const customerEmail = orderRows[0].od_email;
+              const customerName = orderRows[0].od_name;
+              const customerPhone = orderRows[0].od_hp;
 
+              // 메일 발송
               await sendOrderCompleteCustomerEmail(orderEmailData, customerEmail);
               await sendOrderCompleteAdminEmail(orderEmailData);
 
               console.log('주문 완료 메일 발송 완료:', orderId);
+
+              // SMS 발송 (결제 완료 후)
+              try {
+                const smsEnabled = await canSendSMS();
+                const smsSettings = await getSMSSettings();
+
+                if (smsEnabled && smsSettings && customerPhone) {
+                  console.log('결제 완료 SMS 발송 시작:', {
+                    orderId,
+                    customerName,
+                    customerPhone,
+                    paymentMethod: paymentData.method,
+                  });
+
+                  // 결제 완료 SMS 발송
+                  if (smsSettings.de_sms_use3) {
+                    const orderSmsResult = await sendOrderReceivedSMS({
+                      name: customerName,
+                      phone: customerPhone,
+                      orderId: orderId,
+                      totalAmount: paymentData.totalAmount,
+                      companyName: smsSettings.de_admin_company_name,
+                    });
+
+                    console.log('결제 완료 SMS 발송 결과:', orderSmsResult);
+                  }
+                } else {
+                  console.log('SMS 발송 조건이 충족되지 않았습니다 (결제 완료):', {
+                    smsEnabled,
+                    hasSettings: !!smsSettings,
+                    hasPhone: !!customerPhone,
+                  });
+                }
+              } catch (smsError) {
+                // SMS 발송 실패는 로그만 남기고 결제는 정상 처리
+                console.error('결제 완료 SMS 발송 실패:', smsError);
+              }
             }
           }
         } finally {

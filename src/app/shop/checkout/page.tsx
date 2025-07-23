@@ -245,6 +245,23 @@ function CheckoutContent() {
 
       orderCreated = true;
 
+      // 무통장입금(BANK_TRANSFER) 방식은 바로 주문 완료 처리
+      if (selectedPaymentMethod === 'BANK_TRANSFER') {
+        setMessageDialogContent({
+          title: '주문이 완료되었습니다',
+          description:
+            'SMS로 입금 계좌번호를 안내해드렸습니다. 입금 확인 후 상품을 준비해드립니다.',
+        });
+        setShowMessageDialog(true);
+        setIsPaymentProcessing(false);
+
+        // 주문 완료 후 마이페이지로 이동
+        setTimeout(() => {
+          router.push(ROUTES.MY_UDIGN);
+        }, 2000);
+        return;
+      }
+
       // 토스페이먼츠 결제창 요청
       const basePaymentData = {
         orderId: currentOrderId,
@@ -259,6 +276,7 @@ function CheckoutContent() {
         customerMobilePhone: customerInfo.phone,
       };
 
+      // 신용카드 결제만 토스페이먼츠 결제창 사용
       if (selectedPaymentMethod === 'CARD') {
         await payment.requestPayment({
           ...basePaymentData,
@@ -268,31 +286,6 @@ function CheckoutContent() {
             useEscrow: false,
             useCardPoint: false,
             useAppCardOnly: false,
-          },
-        });
-      } else if (selectedPaymentMethod === 'TRANSFER') {
-        await payment.requestPayment({
-          ...basePaymentData,
-          method: 'TRANSFER',
-          amount: amount,
-          transfer: {
-            cashReceipt: {
-              type: '소득공제',
-            },
-            useEscrow: false,
-          },
-        });
-      } else if (selectedPaymentMethod === 'VIRTUAL_ACCOUNT') {
-        await payment.requestPayment({
-          ...basePaymentData,
-          method: 'VIRTUAL_ACCOUNT',
-          amount: amount,
-          virtualAccount: {
-            cashReceipt: {
-              type: '소득공제',
-            },
-            useEscrow: false,
-            validHours: 24,
           },
         });
       }
@@ -508,42 +501,37 @@ function CheckoutContent() {
 
           <div className='space-y-6'>
             <div className='rounded-lg border border-gray-200 p-6'>
-              <h2 className='mb-4 text-lg font-semibold text-gray-900'>결제 수단</h2>
+              <h2 className='mb-4 text-lg font-semibold text-gray-900'>결제 방식</h2>
               <RadioGroup
                 value={selectedPaymentMethod}
                 onValueChange={(value) => setSelectedPaymentMethod(value as PaymentMethodType)}
                 className='space-y-3'
               >
-                <div className='flex items-center space-x-3'>
+                <div className='flex items-center space-x-2'>
                   <RadioGroupItem value='CARD' id='card' />
-                  <Label
-                    htmlFor='card'
-                    className='cursor-pointer text-sm font-medium text-gray-900'
-                  >
-                    신용/체크카드
+                  <Label htmlFor='card' className='cursor-pointer'>
+                    신용카드
                   </Label>
                 </div>
-                <div className='flex items-center space-x-3'>
-                  <RadioGroupItem value='TRANSFER' id='transfer' />
-                  <Label
-                    htmlFor='transfer'
-                    className='cursor-pointer text-sm font-medium text-gray-900'
-                  >
-                    계좌이체
-                  </Label>
-                </div>
-                <div className='flex items-center space-x-3'>
-                  <RadioGroupItem value='VIRTUAL_ACCOUNT' id='virtual-account' />
-                  <Label
-                    htmlFor='virtual-account'
-                    className='cursor-pointer text-sm font-medium text-gray-900'
-                  >
-                    가상계좌
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem value='BANK_TRANSFER' id='bank-transfer' />
+                  <Label htmlFor='bank-transfer' className='cursor-pointer'>
+                    무통장입금
                   </Label>
                 </div>
               </RadioGroup>
-            </div>
 
+              {selectedPaymentMethod === 'BANK_TRANSFER' && (
+                <div className='mt-4 rounded-lg bg-blue-50 p-4'>
+                  <h3 className='mb-2 font-medium text-blue-900'>무통장입금 안내</h3>
+                  <p className='text-sm text-blue-800'>
+                    주문 완료 후 SMS로 입금 계좌번호를 안내해드립니다.
+                    <br />
+                    입금 확인 후 상품을 준비해드립니다.
+                  </p>
+                </div>
+              )}
+            </div>
             <div className='rounded-lg border border-gray-200 p-6'>
               <h2 className='mb-4 text-lg font-semibold text-gray-900'>결제 금액</h2>
               <div className='space-y-2'>

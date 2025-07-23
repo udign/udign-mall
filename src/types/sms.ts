@@ -108,4 +108,7 @@ export const SMS_DEFAULT_TEMPLATES = {
   SHIPPING_START:
     '{이름}님의 상품이 발송되었습니다. 택배회사: {택배회사}, 운송장번호: {운송장번호} - {회사명}',
   MEMBER_JOIN: '{이름}님, {회사명}에 가입해주셔서 감사합니다.',
+  BANK_TRANSFER_INFO: '{이름}님의 입금계좌입니다.\n금액:{입금액}원\n계좌:{계좌번호}\n{회사명}',
+  ORDER_RECEIVED:
+    '{이름}님의 주문이 접수되었습니다. 주문번호: {주문번호}, 금액: {주문금액}원 - {회사명}',
 } as const;

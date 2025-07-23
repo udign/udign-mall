@@ -137,6 +137,11 @@ export const POST = async (request: NextRequest) => {
         'cf_icode_pw VARCHAR(100) NOT NULL DEFAULT ""',
         'cf_icode_token_key VARCHAR(100) NOT NULL DEFAULT ""',
         'cf_phone VARCHAR(20) NOT NULL DEFAULT ""',
+        'de_sms_use2 TINYINT(1) NOT NULL DEFAULT 0',
+        'de_sms_use3 TINYINT(1) NOT NULL DEFAULT 0',
+        'de_admin_company_name VARCHAR(100) NOT NULL DEFAULT "UDIGN"',
+        'de_admin_company_tel VARCHAR(20) NOT NULL DEFAULT ""',
+        'de_sms_hp VARCHAR(20) NOT NULL DEFAULT ""',
       ];
 
       for (const column of smsColumns) {
@@ -152,16 +157,22 @@ export const POST = async (request: NextRequest) => {
       await connection.execute(
         `
         UPDATE g5_config SET
+          cf_sms_use = 'icode',
           cf_sms_type = ?,
           cf_icode_id = ?,
           cf_icode_pw = ?,
           cf_icode_token_key = ?,
           cf_phone = ?,
           cf_icode_server_ip = '211.172.232.124',
-          cf_icode_server_port = '7295'
+          cf_icode_server_port = '7295',
+          de_sms_use2 = 1,
+          de_sms_use3 = 1,
+          de_admin_company_name = 'UDIGN',
+          de_admin_company_tel = ?,
+          de_sms_hp = ?
         WHERE cf_id = 1
       `,
-        [cf_sms_type, cf_icode_id, cf_icode_pw, cf_icode_token_key, cf_phone],
+        [cf_sms_type, cf_icode_id, cf_icode_pw, cf_icode_token_key, cf_phone, cf_phone, cf_phone],
       );
 
       // sms5_config 테이블도 업데이트 시도

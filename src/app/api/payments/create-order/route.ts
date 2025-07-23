@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { PaymentRequest } from '@/types/payment';
 import { getConnection } from '@/lib/database';
+import {
+  canSendSMS,
+  getSMSSettings,
+  sendOrderReceivedSMS,
+  sendBankTransferInfoSMS,
+} from '@/lib/sms';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -94,6 +100,92 @@ export async function POST(request: NextRequest) {
       }
 
       await connection.commit();
+
+      // 주문 생성 성공 후 SMS 발송
+      try {
+        console.log('🚀 주문 생성 완료, SMS 발송 확인 시작:', {
+          orderId: paymentRequest.orderId,
+          phone: paymentRequest.customerInfo.phone,
+          paymentMethod: paymentRequest.paymentMethod,
+        });
+
+        // SMS 발송 가능 여부 및 설정 확인
+        const smsEnabled = await canSendSMS();
+        const smsSettings = await getSMSSettings();
+
+        console.log('📱 SMS 설정 확인 결과:', {
+          smsEnabled,
+          smsSettings: smsSettings
+            ? {
+                de_sms_use2: smsSettings.de_sms_use2,
+                de_sms_use3: smsSettings.de_sms_use3,
+                bank_account: smsSettings.bank_account,
+                companyName: smsSettings.de_admin_company_name,
+              }
+            : null,
+          hasPhone: !!paymentRequest.customerInfo.phone,
+        });
+
+        if (smsEnabled && smsSettings && paymentRequest.customerInfo.phone) {
+          console.log('✅ SMS 발송 조건 충족, 발송 시작:', {
+            orderId: paymentRequest.orderId,
+            phone: paymentRequest.customerInfo.phone,
+            paymentMethod: paymentRequest.paymentMethod,
+          });
+
+          // 무통장입금 SMS 발송 (de_sms_use2)
+          // 실제 무통장입금(BANK_TRANSFER) 방식일 때만 발송
+          const isBankTransfer = paymentRequest.paymentMethod === 'BANK_TRANSFER';
+
+          console.log('💳 결제 방식 확인:', {
+            paymentMethod: paymentRequest.paymentMethod,
+            isBankTransfer,
+            de_sms_use2: smsSettings.de_sms_use2,
+          });
+
+          if (smsSettings.de_sms_use2 && isBankTransfer) {
+            console.log('🏦 무통장입금 SMS 발송 시작');
+
+            // 무통장입금인 경우에만 주문접수 SMS 발송
+            if (smsSettings.de_sms_use3) {
+              const orderSmsResult = await sendOrderReceivedSMS({
+                name: paymentRequest.customerInfo.name,
+                phone: paymentRequest.customerInfo.phone,
+                orderId: paymentRequest.orderId,
+                totalAmount: paymentRequest.totalAmount,
+                companyName: smsSettings.de_admin_company_name,
+              });
+
+              console.log('무통장입금 주문접수 SMS 발송 결과:', orderSmsResult);
+            }
+
+            // 무통장입금 계좌정보 SMS 발송
+            const bankSmsResult = await sendBankTransferInfoSMS({
+              name: paymentRequest.customerInfo.name,
+              phone: paymentRequest.customerInfo.phone,
+              amount: paymentRequest.totalAmount,
+              bankAccount: smsSettings.bank_account || '계좌정보를 설정해주세요',
+              companyName: smsSettings.de_admin_company_name,
+            });
+
+            console.log('🏦 무통장입금 계좌정보 SMS 발송 결과:', bankSmsResult);
+          } else {
+            console.log('💳 신용카드 결제: 결제 완료 후 SMS 발송 예정:', {
+              paymentMethod: paymentRequest.paymentMethod,
+              note: '신용카드는 결제 승인 완료 후 SMS 발송',
+            });
+          }
+        } else {
+          console.log('SMS 발송 조건이 충족되지 않았습니다:', {
+            smsEnabled,
+            hasSettings: !!smsSettings,
+            hasPhone: !!paymentRequest.customerInfo.phone,
+          });
+        }
+      } catch (smsError) {
+        // SMS 발송 실패는 로그만 남기고 주문은 정상 처리
+        console.error('주문 SMS 발송 실패:', smsError);
+      }
 
       return NextResponse.json({
         success: true,
