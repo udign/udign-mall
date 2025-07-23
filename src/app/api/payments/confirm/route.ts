@@ -190,8 +190,8 @@ async function getOrderDataForEmail(
       subtotal_point: 0, // 포인트 계산 로직이 필요하면 추가
       product_url:
         process.env.NODE_ENV === 'production'
-          ? `https://udign.vercel.app/shop/item/${item.it_id}`
-          : `http://localhost:3000/shop/item/${item.it_id}`,
+          ? `https://udign.vercel.app/shop/product/${item.it_id}`
+          : `http://localhost:3000/shop/product/${item.it_id}`,
       image_url: item.it_img1 || '',
     }));
 

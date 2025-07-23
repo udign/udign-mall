@@ -21,6 +21,7 @@ import {
   Monitor,
   Ruler,
   Mail,
+  MessageSquare,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -133,6 +134,17 @@ const menuItems: MenuItem[] = [
         label: '메일 테스트',
         href: ROUTES.ADMIN_MAIL_TEST,
         icon: <Mail className='h-4 w-4' />,
+      },
+    ],
+  },
+  {
+    label: 'SMS 관리',
+    icon: <MessageSquare className='h-4 w-4' />,
+    subMenus: [
+      {
+        label: 'SMS 기본설정',
+        href: ROUTES.ADMIN_SMS_CONFIG,
+        icon: <Settings className='h-4 w-4' />,
       },
     ],
   },
