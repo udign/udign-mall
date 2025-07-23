@@ -111,4 +111,6 @@ export const SMS_DEFAULT_TEMPLATES = {
   BANK_TRANSFER_INFO: '{이름}님의 입금계좌입니다.\n금액:{입금액}원\n계좌:{계좌번호}\n{회사명}',
   ORDER_RECEIVED:
     '{이름}님의 주문이 접수되었습니다. 주문번호: {주문번호}, 금액: {주문금액}원 - {회사명}',
+  PRODUCTION_START: '{이름}님의 상품 제작이 시작되었습니다. 주문번호: {주문번호} - {회사명}',
+  SHIPPING_PROGRESS: '{이름}님의 상품이 배송 중입니다. 주문번호: {주문번호} - {회사명}',
 } as const;

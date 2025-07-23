@@ -85,7 +85,7 @@ export const getSMSSettings = async (): Promise<{
 } | null> => {
   try {
     // g5_config 테이블에서 기본 설정 조회 (컬럼이 없는 경우를 대비해 안전하게 조회)
-    let config: Record<string, any> = {};
+    let config: Record<string, string> = {};
 
     try {
       const configRows = (await executeQuery(`
@@ -96,7 +96,7 @@ export const getSMSSettings = async (): Promise<{
       `)) as RowDataPacket[];
 
       if (configRows.length > 0) {
-        config = configRows[0] as Record<string, any>;
+        config = configRows[0] as Record<string, string>;
       }
     } catch (columnError) {
       console.log('SMS 설정 컬럼이 존재하지 않습니다. 기본값을 사용합니다:', columnError);
@@ -544,5 +544,49 @@ export const sendBankTransferInfoSMS = async (orderData: {
   } catch (error) {
     console.error('무통장입금 SMS 발송 오류:', error);
     return { success: false, message: '무통장입금 SMS 발송 중 오류가 발생했습니다.' };
+  }
+};
+
+// 상품제작 시작 SMS 발송
+export const sendProductionStartSMS = async (orderData: {
+  name: string;
+  phone: string;
+  orderId: string;
+  companyName?: string;
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    const template = SMS_DEFAULT_TEMPLATES.PRODUCTION_START;
+    const message = replaceTemplateVariables(template, {
+      이름: orderData.name,
+      주문번호: orderData.orderId,
+      회사명: orderData.companyName || 'UDIGN',
+    });
+
+    return await sendSMS(orderData.phone, message);
+  } catch (error) {
+    console.error('상품제작 시작 SMS 발송 오류:', error);
+    return { success: false, message: '상품제작 시작 SMS 발송 중 오류가 발생했습니다.' };
+  }
+};
+
+// 배송진행 SMS 발송
+export const sendShippingProgressSMS = async (orderData: {
+  name: string;
+  phone: string;
+  orderId: string;
+  companyName?: string;
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    const template = SMS_DEFAULT_TEMPLATES.SHIPPING_PROGRESS;
+    const message = replaceTemplateVariables(template, {
+      이름: orderData.name,
+      주문번호: orderData.orderId,
+      회사명: orderData.companyName || 'UDIGN',
+    });
+
+    return await sendSMS(orderData.phone, message);
+  } catch (error) {
+    console.error('배송진행 SMS 발송 오류:', error);
+    return { success: false, message: '배송진행 SMS 발송 중 오류가 발생했습니다.' };
   }
 };
