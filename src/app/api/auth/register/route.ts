@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { registerUser } from '@/lib/auth';
 import { RegisterRequest } from '@/types/user';
 import { sendWelcomeEmail, sendNewMemberNotification } from '@/lib/email';
+import { sendWelcomeSMS, canSendSMS } from '@/lib/sms';
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -65,6 +66,48 @@ export const POST = async (request: NextRequest) => {
       } catch (emailError) {
         // 메일 발송 실패는 로그만 남기고 회원가입은 정상 처리
         console.error('회원가입 메일 발송 실패:', emailError);
+      }
+
+      // 회원가입 성공 시 SMS 발송
+      console.log('회원가입 후 SMS 발송 시작. 휴대폰번호:', body.mb_hp);
+
+      if (body.mb_hp) {
+        try {
+          // SMS 발송 가능 여부 확인
+          const smsEnabled = await canSendSMS();
+          console.log('SMS 발송 가능 여부:', smsEnabled);
+
+          if (smsEnabled) {
+            console.log('SMS 발송 시작 - 대상:', {
+              name: body.mb_name,
+              phone: body.mb_hp,
+              cleanPhone: body.mb_hp.replace(/[^0-9]/g, ''),
+              phoneLength: body.mb_hp.replace(/[^0-9]/g, '').length,
+            });
+
+            // 신규 회원에게 환영 SMS 발송
+            const smsResult = await sendWelcomeSMS({
+              name: body.mb_name,
+              phone: body.mb_hp,
+              companyName: 'UDIGN',
+            });
+
+            console.log('SMS 발송 결과:', smsResult);
+
+            if (smsResult.success) {
+              console.log('✅ 회원가입 SMS 발송 완료:', body.mb_id, body.mb_hp);
+            } else {
+              console.error('❌ 회원가입 SMS 발송 실패:', smsResult.message);
+            }
+          } else {
+            console.log('⚠️ SMS 서비스가 비활성화되어 SMS를 발송하지 않습니다.');
+          }
+        } catch (smsError) {
+          // SMS 발송 실패는 로그만 남기고 회원가입은 정상 처리
+          console.error('🚨 회원가입 SMS 발송 오류:', smsError);
+        }
+      } else {
+        console.log('⚠️ 휴대폰 번호가 없어 SMS를 발송하지 않습니다.');
       }
 
       return NextResponse.json(result, { status: 201 });

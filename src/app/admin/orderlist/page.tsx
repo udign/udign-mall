@@ -7,10 +7,19 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PERMISSION_CHECKS, PAGINATION_CONFIG } from '@/lib/constants';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import CommonPagination from '@/components/CommonPagination';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/primitives/tabs';
+
+import { Button } from '@/components/ui/primitives/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/primitives/dropdown-menu';
+import { ChevronDownIcon } from 'lucide-react';
 import { OrderListItem } from '@/app/api/admin/order-list/route';
 import { ROUTES } from '@/lib/routes';
 import { formatOrderId, formatDateOnly } from '@/lib/utils';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface OrderListData {
   orders: OrderListItem[];
@@ -36,27 +45,43 @@ interface ApiResponse {
   error?: string;
 }
 
-// 결제수단 표시명 변환 유틸 함수
-const getPaymentMethodDisplay = (settleCase: string): string => {
-  const paymentMethods: Record<string, string> = {
-    무통장: '무통장',
-    가상계좌: '가상계좌',
-    계좌이체: '계좌이체',
-    휴대폰: '휴대폰',
-    신용카드: '신용카드',
-    간편결제: '간편결제',
-    KAKAOPAY: '카카오페이',
-    삼성페이: '삼성페이',
-    lpay: 'LPAY',
-    inicis_kakaopay: '카카오페이',
-  };
-  return paymentMethods[settleCase] || settleCase || '결제수단없음';
+const getPaymentMethodDisplay = (settle_case: string): string => {
+  switch (settle_case) {
+    case 'card':
+      return '신용카드';
+    case 'bank':
+      return '무통장입금';
+    case 'phone':
+      return '휴대폰';
+    case 'samsung':
+      return '삼성페이';
+    case 'kakao':
+      return '카카오페이';
+    case 'payco':
+      return '페이코';
+    case 'naverpay':
+      return '네이버페이';
+    case 'tosspay':
+      return '토스페이';
+    default:
+      return settle_case || '-';
+  }
 };
 
 export default function OrderListPage() {
   const [orderData, setOrderData] = useState<OrderListData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [statusLoading, setStatusLoading] = useState<string | null>(null);
+  const [messageDialog, setMessageDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+  }>({
+    open: false,
+    title: '',
+    description: '',
+  });
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -64,28 +89,10 @@ export default function OrderListPage() {
   const { user, isLoading: authLoading } = useAuth();
 
   const currentPage = parseInt(searchParams.get('page') || '1');
-  const currentTab = searchParams.get('tab') || 'basic';
-
-  const handleTabChange = (newTab: string) => {
-    const params = new URLSearchParams();
-    params.set('tab', newTab);
-    params.set('page', '1'); // 탭 변경 시 첫 페이지로 이동
-    router.push(`${ROUTES.ADMIN_ORDERLIST}?${params.toString()}`);
-  };
 
   const { orders, pagination } = orderData || {
     orders: [],
     pagination: { total: 0, page: 1, limit: PAGINATION_CONFIG.ITEMS_PER_PAGE, totalPages: 0 },
-  };
-
-  // 현재 페이지 데이터의 합계 계산
-  const currentPageTotals = {
-    itemCount: orders.length,
-    orderPrice: orders.reduce((sum, order) => sum + order.od_cart_price, 0),
-    receiptPrice: orders.reduce((sum, order) => sum + order.od_receipt_price, 0),
-    cancelPrice: orders.reduce((sum, order) => sum + order.od_cancel_price, 0),
-    couponPrice: orders.reduce((sum, order) => sum + (order.od_coupon || 0), 0),
-    misu: orders.reduce((sum, order) => sum + (order.od_misu || 0), 0),
   };
 
   useEffect(() => {
@@ -125,16 +132,67 @@ export default function OrderListPage() {
     }
   };
 
+  const handleOrderStatusChange = async (orderId: string, newStatus: '준비' | '배송') => {
+    try {
+      setStatusLoading(orderId);
+
+      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '주문 상태 변경에 실패했습니다.');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 로컬 상태 업데이트
+        setOrderData((prev) => {
+          if (!prev) return prev;
+
+          return {
+            ...prev,
+            orders: prev.orders.map((order) =>
+              order.od_id === orderId ? { ...order, od_status: newStatus } : order,
+            ),
+          };
+        });
+
+        setMessageDialog({
+          open: true,
+          title: '상태 변경 완료',
+          description: result.message,
+        });
+      } else {
+        throw new Error(result.message || '상태 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('주문 상태 변경 오류:', error);
+      setMessageDialog({
+        open: true,
+        title: '상태 변경 실패',
+        description: error instanceof Error ? error.message : '주문 상태 변경에 실패했습니다.',
+      });
+    } finally {
+      setStatusLoading(null);
+    }
+  };
+
   useEffect(() => {
-    if (!searchParams.get('page') || !searchParams.get('tab')) {
+    if (!searchParams.get('page')) {
       const params = new URLSearchParams();
-      params.set('tab', searchParams.get('tab') || 'basic');
       params.set('page', searchParams.get('page') || '1');
       router.replace(`${ROUTES.ADMIN_ORDERLIST}?${params.toString()}`);
     } else if (user && PERMISSION_CHECKS.isAdmin(user.mb_level)) {
       fetchOrderList(currentPage);
     }
-  }, [currentPage, currentTab, user, searchParams, router]);
+  }, [currentPage, user, searchParams, router]);
 
   return authLoading ? (
     <div className='flex min-h-screen items-center justify-center'>
@@ -184,473 +242,250 @@ export default function OrderListPage() {
           <div className='mb-4 flex items-center justify-between'>
             <h3 className='text-lg font-semibold text-gray-900'>전체 주문내역</h3>
             <p className='text-sm text-gray-600'>
-              총 {pagination.total}개 내역 (페이지 {pagination.totalPages}/{currentPage})
+              총 {pagination.total}개 내역 (페이지 {currentPage}/{pagination.totalPages})
             </p>
           </div>
 
-          <Tabs value={currentTab} onValueChange={handleTabChange} className='w-full'>
-            <TabsList className='grid w-full grid-cols-4'>
-              <TabsTrigger value='basic'>기본 정보</TabsTrigger>
-              <TabsTrigger value='payment'>결제 정보</TabsTrigger>
-              <TabsTrigger value='status'>주문 상태</TabsTrigger>
-              <TabsTrigger value='delivery'>배송 정보</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value='basic' className='mt-6'>
-              <div className='overflow-hidden rounded-lg border bg-white'>
-                <div className='overflow-x-auto'>
-                  <table className='min-w-full divide-y divide-gray-200'>
-                    <thead className='bg-gray-50'>
-                      <tr>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          상품
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문번호
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문자
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문자전화
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          받는분
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className='divide-y divide-gray-200 bg-white'>
-                      {orders.map((order) => (
-                        <tr key={order.od_id} className='transition-colors hover:bg-gray-50'>
-                          <td className='px-4 py-4'>
-                            <div className='flex max-w-48 flex-col space-y-1'>
-                              {order.items.slice(0, 2).map((item, index) => (
-                                <div
-                                  key={`${item.it_id}-${index}`}
-                                  className='flex items-center space-x-2'
-                                >
-                                  {item.it_img1 && (
-                                    <div className='h-8 w-8 flex-shrink-0'>
-                                      <Image
-                                        src={item.it_img1}
-                                        alt={item.it_name}
-                                        width={32}
-                                        height={32}
-                                        className='h-full w-full rounded object-cover'
-                                        unoptimized
-                                        onError={(e) => {
-                                          const target = e.target as HTMLImageElement;
-                                          target.style.display = 'none';
-                                        }}
-                                      />
-                                    </div>
-                                  )}
-                                  <span className='truncate text-sm text-gray-700'>
-                                    {item.it_name}
-                                  </span>
-                                </div>
-                              ))}
-                              {order.items.length > 2 && (
-                                <div className='text-sm text-gray-500'>
-                                  +{order.items.length - 2}개
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm'>
-                              <div className='font-medium text-blue-600'>
-                                {formatOrderId(order.od_id)}
-                              </div>
-                              <div className='text-xs text-gray-500'>
-                                {formatDateOnly(order.od_time)}
-                              </div>
-                              {order.od_mobile === 1 && (
-                                <span className='inline-block rounded bg-green-100 px-1 text-xs text-green-800'>
-                                  M
-                                </span>
-                              )}
-                              {order.od_test === 1 && (
-                                <span className='ml-1 inline-block rounded bg-orange-100 px-1 text-xs text-orange-800'>
-                                  테스트
-                                </span>
-                              )}
-                              {order.od_escrow === 1 && (
-                                <span className='ml-1 inline-block rounded bg-purple-100 px-1 text-xs text-purple-800'>
-                                  에스크로
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm font-medium text-gray-900'>{order.od_name}</div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm text-gray-900'>
-                              {order.od_tel || order.od_hp}
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm'>
-                              <div className='font-medium text-gray-900'>{order.od_b_name}</div>
-                              <div className='text-xs text-gray-500'>
-                                {order.od_b_tel || order.od_b_hp}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className='bg-gray-100'>
-                      <tr>
-                        <td colSpan={5} className='px-4 py-3 text-center font-medium text-gray-900'>
-                          현재 페이지 ({currentPageTotals.itemCount.toLocaleString()}건)
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-
-                {orders.length === 0 && (
-                  <div className='py-12 text-center'>
-                    <p className='text-gray-500'>주문 내역이 없습니다.</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value='payment' className='mt-6'>
-              <div className='overflow-hidden rounded-lg border bg-white'>
-                <div className='overflow-x-auto'>
-                  <table className='min-w-full divide-y divide-gray-200'>
-                    <thead className='bg-gray-50'>
-                      <tr>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문번호
-                        </th>
-                        <th className='px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문합계
-                        </th>
-                        <th className='px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          선불배송비포함
-                        </th>
-                        <th className='px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          입금합계
-                        </th>
-                        <th className='px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문취소
-                        </th>
-                        <th className='px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          쿠폰
-                        </th>
-                        <th className='px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          미수금
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          결제수단
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className='divide-y divide-gray-200 bg-white'>
-                      {orders.map((order) => (
-                        <tr key={order.od_id} className='transition-colors hover:bg-gray-50'>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm'>
-                              <div className='font-medium text-blue-600'>
-                                {formatOrderId(order.od_id)}
-                              </div>
-                              <div className='text-xs text-gray-500'>
-                                {formatDateOnly(order.od_time)}
-                              </div>
-                            </div>
-                          </td>
-                          <td className='px-4 py-4 text-right'>
-                            <div className='text-sm font-medium text-gray-900'>
-                              {order.od_cart_price.toLocaleString()}원
-                            </div>
-                          </td>
-                          <td className='px-4 py-4 text-right'>
-                            <div className='text-sm font-medium text-gray-900'>
-                              {order.od_cart_price.toLocaleString()}원
-                            </div>
-                          </td>
-                          <td className='px-4 py-4 text-right'>
-                            <div className='text-sm font-medium text-gray-900'>
-                              {order.od_receipt_price.toLocaleString()}원
-                            </div>
-                          </td>
-                          <td className='px-4 py-4 text-right'>
+          <div className='overflow-hidden rounded-lg border bg-white'>
+            <div className='overflow-x-auto'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
+                  <tr>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      상품
+                    </th>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      주문번호
+                    </th>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      주문자
+                    </th>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      받는분
+                    </th>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      주문상태
+                    </th>
+                    <th className='px-4 py-3 text-right text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      주문금액
+                    </th>
+                    <th className='px-4 py-3 text-right text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      실결제금액
+                    </th>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      결제수단
+                    </th>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      운송장번호
+                    </th>
+                    <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
+                      배송회사
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className='divide-y divide-gray-200 bg-white'>
+                  {orders.map((order) => (
+                    <tr key={order.od_id} className='transition-colors hover:bg-gray-50'>
+                      <td className='px-4 py-4'>
+                        <div className='flex max-w-48 flex-col space-y-1'>
+                          {order.items.slice(0, 2).map((item, index) => (
                             <div
-                              className={`text-sm font-medium ${order.od_cancel_price > 0 ? 'text-red-600' : 'text-gray-900'}`}
+                              key={`${item.it_id}-${index}`}
+                              className='flex items-center space-x-2'
                             >
-                              {order.od_cancel_price.toLocaleString()}원
+                              {item.it_img1 && (
+                                <div className='h-8 w-8 flex-shrink-0'>
+                                  <Image
+                                    src={item.it_img1}
+                                    alt={item.it_name}
+                                    width={32}
+                                    height={32}
+                                    className='h-full w-full rounded object-cover'
+                                    unoptimized
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <span className='truncate text-sm text-gray-700'>{item.it_name}</span>
                             </div>
-                          </td>
-                          <td className='px-4 py-4 text-right'>
-                            <div className='text-sm font-medium text-gray-900'>
-                              {(order.od_coupon || 0).toLocaleString()}원
-                            </div>
-                          </td>
-                          <td className='px-4 py-4 text-right'>
-                            <div className='text-sm font-medium text-gray-900'>
-                              {(order.od_misu || 0).toLocaleString()}원
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm text-gray-900'>
-                              {getPaymentMethodDisplay(order.od_settle_case)}
-                            </div>
-                            {order.od_receipt_point > 0 && (
-                              <div className='text-xs text-gray-500'>포인트</div>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className='bg-gray-100'>
-                      <tr>
-                        <td className='px-4 py-3 text-center font-medium text-gray-900'>
-                          현재 페이지 ({currentPageTotals.itemCount.toLocaleString()}건)
-                        </td>
-                        <td className='px-4 py-3 text-right font-bold text-gray-900'>
-                          {currentPageTotals.orderPrice.toLocaleString()}원
-                        </td>
-                        <td className='px-4 py-3 text-right font-bold text-gray-900'>
-                          {currentPageTotals.orderPrice.toLocaleString()}원
-                        </td>
-                        <td className='px-4 py-3 text-right font-bold text-gray-900'>
-                          {currentPageTotals.receiptPrice.toLocaleString()}원
-                        </td>
-                        <td className='px-4 py-3 text-right font-bold text-red-600'>
-                          {currentPageTotals.cancelPrice.toLocaleString()}원
-                        </td>
-                        <td className='px-4 py-3 text-right font-bold text-gray-900'>
-                          {currentPageTotals.couponPrice.toLocaleString()}원
-                        </td>
-                        <td className='px-4 py-3 text-right font-bold text-gray-900'>
-                          {currentPageTotals.misu.toLocaleString()}원
-                        </td>
-                        <td className='px-4 py-3'></td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-
-                {orders.length === 0 && (
-                  <div className='py-12 text-center'>
-                    <p className='text-gray-500'>주문 내역이 없습니다.</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value='status' className='mt-6'>
-              <div className='overflow-hidden rounded-lg border bg-white'>
-                <div className='overflow-x-auto'>
-                  <table className='min-w-full divide-y divide-gray-200'>
-                    <thead className='bg-gray-50'>
-                      <tr>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문번호
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문자
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          회원ID
-                        </th>
-                        <th className='px-4 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문상품수
-                        </th>
-                        <th className='px-4 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          누적주문수
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문상태
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className='divide-y divide-gray-200 bg-white'>
-                      {orders.map((order) => (
-                        <tr key={order.od_id} className='transition-colors hover:bg-gray-50'>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm'>
-                              <div className='font-medium text-blue-600'>
-                                {formatOrderId(order.od_id)}
-                              </div>
-                              <div className='text-xs text-gray-500'>
-                                {formatDateOnly(order.od_time)}
-                              </div>
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm font-medium text-gray-900'>{order.od_name}</div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm text-gray-900'>{order.mb_id || '비회원'}</div>
-                          </td>
-                          <td className='px-4 py-4 text-center'>
-                            <div className='text-sm text-gray-900'>{order.od_cart_count}건</div>
-                          </td>
-                          <td className='px-4 py-4 text-center'>
-                            <div className='text-sm text-gray-900'>
-                              {order.member_order_count || 0}건
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <span
-                              className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                                order.od_status === '완료'
-                                  ? 'bg-green-100 text-green-800'
-                                  : order.od_status === '배송'
-                                    ? 'bg-blue-100 text-blue-800'
-                                    : order.od_status === '준비'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : order.od_status === '입금'
-                                        ? 'bg-green-100 text-green-800'
-                                        : order.od_status === '주문'
-                                          ? 'bg-gray-100 text-gray-800'
-                                          : order.od_status === '취소'
-                                            ? 'bg-red-100 text-red-800'
-                                            : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {order.od_status}
+                          ))}
+                          {order.items.length > 2 && (
+                            <div className='text-sm text-gray-500'>+{order.items.length - 2}개</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className='px-4 py-4 whitespace-nowrap'>
+                        <div className='text-sm'>
+                          <div className='font-medium text-blue-600'>
+                            {formatOrderId(order.od_id)}
+                          </div>
+                          <div className='text-xs text-gray-500'>
+                            {formatDateOnly(order.od_time)}
+                          </div>
+                          {order.od_mobile === 1 && (
+                            <span className='inline-block rounded bg-green-100 px-1 text-xs text-green-800'>
+                              M
                             </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className='bg-gray-100'>
-                      <tr>
-                        <td colSpan={6} className='px-4 py-3 text-center font-medium text-gray-900'>
-                          현재 페이지 ({currentPageTotals.itemCount.toLocaleString()}건)
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-
-                {orders.length === 0 && (
-                  <div className='py-12 text-center'>
-                    <p className='text-gray-500'>주문 내역이 없습니다.</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            {/* 배송 정보 탭 */}
-            <TabsContent value='delivery' className='mt-6'>
-              <div className='overflow-hidden rounded-lg border bg-white'>
-                <div className='overflow-x-auto'>
-                  <table className='min-w-full divide-y divide-gray-200'>
-                    <thead className='bg-gray-50'>
-                      <tr>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문번호
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          받는분
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          주문상태
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          운송장번호
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          배송회사
-                        </th>
-                        <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-                          배송일시
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className='divide-y divide-gray-200 bg-white'>
-                      {orders.map((order) => (
-                        <tr key={order.od_id} className='transition-colors hover:bg-gray-50'>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm'>
-                              <div className='font-medium text-blue-600'>
-                                {formatOrderId(order.od_id)}
-                              </div>
-                              <div className='text-xs text-gray-500'>
-                                {formatDateOnly(order.od_time)}
-                              </div>
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm'>
-                              <div className='font-medium text-gray-900'>{order.od_b_name}</div>
-                              <div className='text-xs text-gray-500'>
-                                {order.od_b_tel || order.od_b_hp}
-                              </div>
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <span
-                              className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                                order.od_status === '완료'
-                                  ? 'bg-green-100 text-green-800'
-                                  : order.od_status === '배송'
-                                    ? 'bg-blue-100 text-blue-800'
-                                    : order.od_status === '준비'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : order.od_status === '입금'
-                                        ? 'bg-green-100 text-green-800'
-                                        : order.od_status === '주문'
-                                          ? 'bg-gray-100 text-gray-800'
-                                          : order.od_status === '취소'
-                                            ? 'bg-red-100 text-red-800'
-                                            : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {order.od_status}
+                          )}
+                          {order.od_test === 1 && (
+                            <span className='ml-1 inline-block rounded bg-orange-100 px-1 text-xs text-orange-800'>
+                              테스트
                             </span>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm text-gray-900'>{order.od_invoice || '-'}</div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm text-gray-900'>
-                              {order.od_delivery_company || '-'}
-                            </div>
-                          </td>
-                          <td className='px-4 py-4'>
-                            <div className='text-sm text-gray-900'>-</div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className='bg-gray-100'>
-                      <tr>
-                        <td colSpan={6} className='px-4 py-3 text-center font-medium text-gray-900'>
-                          현재 페이지 ({currentPageTotals.itemCount.toLocaleString()}건)
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
+                          )}
+                          {order.od_escrow === 1 && (
+                            <span className='ml-1 inline-block rounded bg-purple-100 px-1 text-xs text-purple-800'>
+                              에스크로
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className='px-4 py-4 whitespace-nowrap'>
+                        <div className='text-sm font-medium text-gray-900'>{order.od_name}</div>
+                        <div className='text-xs text-gray-500'>
+                          {order.od_tel || order.od_hp || '-'}
+                        </div>
+                      </td>
+                      <td className='px-4 py-4 whitespace-nowrap'>
+                        <div className='text-sm'>
+                          <div className='font-medium text-gray-900'>{order.od_b_name}</div>
+                          <div className='text-xs text-gray-500'>
+                            {order.od_b_tel || order.od_b_hp}
+                          </div>
+                        </div>
+                      </td>
+                      <td className='px-4 py-4 whitespace-nowrap'>
+                        {statusLoading === order.od_id ? (
+                          <div className='flex items-center justify-center'>
+                            <LoadingSpinner size='sm' className='mb-0' />
+                            <span className='ml-2 text-sm text-gray-600'>변경 중...</span>
+                          </div>
+                        ) : ['입금', '준비'].includes(order.od_status as string) ? (
+                          <div className='flex justify-center'>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant='outline'
+                                  size='sm'
+                                  className={`h-8 rounded-full border px-3 text-sm font-medium ${
+                                    order.od_status === '입금'
+                                      ? 'border-green-200 bg-green-100 text-green-800'
+                                      : (order.od_status as string) === '준비'
+                                        ? 'border-yellow-200 bg-yellow-100 text-yellow-800'
+                                        : 'border-gray-200 bg-gray-100 text-gray-800'
+                                  }`}
+                                  disabled={statusLoading !== null}
+                                >
+                                  {order.od_status}
+                                  <ChevronDownIcon className='ml-2 h-4 w-4' />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align='end'>
+                                {order.od_status === '입금' && (
+                                  <>
+                                    <DropdownMenuItem
+                                      onClick={() => handleOrderStatusChange(order.od_id, '준비')}
+                                      disabled={statusLoading !== null}
+                                    >
+                                      <span className='text-yellow-600'>상품제작</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleOrderStatusChange(order.od_id, '배송')}
+                                      disabled={statusLoading !== null}
+                                    >
+                                      <span className='text-blue-600'>배송진행</span>
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                                {(order.od_status as string) === '준비' && (
+                                  <DropdownMenuItem
+                                    onClick={() => handleOrderStatusChange(order.od_id, '배송')}
+                                    disabled={statusLoading !== null}
+                                  >
+                                    <span className='text-blue-600'>배송진행</span>
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        ) : (
+                          <span
+                            className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                              order.od_status === '완료'
+                                ? 'bg-green-100 text-green-800'
+                                : order.od_status === '배송'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : order.od_status === '준비'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : order.od_status === '주문'
+                                      ? 'bg-gray-100 text-gray-800'
+                                      : order.od_status === '취소'
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {order.od_status}
+                          </span>
+                        )}
+                      </td>
+                      <td className='px-4 py-4 text-right whitespace-nowrap'>
+                        <div className='text-sm font-medium text-gray-900'>
+                          {order.od_cart_price.toLocaleString()}원
+                        </div>
+                      </td>
+                      <td className='px-4 py-4 text-right whitespace-nowrap'>
+                        <div className='text-sm font-medium text-gray-900'>
+                          {order.od_receipt_price.toLocaleString()}원
+                        </div>
+                      </td>
+                      <td className='px-4 py-4 whitespace-nowrap'>
+                        <div className='text-sm text-gray-900'>
+                          {getPaymentMethodDisplay(order.od_settle_case)}
+                        </div>
+                        {order.od_receipt_point > 0 && (
+                          <div className='text-xs text-gray-500'>포인트</div>
+                        )}
+                      </td>
+                      <td className='px-4 py-4 whitespace-nowrap'>
+                        <div className='text-sm text-gray-900'>{order.od_invoice || '-'}</div>
+                      </td>
+                      <td className='px-4 py-4 whitespace-nowrap'>
+                        <div className='text-sm text-gray-900'>
+                          {order.od_delivery_company || '-'}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-                {orders.length === 0 && (
-                  <div className='py-12 text-center'>
-                    <p className='text-gray-500'>주문 내역이 없습니다.</p>
-                  </div>
-                )}
+            {orders.length === 0 && (
+              <div className='py-12 text-center'>
+                <p className='text-gray-500'>주문 내역이 없습니다.</p>
               </div>
-            </TabsContent>
-          </Tabs>
+            )}
+          </div>
 
           <div className='mt-6 flex justify-center'>
             <CommonPagination
               currentPage={pagination.page}
               totalPages={pagination.totalPages}
               pathname={ROUTES.ADMIN_ORDERLIST}
-              queryParams={{ tab: currentTab }}
+              queryParams={{}}
             />
           </div>
         </>
       )}
+
+      <MessageDialog
+        open={messageDialog.open}
+        onOpenChange={(open) => setMessageDialog((prev) => ({ ...prev, open }))}
+        title={messageDialog.title}
+        description={messageDialog.description}
+      />
     </div>
   );
 }

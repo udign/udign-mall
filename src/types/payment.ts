@@ -2,6 +2,7 @@ export type PaymentMethodType =
   | 'CARD'
   | 'VIRTUAL_ACCOUNT'
   | 'TRANSFER'
+  | 'BANK_TRANSFER' // 실제 무통장입금 (은행계좌 직접 입금)
   | 'MOBILE_PHONE'
   | 'CULTURE_GIFT_CERTIFICATE'
   | 'BOOK_GIFT_CERTIFICATE'
