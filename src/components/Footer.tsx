@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
+import { YouTubeIcon, InstagramIcon, KakaoTalkIcon, GmailIcon } from './SocialIcons';
 
 interface FooterNavLink {
   href: string;
@@ -17,7 +18,7 @@ const FOOTER_NAV_LINKS: FooterNavLink[] = [
 
 export default function Footer() {
   return (
-    <footer className='space-y-10 border-t border-gray-200 px-6 py-6 sm:px-10 lg:space-y-18'>
+    <footer className='space-y-8 border-t border-gray-200 px-6 py-6 sm:px-10'>
       <div className='mx-auto max-w-7xl flex-row justify-between space-y-10 lg:flex lg:space-y-0'>
         <div className='mb-10 flex justify-center lg:mb-0 lg:flex-shrink-0 lg:justify-start'>
           <Image src='/images/udign-footer.png' alt='UDIGN' width={150} height={60} />
@@ -39,6 +40,47 @@ export default function Footer() {
           <p>토,일요일/공휴일 휴무</p>
         </div>
       </div>
+
+      {/* 소셜 미디어 섹션 */}
+      <div className='flex flex-col items-center'>
+        <div className='flex space-x-4'>
+          <a
+            href='https://youtube.com/@udign?si=qfjEDralJY9zD_O9'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
+            aria-label='YouTube'
+          >
+            <YouTubeIcon size={20} />
+          </a>
+          <a
+            href='https://www.instagram.com/udign.official?igsh=MXA2OHY2OWs0NjlnZw%3D%3D&utm_source=qr'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
+            aria-label='Instagram'
+          >
+            <InstagramIcon size={20} />
+          </a>
+          <a
+            href='http://pf.kakao.com/_wxatbn'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
+            aria-label='KakaoTalk'
+          >
+            <KakaoTalkIcon size={20} />
+          </a>
+          <a
+            href='mailto:udign0401@gmail.com'
+            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
+            aria-label='Email'
+          >
+            <GmailIcon size={20} />
+          </a>
+        </div>
+      </div>
+
       <div>
         <div className='text-gray-dark flex flex-wrap items-center justify-center gap-4 text-sm'>
           {FOOTER_NAV_LINKS.map((link, index) => (
