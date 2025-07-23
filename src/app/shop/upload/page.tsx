@@ -19,6 +19,7 @@ import { Checkbox } from '@/components/ui/primitives/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { FiUpload, FiX, FiPlus } from 'react-icons/fi';
 import { CATEGORY_IDS } from '@/lib/constants';
 import { ROUTES } from '@/lib/routes';
@@ -41,6 +42,7 @@ export default function UploadPage() {
   const [additionalImages, setAdditionalImages] = useState<UploadedFile[]>([]);
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
+  const [showFinalConfirmDialog, setShowFinalConfirmDialog] = useState<boolean>(false);
   const [messageDialogData, setMessageDialogData] = useState({
     title: '',
     description: '',
@@ -149,6 +151,50 @@ export default function UploadPage() {
     }
   };
 
+  const handleActualUpload = async () => {
+    setIsUploading(true);
+
+    try {
+      const uploadData = new FormData();
+
+      // 기본 정보
+      uploadData.append('category', formData.category);
+      uploadData.append('artworkName', formData.artworkName);
+      uploadData.append('description', formData.description);
+      uploadData.append('targetLikes', formData.targetLikes.toString());
+
+      // 대표 이미지
+      uploadData.append('mainImage', mainImage!.file);
+
+      // 추가 이미지들
+      additionalImages.forEach((imageData, index) => {
+        uploadData.append(`additionalImage${index}`, imageData.file);
+      });
+
+      const response = await fetch('/api/upload/artwork', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        showMessage(
+          '업로드 완료',
+          '작품이 성공적으로 업로드되었습니다. 관리자 승인 후 사이트에 노출됩니다.',
+          () => router.push(ROUTES.SHOP),
+        );
+      } else {
+        showMessage('업로드 실패', result.message || '업로드 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      showMessage('업로드 오류', '업로드 중 오류가 발생했습니다.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -184,47 +230,8 @@ export default function UploadPage() {
       return;
     }
 
-    setIsUploading(true);
-
-    try {
-      const uploadData = new FormData();
-
-      // 기본 정보
-      uploadData.append('category', formData.category);
-      uploadData.append('artworkName', formData.artworkName);
-      uploadData.append('description', formData.description);
-      uploadData.append('targetLikes', formData.targetLikes.toString());
-
-      // 대표 이미지
-      uploadData.append('mainImage', mainImage.file);
-
-      // 추가 이미지들
-      additionalImages.forEach((imageData, index) => {
-        uploadData.append(`additionalImage${index}`, imageData.file);
-      });
-
-      const response = await fetch('/api/upload/artwork', {
-        method: 'POST',
-        body: uploadData,
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        showMessage(
-          '업로드 완료',
-          '작품이 성공적으로 업로드되었습니다. 관리자 승인 후 사이트에 노출됩니다.',
-          () => router.push(ROUTES.SHOP),
-        );
-      } else {
-        showMessage('업로드 실패', result.message || '업로드 중 오류가 발생했습니다.');
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      showMessage('업로드 오류', '업로드 중 오류가 발생했습니다.');
-    } finally {
-      setIsUploading(false);
-    }
+    // 최종 확인 다이얼로그 표시
+    setShowFinalConfirmDialog(true);
   };
 
   return (
@@ -555,6 +562,17 @@ export default function UploadPage() {
         title={messageDialogData.title}
         description={messageDialogData.description}
         onConfirm={messageDialogData.onConfirm}
+      />
+
+      <ConfirmDialog
+        open={showFinalConfirmDialog}
+        onOpenChange={setShowFinalConfirmDialog}
+        title='디자인 업로드 시 최종 약관을 확인하셨습니까?'
+        description='업로드된 디자인은 관리자 승인 후 사이트에 노출됩니다. 약관에 동의하신 후 업로드를 진행해주세요.'
+        confirmText='확인'
+        cancelText='취소'
+        variant='default'
+        onConfirm={handleActualUpload}
       />
     </div>
   );
