@@ -114,3 +114,117 @@ export const SMS_DEFAULT_TEMPLATES = {
   PRODUCTION_START: '{이름}님의 상품 제작이 시작되었습니다. 주문번호: {주문번호} - {회사명}',
   SHIPPING_PROGRESS: '{이름}님의 상품이 배송 중입니다. 주문번호: {주문번호} - {회사명}',
 } as const;
+
+// SMS 발송 테스트용 수신자 정보
+export interface SMSRecipient {
+  id: string;
+  name: string;
+  phone: string;
+  type: 'individual' | 'group' | 'level';
+}
+
+// SMS 발송 테스트 폼 데이터
+export interface SMSTestFormData {
+  message: string;
+  recipients: SMSRecipient[];
+  replyNumber: string;
+  scheduled?: {
+    year: number;
+    month: number;
+    day: number;
+    hour: number;
+    minute: number;
+  };
+}
+
+// SMS 발송 테스트 요청
+export interface SMSTestRequest {
+  message: string;
+  recipients: Array<{
+    name: string;
+    phone: string;
+  }>;
+  replyNumber: string;
+  scheduled?: string; // ISO 형식의 날짜 문자열
+}
+
+// SMS 발송 테스트 결과
+export interface SMSTestResult {
+  phone: string;
+  name: string;
+  success: boolean;
+  code?: string;
+  message: string;
+}
+
+// SMS 발송 테스트 응답
+export interface SMSTestResponse {
+  success: boolean;
+  results?: SMSTestResult[];
+  totalSent: number;
+  totalFailed: number;
+  error?: string;
+}
+
+// 특수문자 및 이모티콘 그룹
+export const SMS_SPECIAL_CHARS = [
+  '■',
+  '□',
+  '▣',
+  '◈',
+  '◆',
+  '◇',
+  '♥',
+  '♡',
+  '●',
+  '○',
+  '▲',
+  '▼',
+  '▶',
+  '▷',
+  '◀',
+  '◁',
+  '☎',
+  '☏',
+  '♠',
+  '♤',
+  '♣',
+  '♧',
+  '★',
+  '☆',
+  '☞',
+  '☜',
+  '▒',
+  '⊙',
+  '㈜',
+  '№',
+  '㉿',
+  '♨',
+  '™',
+  '℡',
+  '∑',
+  '∏',
+  '♬',
+  '♪',
+  '♩',
+  '♭',
+] as const;
+
+export const SMS_EMOTICONS = [
+  '*^^*',
+  '♡.♡',
+  '@_@',
+  '☞_☜',
+  'ㅠ ㅠ',
+  'Θ.Θ',
+  '^_~♥',
+  '~o~',
+  '★.★',
+  '(!.!)',
+  '⊙.⊙',
+  'q.p',
+  "┏( '')┛",
+  '@)-)--',
+  '↖(^-^)↗',
+  '(*^-^*)',
+] as const;

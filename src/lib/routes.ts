@@ -18,6 +18,7 @@ export const ROUTES = {
   ADMIN_SIZE_GUIDE: '/admin/size-guide',
   ADMIN_MAIL_TEST: '/admin/mail-test',
   ADMIN_SMS_CONFIG: '/admin/sms/config',
+  ADMIN_SMS_TEST: '/admin/sms/test',
 
   // 인증 관련
   LOGIN: '/shop/login',
