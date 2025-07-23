@@ -203,14 +203,6 @@ export default function ProductDetailPage() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // 인증 로딩이 완료된 후에만 체크
-    if (authLoading) return;
-
-    if (!user) {
-      setShowLoginDialog(true);
-      return;
-    }
-
     const fetchProductDetail = async () => {
       try {
         setLoading(true);
@@ -260,7 +252,7 @@ export default function ProductDetailPage() {
     };
 
     fetchProductDetail();
-  }, [productId, user, authLoading, addViewedProduct]);
+  }, [productId, user, addViewedProduct]);
 
   // 목표 달성했지만 좋아요를 누르지 않은 작품 접근 차단 로직 제거
   // 이제 달성 UI로 표시하도록 변경
@@ -447,7 +439,7 @@ export default function ProductDetailPage() {
 
   const productImages = getProductImages();
 
-  return authLoading || loading ? (
+  return loading ? (
     <LoadingState
       message={authLoading ? '인증 정보를 확인하는 중...' : '작품 정보를 불러오는 중...'}
     />
@@ -608,7 +600,9 @@ export default function ProductDetailPage() {
                   onClick={handleLikeToggle}
                   variant='ghost'
                   size='icon'
-                  disabled={likingInProgress || product.is_under_review || product.can_purchase}
+                  disabled={
+                    likingInProgress || product.is_under_review || product.can_purchase || !user
+                  }
                   className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   {likingInProgress ? (

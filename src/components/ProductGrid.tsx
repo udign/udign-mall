@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Product } from '@/types/product';
 import { LikeResponse } from '@/types/product';
-import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { Button } from '@/components/ui/primitives/button';
 import { Progress } from '@/components/ui/primitives/progress';
@@ -45,7 +44,6 @@ interface SearchProduct {
 type ProductType = Product | SearchProduct;
 
 export default function ProductGrid({ products, className = '' }: ProductGridProps) {
-  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [productLikes, setProductLikes] = useState<
     Record<string, { isLiked: boolean; count: number }>
   >({});
@@ -62,11 +60,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
   const handleProductClick = (e: React.MouseEvent, productId: string) => {
     e.preventDefault();
 
-    if (!user) {
-      setShowLoginDialog(true);
-    } else {
-      router.push(`${ROUTES.PRODUCT}/${productId}`);
-    }
+    router.push(`${ROUTES.PRODUCT}/${productId}`);
   };
 
   const handleLikeToggle = async (e: React.MouseEvent, productId: string) => {
@@ -74,7 +68,6 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
     e.stopPropagation();
 
     if (!user) {
-      setShowLoginDialog(true);
       return;
     }
 
@@ -218,7 +211,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                       onClick={(e) => handleLikeToggle(e, product.it_id)}
                       variant='ghost'
                       size='icon'
-                      disabled={likingInProgress.has(product.it_id)}
+                      disabled={likingInProgress.has(product.it_id) || !user}
                       className='h-7 w-7 flex-shrink-0 rounded-full p-1 text-lg transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
                     >
                       {likingInProgress.has(product.it_id) ? (
@@ -238,13 +231,6 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
           );
         })}
       </div>
-
-      <LoginRequiredDialog
-        open={showLoginDialog}
-        onOpenChange={setShowLoginDialog}
-        title='상품 상세보기'
-        description='상품 상세 정보를 보시려면 로그인이 필요합니다.'
-      />
 
       <MessageDialog
         open={showOrderDialog}
