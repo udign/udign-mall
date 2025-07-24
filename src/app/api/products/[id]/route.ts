@@ -139,15 +139,15 @@ export const GET = async (
       }
     }
 
-    // 모든 작품에서 이전/다음 상품 조회 (필터링 제거)
+    // 같은 카테고리에서 이전/다음 상품 조회
     const getNavigationProducts = async () => {
-      // 이전/다음 상품 조회 (모든 작품 대상)
+      // 이전/다음 상품 조회 (같은 카테고리 내에서만)
       const prevProductQuery = `
         SELECT 
           i.it_id, 
           i.it_name
         FROM g5_shop_item i
-        WHERE i.it_time > ? AND i.it_use = '1'
+        WHERE i.it_time > ? AND i.it_use = '1' AND i.ca_id = ?
         ORDER BY i.it_time ASC 
         LIMIT 1
       `;
@@ -157,17 +157,19 @@ export const GET = async (
           i.it_id, 
           i.it_name
         FROM g5_shop_item i
-        WHERE i.it_time < ? AND i.it_use = '1'
+        WHERE i.it_time < ? AND i.it_use = '1' AND i.ca_id = ?
         ORDER BY i.it_time DESC 
         LIMIT 1
       `;
 
       const prevResults = (await executeQuery(prevProductQuery, [
         product.it_time,
+        product.ca_id,
       ])) as NavigationRow[];
 
       const nextResults = (await executeQuery(nextProductQuery, [
         product.it_time,
+        product.ca_id,
       ])) as NavigationRow[];
 
       return {
