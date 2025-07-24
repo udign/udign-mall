@@ -192,6 +192,9 @@ export default function ProductDetailPage() {
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: ItemOption }>({});
   const [showSizeGuide, setShowSizeGuide] = useState<boolean>(false);
+  const [showAlertDialog, setShowAlertDialog] = useState<boolean>(false);
+  const [alertTitle, setAlertTitle] = useState<string>('');
+  const [alertDescription, setAlertDescription] = useState<string>('');
 
   const params = useParams();
   const router = useRouter();
@@ -438,6 +441,13 @@ export default function ProductDetailPage() {
   };
 
   const productImages = getProductImages();
+
+  // alert 대신 dialog를 보여주는 함수
+  const showAlert = (title: string, description?: string) => {
+    setAlertTitle(title);
+    setAlertDescription(description || '');
+    setShowAlertDialog(true);
+  };
 
   return loading ? (
     <LoadingState
@@ -798,7 +808,7 @@ export default function ProductDetailPage() {
                         size='lg'
                         disabled={product.options.length > 0 && !isAllOptionsSelected()}
                         onClick={() => {
-                          alert('장바구니 기능은 개발 중입니다.');
+                          showAlert('알림', '장바구니 기능은 개발 중입니다.');
                         }}
                       >
                         장바구니 담기
@@ -993,6 +1003,13 @@ export default function ProductDetailPage() {
 
       {/* 사이즈 가이드 모달 */}
       <SizeGuideDialog open={showSizeGuide} onOpenChange={setShowSizeGuide} />
+
+      <MessageDialog
+        open={showAlertDialog}
+        onOpenChange={setShowAlertDialog}
+        title={alertTitle}
+        description={alertDescription}
+      />
     </div>
   );
 }

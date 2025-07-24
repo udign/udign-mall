@@ -44,6 +44,7 @@ import {
   SMS_SPECIAL_CHARS,
   SMS_EMOTICONS,
 } from '@/types/sms';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 export default function SMSTestPage() {
   const [config, setConfig] = useState<SMSConfig | null>(null);
@@ -62,6 +63,9 @@ export default function SMSTestPage() {
   });
   const [isScheduled, setIsScheduled] = useState<boolean>(false);
   const [sendResults, setSendResults] = useState<SMSTestResponse | null>(null);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogDescription, setDialogDescription] = useState<string>('');
 
   // 설정 로드
   useEffect(() => {
@@ -107,9 +111,16 @@ export default function SMSTestPage() {
     }
   };
 
+  // alert 대신 dialog를 보여주는 함수
+  const showAlert = (title: string, description?: string) => {
+    setDialogTitle(title);
+    setDialogDescription(description || '');
+    setShowDialog(true);
+  };
+
   const addRecipient = () => {
     if (!newRecipient.phone.trim()) {
-      alert('휴대폰 번호를 입력해주세요.');
+      showAlert('입력 오류', '휴대폰 번호를 입력해주세요.');
       return;
     }
 
@@ -118,13 +129,13 @@ export default function SMSTestPage() {
     const formattedPhone = newRecipient.phone.replace(/[^0-9]/g, '');
 
     if (!phoneRegex.test(formattedPhone)) {
-      alert('휴대폰 번호 형식이 올바르지 않습니다.');
+      showAlert('형식 오류', '휴대폰 번호 형식이 올바르지 않습니다.');
       return;
     }
 
     // 중복 확인
     if (formData.recipients.some((r) => r.phone === formattedPhone)) {
-      alert('이미 같은 번호가 목록에 있습니다.');
+      showAlert('중복 오류', '이미 같은 번호가 목록에 있습니다.');
       return;
     }
 
@@ -159,17 +170,17 @@ export default function SMSTestPage() {
 
   const handleSend = async () => {
     if (!formData.message.trim()) {
-      alert('메시지를 입력해주세요.');
+      showAlert('입력 오류', '메시지를 입력해주세요.');
       return;
     }
 
     if (formData.recipients.length === 0) {
-      alert('수신자를 추가해주세요.');
+      showAlert('입력 오류', '수신자를 추가해주세요.');
       return;
     }
 
     if (!formData.replyNumber.trim()) {
-      alert('회신번호를 입력해주세요.');
+      showAlert('입력 오류', '회신번호를 입력해주세요.');
       return;
     }
 
@@ -622,6 +633,13 @@ export default function SMSTestPage() {
           </CardContent>
         </Card>
       )}
+
+      <MessageDialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        title={dialogTitle}
+        description={dialogDescription}
+      />
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
   ImageIcon,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface TiptapEditorProps {
   content: string;
@@ -38,6 +39,9 @@ export function TiptapEditor({
   popupId,
 }: TiptapEditorProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogDescription, setDialogDescription] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -67,9 +71,16 @@ export function TiptapEditor({
     },
   });
 
+  // alert 대신 dialog를 보여주는 함수
+  const showAlert = (title: string, description?: string) => {
+    setDialogTitle(title);
+    setDialogDescription(description || '');
+    setShowDialog(true);
+  };
+
   const handleImageUpload = async (file: File) => {
     if (!popupId) {
-      alert('팝업 ID가 필요합니다.');
+      showAlert('오류', '팝업 ID가 필요합니다.');
       return;
     }
 
@@ -91,11 +102,11 @@ export function TiptapEditor({
         // 에디터에 이미지 삽입
         editor?.chain().focus().setImage({ src: result.imageUrl }).run();
       } else {
-        alert(result.message || '이미지 업로드에 실패했습니다.');
+        showAlert('업로드 실패', result.message || '이미지 업로드에 실패했습니다.');
       }
     } catch (error) {
       console.error('이미지 업로드 오류:', error);
-      alert('이미지 업로드 중 오류가 발생했습니다.');
+      showAlert('오류', '이미지 업로드 중 오류가 발생했습니다.');
     } finally {
       setIsUploading(false);
     }
@@ -103,7 +114,7 @@ export function TiptapEditor({
 
   const handleImageButtonClick = () => {
     if (!popupId) {
-      alert('팝업을 저장한 후 이미지를 업로드할 수 있습니다.');
+      showAlert('알림', '팝업을 저장한 후 이미지를 업로드할 수 있습니다.');
       return;
     }
     fileInputRef.current?.click();
@@ -114,13 +125,13 @@ export function TiptapEditor({
     if (file) {
       // 파일 크기 체크 (5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('파일 용량은 5MB 이하여야 합니다.');
+        showAlert('파일 크기 초과', '파일 용량은 5MB 이하여야 합니다.');
         return;
       }
 
       // 이미지 파일인지 확인
       if (!file.type.match('image.*')) {
-        alert('이미지 파일만 업로드 가능합니다.');
+        showAlert('파일 형식 오류', '이미지 파일만 업로드 가능합니다.');
         return;
       }
 
@@ -278,6 +289,13 @@ export function TiptapEditor({
             <div className='text-sm text-gray-600'>이미지 업로드 중...</div>
           </div>
         )}
+
+        <MessageDialog
+          open={showDialog}
+          onOpenChange={setShowDialog}
+          title={dialogTitle}
+          description={dialogDescription}
+        />
       </div>
     )
   );

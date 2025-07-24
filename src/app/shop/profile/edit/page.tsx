@@ -8,6 +8,7 @@ import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
+import MessageDialog from '@/components/ui/MessageDialog';
 
 interface ProfileFormData {
   mb_id: string;
@@ -30,6 +31,9 @@ export default function ProfileEditPage() {
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogDescription, setDialogDescription] = useState<string>('');
 
   const router = useRouter();
 
@@ -116,6 +120,13 @@ export default function ProfileEditPage() {
     });
   };
 
+  // alert 대신 dialog를 보여주는 함수
+  const showAlert = (title: string, description?: string) => {
+    setDialogTitle(title);
+    setDialogDescription(description || '');
+    setShowDialog(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -155,9 +166,8 @@ export default function ProfileEditPage() {
       const data = await response.json();
 
       if (data.success) {
-        alert('회원정보가 성공적으로 수정되었습니다.');
-        // 페이지 새로고침하여 사용자 정보 업데이트
-        window.location.href = ROUTES.MY_UDIGN;
+        showAlert('성공', '회원정보가 성공적으로 수정되었습니다.');
+        // 페이지 이동을 dialog 닫힘 후에 처리하도록 수정
       } else {
         setError(data.message || '회원정보 수정 중 오류가 발생했습니다.');
       }
@@ -321,6 +331,18 @@ export default function ProfileEditPage() {
           </div>
         </div>
       </div>
+
+      <MessageDialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        title={dialogTitle}
+        description={dialogDescription}
+        onConfirm={() => {
+          if (dialogTitle === '성공') {
+            window.location.href = ROUTES.MY_UDIGN;
+          }
+        }}
+      />
     </div>
   );
 }
