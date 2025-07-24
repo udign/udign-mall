@@ -45,6 +45,8 @@ import {
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
 import { User } from '@/types/user';
+import MessageDialog from '@/components/ui/MessageDialog';
+import { useState } from 'react';
 
 interface AdminLayoutClientProps {
   children: ReactNode;
@@ -159,6 +161,9 @@ const menuItems: MenuItem[] = [
 export default function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogDescription, setDialogDescription] = useState<string>('');
 
   const isActive = (href: string) => pathname === href;
 
@@ -169,6 +174,12 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
 
   const handleNavigation = (href: string) => {
     router.push(href);
+  };
+
+  const showAlert = (title: string, description?: string) => {
+    setDialogTitle(title);
+    setDialogDescription(description || '');
+    setShowDialog(true);
   };
 
   const handleLogout = async () => {
@@ -183,7 +194,7 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
       }
     } catch (error) {
       console.error('로그아웃 실패:', error);
-      alert('로그아웃 중 오류가 발생했습니다.');
+      showAlert('오류', '로그아웃 중 오류가 발생했습니다.');
     }
   };
 
@@ -313,6 +324,13 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
 
         <main className='mb-20 flex-1 space-y-4 p-4 md:p-6'>{children}</main>
       </SidebarInset>
+
+      <MessageDialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        title={dialogTitle}
+        description={dialogDescription}
+      />
     </SidebarProvider>
   );
 }
