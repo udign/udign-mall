@@ -13,6 +13,7 @@ import MessageDialog from '@/components/ui/MessageDialog';
 interface ProfileFormData {
   mb_id: string;
   mb_name: string;
+  mb_email: string;
   mb_hp: string;
   mb_password: string;
   mb_password_confirm: string;
@@ -23,6 +24,7 @@ export default function ProfileEditPage() {
   const [formData, setFormData] = useState<ProfileFormData>({
     mb_id: '',
     mb_name: '',
+    mb_email: '',
     mb_hp: '',
     mb_password: '',
     mb_password_confirm: '',
@@ -56,6 +58,7 @@ export default function ProfileEditPage() {
           setFormData({
             mb_id: data.user.mb_id,
             mb_name: data.user.mb_name,
+            mb_email: data.user.mb_email || '',
             mb_hp: data.user.mb_hp || '',
             mb_password: '',
             mb_password_confirm: '',
@@ -87,22 +90,13 @@ export default function ProfileEditPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // 휴대폰 번호 자동 포맷팅
+    // 휴대폰 번호는 숫자만 입력받도록 처리
     if (name === 'mb_hp') {
       // 숫자만 추출
       const numbers = value.replace(/[^0-9]/g, '');
-      let formattedValue = numbers;
-
-      // 휴대폰 번호 포맷팅 (010-1234-5678)
-      if (numbers.length > 3 && numbers.length <= 7) {
-        formattedValue = `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-      } else if (numbers.length > 7) {
-        formattedValue = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
-      }
-
       setFormData({
         ...formData,
-        [name]: formattedValue,
+        [name]: numbers,
       });
     } else {
       setFormData({
@@ -132,21 +126,39 @@ export default function ProfileEditPage() {
     setError('');
     setIsLoading(true);
 
+    // 필수 입력값 체크
+    if (!formData.mb_email) {
+      setError('이메일을 입력해주세요.');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!formData.mb_hp) {
+      setError('휴대폰 번호를 입력해주세요.');
+      setIsLoading(false);
+      return;
+    }
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.mb_email)) {
+      setError('올바른 이메일 주소를 입력해주세요.');
+      setIsLoading(false);
+      return;
+    }
+
+    // 휴대폰 번호 형식 검증 (숫자만 11자리)
+    if (formData.mb_hp.length !== 11 || !formData.mb_hp.startsWith('01')) {
+      setError('휴대폰 번호는 01로 시작하는 11자리 숫자로 입력해주세요.');
+      setIsLoading(false);
+      return;
+    }
+
     // 비밀번호 확인
     if (formData.mb_password !== formData.mb_password_confirm) {
       setError('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
       setIsLoading(false);
       return;
-    }
-
-    // 휴대폰 번호 형식 검증 (숫자만 11자리 또는 하이픈 포함 13자리)
-    if (formData.mb_hp) {
-      const phoneNumbers = formData.mb_hp.replace(/[^0-9]/g, '');
-      if (phoneNumbers.length !== 11 || !phoneNumbers.startsWith('01')) {
-        setError('휴대폰 번호는 01로 시작하는 11자리 숫자로 입력해주세요.');
-        setIsLoading(false);
-        return;
-      }
     }
 
     try {
@@ -157,6 +169,7 @@ export default function ProfileEditPage() {
         },
         body: JSON.stringify({
           mb_name: formData.mb_name,
+          mb_email: formData.mb_email,
           mb_hp: formData.mb_hp,
           mb_password: formData.mb_password || undefined, // 빈 값이면 undefined로 보내서 업데이트하지 않음
           mb_mailling: formData.mb_mailling,
@@ -234,14 +247,30 @@ export default function ProfileEditPage() {
 
               <div>
                 <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_name'>
-                  이름 <span className='text-red-400'>*</span>
+                  이름
                 </label>
                 <input
                   id='mb_name'
                   type='text'
                   name='mb_name'
                   value={formData.mb_name}
+                  disabled
+                  className='w-full cursor-not-allowed rounded border border-gray-600 bg-gray-700/50 px-3 py-2 text-gray-400'
+                />
+                <p className='mt-1 text-xs text-gray-400'>이름은 변경할 수 없습니다.</p>
+              </div>
+
+              <div>
+                <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_email'>
+                  이메일 <span className='text-red-400'>*</span>
+                </label>
+                <input
+                  id='mb_email'
+                  type='email'
+                  name='mb_email'
+                  value={formData.mb_email}
                   onChange={handleChange}
+                  placeholder='이메일을 입력해주세요'
                   required
                   disabled={isLoading}
                   className='w-full rounded border border-gray-600 bg-gray-800/50 px-3 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none disabled:opacity-50'
@@ -250,7 +279,7 @@ export default function ProfileEditPage() {
 
               <div>
                 <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_hp'>
-                  휴대폰 번호
+                  휴대폰 번호 <span className='text-red-400'>*</span>
                 </label>
                 <input
                   id='mb_hp'
@@ -259,6 +288,7 @@ export default function ProfileEditPage() {
                   value={formData.mb_hp}
                   onChange={handleChange}
                   placeholder='예: 01012345678 (숫자만 입력)'
+                  required
                   disabled={isLoading}
                   className='w-full rounded border border-gray-600 bg-gray-800/50 px-3 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none disabled:opacity-50'
                 />
