@@ -109,46 +109,88 @@ export const GET = async (request: NextRequest) => {
     const totalCount = countResult[0]?.total_count || 0;
 
     // 검색 결과 조회 (좋아요 상태 포함)
-    const userCondition = currentUserId ? `AND user_like.mb_id = '${currentUserId}'` : '';
+    let searchQuery;
 
-    const searchQuery = `
-      SELECT 
-        i.it_id,
-        i.it_name,
-        i.it_basic,
-        i.it_cust_price,
-        i.it_price,
-        i.it_img1,
-        i.it_img2,
-        i.it_img3,
-        i.it_use_avg,
-        i.it_use_cnt,
-        i.it_hit,
-        i.it_time,
-        i.it_update_time,
-        i.ca_id,
-        i.it_1 as creator_id,
-        i.it_2 as creator_name,
-        i.it_3 as description,
-        i.it_4 as target_likes,
-        COALESCE(like_count.cnt, 0) as current_likes,
-        CASE WHEN user_like.it_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
-      FROM g5_shop_item i
-      LEFT JOIN (
-        SELECT it_id, COUNT(*) as cnt 
-        FROM g5_shop_interrest 
-        GROUP BY it_id
-      ) like_count ON i.it_id = like_count.it_id
-      LEFT JOIN g5_shop_interrest user_like ON i.it_id = user_like.it_id ${userCondition}
-      WHERE i.it_use = '1' AND (
-        i.it_name LIKE '%${escapedPattern}%' OR 
-        i.it_explan LIKE '%${escapedPattern}%' OR 
-        i.it_id LIKE '%${escapedPattern}%' OR 
-        i.it_basic LIKE '%${escapedPattern}%'
-      )
-      ORDER BY i.it_id DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `;
+    if (currentUserId) {
+      // 로그인 상태: 사용자별 좋아요 상태 포함
+      searchQuery = `
+        SELECT 
+          i.it_id,
+          i.it_name,
+          i.it_basic,
+          i.it_cust_price,
+          i.it_price,
+          i.it_img1,
+          i.it_img2,
+          i.it_img3,
+          i.it_use_avg,
+          i.it_use_cnt,
+          i.it_hit,
+          i.it_time,
+          i.it_update_time,
+          i.ca_id,
+          i.it_1 as creator_id,
+          i.it_2 as creator_name,
+          i.it_3 as description,
+          i.it_4 as target_likes,
+          COALESCE(like_count.cnt, 0) as current_likes,
+          CASE WHEN user_like.it_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
+        FROM g5_shop_item i
+        LEFT JOIN (
+          SELECT it_id, COUNT(*) as cnt 
+          FROM g5_shop_interrest 
+          GROUP BY it_id
+        ) like_count ON i.it_id = like_count.it_id
+        LEFT JOIN g5_shop_interrest user_like ON i.it_id = user_like.it_id AND user_like.mb_id = '${currentUserId}'
+        WHERE i.it_use = '1' AND (
+          i.it_name LIKE '%${escapedPattern}%' OR 
+          i.it_explan LIKE '%${escapedPattern}%' OR 
+          i.it_id LIKE '%${escapedPattern}%' OR 
+          i.it_basic LIKE '%${escapedPattern}%'
+        )
+        ORDER BY i.it_id DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `;
+    } else {
+      // 비로그인 상태: 좋아요 상태 없이 조회 (중복 방지)
+      searchQuery = `
+        SELECT 
+          i.it_id,
+          i.it_name,
+          i.it_basic,
+          i.it_cust_price,
+          i.it_price,
+          i.it_img1,
+          i.it_img2,
+          i.it_img3,
+          i.it_use_avg,
+          i.it_use_cnt,
+          i.it_hit,
+          i.it_time,
+          i.it_update_time,
+          i.ca_id,
+          i.it_1 as creator_id,
+          i.it_2 as creator_name,
+          i.it_3 as description,
+          i.it_4 as target_likes,
+          COALESCE(like_count.cnt, 0) as current_likes,
+          0 as is_liked
+        FROM g5_shop_item i
+        LEFT JOIN (
+          SELECT it_id, COUNT(*) as cnt 
+          FROM g5_shop_interrest 
+          GROUP BY it_id
+        ) like_count ON i.it_id = like_count.it_id
+        WHERE i.it_use = '1' AND (
+          i.it_name LIKE '%${escapedPattern}%' OR 
+          i.it_explan LIKE '%${escapedPattern}%' OR 
+          i.it_id LIKE '%${escapedPattern}%' OR 
+          i.it_basic LIKE '%${escapedPattern}%'
+        )
+        ORDER BY i.it_id DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `;
+    }
 
     const searchResults = (await executeQuery(searchQuery, [])) as ProductRow[];
 

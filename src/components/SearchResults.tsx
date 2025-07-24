@@ -58,6 +58,8 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  console.log(searchData);
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1');
