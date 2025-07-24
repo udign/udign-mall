@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
               await sendOrderCompleteCustomerEmail(orderEmailData, customerEmail);
               await sendOrderCompleteAdminEmail(orderEmailData);
 
-              console.log('주문 완료 메일 발송 완료:', orderId);
+              // 주문 완료 메일 발송 완료
 
               // SMS 발송 (결제 완료 후)
               try {
@@ -106,31 +106,16 @@ export async function POST(request: NextRequest) {
                 const smsSettings = await getSMSSettings();
 
                 if (smsEnabled && smsSettings && customerPhone) {
-                  console.log('결제 완료 SMS 발송 시작:', {
-                    orderId,
-                    customerName,
-                    customerPhone,
-                    paymentMethod: paymentData.method,
-                  });
-
                   // 결제 완료 SMS 발송
                   if (smsSettings.de_sms_use3) {
-                    const orderSmsResult = await sendOrderReceivedSMS({
+                    await sendOrderReceivedSMS({
                       name: customerName,
                       phone: customerPhone,
                       orderId: orderId,
                       totalAmount: paymentData.totalAmount,
                       companyName: smsSettings.de_admin_company_name,
                     });
-
-                    console.log('결제 완료 SMS 발송 결과:', orderSmsResult);
                   }
-                } else {
-                  console.log('SMS 발송 조건이 충족되지 않았습니다 (결제 완료):', {
-                    smsEnabled,
-                    hasSettings: !!smsSettings,
-                    hasPhone: !!customerPhone,
-                  });
                 }
               } catch (smsError) {
                 // SMS 발송 실패는 로그만 남기고 결제는 정상 처리

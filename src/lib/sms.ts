@@ -35,7 +35,7 @@ export const getSMSConfig = async (): Promise<SMSConfig | null> => {
       `)) as RowDataPacket[];
       smsConfigData = smsRows[0] || {};
     } catch (error) {
-      console.log('sms5_config 테이블 조회 중 오류:', error);
+      console.error('sms5_config 테이블 조회 중 오류:', error);
     }
 
     return {
@@ -109,12 +109,6 @@ export const canSendSMS = async (): Promise<boolean> => {
           const minimumCoin = 100; // G5_ICODE_COIN과 동일한 값
           const hasSufficientBalance = userInfo.coin >= minimumCoin;
 
-          console.log('충전제 잔액 확인:', {
-            currentBalance: userInfo.coin,
-            minimumRequired: minimumCoin,
-            hasSufficientBalance,
-          });
-
           if (!hasSufficientBalance) {
             console.warn(
               `❌ SMS 발송 불가: 잔액 부족 (현재: ${userInfo.coin}원, 필요: ${minimumCoin}원)`,
@@ -163,7 +157,8 @@ export const getSMSSettings = async (): Promise<{
         config = configRows[0] as Record<string, string>;
       }
     } catch (columnError) {
-      console.log('SMS 설정 컬럼이 존재하지 않습니다. 기본값을 사용합니다:', columnError);
+      console.error('SMS 설정 컬럼 조회 중 오류:', columnError);
+      // SMS 설정 컬럼이 존재하지 않는 경우 기본값 사용
 
       // SMS 관련 컬럼이 없는 경우 기본 설정 사용
       // SMS 기능을 사용하려면 최소한 아이코드 설정이 되어있어야 함
@@ -197,7 +192,7 @@ export const getSMSSettings = async (): Promise<{
         bankAccount = accounts[0]?.trim() || '계좌정보를 설정해주세요';
       }
     } catch (error) {
-      console.log('계좌번호 조회 중 오류:', error);
+      console.error('계좌번호 조회 중 오류:', error);
       bankAccount = '계좌정보를 설정해주세요';
     }
 
@@ -367,13 +362,7 @@ const sendSMSWithToken = async (
 ): Promise<{ success: boolean; message: string; result?: string }> => {
   return new Promise((resolve) => {
     try {
-      console.log('토큰키 방식 SMS 발송 시작 (TCP 소켓):', {
-        server: '211.172.232.124', // 토큰키 방식은 고정 서버 사용
-        port: '9201', // 토큰키 방식은 9201 포트 사용
-        recipient,
-        callback,
-        message: message.substring(0, 20) + '...',
-      });
+      // 토큰키 방식 SMS 발송 시작
 
       // JSON 패킷 구성
       const packet = {
@@ -389,7 +378,7 @@ const sendSMSWithToken = async (
       const packetLength = packetData.length.toString().padStart(4, '0');
       const fullPacket = `06${packetLength}${packetData}`;
 
-      console.log('발송 패킷 생성 (토큰키):', fullPacket.substring(0, 50) + '...');
+      // 발송 패킷 생성 완료
 
       // TCP 소켓 연결
       const socket = new Socket();
@@ -398,13 +387,11 @@ const sendSMSWithToken = async (
       socket.setTimeout(10000); // 10초 타임아웃
 
       socket.connect(9201, '211.172.232.124', () => {
-        console.log('아이코드 서버 연결 성공 (토큰키)');
         socket.write(fullPacket);
       });
 
       socket.on('data', (data) => {
         responseData += data.toString();
-        console.log('아이코드 서버 응답 (토큰키):', responseData);
 
         // 응답 분석 (토큰키 방식)
         if (responseData.length >= 20) {
@@ -431,7 +418,6 @@ const sendSMSWithToken = async (
       });
 
       socket.on('timeout', () => {
-        console.error('아이코드 서버 연결 타임아웃 (토큰키)');
         socket.destroy();
         resolve({
           success: false,
@@ -440,18 +426,17 @@ const sendSMSWithToken = async (
         });
       });
 
-      socket.on('error', (error) => {
-        console.error('아이코드 서버 연결 오류 (토큰키):', error);
+      socket.on('error', () => {
         socket.destroy();
         resolve({
           success: false,
-          message: `연결 오류: ${error.message}`,
+          message: '연결 오류',
           result: `${recipient.trim()}:연결오류`,
         });
       });
 
       socket.on('close', () => {
-        console.log('아이코드 서버 연결 종료 (토큰키)');
+        // 연결 종료
       });
     } catch (error) {
       console.error('토큰키 방식 SMS 발송 오류:', error);
@@ -469,13 +454,7 @@ const sendSMSWithCredentials = async (
 ): Promise<{ success: boolean; message: string; result?: string }> => {
   return new Promise((resolve) => {
     try {
-      console.log('ID/PW 방식 SMS 발송 시작 (TCP 소켓):', {
-        server: config.cf_icode_server_ip,
-        port: config.cf_icode_server_port,
-        recipient,
-        callback,
-        message: message.substring(0, 20) + '...',
-      });
+      // ID/PW 방식 SMS 발송 시작
 
       // 패킷 구성 (PHP와 동일한 방식)
       const id = config.cf_icode_id.padEnd(10, ' ');
@@ -497,7 +476,7 @@ const sendSMSWithCredentials = async (
       // 전체 패킷 조합
       const packet = Buffer.concat([headerBuffer, msgBytes]);
 
-      console.log('발송 패킷 생성:', packet.toString('binary').substring(0, 50) + '...');
+      // 발송 패킷 생성 완료
 
       // TCP 소켓 연결
       const socket = new Socket();
@@ -506,13 +485,11 @@ const sendSMSWithCredentials = async (
       socket.setTimeout(10000); // 10초 타임아웃
 
       socket.connect(parseInt(config.cf_icode_server_port), config.cf_icode_server_ip, () => {
-        console.log('아이코드 서버 연결 성공');
         socket.write(packet);
       });
 
       socket.on('data', (data) => {
         responseData += data.toString();
-        console.log('아이코드 서버 응답:', responseData);
 
         // 응답 분석
         if (responseData.length >= 19) {
@@ -538,7 +515,6 @@ const sendSMSWithCredentials = async (
       });
 
       socket.on('timeout', () => {
-        console.error('아이코드 서버 연결 타임아웃');
         socket.destroy();
         resolve({
           success: false,
@@ -547,18 +523,17 @@ const sendSMSWithCredentials = async (
         });
       });
 
-      socket.on('error', (error) => {
-        console.error('아이코드 서버 연결 오류:', error);
+      socket.on('error', () => {
         socket.destroy();
         resolve({
           success: false,
-          message: `연결 오류: ${error.message}`,
+          message: '연결 오류',
           result: `${recipient.trim()}:연결오류`,
         });
       });
 
       socket.on('close', () => {
-        console.log('아이코드 서버 연결 종료');
+        // 연결 종료
       });
     } catch (error) {
       console.error('ID/PW 방식 SMS 발송 오류:', error);

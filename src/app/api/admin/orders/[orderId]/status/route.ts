@@ -31,8 +31,6 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     const body = await request.json();
     const { status }: { status: OrderStatus } = body;
 
-    console.log('주문 상태 변경 요청:', { orderId, status, orderIdType: typeof orderId });
-
     // 상태 값 검증 - '준비'(상품제작) 또는 '배송'(배송진행)만 허용
     if (!['준비', '배송'].includes(status)) {
       return NextResponse.json(
@@ -49,8 +47,6 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
       WHERE o.od_id = ? OR o.od_tno = ?
     `;
 
-    console.log('주문 조회 쿼리 실행:', { query: orderCheckQuery, orderId });
-
     const orderResult = (await executeQuery(orderCheckQuery, [orderId, orderId])) as {
       od_id: string;
       od_tno: string;
@@ -59,14 +55,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
       od_status: string;
     }[];
 
-    console.log('주문 조회 결과:', orderResult);
-
     if (orderResult.length === 0) {
-      // 주문이 존재하지 않는 경우 추가 디버깅
-      const allOrdersQuery = `SELECT od_id, od_tno FROM g5_shop_order LIMIT 5`;
-      const sampleOrders = await executeQuery(allOrdersQuery);
-      console.log('샘플 주문 ID들:', sampleOrders);
-
       return NextResponse.json(
         { success: false, message: '존재하지 않는 주문입니다.' },
         { status: 404 },
@@ -117,20 +106,12 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
         const smsSettings = await getSMSSettings();
 
         if (!smsEnabled || !smsSettings?.de_sms_use3 || !order.od_hp) {
-          console.log('SMS 발송 조건이 충족되지 않음:', {
-            smsEnabled,
-            smsUse3: smsSettings?.de_sms_use3,
-            hasPhone: !!order.od_hp,
-          });
           return;
         }
 
-        console.log(`주문 상태 변경 SMS 발송 시작 - 주문ID: ${orderId}, 상태: ${status}`);
-
-        let smsResult;
         if (status === '준비') {
           // 상품제작 시작 SMS 발송
-          smsResult = await sendProductionStartSMS({
+          await sendProductionStartSMS({
             name: order.od_name,
             phone: order.od_hp,
             orderId: orderId,
@@ -138,7 +119,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
           });
         } else if (status === '배송') {
           // 배송진행 SMS 발송
-          smsResult = await sendShippingProgressSMS({
+          await sendShippingProgressSMS({
             name: order.od_name,
             phone: order.od_hp,
             orderId: orderId,
@@ -146,11 +127,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
           });
         }
 
-        if (smsResult?.success) {
-          console.log(`✅ 주문 상태 변경 SMS 발송 완료: ${orderId} → ${status}`);
-        } else {
-          console.error(`❌ 주문 상태 변경 SMS 발송 실패:`, smsResult?.message);
-        }
+        // SMS 발송 처리 완료
       } catch (smsError) {
         console.error('🚨 주문 상태 변경 SMS 발송 오류:', smsError);
       }

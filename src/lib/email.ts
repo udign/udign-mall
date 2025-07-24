@@ -49,8 +49,7 @@ export const sendEmail = async ({ to, subject, html, from }: EmailConfig): Promi
       html,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('이메일 발송 성공:', info.messageId);
+    await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
     console.error('이메일 발송 실패:', error);

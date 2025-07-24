@@ -20,7 +20,7 @@ export const GET = async () => {
 
       configData = configRows[0] || {};
     } catch (error) {
-      console.log('g5_config 테이블 조회 중 오류:', error);
+      console.error('g5_config 테이블 조회 중 오류:', error);
     }
 
     try {
@@ -33,7 +33,7 @@ export const GET = async () => {
 
       smsConfigData = smsRows[0] || {};
     } catch (error) {
-      console.log('sms5_config 테이블 조회 중 오류:', error);
+      console.error('sms5_config 테이블 조회 중 오류:', error);
     }
 
     // 기본값 설정 (두 테이블의 데이터를 합침)
@@ -147,9 +147,8 @@ export const POST = async (request: NextRequest) => {
       for (const column of smsColumns) {
         try {
           await connection.execute(`ALTER TABLE g5_config ADD COLUMN ${column}`);
-        } catch (error) {
+        } catch {
           // 컬럼이 이미 존재하면 무시
-          console.log(`컬럼 추가 시도 중 오류 (이미 존재할 수 있음): ${error}`);
         }
       }
 
@@ -188,7 +187,7 @@ export const POST = async (request: NextRequest) => {
           [cf_phone],
         );
       } catch (error) {
-        console.log('sms5_config 테이블 업데이트 시도 중 오류:', error);
+        console.error('sms5_config 테이블 업데이트 중 오류:', error);
       }
 
       await connection.commit();
