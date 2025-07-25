@@ -252,6 +252,7 @@ export const GET = async (
         it_img1: getImageUrl(product.it_img1),
         it_img2: getImageUrl(product.it_img2),
         it_img3: getImageUrl(product.it_img3),
+        it_img4: getImageUrl(product.it_img4),
         it_info: product.it_explan || '', // it_explan을 it_info로 매핑
         ca_name: product.ca_name || '',
         creator_name: product.it_2 || '', // it_2가 작가명

@@ -223,12 +223,13 @@ export default function ProductDetailPage() {
             it_id: data.product.it_id,
             it_name: data.product.it_name,
             it_img1: data.product.it_img1,
+            it_img2: data.product.it_img2,
+            it_img3: data.product.it_img3,
+            it_img4: (data.product as ProductDetail & { it_img4: string | null }).it_img4,
             it_price: data.product.it_price,
             creator_name: data.product.creator_name,
             it_basic: data.product.it_basic,
             it_cust_price: data.product.it_cust_price,
-            it_img2: data.product.it_img2,
-            it_img3: data.product.it_img3,
             it_use_avg: 0,
             it_use_cnt: 0,
             it_hit: 0,
@@ -259,7 +260,13 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!carouselApi || !product) return;
 
-    const images = [product.it_img1, product.it_img2, product.it_img3].filter(Boolean) as string[];
+    const productWithImg4 = product as ProductDetail & { it_img4: string | null };
+    const images = [
+      productWithImg4.it_img1,
+      productWithImg4.it_img2,
+      productWithImg4.it_img3,
+      productWithImg4.it_img4,
+    ].filter(Boolean) as string[];
 
     const onSelect = () => {
       const index = carouselApi.selectedScrollSnap();
@@ -347,9 +354,13 @@ export default function ProductDetailPage() {
   const handleThumbnailClick = (imageUrl: string) => {
     setSelectedImage(imageUrl);
     if (product && carouselApi) {
-      const images = [product.it_img1, product.it_img2, product.it_img3].filter(
-        Boolean,
-      ) as string[];
+      const productWithImg4 = product as ProductDetail & { it_img4: string | null };
+      const images = [
+        productWithImg4.it_img1,
+        productWithImg4.it_img2,
+        productWithImg4.it_img3,
+        productWithImg4.it_img4,
+      ].filter(Boolean) as string[];
       const imageIndex = images.indexOf(imageUrl);
       if (imageIndex !== -1) {
         carouselApi.scrollTo(imageIndex);
@@ -432,7 +443,13 @@ export default function ProductDetailPage() {
   // 이미지 배열 생성 로직
   const getProductImages = () => {
     if (!product) return [];
-    return [product.it_img1, product.it_img2, product.it_img3].filter(Boolean) as string[];
+    const productWithImg4 = product as ProductDetail & { it_img4: string | null };
+    return [
+      productWithImg4.it_img1,
+      productWithImg4.it_img2,
+      productWithImg4.it_img3,
+      productWithImg4.it_img4,
+    ].filter(Boolean) as string[];
   };
 
   const productImages = getProductImages();
