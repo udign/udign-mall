@@ -1,6 +1,6 @@
 export const STATUS_GROUPS = {
   all: '전체',
-  collection: '❤️ 디자인',
+  collection: '디자인 좋아요',
   review: '제작 검토',
   payment: '구매 진행',
   paymentCompleted: '주문 확정',

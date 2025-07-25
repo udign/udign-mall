@@ -93,6 +93,8 @@ export default function PopularProducts({ excludeProductId }: PopularProductsPro
               current_likes: product.current_likes,
               target_likes: product.target_likes,
               ca_name: product.ca_name,
+              it_4: 'it_4' in product ? product.it_4 : product.target_likes, // 블러 처리를 위한 it_4
+              _status_text: '_status_text' in product ? product._status_text : '컬렉션', // 상태 정보
             }));
 
           setProducts(formattedProducts);

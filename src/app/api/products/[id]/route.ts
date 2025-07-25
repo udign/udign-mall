@@ -112,7 +112,13 @@ export const GET = async (
     const reviewDays = parseInt(product.it_8) || 0;
 
     let isUnderReview = false;
-    if (!isReviewCompleted) {
+
+    // 1. 관리자가 수동으로 심의중으로 설정한 경우 (최우선 처리)
+    if (product.it_10 === 'Y') {
+      isUnderReview = true;
+    }
+    // 2. 심의 완료가 아닌 경우의 다른 조건들
+    else if (!isReviewCompleted) {
       if (goalAttainment && !manualReview) {
         // 자동 심의: 목표 달성시 심의중
         isUnderReview = true;
