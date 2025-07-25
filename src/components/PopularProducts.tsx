@@ -7,6 +7,9 @@ interface ApiPopularProduct {
   it_id: string;
   it_name: string;
   it_img1: string;
+  it_img2: string;
+  it_img3: string;
+  it_img4: string;
   it_price: number;
   it_cust_price: number;
   it_hit: number;
@@ -21,6 +24,9 @@ interface PopularProduct {
   it_id: string;
   it_name: string;
   it_img1: string;
+  it_img2: string | null;
+  it_img3: string | null;
+  it_img4: string | null;
   it_price: number;
   it_cust_price: number;
   it_hit: number;
@@ -30,8 +36,6 @@ interface PopularProduct {
   current_likes: number;
   ca_name: string;
   it_basic: string;
-  it_img2: string | null;
-  it_img3: string | null;
   it_use_avg: number;
   it_use_cnt: number;
   it_time: string;
@@ -77,8 +81,9 @@ export default function PopularProducts({ excludeProductId }: PopularProductsPro
               it_cust_price: product.it_cust_price,
               it_price: product.it_price,
               it_img1: product.it_img1,
-              it_img2: null,
-              it_img3: null,
+              it_img2: product.it_img2 || null,
+              it_img3: product.it_img3 || null,
+              it_img4: product.it_img4 || null,
               it_use_avg: 0,
               it_use_cnt: 0,
               it_hit: product.it_hit,
