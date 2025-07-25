@@ -258,7 +258,7 @@ export default function ArtworkCard({
               )}
 
               {/* 상품문의 */}
-              {(artwork._status_text === '상품 제작' || artwork._status_text === '제작중') && (
+              {/* {(artwork._status_text === '상품 제작' || artwork._status_text === '제작중') && (
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -270,7 +270,7 @@ export default function ArtworkCard({
                 >
                   상품문의
                 </Button>
-              )}
+              )} */}
 
               {/* 배송조회 */}
               {(artwork._status_text === '배송 진행' || artwork._status_text === '배송중') && (
