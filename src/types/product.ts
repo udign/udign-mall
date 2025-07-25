@@ -37,6 +37,8 @@ export interface Product {
   is_liked?: boolean; // 현재 사용자가 좋아요했는지 여부 (선택적)
   current_likes?: number; // 현재 좋아요 수 (선택적)
   target_likes?: number; // 목표 좋아요 수 (선택적)
+  it_4?: number; // 목표 인원 (선택적)
+  _status_text?: string; // 작품 상태 텍스트 (선택적)
 }
 
 export interface ProductDetail extends Product {

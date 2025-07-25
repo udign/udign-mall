@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/primitives/button';
 import { Progress } from '@/components/ui/primitives/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
-import { shouldBlurProduct } from '@/lib/artwork-helpers';
+import { shouldBlurProduct, isCollectionStatus } from '@/lib/artwork-helpers';
 
 interface ProductGridProps {
   products: ProductType[];
@@ -40,6 +40,8 @@ interface SearchProduct {
   is_liked: boolean;
   current_likes: number;
   target_likes?: number;
+  it_4?: number;
+  _status_text?: string;
 }
 
 type ProductType = Product | SearchProduct;
@@ -221,7 +223,13 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                       onClick={(e) => handleLikeToggle(e, product.it_id)}
                       variant='ghost'
                       size='icon'
-                      disabled={likingInProgress.has(product.it_id) || !user}
+                      disabled={
+                        likingInProgress.has(product.it_id) ||
+                        !user ||
+                        shouldBlur ||
+                        ('_status_text' in product &&
+                          !isCollectionStatus(product._status_text as string))
+                      }
                       className='h-7 w-7 flex-shrink-0 rounded-full p-1 text-lg transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
                     >
                       {likingInProgress.has(product.it_id) ? (
