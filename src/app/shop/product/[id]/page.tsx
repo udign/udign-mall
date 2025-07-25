@@ -193,9 +193,6 @@ export default function ProductDetailPage() {
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: ItemOption }>({});
   const [showSizeGuide, setShowSizeGuide] = useState<boolean>(false);
-  const [showAlertDialog, setShowAlertDialog] = useState<boolean>(false);
-  const [alertTitle, setAlertTitle] = useState<string>('');
-  const [alertDescription, setAlertDescription] = useState<string>('');
 
   const params = useParams();
   const router = useRouter();
@@ -257,9 +254,6 @@ export default function ProductDetailPage() {
 
     fetchProductDetail();
   }, [productId, user, addViewedProduct]);
-
-  // 목표 달성했지만 좋아요를 누르지 않은 작품 접근 차단 로직 제거
-  // 이제 달성 UI로 표시하도록 변경
 
   // Carousel과 thumbnail 동기화
   useEffect(() => {
@@ -442,13 +436,6 @@ export default function ProductDetailPage() {
   };
 
   const productImages = getProductImages();
-
-  // alert 대신 dialog를 보여주는 함수
-  const showAlert = (title: string, description?: string) => {
-    setAlertTitle(title);
-    setAlertDescription(description || '');
-    setShowAlertDialog(true);
-  };
 
   return loading ? (
     <LoadingState
@@ -805,38 +792,25 @@ export default function ProductDetailPage() {
                       </Button>
                     </div>
 
-                    <div className='space-y-3'>
-                      <Button
-                        className='bg-primary hover:bg-primary/90 w-full text-white'
-                        size='lg'
-                        disabled={product.options.length > 0 && !isAllOptionsSelected()}
-                        onClick={() => {
-                          showAlert('알림', '장바구니 기능은 개발 중입니다.');
-                        }}
-                      >
-                        장바구니 담기
-                      </Button>
-                      <Button
-                        variant='outline'
-                        className='border-primary text-primary hover:bg-primary w-full hover:text-white'
-                        size='lg'
-                        disabled={product.options.length > 0 && !isAllOptionsSelected()}
-                        onClick={() => {
-                          const selectedOptionIds = Object.values(selectedOptions).map(
-                            (option) => option.io_id,
-                          );
-                          const optionParams =
-                            selectedOptionIds.length > 0
-                              ? `&optionIds=${selectedOptionIds.join(',')}`
-                              : '';
-                          router.push(
-                            `/shop/checkout?itemId=${product.it_id}&quantity=${quantity}${optionParams}`,
-                          );
-                        }}
-                      >
-                        구매하기
-                      </Button>
-                    </div>
+                    <Button
+                      className='bg-primary hover:bg-primary/90 w-full text-white'
+                      size='lg'
+                      disabled={product.options.length > 0 && !isAllOptionsSelected()}
+                      onClick={() => {
+                        const selectedOptionIds = Object.values(selectedOptions).map(
+                          (option) => option.io_id,
+                        );
+                        const optionParams =
+                          selectedOptionIds.length > 0
+                            ? `&optionIds=${selectedOptionIds.join(',')}`
+                            : '';
+                        router.push(
+                          `/shop/checkout?itemId=${product.it_id}&quantity=${quantity}${optionParams}`,
+                        );
+                      }}
+                    >
+                      구매하기
+                    </Button>
 
                     {product.options.length > 0 && !isAllOptionsSelected() && (
                       <div className='rounded-lg border border-orange-200 bg-orange-50 p-3'>
@@ -1006,13 +980,6 @@ export default function ProductDetailPage() {
 
       {/* 사이즈 가이드 모달 */}
       <SizeGuideDialog open={showSizeGuide} onOpenChange={setShowSizeGuide} />
-
-      <MessageDialog
-        open={showAlertDialog}
-        onOpenChange={setShowAlertDialog}
-        title={alertTitle}
-        description={alertDescription}
-      />
     </div>
   );
 }
