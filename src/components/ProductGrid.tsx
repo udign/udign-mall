@@ -27,6 +27,7 @@ interface SearchProduct {
   it_img1: string | null;
   it_img2: string | null;
   it_img3: string | null;
+  it_img4: string | null;
   it_use_avg: number;
   it_use_cnt: number;
   it_hit: number;

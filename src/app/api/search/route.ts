@@ -239,6 +239,7 @@ export const GET = async (request: NextRequest) => {
       it_img1: getImageUrl(item.it_img1),
       it_img2: getImageUrl(item.it_img2),
       it_img3: getImageUrl(item.it_img3),
+      it_img4: getImageUrl(item.it_img4),
       it_use_avg: item.it_use_avg,
       it_use_cnt: item.it_use_cnt,
       it_hit: item.it_hit,

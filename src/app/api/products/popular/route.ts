@@ -59,6 +59,9 @@ export const GET = async () => {
         i.it_id,
         i.it_name,
         i.it_img1,
+        i.it_img2,
+        i.it_img3,
+        i.it_img4,
         i.it_price,
         i.it_cust_price,
         i.it_hit,
@@ -86,6 +89,9 @@ export const GET = async () => {
       it_id: product.it_id,
       it_name: product.it_name || '',
       it_img1: getImageUrl(product.it_img1),
+      it_img2: getImageUrl(product.it_img2),
+      it_img3: getImageUrl(product.it_img3),
+      it_img4: getImageUrl(product.it_img4),
       it_price:
         typeof product.it_price === 'string' ? parseInt(product.it_price) : product.it_price || 0,
       it_cust_price:

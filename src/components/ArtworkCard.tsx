@@ -186,10 +186,7 @@ export default function ArtworkCard({
               {/* 구매 진행 */}
               {artwork._status_text === '구매 진행' && (
                 <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/shop/checkout?itemId=${artwork.it_id}&quantity=1`);
-                  }}
+                  onClick={() => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`)}
                   variant='default'
                   size='sm'
                   className='whitespace-nowrap'
@@ -201,10 +198,7 @@ export default function ArtworkCard({
               {/* 결제대기 */}
               {artwork._status_text === '결제대기' && artwork.od_settle_case !== '무통장' && (
                 <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/shop/checkout?itemId=${artwork.it_id}&quantity=1`);
-                  }}
+                  onClick={() => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`)}
                   variant='default'
                   size='sm'
                   className='whitespace-nowrap'
