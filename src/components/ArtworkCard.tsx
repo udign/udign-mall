@@ -166,7 +166,7 @@ export default function ArtworkCard({
                       disabled={isToggling}
                     />
                     <span className='text-gray-700'>
-                      {isToggling ? '처리중...' : artwork.it_10 === 'N' ? '심의종료' : '심의중'}
+                      {isToggling ? '처리중...' : artwork.it_10 === 'N' ? '구매 진행' : '제작 검토'}
                     </span>
                   </div>
                 </div>

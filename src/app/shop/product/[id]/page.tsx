@@ -477,13 +477,7 @@ export default function ProductDetailPage() {
               </div>
               {/* 레이어 오버레이 */}
               <div className='absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/60'>
-                <div className='text-center text-white'>
-                  <div className='mb-4 text-6xl'>🎉</div>
-                  <div className='text-xl font-bold'>좋아요 목표 달성!</div>
-                  <div className='mt-4 text-xs opacity-75'>
-                    총 {product.current_likes}명의 컬렉터가 참여했습니다.
-                  </div>
-                </div>
+                <span className='text-xl text-white'>full & under review</span>
               </div>
             </div>
 
