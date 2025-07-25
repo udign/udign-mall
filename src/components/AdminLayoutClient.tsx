@@ -165,7 +165,14 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
   const [dialogTitle, setDialogTitle] = useState<string>('');
   const [dialogDescription, setDialogDescription] = useState<string>('');
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => {
+    // 정확히 일치하는 경우
+    if (pathname === href) return true;
+    // 하위 경로인 경우
+    if (pathname.startsWith(href + '/')) return true;
+
+    return false;
+  };
 
   const isParentActive = (item: MenuItem) => {
     if (item.href) return isActive(item.href);
