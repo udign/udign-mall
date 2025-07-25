@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/primitives/button';
 import { Progress } from '@/components/ui/primitives/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
+import { shouldBlurProduct, isCollectionStatus } from '@/lib/artwork-helpers';
 
 interface ProductGridProps {
   products: ProductType[];
@@ -39,6 +40,8 @@ interface SearchProduct {
   is_liked: boolean;
   current_likes: number;
   target_likes?: number;
+  it_4?: number;
+  _status_text?: string;
 }
 
 type ProductType = Product | SearchProduct;
@@ -159,14 +162,23 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
           const likeInfo = getLikeInfo(product);
           const likeTarget = getLikeTarget(product);
           const progressValue = Math.min((likeInfo.count / likeTarget) * 100, 100);
-          const isGoalAchieved = likeInfo.count >= likeTarget;
+          const shouldBlur = shouldBlurProduct(
+            {
+              current_likes: likeInfo.count,
+              it_4: 'it_4' in product ? (product.it_4 as number) : undefined,
+              target_likes: likeTarget,
+              _status_text:
+                '_status_text' in product ? (product._status_text as string) : undefined,
+            },
+            likeInfo.isLiked,
+          );
 
           return (
             <div
               key={product.it_id}
-              onClick={isGoalAchieved ? undefined : (e) => handleProductClick(e, product.it_id)}
+              onClick={shouldBlur ? undefined : (e) => handleProductClick(e, product.it_id)}
               className={`flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white ${
-                isGoalAchieved ? 'cursor-default' : 'cursor-pointer'
+                shouldBlur ? 'cursor-default' : 'cursor-pointer'
               }`}
             >
               <div className='relative aspect-square'>
@@ -185,7 +197,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                   </div>
                 )}
 
-                {isGoalAchieved && (
+                {shouldBlur && (
                   <div className='absolute inset-0 z-10 flex items-center justify-center rounded-t-lg bg-black/50'>
                     <span className='text-sm text-white'>full & under review</span>
                   </div>
@@ -197,7 +209,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                   <h3 className='mr-2 flex overflow-hidden font-medium text-gray-900'>
                     {product.it_name}
                   </h3>
-                  {isGoalAchieved ? (
+                  {shouldBlur ? (
                     <div className='relative h-7 w-7 flex-shrink-0'>
                       <Image
                         src='/images/logo.png'
@@ -211,7 +223,13 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                       onClick={(e) => handleLikeToggle(e, product.it_id)}
                       variant='ghost'
                       size='icon'
-                      disabled={likingInProgress.has(product.it_id) || !user}
+                      disabled={
+                        likingInProgress.has(product.it_id) ||
+                        !user ||
+                        shouldBlur ||
+                        ('_status_text' in product &&
+                          !isCollectionStatus(product._status_text as string))
+                      }
                       className='h-7 w-7 flex-shrink-0 rounded-full p-1 text-lg transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
                     >
                       {likingInProgress.has(product.it_id) ? (

@@ -8,6 +8,7 @@ import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
+import { shouldBlurProduct, getProductStatus } from '@/lib/artwork-helpers';
 import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Progress } from '@/components/ui/primitives/progress';
@@ -460,8 +461,16 @@ export default function ProductDetailPage() {
   ) : (
     <div className='bg-white'>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
-        {/* 좋아요 수 충족된 작품 - 좋아요를 누르지 않은 사용자에게만 달성 UI 표시 */}
-        {product.current_likes >= product.it_4 && !product.is_liked ? (
+        {/* 블러 처리 대상 작품 - 좋아요를 누르지 않은 사용자에게만 달성 UI 표시 */}
+        {shouldBlurProduct(
+          {
+            current_likes: product.current_likes,
+            it_4: product.it_4,
+            target_likes: product.it_4,
+            _status_text: getProductStatus(product),
+          },
+          product.is_liked,
+        ) ? (
           <div className='text-center'>
             <h1 className='mb-8 text-3xl font-bold text-gray-900'>{product.it_name}</h1>
             <div className='relative mx-auto max-w-md'>
@@ -477,13 +486,7 @@ export default function ProductDetailPage() {
               </div>
               {/* 레이어 오버레이 */}
               <div className='absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/60'>
-                <div className='text-center text-white'>
-                  <div className='mb-4 text-6xl'>🎉</div>
-                  <div className='text-xl font-bold'>좋아요 목표 달성!</div>
-                  <div className='mt-4 text-xs opacity-75'>
-                    총 {product.current_likes}명의 컬렉터가 참여했습니다.
-                  </div>
-                </div>
+                <span className='text-xl text-white'>full & under review</span>
               </div>
             </div>
 

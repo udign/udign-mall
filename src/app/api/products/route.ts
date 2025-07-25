@@ -6,6 +6,38 @@ import { getImageUrl } from '@/lib/utils';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 
+// 상태 계산 함수
+const calculateProductStatus = (item: ProductRow): string => {
+  const goalAttainment = item.current_likes >= item.target_likes;
+
+  // 1. 관리자 토글 최우선 처리
+  if (item.admin_review_status === 'Y') {
+    return '심의중';
+  }
+
+  // 2. 심의 종료 상태 처리
+  if (item.admin_review_status === 'N') {
+    return '구매 진행';
+  }
+
+  // 3. 반려 상태 처리
+  if (item.admin_review_status === 'R') {
+    return '반려';
+  }
+
+  // 4. 목표를 달성하지 않은 경우
+  if (!goalAttainment) {
+    return '컬렉션';
+  }
+
+  // 5. 목표를 달성한 경우 → 자동으로 심의중 상태
+  if (goalAttainment) {
+    return '제작 검토';
+  }
+
+  return '컬렉션';
+};
+
 interface JwtPayload {
   mb_id: string;
   [key: string]: unknown;
@@ -30,6 +62,9 @@ interface ProductRow extends RowDataPacket {
   creator_name: string;
   description: string;
   target_likes: number;
+  review_days: number;
+  manual_review: 'Y' | 'N';
+  admin_review_status: 'Y' | 'N' | 'R' | string | null;
   current_likes: number;
   is_liked: number;
 }
@@ -120,6 +155,9 @@ export const GET = async (request: NextRequest) => {
         i.it_2 as creator_name,
         i.it_3 as description,
         i.it_4 as target_likes,
+        i.it_8 as review_days,
+        i.it_9 as manual_review,
+        i.it_10 as admin_review_status,
         COALESCE(like_count.cnt, 0) as current_likes,
         CASE WHEN user_like.mb_id IS NOT NULL THEN 1 ELSE 0 END as is_liked
       FROM g5_shop_item i
@@ -186,6 +224,8 @@ export const GET = async (request: NextRequest) => {
       is_liked: Boolean(item.is_liked), // 사용자별 좋아요 상태 추가
       current_likes: item.current_likes, // 현재 좋아요 수 추가
       target_likes: item.target_likes, // 목표 좋아요 수 추가
+      it_4: item.target_likes, // 블러 처리 로직을 위한 it_4 추가
+      _status_text: calculateProductStatus(item), // 상태 텍스트 추가
     }));
 
     return NextResponse.json({
