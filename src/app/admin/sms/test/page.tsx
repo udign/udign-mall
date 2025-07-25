@@ -13,15 +13,8 @@ import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
 import { Label } from '@/components/ui/primitives/label';
 import { Textarea } from '@/components/ui/primitives/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/primitives/select';
+
 import { Separator } from '@/components/ui/primitives/separator';
-import { Checkbox } from '@/components/ui/primitives/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/primitives/popover';
 import {
   AlertTriangle,
@@ -32,7 +25,6 @@ import {
   Hash,
   User,
   Users,
-  Clock,
   Trash2,
 } from 'lucide-react';
 import {
@@ -61,7 +53,7 @@ export default function SMSTestPage() {
     name: '',
     phone: '',
   });
-  const [isScheduled, setIsScheduled] = useState<boolean>(false);
+
   const [sendResults, setSendResults] = useState<SMSTestResponse | null>(null);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [dialogTitle, setDialogTitle] = useState<string>('');
@@ -196,10 +188,6 @@ export default function SMSTestPage() {
           phone: r.phone,
         })),
         replyNumber: formData.replyNumber,
-        scheduled:
-          isScheduled && formData.scheduled
-            ? `${formData.scheduled.year}-${formData.scheduled.month.toString().padStart(2, '0')}-${formData.scheduled.day.toString().padStart(2, '0')} ${formData.scheduled.hour.toString().padStart(2, '0')}:${formData.scheduled.minute.toString().padStart(2, '0')}:00`
-            : undefined,
       };
 
       const response = await fetch('/api/admin/sms/send', {
@@ -379,129 +367,6 @@ export default function SMSTestPage() {
                 onChange={(e) => setFormData((prev) => ({ ...prev, replyNumber: e.target.value }))}
                 placeholder='010-1234-5678'
               />
-            </div>
-
-            <div className='space-y-2'>
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='scheduled'
-                  checked={isScheduled}
-                  onCheckedChange={(checked) => setIsScheduled(checked === true)}
-                />
-                <Label htmlFor='scheduled' className='flex items-center gap-2'>
-                  <Clock className='h-4 w-4' />
-                  예약 전송
-                </Label>
-              </div>
-
-              {isScheduled && (
-                <div className='grid grid-cols-5 gap-2'>
-                  <Select
-                    value={formData.scheduled?.year?.toString()}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        scheduled: { ...prev.scheduled!, year: parseInt(value) },
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='년' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[dayjs().year(), dayjs().year() + 1].map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}년
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    value={formData.scheduled?.month?.toString()}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        scheduled: { ...prev.scheduled!, month: parseInt(value) },
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='월' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                        <SelectItem key={month} value={month.toString()}>
-                          {month}월
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    value={formData.scheduled?.day?.toString()}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        scheduled: { ...prev.scheduled!, day: parseInt(value) },
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='일' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                        <SelectItem key={day} value={day.toString()}>
-                          {day}일
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    value={formData.scheduled?.hour?.toString()}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        scheduled: { ...prev.scheduled!, hour: parseInt(value) },
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='시' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
-                        <SelectItem key={hour} value={hour.toString()}>
-                          {hour}시
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    value={formData.scheduled?.minute?.toString()}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        scheduled: { ...prev.scheduled!, minute: parseInt(value) },
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='분' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
-                        <SelectItem key={minute} value={minute.toString()}>
-                          {minute}분
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
