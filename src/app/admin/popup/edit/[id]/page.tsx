@@ -563,9 +563,6 @@ export default function PopupEditPage() {
                             popupId={popupId}
                           />
                         </FormControl>
-                        <p className='text-xs text-gray-500'>
-                          리치 텍스트 에디터를 사용하여 다양한 서식을 적용할 수 있습니다.
-                        </p>
                         <FormMessage />
                       </FormItem>
                     )}
