@@ -13,6 +13,7 @@ export const ROUTES = {
   ADMIN_ORDERPRINT: '/admin/orderprint',
   ADMIN_ORDERLIST: '/admin/orderlist',
   ADMIN_RETURNLIST: '/admin/returnlist',
+  ADMIN_COPYRIGHT_REPORT: '/admin/copyright-report',
   ADMIN_POPUP: '/admin/popup',
   ADMIN_POPUP_CREATE: '/admin/popup/create',
   ADMIN_POPUP_EDIT: '/admin/popup/edit',
