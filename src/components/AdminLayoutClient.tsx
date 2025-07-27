@@ -24,6 +24,7 @@ import {
   MessageSquare,
   Send,
   Building,
+  Shield,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -101,6 +102,11 @@ const menuItems: MenuItem[] = [
         label: '교환/반품내역',
         href: ROUTES.ADMIN_RETURNLIST,
         icon: <RefreshCw className='h-4 w-4' />,
+      },
+      {
+        label: '저작권 신고 조회',
+        href: ROUTES.ADMIN_COPYRIGHT_REPORT,
+        icon: <Shield className='h-4 w-4' />,
       },
     ],
   },
