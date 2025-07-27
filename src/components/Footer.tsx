@@ -13,7 +13,7 @@ const FOOTER_NAV_LINKS: FooterNavLink[] = [
   { href: ROUTES.GUIDE, label: '이용안내' },
   { href: ROUTES.PROVISION, label: '이용약관' },
   { href: ROUTES.PRIVACY, label: '개인정보처리방침' },
-  { href: ROUTES.BAND, label: '벤더페이지' },
+  { href: ROUTES.VENDOR, label: '벤더페이지' },
 ];
 
 export default function Footer() {

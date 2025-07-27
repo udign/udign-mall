@@ -49,5 +49,5 @@ export const ROUTES = {
   GUIDE: '/shop/guide',
   PROVISION: '/shop/provision',
   PRIVACY: '/shop/privacy',
-  BAND: '/shop/band',
+  VENDOR: '/shop/vendor',
 } as const;
