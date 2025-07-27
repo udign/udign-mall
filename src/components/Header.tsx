@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { HiOutlineSearch, HiOutlineMenu } from 'react-icons/hi';
-import { FiBox } from 'react-icons/fi';
+import { FiBox, FiClock, FiSearch } from 'react-icons/fi';
 import { FaRegUserCircle } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +24,7 @@ import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar'
 import SearchSidebar from '@/components/SearchSidebar';
 import NavigationSidebar from '@/components/NavigationSidebar';
 import { Button } from '@/components/ui/primitives/button';
+import Link from 'next/link';
 
 export default function Header() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
@@ -79,73 +80,51 @@ export default function Header() {
   return (
     !hideHeader && (
       <>
-        <header className='sticky top-0 z-50 bg-white'>
+        <header className='sticky top-0 z-50 bg-[#0e1731]'>
           <div className='space-y-5 px-6 py-5 sm:px-10'>
             <div className='flex items-center gap-3'>
               <div className='non-login'>
-                <Button
-                  onClick={() => router.push(ROUTES.SHOP)}
-                  variant='ghost'
-                  className='flex h-auto items-center p-0 hover:bg-transparent'
-                >
-                  <Image
-                    src='/images/udign-header.png'
-                    alt='UDIGN'
-                    width={100}
-                    height={40}
-                    className='h-auto'
-                  />
-                </Button>
+                <Link href={ROUTES.HOME}>
+                  <Image src='/images/udign-white.png' alt='logo' width={103} height={35} />
+                </Link>
               </div>
-              <div className='text-gray-dark ml-auto flex items-center gap-1'>
+              <div className='ml-auto flex flex-shrink-0 items-center gap-2'>
                 <Button
-                  onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
-                  variant='ghost'
-                  className='hover:text-primary-hover'
-                >
-                  <FaRegUserCircle className='text-xl' />
-                </Button>
-                <Button
-                  variant='ghost'
-                  className='hover:text-primary-hover relative'
                   onClick={handleTodayViewedClick}
+                  size='icon'
+                  variant='ghost'
+                  className='hover:text-white hover:bg-white/10'
                 >
-                  <FiBox className='text-xl' />
-                  {viewedProductsCount > 0 && (
-                    <span className='absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs text-white'>
-                      {viewedProductsCount}
-                    </span>
-                  )}
+                  <FiClock className='text-xl text-white' />
                 </Button>
                 <Button
-                  variant='ghost'
-                  className='hover:text-primary-hover'
                   onClick={handleSearchClick}
+                  size='icon'
+                  variant='ghost'
+                  className='hover:text-white hover:bg-white/10'
                 >
-                  <HiOutlineSearch className='text-xl' />
+                  <FiSearch className='text-xl text-white' />
                 </Button>
-
-                {isLoading ? (
-                  <LoadingSpinner size='sm' />
-                ) : user ? (
-                  <DropdownMenu modal={false}>
+                {user && user.mb_level >= 2 && (
+                  <Button
+                    onClick={() => router.push(ROUTES.ADMIN)}
+                    variant='ghost'
+                    className='hover:text-white hover:bg-white/10 text-base text-white'
+                  >
+                    <span>관리자</span>
+                  </Button>
+                )}
+                {user ? (
+                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant='ghost'
-                        className='hover:text-primary-hover text-base text-gray-600'
+                        className='hover:text-white hover:bg-white/10 text-base text-white'
                       >
-                        <span>{user.mb_nick} 님</span>
+                        <span>{user.mb_name}</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end' className='w-36 p-0'>
-                      {PERMISSION_CHECKS.isAdmin(user.mb_level) && (
-                        <DropdownMenuItem
-                          onClick={() => router.push(ROUTES.ADMIN)}
-                          className='cursor-pointer'
-                        >
-                          관리자
-                        </DropdownMenuItem>
-                      )}
+                    <DropdownMenuContent align='end' className='w-48'>
                       <DropdownMenuItem
                         onClick={() => router.push(ROUTES.PROFILE_CONFIRM)}
                         className='cursor-pointer'
@@ -161,7 +140,7 @@ export default function Header() {
                   <Button
                     onClick={() => router.push(ROUTES.LOGIN)}
                     variant='ghost'
-                    className='hover:text-primary-hover text-base text-gray-600'
+                    className='hover:text-white hover:bg-white/10 text-base text-white'
                   >
                     <span>로그인</span>
                   </Button>
@@ -169,109 +148,25 @@ export default function Header() {
 
                 <Button
                   variant='ghost'
-                  className='hover:text-primary-hover md:hidden'
+                  className='hover:text-white hover:bg-white/10'
                   onClick={handleNavigationClick}
                 >
-                  <HiOutlineMenu className='text-xl' />
+                  <HiOutlineMenu className='text-xl text-white' />
                 </Button>
               </div>
             </div>
-            <nav className='hidden md:flex md:items-center md:justify-between'>
-              <ul className='flex items-center gap-1'>
-                {NAV_MENU_ITEMS.map((item) => (
-                  <li key={item.href} className='flex items-center'>
-                    {item.subCategories ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
-                          >
-                            {item.label}
-                            <IoIosArrowDown className='text-sm' />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='start' className='w-32 p-0'>
-                          <DropdownMenuItem
-                            onClick={() => router.push(item.href)}
-                            className='cursor-pointer'
-                          >
-                            전체
-                          </DropdownMenuItem>
-                          {item.subCategories.map((subCategory) =>
-                            subCategory.thirdCategories ? (
-                              <DropdownMenu key={subCategory.id}>
-                                <DropdownMenuTrigger asChild>
-                                  <DropdownMenuItem
-                                    onSelect={(e) => e.preventDefault()}
-                                    className='cursor-pointer justify-between'
-                                  >
-                                    {subCategory.label}
-                                    <IoIosArrowDown className='rotate-[-90deg] text-sm' />
-                                  </DropdownMenuItem>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                  side='right'
-                                  alignOffset={-5}
-                                  className='w-32 p-0'
-                                >
-                                  <DropdownMenuItem
-                                    onClick={() => router.push(subCategory.href)}
-                                    className='cursor-pointer'
-                                  >
-                                    전체
-                                  </DropdownMenuItem>
-                                  {subCategory.thirdCategories.map((thirdCategory) => (
-                                    <DropdownMenuItem
-                                      key={thirdCategory.id}
-                                      onClick={() => router.push(thirdCategory.href)}
-                                      className='cursor-pointer'
-                                    >
-                                      {thirdCategory.label}
-                                    </DropdownMenuItem>
-                                  ))}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            ) : (
-                              <DropdownMenuItem
-                                key={subCategory.id}
-                                onClick={() => router.push(subCategory.href)}
-                                className='cursor-pointer'
-                              >
-                                {subCategory.label}
-                              </DropdownMenuItem>
-                            ),
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : item.requiresAuth ? (
-                      <Button
-                        onClick={(e) => handleAuthRequiredClick(e, item.href)}
-                        variant='ghost'
-                        className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
-                      >
-                        {item.label}
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => router.push(item.href)}
-                        variant='ghost'
-                        className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
-                      >
-                        {item.label}
-                      </Button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
-                variant='ghost'
-                className='text-gray-medium hover:text-primary-hover h-10 text-lg font-semibold'
-              >
-                My UDIGN
-              </Button>
-            </nav>
+            {/* 데스크톱 네비게이션 메뉴 제거 */}
+            {user && (
+              <div className='flex justify-end -mt-4 -mb-4'>
+                <Button
+                  onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
+                  variant='ghost'
+                  className='text-white hover:text-white hover:bg-white/10 h-10 text-lg font-semibold'
+                >
+                  My UDIGN
+                </Button>
+              </div>
+            )}
           </div>
         </header>
 
