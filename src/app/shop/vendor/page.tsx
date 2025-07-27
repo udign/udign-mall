@@ -2,8 +2,6 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import VendorRegisterForm from '@/components/VendorRegisterForm';
 import { ROUTES } from '@/lib/routes';

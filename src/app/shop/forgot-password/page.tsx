@@ -1,9 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
 import ForgotPasswordForm from '@/components/ForgotPasswordForm';
-import { ROUTES } from '@/lib/routes';
 
 export default function ForgotPasswordPage() {
   return (

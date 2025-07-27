@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { executeQuery } from '@/lib/database';
 
+interface PurchaseCountResult {
+  purchase_count: number;
+}
+
 export const GET = async (request: NextRequest) => {
   try {
     const token = request.cookies.get('auth-token')?.value;
@@ -44,7 +48,7 @@ export const GET = async (request: NextRequest) => {
         AND cart.it_id IS NULL
     `;
 
-    const result = await executeQuery(query, [decoded.mb_id, decoded.mb_id]) as any[];
+    const result = await executeQuery(query, [decoded.mb_id, decoded.mb_id]) as PurchaseCountResult[];
     const purchaseCount = result[0]?.purchase_count || 0;
 
     return NextResponse.json({

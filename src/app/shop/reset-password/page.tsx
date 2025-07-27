@@ -2,8 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
 import LoadingState from '@/components/states/LoadingState';
