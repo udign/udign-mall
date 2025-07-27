@@ -178,7 +178,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
             <div
               key={product.it_id}
               onClick={shouldBlur ? undefined : (e) => handleProductClick(e, product.it_id)}
-              className={`flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white ${
+              className={`flex flex-col overflow-hidden border border-gray-200 bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] hover:shadow-[0_0_30px_rgba(255,255,255,0.8)] transition-shadow duration-300 ${
                 shouldBlur ? 'cursor-default' : 'cursor-pointer'
               }`}
             >
@@ -199,7 +199,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                 )}
 
                 {shouldBlur && (
-                  <div className='absolute inset-0 z-10 flex items-center justify-center rounded-t-lg bg-black/50'>
+                  <div className='absolute inset-0 z-10 flex items-center justify-center bg-black/50'>
                     <span className='text-sm text-white'>full & under review</span>
                   </div>
                 )}
@@ -231,7 +231,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                         ('_status_text' in product &&
                           !isCollectionStatus(product._status_text as string))
                       }
-                      className='h-7 w-7 flex-shrink-0 rounded-full p-1 text-lg transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
+                      className='h-7 w-7 flex-shrink-0 p-1 text-lg transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
                     >
                       {likingInProgress.has(product.it_id) ? (
                         <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
@@ -245,7 +245,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
                 </div>
               </div>
 
-              <Progress value={progressValue} className='h-2 rounded-none rounded-b-lg' />
+              <Progress value={progressValue} className='h-2 rounded-none' />
             </div>
           );
         })}

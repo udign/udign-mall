@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/primitives/button';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaPlus } from 'react-icons/fa';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -15,6 +15,7 @@ import ProductGrid from '@/components/ProductGrid';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import ErrorState from '@/components/states/ErrorState';
 import { Product } from '@/types/product';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 export default function ShopPage() {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
@@ -22,7 +23,11 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const isLoadingRef = useRef(false);
 
   const router = useRouter();
   const { user, isLoading } = useAuth();
@@ -45,21 +50,35 @@ export default function ShopPage() {
     setIsButtonOpen(!isButtonOpen);
   };
 
-  const fetchProducts = async (category: string) => {
+  const fetchProducts = async (pageNum: number, isNewCategory: boolean = false) => {
+    if (isLoadingRef.current) return;
+    
     try {
-      setLoading(true);
+      isLoadingRef.current = true;
+      
+      if (pageNum === 1 || isNewCategory) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      
       setError(null);
       
-      let url = '/api/products?limit=12';
-      if (category !== 'all') {
-        url += `&category=${category}`;
+      let url = `/api/products?limit=12&page=${pageNum}`;
+      if (selectedCategory !== 'all') {
+        url += `&category=${selectedCategory}`;
       }
       
       const response = await fetch(url);
       const data = await response.json();
       
       if (data.success) {
-        setProducts(data.items);
+        if (pageNum === 1 || isNewCategory) {
+          setProducts(data.items);
+        } else {
+          setProducts(prev => [...prev, ...data.items]);
+        }
+        setHasMore(data.pagination.hasNext);
       } else {
         setError(data.error || '제품을 불러오는데 실패했습니다.');
       }
@@ -68,11 +87,26 @@ export default function ShopPage() {
       setError('제품을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+      isLoadingRef.current = false;
     }
   };
 
+  const loadMore = useCallback(() => {
+    if (!loading && !loadingMore && hasMore && !isLoadingRef.current) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchProducts(nextPage);
+    }
+  }, [page, loading, loadingMore, hasMore]);
+
+  const observerTarget = useIntersectionObserver(loadMore);
+
   useEffect(() => {
-    fetchProducts(selectedCategory);
+    setPage(1);
+    setProducts([]);
+    setHasMore(true);
+    fetchProducts(1, true);
   }, [selectedCategory]);
 
   const categories = [
@@ -86,7 +120,7 @@ export default function ShopPage() {
     <>
       <main>
         <div className='py-5 lg:px-10'>
-          <div className='aspect-video overflow-hidden lg:rounded-xl'>
+          <div className='aspect-video overflow-hidden'>
             <video
               src='/videos/main-banner-pc.mp4'
               autoPlay
@@ -129,18 +163,39 @@ export default function ShopPage() {
 
             {/* 제품 목록 */}
             <div className='w-full mt-8'>
-              {loading ? (
+              {loading && products.length === 0 ? (
                 <div className='flex min-h-96 items-center justify-center'>
                   <LoadingSpinner size='lg' message='작품을 불러오는 중입니다...' />
                 </div>
-              ) : error ? (
-                <ErrorState message={error} onRetry={() => fetchProducts(selectedCategory)} showRetry={true} />
-              ) : products.length === 0 ? (
-                <div className='text-center py-12'>
-                  <p className='text-white/60'>등록된 작품이 없습니다.</p>
-                </div>
+              ) : error && products.length === 0 ? (
+                <ErrorState message={error} onRetry={() => fetchProducts(1, true)} showRetry={true} />
               ) : (
-                <ProductGrid products={products} />
+                <>
+                  {products.length === 0 ? (
+                    <div className='text-center py-12'>
+                      <p className='text-white/60'>등록된 작품이 없습니다.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <ProductGrid products={products} />
+                      
+                      {/* 무한 스크롤 트리거 */}
+                      {hasMore && (
+                        <div ref={observerTarget} className='h-20 flex items-center justify-center'>
+                          {loadingMore && (
+                            <LoadingSpinner size='sm' message='추가 작품을 불러오는 중...' />
+                          )}
+                        </div>
+                      )}
+                      
+                      {!hasMore && products.length > 0 && (
+                        <div className='text-center py-8'>
+                          <p className='text-white/60'>모든 작품을 불러왔습니다.</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -158,7 +213,7 @@ export default function ShopPage() {
           <Button
             onClick={handleUploadClick}
             disabled={isLoading}
-            className='flex h-12 items-center gap-2 rounded-l-none rounded-r-none px-6 text-white shadow-lg'
+            className='flex h-12 items-center gap-2 px-6 text-white shadow-lg rounded-none'
             style={{ backgroundColor: '#618e49' }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4a6e37'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#618e49'}
@@ -167,7 +222,7 @@ export default function ShopPage() {
           </Button>
           <button
             onClick={toggleButton}
-            className='flex h-12 w-8 items-center justify-center rounded-r-lg text-white shadow-lg transition-colors'
+            className='flex h-12 w-8 items-center justify-center text-white shadow-lg transition-colors rounded-none'
             style={{ backgroundColor: '#618e49' }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4a6e37'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#618e49'}
