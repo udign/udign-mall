@@ -177,6 +177,17 @@ export default function Header() {
               </div>
             </div>
             {/* 데스크톱 네비게이션 메뉴 제거 */}
+            {user && (
+              <div className='flex justify-end -mt-4 -mb-4'>
+                <Button
+                  onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
+                  variant='ghost'
+                  className='text-gray-medium hover:text-primary-hover h-10 text-lg font-semibold'
+                >
+                  My UDIGN
+                </Button>
+              </div>
+            )}
           </div>
         </header>
 

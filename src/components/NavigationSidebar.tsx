@@ -158,9 +158,18 @@ export default function NavigationSidebar({ isOpen, onClose }: NavigationSidebar
                   <Button
                     variant='ghost'
                     className='hover:text-primary-hover w-full justify-start pl-4 text-left text-lg font-semibold text-gray-700 hover:bg-gray-50'
-                    onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
+                    onClick={() => handleNavigation(ROUTES.VENDOR)}
                   >
-                    My UDIGN
+                    벤더페이지
+                  </Button>
+                </div>
+                <div className='py-2'>
+                  <Button
+                    variant='ghost'
+                    className='hover:text-primary-hover w-full justify-start pl-4 text-left text-lg font-semibold text-gray-700 hover:bg-gray-50'
+                    onClick={() => handleNavigation(ROUTES.COPYRIGHT_REPORT)}
+                  >
+                    저작권 신고
                   </Button>
                 </div>
               </div>
