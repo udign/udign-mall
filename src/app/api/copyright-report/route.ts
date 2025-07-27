@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     let reportData;
     try {
       reportData = JSON.parse(sg_desc);
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { 
           success: false, 
@@ -60,7 +60,10 @@ export async function POST(request: NextRequest) {
       FROM g5_shop_item 
       WHERE it_id = ? AND it_use = 1
     `;
-    const products = await executeQuery(productQuery, [sg_id]) as any[];
+    const products = await executeQuery(productQuery, [sg_id]) as Array<{
+      it_id: string;
+      creator_id: string | null;
+    }>;
     
     if (!products || products.length === 0) {
       return NextResponse.json(
@@ -94,7 +97,7 @@ export async function POST(request: NextRequest) {
         AND sg_id = ? 
         AND sg_flag = 3
     `;
-    const duplicates = await executeQuery(duplicateQuery, [decoded.mb_id, sg_id]) as any[];
+    const duplicates = await executeQuery(duplicateQuery, [decoded.mb_id, sg_id]) as Array<{ id: number }>;
     
     if (duplicates && duplicates.length > 0) {
       return NextResponse.json(

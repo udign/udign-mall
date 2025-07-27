@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // 조건 구성
-    let whereConditions = ['s.sg_flag = 3', 's.sg_type = 6']; // 제품 신고, 저작권 침해
-    const params: any[] = [];
+    const whereConditions = ['s.sg_flag = 3', 's.sg_type = 6']; // 제품 신고, 저작권 침해
+    const params: (string | number)[] = [];
 
     if (dateFrom) {
       whereConditions.push('DATE(s.sg_time) >= ?');
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       LEFT JOIN g5_member creator ON i.it_1 = creator.mb_id
       WHERE ${whereClause}
     `;
-    const countResult = await executeQuery(countQuery, params) as any[];
+    const countResult = await executeQuery(countQuery, params) as Array<{ total: number }>;
     const totalCount = countResult[0]?.total || 0;
 
     // 목록 조회
@@ -86,17 +86,28 @@ export async function GET(request: NextRequest) {
     `;
 
     const queryParams = [...params, limit, offset];
-    const reports = await executeQuery(query, queryParams) as any[];
+    const reports = await executeQuery(query, queryParams) as Array<{
+      id: number;
+      reporter_id: string;
+      reporter_name: string | null;
+      product_id: string;
+      product_name: string | null;
+      product_image: string | null;
+      creator_id: string | null;
+      creator_name: string | null;
+      sg_desc: string;
+      sg_time: string;
+    }>;
 
     // 신고 데이터 가공
-    const processedReports = reports.map((report: any) => {
+    const processedReports = reports.map((report) => {
       let reportData: CopyrightReportData = { content: '', evidence_urls: [] };
       
       try {
         if (report.sg_desc) {
           reportData = JSON.parse(report.sg_desc);
         }
-      } catch (e) {
+      } catch {
         // JSON 파싱 실패시 원본 텍스트 사용
         reportData.content = report.sg_desc || '';
       }
