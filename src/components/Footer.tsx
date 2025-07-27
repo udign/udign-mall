@@ -24,21 +24,23 @@ export default function Footer() {
   const router = useRouter();
 
   return (
-    <footer className='bg-[#0e1731] py-12 text-white'>
+    <footer className='bg-[#0e1731] py-8 text-white'>
       <div className='mx-auto px-6 sm:px-10'>
-        <div className='mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:justify-between'>
-          <div className='flex flex-col items-center gap-4 sm:items-start'>
+        <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
+          {/* 로고 */}
+          <div className='flex-shrink-0'>
             <Image src='/images/udign-white.png' alt='UDIGN' width={103} height={35} />
-            <SocialIcons />
           </div>
-          <nav className='mt-4 sm:mt-0'>
-            <ul className='flex flex-wrap justify-center gap-4 sm:justify-end'>
+
+          {/* 네비게이션 링크 */}
+          <nav className='flex-shrink-0'>
+            <ul className='flex flex-col gap-y-1'>
               {FOOTER_NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <Button
                     onClick={() => router.push(link.href)}
                     variant='link'
-                    className='text-sm text-white hover:text-white/80 hover:no-underline p-0'
+                    className='text-sm text-white/80 hover:text-white hover:no-underline p-0 text-left'
                   >
                     {link.label}
                   </Button>
@@ -46,38 +48,40 @@ export default function Footer() {
               ))}
             </ul>
           </nav>
-        </div>
-        <div className='border-t border-white/20 pt-8'>
-          <div className='text-center text-sm text-white/80 sm:text-left'>
-            <p className='mb-2'>
-              <span className='font-semibold'>상호명:</span> 유다인 |{' '}
-              <span className='font-semibold'>대표자:</span> 이지욱 |{' '}
-              <span className='font-semibold'>사업자등록번호:</span> 881-63-00646
+
+          {/* 회사 정보 */}
+          <div className='flex-shrink-0 text-sm text-white/80'>
+            <p className='mb-1'>
+              <span className='font-semibold'>대표:</span> 문유성 |{' '}
+              <span className='font-semibold'>전화:</span> 1577-4215 |{' '}
+              <span className='font-semibold'>팩스:</span> 02-356-5889
+            </p>
+            <p className='mb-1'>
+              <span className='font-semibold'>사업장주소:</span> 서울시 은평구 진관3로 32, 은평뉴타운파크앤타워 B동 6층 618호
+            </p>
+            <p className='mb-1'>
+              <span className='font-semibold'>사업자등록번호:</span> 259-87-03288
+            </p>
+            <p className='mb-1'>
+              <span className='font-semibold'>통신판매업신고번호:</span> 제 2025-서울은평-0219호
             </p>
             <p className='mb-2'>
-              <span className='font-semibold'>통신판매업신고번호:</span> 제2024-대구북구-0161호 |{' '}
-              <span className='font-semibold'>주소:</span> 대구광역시 북구 대현남로 3길 21-8 2층 201호
+              <span className='font-semibold'>개인정보관리책임자:</span> 문유성, 한훈희 |{' '}
+              <span className='font-semibold'>E-MAIL:</span> udign0401@naver.com
             </p>
-            <p className='mb-2'>
-              <span className='font-semibold'>고객센터:</span> 1833-5462 (평일 9:00 ~ 18:00 / 점심
-              12:00 ~ 13:00) |{' '}
-              <span className='font-semibold'>이메일:</span>{' '}
-              <a href='mailto:teamiudan5@gmail.com' className='text-white hover:text-white/80'>
-                teamiudan5@gmail.com
-              </a>
-            </p>
-            <div className='mt-4 space-y-2'>
-              <p>
-                유다인은 통신판매중개자이며, 통신판매의 당사자가 아닙니다. 상품, 상품정보, 거래에
-                관한 의무와 책임은 판매자에게 있습니다.
-              </p>
-              <p>
-                유다인은 소비자보호와 안전거래를 위해 신뢰관리센터(udign@email.com)를 운영하고
-                있으며, 분쟁이 발생 된 경우 별도의 분쟁처리절차에 의거 분쟁해결 및 청약철회 등이
-                진행됩니다.
-              </p>
+          </div>
+
+          {/* Contact Us */}
+          <div className='flex-shrink-0 text-sm'>
+            <p className='font-semibold text-white mb-2'>Contact Us</p>
+            <div className='text-white/80'>
+              <p className='font-semibold text-lg mb-1'>1577-4215</p>
+              <p>운영시간 : 평일 09:00 ~ 17:00</p>
+              <p>점심시간 : 평일 12:00 ~ 13:00</p>
+              <p className='mb-4'>토, 일요일 / 공휴일 휴무</p>
+              <p className='font-semibold text-white mb-2'>Follow Us</p>
+              <SocialIcons />
             </div>
-            <p className='mt-6 text-white/60'>© 2024 UDIGN. All rights reserved.</p>
           </div>
         </div>
       </div>
