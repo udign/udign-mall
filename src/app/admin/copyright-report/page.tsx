@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/primitives/button';
@@ -41,7 +41,6 @@ interface PaginationInfo {
 }
 
 export default function CopyrightReportPage() {
-  const router = useRouter();
   const pathname = usePathname();
   const [reports, setReports] = useState<CopyrightReport[]>([]);
   const [loading, setLoading] = useState(false);
@@ -90,7 +89,7 @@ export default function CopyrightReportPage() {
 
   useEffect(() => {
     fetchReports();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = () => {
     fetchReports(1);
@@ -284,13 +283,20 @@ export default function CopyrightReportPage() {
                               증거파일 {index + 1} (PDF)
                             </a>
                           ) : (
-                            <a href={url} target='_blank' rel='noopener noreferrer'>
-                              <img
+                            <Link
+                              href={url}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='text-blue-600 hover:underline flex items-center gap-2'
+                            >
+                              <Image
                                 src={url}
                                 alt={`증거 ${index + 1}`}
+                                width={200}
+                                height={150}
                                 className='max-w-full h-auto rounded cursor-pointer hover:opacity-90'
                               />
-                            </a>
+                            </Link>
                           )}
                         </div>
                       );

@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       ${categoryCondition}
     `;
     const countParams = ca_id ? [ca_id] : [];
-    const countResult = await executeQuery(countQuery, countParams) as any[];
+    const countResult = await executeQuery(countQuery, countParams) as Array<{ total: number }>;
     const totalCount = countResult[0]?.total || 0;
 
     // 제품 목록 조회
@@ -60,13 +60,22 @@ export async function GET(request: NextRequest) {
       LIMIT ? OFFSET ?
     `;
     const params = ca_id ? [ca_id, limit, offset] : [limit, offset];
-    const products = await executeQuery(query, params) as any[];
+    const products = await executeQuery(query, params) as Array<{
+      it_id: string;
+      it_name: string;
+      it_img1: string | null;
+      it_basic: string;
+      ca_id: string;
+      ca_name: string | null;
+      creator_id: string | null;
+      creator_name: string | null;
+    }>;
 
     const totalPages = Math.ceil(totalCount / limit);
 
     const response: ProductSearchResponse = {
       success: true,
-      products: products.map((product: any) => ({
+      products: products.map((product) => ({
         it_id: product.it_id,
         it_name: product.it_name,
         it_img1: product.it_img1,

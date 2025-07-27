@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card } from '@/components/ui/primitives/card';
 import { Button } from '@/components/ui/primitives/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/primitives/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/primitives/tabs';
 import LoadingState from '@/components/states/LoadingState';
 import EmptyState from '@/components/states/EmptyState';
 import { ProductForReport, ProductSearchResponse } from '@/types/copyright-report';
