@@ -11,6 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/primitives/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/primitives/tooltip';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
@@ -18,6 +24,7 @@ import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar'
 import SearchSidebar from '@/components/SearchSidebar';
 import NavigationSidebar from '@/components/NavigationSidebar';
 import { Button } from '@/components/ui/primitives/button';
+import { MEMBER_LEVELS } from '@/lib/constants';
 import Link from 'next/link';
 
 export default function Header() {
@@ -26,6 +33,7 @@ export default function Header() {
   const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState<boolean>(false);
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+  const [purchaseCount, setPurchaseCount] = useState<number>(0);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -34,6 +42,28 @@ export default function Header() {
   useEffect(() => {
     setHideHeader(pathname.includes('/admin'));
   }, [pathname]);
+
+  // 구매가능한 상품 수 조회
+  useEffect(() => {
+    const fetchPurchaseCount = async () => {
+      if (!user || isLoading) return;
+
+      try {
+        const response = await fetch('/api/my-udign/purchase-count', {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPurchaseCount(data.data.count);
+        }
+      } catch (error) {
+        console.error('구매가능 상품 수 조회 오류:', error);
+      }
+    };
+
+    fetchPurchaseCount();
+  }, [user, isLoading]);
 
   const handleLogout = async () => {
     try {
@@ -106,7 +136,7 @@ export default function Header() {
                 >
                   <FiSearch className='text-xl text-white' />
                 </Button>
-                {user && user.mb_level >= 2 && (
+                {user && user.mb_level >= MEMBER_LEVELS.ADMIN && (
                   <Button
                     onClick={() => router.push(ROUTES.ADMIN)}
                     variant='ghost'
@@ -159,13 +189,29 @@ export default function Header() {
             {/* 데스크톱 네비게이션 메뉴 제거 */}
             {user && (
               <div className='flex justify-end -mt-4 -mb-4'>
-                <Button
-                  onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
-                  variant='ghost'
-                  className='text-white hover:text-white hover:bg-white/10 h-10 text-lg font-semibold'
-                >
-                  My UDIGN
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
+                        variant='ghost'
+                        className='text-white hover:text-white hover:bg-white/10 h-10 text-lg font-semibold relative'
+                      >
+                        My UDIGN
+                        {purchaseCount > 0 && (
+                          <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center'>
+                            {purchaseCount}
+                          </span>
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    {purchaseCount > 0 && (
+                      <TooltipContent side='bottom' className='bg-gray-800 text-white'>
+                        <p>구매가능한 상품이 {purchaseCount}개 있습니다.</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             )}
           </div>
