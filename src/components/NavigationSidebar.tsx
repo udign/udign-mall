@@ -1,9 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { NAV_MENU_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/routes';
 import {
@@ -30,11 +28,6 @@ interface NavigationSidebarProps {
 export default function NavigationSidebar({ isOpen, onClose }: NavigationSidebarProps) {
   const { user } = useAuth();
   const router = useRouter();
-  const isMobile = useIsMobile();
-
-  useEffect(() => {
-    if (!isMobile && isOpen) onClose();
-  }, [isMobile, isOpen, onClose]);
 
   const handleAuthRequiredClick = (e: React.MouseEvent, href: string) => {
     e.preventDefault();

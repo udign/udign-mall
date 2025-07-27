@@ -169,109 +169,14 @@ export default function Header() {
 
                 <Button
                   variant='ghost'
-                  className='hover:text-primary-hover md:hidden'
+                  className='hover:text-primary-hover'
                   onClick={handleNavigationClick}
                 >
                   <HiOutlineMenu className='text-xl' />
                 </Button>
               </div>
             </div>
-            <nav className='hidden md:flex md:items-center md:justify-between'>
-              <ul className='flex items-center gap-1'>
-                {NAV_MENU_ITEMS.map((item) => (
-                  <li key={item.href} className='flex items-center'>
-                    {item.subCategories ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
-                          >
-                            {item.label}
-                            <IoIosArrowDown className='text-sm' />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='start' className='w-32 p-0'>
-                          <DropdownMenuItem
-                            onClick={() => router.push(item.href)}
-                            className='cursor-pointer'
-                          >
-                            전체
-                          </DropdownMenuItem>
-                          {item.subCategories.map((subCategory) =>
-                            subCategory.thirdCategories ? (
-                              <DropdownMenu key={subCategory.id}>
-                                <DropdownMenuTrigger asChild>
-                                  <DropdownMenuItem
-                                    onSelect={(e) => e.preventDefault()}
-                                    className='cursor-pointer justify-between'
-                                  >
-                                    {subCategory.label}
-                                    <IoIosArrowDown className='rotate-[-90deg] text-sm' />
-                                  </DropdownMenuItem>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                  side='right'
-                                  alignOffset={-5}
-                                  className='w-32 p-0'
-                                >
-                                  <DropdownMenuItem
-                                    onClick={() => router.push(subCategory.href)}
-                                    className='cursor-pointer'
-                                  >
-                                    전체
-                                  </DropdownMenuItem>
-                                  {subCategory.thirdCategories.map((thirdCategory) => (
-                                    <DropdownMenuItem
-                                      key={thirdCategory.id}
-                                      onClick={() => router.push(thirdCategory.href)}
-                                      className='cursor-pointer'
-                                    >
-                                      {thirdCategory.label}
-                                    </DropdownMenuItem>
-                                  ))}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            ) : (
-                              <DropdownMenuItem
-                                key={subCategory.id}
-                                onClick={() => router.push(subCategory.href)}
-                                className='cursor-pointer'
-                              >
-                                {subCategory.label}
-                              </DropdownMenuItem>
-                            ),
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : item.requiresAuth ? (
-                      <Button
-                        onClick={(e) => handleAuthRequiredClick(e, item.href)}
-                        variant='ghost'
-                        className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
-                      >
-                        {item.label}
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => router.push(item.href)}
-                        variant='ghost'
-                        className='text-gray-medium hover:text-primary-hover flex h-10 items-center gap-1 text-lg font-semibold'
-                      >
-                        {item.label}
-                      </Button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
-                variant='ghost'
-                className='text-gray-medium hover:text-primary-hover h-10 text-lg font-semibold'
-              >
-                My UDIGN
-              </Button>
-            </nav>
+            {/* 데스크톱 네비게이션 메뉴 제거 */}
           </div>
         </header>
 
