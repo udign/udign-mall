@@ -1,7 +1,10 @@
+'use client';
+
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
-import { YouTubeIcon, InstagramIcon, KakaoTalkIcon, GmailIcon } from './SocialIcons';
+import SocialIcons from '@/components/SocialIcons';
 
 interface FooterNavLink {
   href: string;
@@ -18,83 +21,64 @@ const FOOTER_NAV_LINKS: FooterNavLink[] = [
 ];
 
 export default function Footer() {
+  const router = useRouter();
+
   return (
-    <footer className='space-y-8 border-t border-gray-200 px-6 py-6 sm:px-10'>
-      <div className='mx-auto max-w-7xl flex-row justify-between space-y-10 lg:flex lg:space-y-0'>
-        <div className='mb-10 flex justify-center lg:mb-0 lg:flex-shrink-0 lg:justify-start'>
-          <Image src='/images/udign-footer.png' alt='UDIGN' width={150} height={60} />
+    <footer className='bg-[#0e1731] py-12 text-white'>
+      <div className='mx-auto px-6 sm:px-10'>
+        <div className='mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:justify-between'>
+          <div className='flex flex-col items-center gap-4 sm:items-start'>
+            <Image src='/images/udign-white.png' alt='UDIGN' width={103} height={35} />
+            <SocialIcons />
+          </div>
+          <nav className='mt-4 sm:mt-0'>
+            <ul className='flex flex-wrap justify-center gap-4 sm:justify-end'>
+              {FOOTER_NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Button
+                    onClick={() => router.push(link.href)}
+                    variant='link'
+                    className='text-sm text-white hover:text-white/80 hover:no-underline p-0'
+                  >
+                    {link.label}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
-        <div className='text-gray-light text-sm leading-7'>
-          <p className='font-bold text-black'>(주)유다인</p>
-          <p>대표 : 문유성 | 전화 : 1577-4215 | 팩스 : 02-356-5889</p>
-          <p>사업장주소 : 서울시 은평구 진관3로 32, 은평뉴타운파크앤타워 B동 6층 618호</p>
-          <p>
-            사업자등록번호 : 259-87-03288 | 통신판매업신고번호 : 제 2025-서울은평-0219호
-            [사업자정보확인]
-          </p>
-          <p>개인정보관리책임자 : 문유성, 한훈희 | E-MAIL : udign0401@naver.com</p>
-        </div>
-        <div className='text-gray-light text-sm leading-7'>
-          <p className='font-bold text-black'>고객센터 1577-4215</p>
-          <p>운영시간 : 평일 09:00 ~ 17:00</p>
-          <p>점심시간 : 평일 12:00 ~ 13:00</p>
-          <p>토,일요일/공휴일 휴무</p>
-        </div>
-      </div>
-
-      {/* 소셜 미디어 섹션 */}
-      <div className='flex flex-col items-center'>
-        <div className='flex space-x-4'>
-          <a
-            href='https://youtube.com/@udign?si=qfjEDralJY9zD_O9'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
-            aria-label='YouTube'
-          >
-            <YouTubeIcon size={20} />
-          </a>
-          <a
-            href='https://www.instagram.com/udign.official?igsh=MXA2OHY2OWs0NjlnZw%3D%3D&utm_source=qr'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
-            aria-label='Instagram'
-          >
-            <InstagramIcon size={20} />
-          </a>
-          <a
-            href='http://pf.kakao.com/_wxatbn'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
-            aria-label='KakaoTalk'
-          >
-            <KakaoTalkIcon size={20} />
-          </a>
-          <a
-            href='mailto:udign0401@gmail.com'
-            className='rounded-full bg-gray-50 p-2 transition-opacity hover:bg-gray-100 hover:opacity-70'
-            aria-label='Email'
-          >
-            <GmailIcon size={20} />
-          </a>
-        </div>
-      </div>
-
-      <div>
-        <div className='text-gray-dark flex flex-wrap items-center justify-center gap-4 text-sm'>
-          {FOOTER_NAV_LINKS.map((link, index) => (
-            <div key={link.href} className='flex items-center gap-4'>
-              <Link href={link.href} className='hover:text-primary-hover transition-colors'>
-                {link.label}
-              </Link>
-              {index < FOOTER_NAV_LINKS.length - 1 && <div className='h-4 w-px bg-gray-400' />}
+        <div className='border-t border-white/20 pt-8'>
+          <div className='text-center text-sm text-white/80 sm:text-left'>
+            <p className='mb-2'>
+              <span className='font-semibold'>상호명:</span> 유다인 |{' '}
+              <span className='font-semibold'>대표자:</span> 이지욱 |{' '}
+              <span className='font-semibold'>사업자등록번호:</span> 881-63-00646
+            </p>
+            <p className='mb-2'>
+              <span className='font-semibold'>통신판매업신고번호:</span> 제2024-대구북구-0161호 |{' '}
+              <span className='font-semibold'>주소:</span> 대구광역시 북구 대현남로 3길 21-8 2층 201호
+            </p>
+            <p className='mb-2'>
+              <span className='font-semibold'>고객센터:</span> 1833-5462 (평일 9:00 ~ 18:00 / 점심
+              12:00 ~ 13:00) |{' '}
+              <span className='font-semibold'>이메일:</span>{' '}
+              <a href='mailto:teamiudan5@gmail.com' className='text-white hover:text-white/80'>
+                teamiudan5@gmail.com
+              </a>
+            </p>
+            <div className='mt-4 space-y-2'>
+              <p>
+                유다인은 통신판매중개자이며, 통신판매의 당사자가 아닙니다. 상품, 상품정보, 거래에
+                관한 의무와 책임은 판매자에게 있습니다.
+              </p>
+              <p>
+                유다인은 소비자보호와 안전거래를 위해 신뢰관리센터(udign@email.com)를 운영하고
+                있으며, 분쟁이 발생 된 경우 별도의 분쟁처리절차에 의거 분쟁해결 및 청약철회 등이
+                진행됩니다.
+              </p>
             </div>
-          ))}
-        </div>
-        <div className='text-gray-dark mt-2 text-center text-sm'>
-          Copyright © <strong>udign.com</strong>. All rights reserved.
+            <p className='mt-6 text-white/60'>© 2024 UDIGN. All rights reserved.</p>
+          </div>
         </div>
       </div>
     </footer>

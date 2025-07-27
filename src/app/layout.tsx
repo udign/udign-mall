@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko'>
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-[#0e1731]`}>
         <div className='flex min-h-screen justify-center'>
           <div className='container'>
             <AuthProvider>
