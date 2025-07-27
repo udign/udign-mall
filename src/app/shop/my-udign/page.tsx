@@ -675,22 +675,21 @@ export default function MyUdignPage() {
     user && (
       <div className='min-h-screen'>
         <div className='px-4 py-8 sm:px-6 lg:px-8'>
-          <div className='mb-6 rounded-lg bg-gray-50 p-4 sm:p-6'>
-            <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
-              <div>
-                <h1 className='mb-1 text-xl font-bold text-gray-900 sm:mb-2 sm:text-2xl'>
-                  My UDIGN
-                </h1>
-                <p className='text-sm text-gray-600 sm:text-base'>나만의 특별한 디자인 여정</p>
-              </div>
-              <div className='text-left sm:text-right'>
-                <p className='text-base font-semibold sm:text-lg'>{user.mb_name}님</p>
-                <p className='text-sm text-gray-600 sm:text-base'>유다인에 오신 것을 환영합니다</p>
+          <div className='mb-6 rounded-none border border-gray-100 bg-white p-6'>
+            <div className='mb-6 rounded-lg p-4 sm:p-6' style={{ backgroundColor: '#17244c' }}>
+              <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
+                <div>
+                  <h1 className='mb-1 text-xl font-bold text-white sm:mb-2 sm:text-2xl'>
+                    My UDIGN
+                  </h1>
+                  <p className='text-sm text-gray-300 sm:text-base'>나만의 특별한 디자인 여정</p>
+                </div>
+                <div className='text-left sm:text-right'>
+                  <p className='text-base font-semibold text-white sm:text-lg'>{user.mb_name}님</p>
+                  <p className='text-sm text-gray-300 sm:text-base'>유다인에 오신 것을 환영합니다</p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className='mb-6 rounded-lg border border-gray-100 p-6'>
             <h2 className='mb-4 flex items-center text-lg font-semibold'>
               <FiAlertCircle className='mr-2' />
               UDIGN 프리오더 시스템
@@ -707,8 +706,8 @@ export default function MyUdignPage() {
               </p>
             </div>
 
-            <div className='mb-4 rounded-lg bg-blue-50 p-4'>
-              <p className='text-sm text-blue-800'>
+            <div className='mb-4 rounded-lg bg-gray-100 p-4'>
+              <p className='text-sm text-gray-700'>
                 <span className='flex items-center'>
                   <BsLightbulb className='mr-1' /> 심의 진행 방식:
                 </span>
@@ -736,7 +735,7 @@ export default function MyUdignPage() {
             </div>
           </div>
 
-          <div className='rounded-lg border border-gray-100 p-6'>
+          <div className='rounded-none bg-white border border-gray-100 p-6'>
             <div className='mb-6 flex items-center'>
               <h2 className='text-xl font-semibold'>나의 작품 현황</h2>
             </div>
