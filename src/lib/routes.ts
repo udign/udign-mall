@@ -6,6 +6,7 @@ export const ROUTES = {
   // 관리자 페이지
   ADMIN: '/admin',
   ADMIN_MEMBER: '/admin/member',
+  ADMIN_VENDOR: '/admin/vendor',
   ADMIN_REVIEW: '/admin/review',
   ADMIN_SALES: '/admin/sales',
   ADMIN_SALES_RANKING: '/admin/sales-ranking',

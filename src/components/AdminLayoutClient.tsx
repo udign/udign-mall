@@ -23,6 +23,7 @@ import {
   Mail,
   MessageSquare,
   Send,
+  Building,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -74,6 +75,11 @@ const menuItems: MenuItem[] = [
         label: '회원 관리',
         href: ROUTES.ADMIN_MEMBER,
         icon: <UserCheck className='h-4 w-4' />,
+      },
+      {
+        label: '벤더 관리',
+        href: ROUTES.ADMIN_VENDOR,
+        icon: <Building className='h-4 w-4' />,
       },
     ],
   },
