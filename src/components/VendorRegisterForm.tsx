@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/primitives/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/primitives/radio-group';
 import { Label } from '@/components/ui/primitives/label';
 import { Textarea } from '@/components/ui/primitives/textarea';
-import MessageDialog from '@/components/ui/MessageDialog';
 import DaumPostcode from 'react-daum-postcode';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/primitives/dialog';
 
@@ -28,6 +27,12 @@ interface VendorFormData {
   vendor_address: string;
   vendor_address_detail: string;
   vendor_introduction: string;
+}
+
+interface DaumPostcodeData {
+  zonecode: string;
+  roadAddress: string;
+  jibunAddress: string;
 }
 
 export default function VendorRegisterForm({ onSuccess, onCancel }: VendorRegisterFormProps) {
@@ -105,7 +110,7 @@ export default function VendorRegisterForm({ onSuccess, onCancel }: VendorRegist
     setError('');
   };
 
-  const handlePostcodeComplete = (data: any) => {
+  const handlePostcodeComplete = (data: DaumPostcodeData) => {
     setFormData({
       ...formData,
       vendor_postcode: data.zonecode,
@@ -145,7 +150,7 @@ export default function VendorRegisterForm({ onSuccess, onCancel }: VendorRegist
       } else {
         setError(result.message || '유효하지 않은 사업자등록번호입니다.');
       }
-    } catch (error) {
+    } catch {
       setError('사업자등록번호 검증 중 오류가 발생했습니다.');
     } finally {
       setIsVerifying(false);
@@ -188,7 +193,7 @@ export default function VendorRegisterForm({ onSuccess, onCancel }: VendorRegist
       } else {
         setError(result.message || '벤더 등록 중 오류가 발생했습니다.');
       }
-    } catch (error) {
+    } catch {
       setError('벤더 등록 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);

@@ -42,7 +42,22 @@ export async function GET(request: NextRequest) {
       FROM g5_member 
       WHERE mb_id = ?`,
       [decoded.mb_id]
-    ) as any[];
+    ) as Array<{
+      vendor_name: string | null;
+      vendor_class: string | null;
+      vendor_representative: string | null;
+      vendor_tel: string | null;
+      vendor_email: string | null;
+      vendor_fax: string | null;
+      vendor_number: string | null;
+      vendor_postcode: string | null;
+      vendor_address: string | null;
+      vendor_address_detail: string | null;
+      vendor_introduction: string | null;
+      vendro_request_date: Date | null;
+      vendro_update_date: Date | null;
+      vendro_apply_date: Date | null;
+    }>;
 
     if (vendorInfo.length === 0) {
       return NextResponse.json(

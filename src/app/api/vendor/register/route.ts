@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const existing = await executeQuery(
       'SELECT mb_id FROM g5_member WHERE vendor_number = ? AND mb_id != ?',
       [vendorData.vendor_number, decoded.mb_id]
-    ) as any[];
+    ) as Array<{ mb_id: string }>;
 
     if (existing.length > 0) {
       return NextResponse.json(
