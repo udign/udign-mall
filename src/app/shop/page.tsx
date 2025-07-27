@@ -1,11 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { Button } from '@/components/ui/primitives/button';
-import Image from 'next/image';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaPlus } from 'react-icons/fa';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
@@ -50,7 +47,7 @@ export default function ShopPage() {
     setIsButtonOpen(!isButtonOpen);
   };
 
-  const fetchProducts = async (pageNum: number, isNewCategory: boolean = false) => {
+  const fetchProducts = useCallback(async (pageNum: number, isNewCategory: boolean = false) => {
     if (isLoadingRef.current) return;
     
     try {
@@ -90,7 +87,7 @@ export default function ShopPage() {
       setLoadingMore(false);
       isLoadingRef.current = false;
     }
-  };
+  }, [selectedCategory]);
 
   const loadMore = useCallback(() => {
     if (!loading && !loadingMore && hasMore && !isLoadingRef.current) {
@@ -98,7 +95,7 @@ export default function ShopPage() {
       setPage(nextPage);
       fetchProducts(nextPage);
     }
-  }, [page, loading, loadingMore, hasMore]);
+  }, [page, loading, loadingMore, hasMore, fetchProducts]);
 
   const observerTarget = useIntersectionObserver(loadMore);
 
@@ -107,7 +104,7 @@ export default function ShopPage() {
     setProducts([]);
     setHasMore(true);
     fetchProducts(1, true);
-  }, [selectedCategory]);
+  }, [selectedCategory, fetchProducts]);
 
   const categories = [
     { id: 'all', name: 'All' },
@@ -119,7 +116,7 @@ export default function ShopPage() {
   return (
     <>
       <main>
-        <div className='py-5 lg:px-10'>
+        <div className='py-5 xl:px-10'>
           <div className='aspect-video overflow-hidden'>
             <video
               src='/videos/main-banner-pc.mp4'

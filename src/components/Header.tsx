@@ -1,25 +1,19 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { HiOutlineSearch, HiOutlineMenu } from 'react-icons/hi';
-import { FiBox, FiClock, FiSearch } from 'react-icons/fi';
-import { FaRegUserCircle } from 'react-icons/fa';
-import { IoIosArrowDown } from 'react-icons/io';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
-import { ROUTES } from '@/lib/routes';
-import { NAV_MENU_ITEMS } from '@/lib/navigation';
-import { PERMISSION_CHECKS } from '@/lib/constants';
+import { HiOutlineMenu } from 'react-icons/hi';
+import { FiClock, FiSearch } from 'react-icons/fi';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/primitives/dropdown-menu';
+import { ROUTES } from '@/lib/routes';
+import { useAuth } from '@/contexts/AuthContext';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
-import LoadingSpinner from '@/components/states/LoadingSpinner';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
 import NavigationSidebar from '@/components/NavigationSidebar';
@@ -27,28 +21,35 @@ import { Button } from '@/components/ui/primitives/button';
 import Link from 'next/link';
 
 export default function Header() {
-  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+  const [hideHeader, setHideHeader] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState<boolean>(false);
-
-  const { user, logout, isLoading } = useAuth();
-  const { count: viewedProductsCount } = useTodayViewedProducts();
+  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
 
   const router = useRouter();
   const pathname = usePathname();
+  const { user, isLoading, logout } = useAuth();
 
-  const hideHeader =
-    pathname === ROUTES.LOGIN ||
-    pathname === ROUTES.REGISTER ||
-    pathname === ROUTES.TERMS ||
-    pathname === ROUTES.FORGOT_PASSWORD ||
-    pathname === ROUTES.RESET_PASSWORD ||
-    pathname === ROUTES.PROFILE_CONFIRM ||
-    pathname === ROUTES.PROFILE_EDIT;
+  useEffect(() => {
+    setHideHeader(pathname.includes('/admin'));
+  }, [pathname]);
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        logout();
+        console.log('로그아웃 되었습니다.');
+        router.push(ROUTES.SHOP);
+      }
+    } catch (error) {
+      console.error('로그아웃 오류:', error);
+    }
   };
 
   const handleAuthRequiredClick = (e: React.MouseEvent, href: string) => {
@@ -170,15 +171,26 @@ export default function Header() {
           </div>
         </header>
 
-        <LoginRequiredDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
         <TodayViewedProductsSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />
-        <SearchSidebar isOpen={isSearchSidebarOpen} onClose={() => setIsSearchSidebarOpen(false)} />
+
+        <SearchSidebar
+          isOpen={isSearchSidebarOpen}
+          onClose={() => setIsSearchSidebarOpen(false)}
+        />
+
         <NavigationSidebar
           isOpen={isNavigationSidebarOpen}
           onClose={() => setIsNavigationSidebarOpen(false)}
+        />
+
+        <LoginRequiredDialog
+          open={showLoginDialog}
+          onOpenChange={setShowLoginDialog}
+          title='로그인이 필요합니다'
+          description='이 기능을 사용하시려면 로그인이 필요합니다.'
         />
       </>
     )
