@@ -211,3 +211,17 @@
 .ProseMirror s {
   text-decoration: line-through;
 }
+
+/* Custom animations */
+@keyframes slideInRight {
+  from {
+    transform: translate(100%, -50%);
+  }
+  to {
+    transform: translate(0, -50%);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+}
