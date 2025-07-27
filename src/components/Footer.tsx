@@ -14,6 +14,7 @@ const FOOTER_NAV_LINKS: FooterNavLink[] = [
   { href: ROUTES.PROVISION, label: '이용약관' },
   { href: ROUTES.PRIVACY, label: '개인정보처리방침' },
   { href: ROUTES.VENDOR, label: '벤더페이지' },
+  { href: ROUTES.COPYRIGHT_REPORT, label: '저작권 신고' },
 ];
 
 export default function Footer() {

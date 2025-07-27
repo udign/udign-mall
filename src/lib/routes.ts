@@ -51,4 +51,5 @@ export const ROUTES = {
   PROVISION: '/shop/provision',
   PRIVACY: '/shop/privacy',
   VENDOR: '/shop/vendor',
+  COPYRIGHT_REPORT: '/shop/copyright-report',
 } as const;
