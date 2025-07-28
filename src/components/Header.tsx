@@ -142,7 +142,7 @@ export default function Header() {
                 </Button>
                 {user && user.mb_level >= MEMBER_LEVELS.ADMIN && (
                   <Button
-                    onClick={() => router.push(addLocalePath(ROUTES.ADMIN))}
+                    onClick={() => router.push(ROUTES.ADMIN)}
                     variant='ghost'
                     className='text-base text-white hover:bg-white/10 hover:text-white'
                   >

@@ -20,6 +20,7 @@ import { OrderListItem } from '@/app/api/admin/order-list/route';
 import { ROUTES } from '@/lib/routes';
 import { formatOrderId, formatDateOnly } from '@/lib/utils';
 import MessageDialog from '@/components/ui/MessageDialog';
+import { useLocalePath } from '@/hooks/useLocalePath';
 
 interface OrderListData {
   orders: OrderListItem[];
@@ -87,6 +88,7 @@ export default function OrderListPage() {
   const router = useRouter();
 
   const { user, isLoading: authLoading } = useAuth();
+  const addLocalePath = useLocalePath();
 
   const currentPage = parseInt(searchParams.get('page') || '1');
 
@@ -99,15 +101,15 @@ export default function OrderListPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push(ROUTES.LOGIN);
+      router.push(addLocalePath(ROUTES.LOGIN));
       return;
     }
 
     if (!PERMISSION_CHECKS.isAdmin(user.mb_level)) {
-      router.push(ROUTES.HOME);
+      router.push(addLocalePath(ROUTES.SHOP));
       return;
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, addLocalePath]);
 
   const fetchOrderList = async (page: number = 1) => {
     try {
@@ -203,7 +205,7 @@ export default function OrderListPage() {
       <div className='text-center'>
         <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
         <button
-          onClick={() => router.push(ROUTES.LOGIN)}
+          onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}
           className='rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
         >
           로그인하기

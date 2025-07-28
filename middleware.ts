@@ -22,8 +22,13 @@ function getLocale(request: NextRequest): string {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  // API 라우트와 정적 파일은 제외
-  if (pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.')) {
+  // API 라우트, 정적 파일, admin 경로는 제외
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/admin') ||
+    pathname.includes('.')
+  ) {
     return;
   }
 

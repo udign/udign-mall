@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { PERMISSION_CHECKS } from '@/lib/constants';
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/primitives/button';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 import { formatDate, truncateText } from '@/lib/utils';
+import { useLocalePath } from '@/hooks/useLocalePath';
 
 const tableHeaders = [
   'ID',
@@ -40,6 +41,7 @@ export default function PopupListPage() {
   const searchParams = useSearchParams();
 
   const { user, isLoading: authLoading } = useAuth();
+  const addLocalePath = useLocalePath();
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
@@ -47,15 +49,15 @@ export default function PopupListPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push(ROUTES.LOGIN);
+      router.push(addLocalePath(ROUTES.LOGIN));
       return;
     }
 
     if (!PERMISSION_CHECKS.isAdmin(user.mb_level)) {
-      router.push(ROUTES.SHOP);
+      router.push(addLocalePath(ROUTES.SHOP));
       return;
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, addLocalePath]);
 
   const fetchData = async (page: number = 1) => {
     try {
@@ -133,7 +135,7 @@ export default function PopupListPage() {
     <div className='flex min-h-screen items-center justify-center'>
       <div className='text-center'>
         <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
-        <Button onClick={() => router.push(ROUTES.LOGIN)}>로그인하기</Button>
+        <Button onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}>로그인하기</Button>
       </div>
     </div>
   ) : loading ? (

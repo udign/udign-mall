@@ -14,6 +14,7 @@ import {
 } from '@/types/return';
 import { ROUTES } from '@/lib/routes';
 import { formatOrderId, formatDate, truncateText } from '@/lib/utils';
+import { useLocalePath } from '@/hooks/useLocalePath';
 
 const statusCards = [
   { label: '전체', key: 'total', color: 'text-gray-900' },
@@ -49,6 +50,7 @@ export default function ReturnListPage() {
   const searchParams = useSearchParams();
 
   const { user, isLoading: authLoading } = useAuth();
+  const addLocalePath = useLocalePath();
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
@@ -56,15 +58,15 @@ export default function ReturnListPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push(ROUTES.LOGIN);
+      router.push(addLocalePath(ROUTES.LOGIN));
       return;
     }
 
     if (!PERMISSION_CHECKS.isAdmin(user.mb_level)) {
-      router.push(ROUTES.SHOP);
+      router.push(addLocalePath(ROUTES.SHOP));
       return;
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, addLocalePath]);
 
   const fetchData = async (page: number = 1) => {
     try {
@@ -108,7 +110,7 @@ export default function ReturnListPage() {
       <div className='text-center'>
         <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
         <button
-          onClick={() => router.push(ROUTES.LOGIN)}
+          onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}
           className='rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
         >
           로그인하기
