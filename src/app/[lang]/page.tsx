@@ -5,7 +5,7 @@ interface RootPageProps {
   params: Promise<{ lang: Locale }>;
 }
 
-export default async function RootPage({ params }: RootPageProps) {
+export default async function LangRootPage({ params }: RootPageProps) {
   const { lang } = await params;
   redirect(`/${lang}/shop`);
 }
