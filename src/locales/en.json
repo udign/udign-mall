@@ -1,0 +1,45 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "upload": "Upload",
+    "search": "Search",
+    "all": "All",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "profile": "Profile",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "shop": {
+    "title": "Shop",
+    "uploadProduct": "Upload Product",
+    "categories": {
+      "all": "All",
+      "fashion": "Fashion",
+      "shoes": "Shoes",
+      "others": "Others",
+      "accessory": "Accessory",
+      "home": "Home Interior",
+      "beauty": "Beauty",
+      "art": "Art",
+      "digital": "Digital",
+      "lifestyle": "Lifestyle"
+    },
+    "noProducts": "No products found",
+    "loadMore": "Load More",
+    "loginRequired": "Login Required",
+    "loginRequiredMessage": "You need to login to upload a product.",
+    "goToLogin": "Go to Login"
+  },
+  "language": {
+    "select": "Select Language",
+    "korean": "한국어",
+    "english": "English",
+    "changeLanguage": "Would you like to change the language?",
+    "languageChanged": "Language has been changed"
+  }
+}

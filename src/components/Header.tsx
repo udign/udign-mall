@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { HiOutlineMenu } from 'react-icons/hi';
 import { FiClock, FiSearch } from 'react-icons/fi';
+import { Languages } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/primitives/tooltip';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
@@ -37,7 +39,9 @@ export default function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
+
   const { user, isLoading, logout } = useAuth();
+  const { showLanguageModal } = useI18n();
 
   useEffect(() => {
     setHideHeader(pathname.includes('/admin'));
@@ -124,7 +128,7 @@ export default function Header() {
                   onClick={handleTodayViewedClick}
                   size='icon'
                   variant='ghost'
-                  className='hover:text-white hover:bg-white/10'
+                  className='hover:bg-white/10 hover:text-white'
                 >
                   <FiClock className='text-xl text-white' />
                 </Button>
@@ -132,7 +136,7 @@ export default function Header() {
                   onClick={handleSearchClick}
                   size='icon'
                   variant='ghost'
-                  className='hover:text-white hover:bg-white/10'
+                  className='hover:bg-white/10 hover:text-white'
                 >
                   <FiSearch className='text-xl text-white' />
                 </Button>
@@ -140,7 +144,7 @@ export default function Header() {
                   <Button
                     onClick={() => router.push(ROUTES.ADMIN)}
                     variant='ghost'
-                    className='hover:text-white hover:bg-white/10 text-base text-white'
+                    className='text-base text-white hover:bg-white/10 hover:text-white'
                   >
                     <span>관리자</span>
                   </Button>
@@ -150,7 +154,7 @@ export default function Header() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant='ghost'
-                        className='hover:text-white hover:bg-white/10 text-base text-white'
+                        className='text-base text-white hover:bg-white/10 hover:text-white'
                       >
                         <span>{user.mb_name}</span>
                       </Button>
@@ -171,7 +175,7 @@ export default function Header() {
                   <Button
                     onClick={() => router.push(ROUTES.LOGIN)}
                     variant='ghost'
-                    className='hover:text-white hover:bg-white/10 text-base text-white'
+                    className='text-base text-white hover:bg-white/10 hover:text-white'
                   >
                     <span>로그인</span>
                   </Button>
@@ -179,7 +183,15 @@ export default function Header() {
 
                 <Button
                   variant='ghost'
-                  className='hover:text-white hover:bg-white/10'
+                  className='hover:bg-white/10 hover:text-white'
+                  onClick={showLanguageModal}
+                >
+                  <Languages className='text-xl text-white' />
+                </Button>
+
+                <Button
+                  variant='ghost'
+                  className='hover:bg-white/10 hover:text-white'
                   onClick={handleNavigationClick}
                 >
                   <HiOutlineMenu className='text-xl text-white' />
@@ -188,18 +200,18 @@ export default function Header() {
             </div>
             {/* 데스크톱 네비게이션 메뉴 제거 */}
             {user && (
-              <div className='flex justify-end -mt-4 -mb-4'>
+              <div className='-mt-4 -mb-4 flex justify-end'>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
                         variant='ghost'
-                        className='text-white hover:text-white hover:bg-white/10 h-10 text-lg font-semibold relative'
+                        className='relative h-10 text-lg font-semibold text-white hover:bg-white/10 hover:text-white'
                       >
                         My UDIGN
                         {purchaseCount > 0 && (
-                          <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center'>
+                          <span className='absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white'>
                             {purchaseCount}
                           </span>
                         )}
@@ -222,10 +234,7 @@ export default function Header() {
           onClose={() => setIsSidebarOpen(false)}
         />
 
-        <SearchSidebar
-          isOpen={isSearchSidebarOpen}
-          onClose={() => setIsSearchSidebarOpen(false)}
-        />
+        <SearchSidebar isOpen={isSearchSidebarOpen} onClose={() => setIsSearchSidebarOpen(false)} />
 
         <NavigationSidebar
           isOpen={isNavigationSidebarOpen}

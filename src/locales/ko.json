@@ -1,0 +1,45 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "upload": "업로드",
+    "search": "검색",
+    "all": "전체",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "register": "회원가입",
+    "profile": "프로필",
+    "close": "닫기",
+    "confirm": "확인",
+    "cancel": "취소"
+  },
+  "shop": {
+    "title": "쇼핑몰",
+    "uploadProduct": "상품 업로드",
+    "categories": {
+      "all": "전체",
+      "fashion": "패션",
+      "shoes": "신발",
+      "others": "기타",
+      "accessory": "액세서리",
+      "home": "홈인테리어",
+      "beauty": "뷰티",
+      "art": "예술작품",
+      "digital": "디지털",
+      "lifestyle": "라이프스타일"
+    },
+    "noProducts": "상품이 없습니다",
+    "loadMore": "더 보기",
+    "loginRequired": "로그인이 필요합니다",
+    "loginRequiredMessage": "상품을 업로드하려면 로그인이 필요합니다.",
+    "goToLogin": "로그인하러 가기"
+  },
+  "language": {
+    "select": "언어 선택",
+    "korean": "한국어",
+    "english": "English",
+    "changeLanguage": "언어를 변경하시겠습니까?",
+    "languageChanged": "언어가 변경되었습니다"
+  }
+}
