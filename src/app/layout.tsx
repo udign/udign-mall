@@ -2,9 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-import ScrollToTop from '@/components/ScrollToTop';
-import { AuthProvider } from '@/contexts/AuthContext';
-
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -19,16 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko'>
-      <body className={`${inter.className} bg-[#0e1731]`}>
-        <div className='flex min-h-screen justify-center'>
-          <div className='container'>
-            <AuthProvider>
-              {children}
-              <ScrollToTop />
-            </AuthProvider>
-          </div>
-        </div>
-      </body>
+      <body className={`${inter.className} bg-[#0e1731]`}>{children}</body>
     </html>
   );
 }

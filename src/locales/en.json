@@ -16,7 +16,7 @@
   },
   "shop": {
     "title": "Shop",
-    "uploadProduct": "Upload Product",
+    "uploadProduct": "Upload Design",
     "categories": {
       "all": "All",
       "fashion": "Fashion",
@@ -29,10 +29,13 @@
       "digital": "Digital",
       "lifestyle": "Lifestyle"
     },
-    "noProducts": "No products found",
-    "loadMore": "Load More",
-    "loginRequired": "Login Required",
-    "loginRequiredMessage": "You need to login to upload a product.",
+    "noProducts": "No artworks registered",
+    "loadMore": "Loading more artworks...",
+    "allLoaded": "All artworks have been loaded",
+    "loadingProducts": "Loading artworks...",
+    "designDescription": "Choose a design made just for you. The perfect gift will be completed.",
+    "loginRequired": "Upload Design",
+    "loginRequiredMessage": "You need to login to upload a design.",
     "goToLogin": "Go to Login"
   },
   "language": {

@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { HiOutlineMenu } from 'react-icons/hi';
 import { FiClock, FiSearch } from 'react-icons/fi';
-import { Languages } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,11 +19,11 @@ import {
 } from '@/components/ui/primitives/tooltip';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/contexts/AuthContext';
-import { useI18n } from '@/contexts/I18nContext';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
 import NavigationSidebar from '@/components/NavigationSidebar';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/primitives/button';
 import { MEMBER_LEVELS } from '@/lib/constants';
 import Link from 'next/link';
@@ -41,7 +40,6 @@ export default function Header() {
   const pathname = usePathname();
 
   const { user, isLoading, logout } = useAuth();
-  const { showLanguageModal } = useI18n();
 
   useEffect(() => {
     setHideHeader(pathname.includes('/admin'));
@@ -181,13 +179,7 @@ export default function Header() {
                   </Button>
                 )}
 
-                <Button
-                  variant='ghost'
-                  className='hover:bg-white/10 hover:text-white'
-                  onClick={showLanguageModal}
-                >
-                  <Languages className='text-xl text-white' />
-                </Button>
+                <LanguageSwitcher />
 
                 <Button
                   variant='ghost'

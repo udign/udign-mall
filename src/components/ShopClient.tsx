@@ -13,8 +13,13 @@ import LoadingSpinner from '@/components/states/LoadingSpinner';
 import ErrorState from '@/components/states/ErrorState';
 import { Product } from '@/types/product';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { Dictionary } from '@/lib/dictionaries';
 
-export default function ShopPage() {
+interface ShopClientProps {
+  dictionary: Dictionary;
+}
+
+export default function ShopClient({ dictionary }: ShopClientProps) {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [isButtonOpen, setIsButtonOpen] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -47,47 +52,50 @@ export default function ShopPage() {
     setIsButtonOpen(!isButtonOpen);
   };
 
-  const fetchProducts = useCallback(async (pageNum: number, isNewCategory: boolean = false) => {
-    if (isLoadingRef.current) return;
-    
-    try {
-      isLoadingRef.current = true;
-      
-      if (pageNum === 1 || isNewCategory) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
-      
-      setError(null);
-      
-      let url = `/api/products?limit=12&page=${pageNum}`;
-      if (selectedCategory !== 'all') {
-        url += `&category=${selectedCategory}`;
-      }
-      
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (data.success) {
+  const fetchProducts = useCallback(
+    async (pageNum: number, isNewCategory: boolean = false) => {
+      if (isLoadingRef.current) return;
+
+      try {
+        isLoadingRef.current = true;
+
         if (pageNum === 1 || isNewCategory) {
-          setProducts(data.items);
+          setLoading(true);
         } else {
-          setProducts(prev => [...prev, ...data.items]);
+          setLoadingMore(true);
         }
-        setHasMore(data.pagination.hasNext);
-      } else {
-        setError(data.error || '제품을 불러오는데 실패했습니다.');
+
+        setError(null);
+
+        let url = `/api/products?limit=12&page=${pageNum}`;
+        if (selectedCategory !== 'all') {
+          url += `&category=${selectedCategory}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success) {
+          if (pageNum === 1 || isNewCategory) {
+            setProducts(data.items);
+          } else {
+            setProducts((prev) => [...prev, ...data.items]);
+          }
+          setHasMore(data.pagination.hasNext);
+        } else {
+          setError(data.error || dictionary.shop.noProducts);
+        }
+      } catch (err) {
+        console.error('제품 조회 오류:', err);
+        setError(dictionary.shop.noProducts);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+        isLoadingRef.current = false;
       }
-    } catch (err) {
-      console.error('제품 조회 오류:', err);
-      setError('제품을 불러오는데 실패했습니다.');
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-      isLoadingRef.current = false;
-    }
-  }, [selectedCategory]);
+    },
+    [selectedCategory, dictionary],
+  );
 
   const loadMore = useCallback(() => {
     if (!loading && !loadingMore && hasMore && !isLoadingRef.current) {
@@ -107,10 +115,10 @@ export default function ShopPage() {
   }, [selectedCategory, fetchProducts]);
 
   const categories = [
-    { id: 'all', name: 'All' },
-    { id: CATEGORY_IDS.FASHION, name: 'Fashion' },
-    { id: CATEGORY_IDS.SHOES, name: 'Shoes' },
-    { id: CATEGORY_IDS.OTHERS, name: 'Others' },
+    { id: 'all', name: dictionary.shop.categories.all },
+    { id: CATEGORY_IDS.FASHION, name: dictionary.shop.categories.fashion },
+    { id: CATEGORY_IDS.SHOES, name: dictionary.shop.categories.shoes },
+    { id: CATEGORY_IDS.OTHERS, name: dictionary.shop.categories.others },
   ];
 
   return (
@@ -137,10 +145,10 @@ export default function ShopPage() {
         </div>
         <section className='mb-10 px-6 py-14 sm:px-10 sm:py-20'>
           <div className='flex flex-col items-center gap-y-8'>
-            <p className='text-white text-center text-xl font-bold tracking-tight sm:text-3xl'>
-              오직 당신만을 위한 디자인을 선택하세요. 최고의 선물이 완성됩니다.
+            <p className='text-center text-xl font-bold tracking-tight text-white sm:text-3xl'>
+              {dictionary.shop.designDescription}
             </p>
-            
+
             {/* 카테고리 탭 */}
             <div className='flex gap-4'>
               {categories.map((category) => (
@@ -159,35 +167,39 @@ export default function ShopPage() {
             </div>
 
             {/* 제품 목록 */}
-            <div className='w-full mt-8'>
+            <div className='mt-8 w-full'>
               {loading && products.length === 0 ? (
                 <div className='flex min-h-96 items-center justify-center'>
-                  <LoadingSpinner size='lg' message='작품을 불러오는 중입니다...' />
+                  <LoadingSpinner size='lg' message={dictionary.shop.loadingProducts} />
                 </div>
               ) : error && products.length === 0 ? (
-                <ErrorState message={error} onRetry={() => fetchProducts(1, true)} showRetry={true} />
+                <ErrorState
+                  message={error}
+                  onRetry={() => fetchProducts(1, true)}
+                  showRetry={true}
+                />
               ) : (
                 <>
                   {products.length === 0 ? (
-                    <div className='text-center py-12'>
-                      <p className='text-white/60'>등록된 작품이 없습니다.</p>
+                    <div className='py-12 text-center'>
+                      <p className='text-white/60'>{dictionary.shop.noProducts}</p>
                     </div>
                   ) : (
                     <>
                       <ProductGrid products={products} />
-                      
+
                       {/* 무한 스크롤 트리거 */}
                       {hasMore && (
-                        <div ref={observerTarget} className='h-20 flex items-center justify-center'>
+                        <div ref={observerTarget} className='flex h-20 items-center justify-center'>
                           {loadingMore && (
-                            <LoadingSpinner size='sm' message='추가 작품을 불러오는 중...' />
+                            <LoadingSpinner size='sm' message={dictionary.shop.loadMore} />
                           )}
                         </div>
                       )}
-                      
+
                       {!hasMore && products.length > 0 && (
-                        <div className='text-center py-8'>
-                          <p className='text-white/60'>모든 작품을 불러왔습니다.</p>
+                        <div className='py-8 text-center'>
+                          <p className='text-white/60'>{dictionary.shop.allLoaded}</p>
                         </div>
                       )}
                     </>
@@ -200,8 +212,8 @@ export default function ShopPage() {
       </main>
 
       {/* 플로팅 업로드 버튼 */}
-      <div className='fixed left-0 top-1/3 z-40 -translate-y-1/2'>
-        <div 
+      <div className='fixed top-1/3 left-0 z-40 -translate-y-1/2'>
+        <div
           className='flex items-center transition-transform duration-300 ease-in-out'
           style={{
             transform: isButtonOpen ? 'translateX(0)' : 'translateX(calc(-100% + 32px))',
@@ -210,19 +222,19 @@ export default function ShopPage() {
           <Button
             onClick={handleUploadClick}
             disabled={isLoading}
-            className='flex h-12 items-center gap-2 px-6 text-white shadow-lg rounded-none'
+            className='flex h-12 items-center gap-2 rounded-none px-6 text-white shadow-lg'
             style={{ backgroundColor: '#618e49' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4a6e37'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#618e49'}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4a6e37')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#618e49')}
           >
-            <span className='text-base font-semibold'>디자인 업로드</span>
+            <span className='text-base font-semibold'>{dictionary.shop.uploadProduct}</span>
           </Button>
           <button
             onClick={toggleButton}
-            className='flex h-12 w-8 items-center justify-center text-white shadow-lg transition-colors rounded-none'
+            className='flex h-12 w-8 items-center justify-center rounded-none text-white shadow-lg transition-colors'
             style={{ backgroundColor: '#618e49' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4a6e37'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#618e49'}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4a6e37')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#618e49')}
           >
             {isButtonOpen ? (
               <ChevronLeft className='h-5 w-5' />
@@ -236,8 +248,8 @@ export default function ShopPage() {
       <LoginRequiredDialog
         open={showLoginDialog}
         onOpenChange={setShowLoginDialog}
-        title='디자인 업로드'
-        description='디자인을 업로드하시려면 로그인이 필요합니다.'
+        title={dictionary.shop.loginRequired}
+        description={dictionary.shop.loginRequiredMessage}
       />
     </>
   );
