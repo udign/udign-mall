@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { X, Trash2, ShoppingBag } from 'lucide-react';
 import { useTodayViewedProducts } from '@/hooks/useTodayViewedProducts';
 import { ROUTES } from '@/lib/routes';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { Button } from '@/components/ui/primitives/button';
 import {
   Sheet,
@@ -29,12 +30,13 @@ export default function TodayViewedProductsSidebar({
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   const router = useRouter();
+  const addLocalePath = useLocalePath();
 
   const { viewedProducts, isLoadingTodayViewed, removeViewedProduct, clearViewedProducts } =
     useTodayViewedProducts();
 
   const handleProductClick = (productId: string) => {
-    router.push(`${ROUTES.PRODUCT}/${productId}`);
+    router.push(addLocalePath(`${ROUTES.PRODUCT}/${productId}`));
     onClose();
   };
 

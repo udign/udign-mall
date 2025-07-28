@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/primitives/dialog';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
+import { useLocalePath } from '@/hooks/useLocalePath';
 
 interface LoginRequiredDialogProps {
   open: boolean;
@@ -24,10 +25,11 @@ export default function LoginRequiredDialog({
   description = '회원이시라면 로그인 후 이용해 주십시오.',
 }: LoginRequiredDialogProps) {
   const router = useRouter();
+  const addLocalePath = useLocalePath();
 
   const handleLoginConfirm = () => {
     onOpenChange(false);
-    router.push(ROUTES.LOGIN);
+    router.push(addLocalePath(ROUTES.LOGIN));
   };
 
   const handleCancel = () => onOpenChange(false);

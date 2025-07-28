@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/primitives/tooltip';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
@@ -38,6 +39,7 @@ export default function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
+  const addLocalePath = useLocalePath();
 
   const { user, isLoading, logout } = useAuth();
 
@@ -77,7 +79,7 @@ export default function Header() {
       if (response.ok) {
         logout();
         console.log('로그아웃 되었습니다.');
-        router.push(ROUTES.SHOP);
+        router.push(addLocalePath(ROUTES.SHOP));
       }
     } catch (error) {
       console.error('로그아웃 오류:', error);
@@ -94,7 +96,7 @@ export default function Header() {
     if (!user) {
       setShowLoginDialog(true);
     } else {
-      router.push(href);
+      router.push(addLocalePath(href));
     }
   };
 
@@ -117,7 +119,7 @@ export default function Header() {
           <div className='space-y-5 px-6 py-5 sm:px-10'>
             <div className='flex items-center gap-3'>
               <div className='non-login'>
-                <Link href={ROUTES.HOME}>
+                <Link href={addLocalePath(ROUTES.HOME)}>
                   <Image src='/images/udign-white.png' alt='logo' width={103} height={35} />
                 </Link>
               </div>
@@ -140,7 +142,7 @@ export default function Header() {
                 </Button>
                 {user && user.mb_level >= MEMBER_LEVELS.ADMIN && (
                   <Button
-                    onClick={() => router.push(ROUTES.ADMIN)}
+                    onClick={() => router.push(addLocalePath(ROUTES.ADMIN))}
                     variant='ghost'
                     className='text-base text-white hover:bg-white/10 hover:text-white'
                   >
@@ -159,7 +161,7 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end' className='w-48'>
                       <DropdownMenuItem
-                        onClick={() => router.push(ROUTES.PROFILE_CONFIRM)}
+                        onClick={() => router.push(addLocalePath(ROUTES.PROFILE_CONFIRM))}
                         className='cursor-pointer'
                       >
                         회원정보 수정
@@ -171,7 +173,7 @@ export default function Header() {
                   </DropdownMenu>
                 ) : (
                   <Button
-                    onClick={() => router.push(ROUTES.LOGIN)}
+                    onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}
                     variant='ghost'
                     className='text-base text-white hover:bg-white/10 hover:text-white'
                   >

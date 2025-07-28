@@ -21,8 +21,7 @@ function getLocale(request: NextRequest): string {
 }
 
 export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-
+  const { pathname } = request.nextUrl;
   // API 라우트와 정적 파일은 제외
   if (pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.')) {
     return;
@@ -34,7 +33,6 @@ export function middleware(request: NextRequest) {
 
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
-
     // 루트 경로 처리
     const redirectPath = pathname === '/' ? `/${locale}/shop` : `/${locale}${pathname}`;
 

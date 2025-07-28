@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
@@ -22,10 +23,11 @@ export default function SearchSidebar({ isOpen, onClose }: SearchSidebarProps) {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const router = useRouter();
+  const addLocalePath = useLocalePath();
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      router.push(`/shop/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(addLocalePath(`/shop/search?q=${encodeURIComponent(searchQuery.trim())}`));
       onClose();
     }
   };

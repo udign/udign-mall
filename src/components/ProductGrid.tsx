@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/primitives/button';
 import { Progress } from '@/components/ui/primitives/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { shouldBlurProduct, isCollectionStatus } from '@/lib/artwork-helpers';
 
 interface ProductGridProps {
@@ -60,11 +61,12 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
 
   const router = useRouter();
   const { user } = useAuth();
+  const addLocalePath = useLocalePath();
 
   const handleProductClick = (e: React.MouseEvent, productId: string) => {
     e.preventDefault();
 
-    router.push(`${ROUTES.PRODUCT}/${productId}`);
+    router.push(addLocalePath(`${ROUTES.PRODUCT}/${productId}`));
   };
 
   const handleLikeToggle = async (e: React.MouseEvent, productId: string) => {
@@ -178,7 +180,7 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
             <div
               key={product.it_id}
               onClick={shouldBlur ? undefined : (e) => handleProductClick(e, product.it_id)}
-              className={`flex flex-col overflow-hidden border border-gray-200 bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] hover:shadow-[0_0_30px_rgba(255,255,255,0.8)] transition-shadow duration-300 ${
+              className={`flex flex-col overflow-hidden border border-gray-200 bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.8)] ${
                 shouldBlur ? 'cursor-default' : 'cursor-pointer'
               }`}
             >

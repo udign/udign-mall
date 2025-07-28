@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
 import SocialIcons from '@/components/SocialIcons';
@@ -22,6 +23,7 @@ const FOOTER_NAV_LINKS: FooterNavLink[] = [
 
 export default function Footer() {
   const router = useRouter();
+  const addLocalePath = useLocalePath();
 
   return (
     <footer className='bg-[#0e1731] py-8 text-white'>
@@ -38,9 +40,9 @@ export default function Footer() {
               {FOOTER_NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <Button
-                    onClick={() => router.push(link.href)}
+                    onClick={() => router.push(addLocalePath(link.href))}
                     variant='link'
-                    className='text-sm text-white/80 hover:text-white hover:no-underline p-0 text-left'
+                    className='p-0 text-left text-sm text-white/80 hover:text-white hover:no-underline'
                   >
                     {link.label}
                   </Button>
@@ -57,7 +59,8 @@ export default function Footer() {
               <span className='font-semibold'>팩스:</span> 02-356-5889
             </p>
             <p className='mb-1'>
-              <span className='font-semibold'>사업장주소:</span> 서울시 은평구 진관3로 32, 은평뉴타운파크앤타워 B동 6층 618호
+              <span className='font-semibold'>사업장주소:</span> 서울시 은평구 진관3로 32,
+              은평뉴타운파크앤타워 B동 6층 618호
             </p>
             <p className='mb-1'>
               <span className='font-semibold'>사업자등록번호:</span> 259-87-03288
@@ -73,13 +76,13 @@ export default function Footer() {
 
           {/* Contact Us */}
           <div className='flex-shrink-0 text-sm'>
-            <p className='font-semibold text-white mb-2'>Contact Us</p>
+            <p className='mb-2 font-semibold text-white'>Contact Us</p>
             <div className='text-white/80'>
-              <p className='font-semibold text-lg mb-1'>1577-4215</p>
+              <p className='mb-1 text-lg font-semibold'>1577-4215</p>
               <p>운영시간 : 평일 09:00 ~ 17:00</p>
               <p>점심시간 : 평일 12:00 ~ 13:00</p>
               <p className='mb-4'>토, 일요일 / 공휴일 휴무</p>
-              <p className='font-semibold text-white mb-2'>Follow Us</p>
+              <p className='mb-2 font-semibold text-white'>Follow Us</p>
               <SocialIcons />
             </div>
           </div>

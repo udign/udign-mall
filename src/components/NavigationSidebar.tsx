@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { NAV_MENU_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/routes';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import {
   Accordion,
   AccordionContent,
@@ -28,15 +29,16 @@ interface NavigationSidebarProps {
 export default function NavigationSidebar({ isOpen, onClose }: NavigationSidebarProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const addLocalePath = useLocalePath();
 
   const handleAuthRequiredClick = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
     onClose();
 
     if (!user) {
-      router.push(ROUTES.LOGIN);
+      router.push(addLocalePath(ROUTES.LOGIN));
     } else {
-      router.push(href);
+      router.push(addLocalePath(href));
     }
   };
 

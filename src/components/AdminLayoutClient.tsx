@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/primitives/accordion';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { User } from '@/types/user';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { useState } from 'react';
@@ -173,6 +174,7 @@ const menuItems: MenuItem[] = [
 export default function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const addLocalePath = useLocalePath();
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [dialogTitle, setDialogTitle] = useState<string>('');
   const [dialogDescription, setDialogDescription] = useState<string>('');
@@ -192,7 +194,7 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
   };
 
   const handleNavigation = (href: string) => {
-    router.push(href);
+    router.push(addLocalePath(href));
   };
 
   const showAlert = (title: string, description?: string) => {
@@ -316,7 +318,7 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
 
           <div className='flex items-center gap-2'>
             <Button
-              onClick={() => router.push(ROUTES.SHOP)}
+              onClick={() => router.push(addLocalePath(ROUTES.SHOP))}
               variant='ghost'
               size='sm'
               className='flex items-center gap-2'

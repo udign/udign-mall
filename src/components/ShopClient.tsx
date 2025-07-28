@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { CATEGORY_IDS } from '@/lib/constants';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import ProductGrid from '@/components/ProductGrid';
@@ -33,6 +34,7 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
 
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  const addLocalePath = useLocalePath();
 
   const handleUploadClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,7 +46,7 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
     if (!user) {
       setShowLoginDialog(true);
     } else {
-      router.push(ROUTES.UPLOAD);
+      router.push(addLocalePath(ROUTES.UPLOAD));
     }
   };
 
