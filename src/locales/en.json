@@ -842,5 +842,84 @@
       "title": "Login Required",
       "description": "Design upload is only available to members. Please log in to use this service."
     }
+  },
+  "resetPassword": {
+    "success": {
+      "title": "Password Reset Complete",
+      "subtitle": "Your password has been successfully changed.",
+      "message": "Password reset has been completed.",
+      "loginMessage": "Please log in with your member ID and the new password.",
+      "securityMessage": "For security reasons, please change to a new password after logging in.",
+      "goToLogin": "Go to Login Page"
+    },
+    "failure": {
+      "title": "Password Reset Failed",
+      "subtitle": "There was a problem changing your password.",
+      "errorLabel": "Error:",
+      "linkExpiredMessage": "The authentication link may have expired or already been used.",
+      "tryAgain": "Try Again",
+      "backToLogin": "Back to Login"
+    },
+    "errors": {
+      "invalidAccess": "Invalid access.",
+      "resetFailed": "Password reset failed.",
+      "requestError": "An error occurred while processing the request."
+    }
+  },
+  "profile": {
+    "edit": {
+      "title": "Edit Profile",
+      "subtitle": "You can edit your profile information.",
+      "loadingMessage": "Loading user information...",
+      "successTitle": "Success",
+      "successMessage": "Profile information has been successfully updated.",
+      "fields": {
+        "userId": "User ID",
+        "userIdNotEditable": "User ID cannot be changed.",
+        "name": "Name",
+        "nameNotEditable": "Name cannot be changed.",
+        "email": "Email",
+        "emailPlaceholder": "Please enter your email",
+        "phone": "Phone Number",
+        "phonePlaceholder": "e.g. 01012345678 (numbers only)",
+        "newPassword": "New Password",
+        "newPasswordPlaceholder": "Leave empty if you don't want to change",
+        "confirmPassword": "Confirm New Password",
+        "confirmPasswordPlaceholder": "Re-enter your new password",
+        "marketingConsent": "Marketing Information Consent",
+        "marketingConsentDesc": "Would you like to receive information about events and discount offers?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "submit": "Update",
+        "submitting": "Updating..."
+      },
+      "errors": {
+        "emailRequired": "Please enter your email.",
+        "phoneRequired": "Please enter your phone number.",
+        "invalidEmail": "Please enter a valid email address.",
+        "invalidPhone": "Phone number must be 11 digits starting with 01.",
+        "passwordMismatch": "New password and password confirmation do not match.",
+        "updateFailed": "An error occurred while updating profile information.",
+        "loadFailed": "An error occurred while loading user information."
+      }
+    },
+    "confirm": {
+      "title": "Edit Profile",
+      "subtitle": "Please enter your current password to edit profile information.",
+      "fields": {
+        "password": "Password",
+        "passwordPlaceholder": "Enter your current password"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "confirming": "Confirming..."
+      },
+      "errors": {
+        "invalidPassword": "Password is incorrect.",
+        "confirmFailed": "An error occurred while confirming password."
+      }
+    }
   }
 }

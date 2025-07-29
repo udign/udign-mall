@@ -842,5 +842,84 @@
       "title": "로그인이 필요합니다",
       "description": "디자인 업로드는 회원만 이용하실 수 있습니다. 로그인 후 이용해 주시기 바랍니다."
     }
+  },
+  "resetPassword": {
+    "success": {
+      "title": "비밀번호 변경 완료",
+      "subtitle": "비밀번호가 성공적으로 변경되었습니다.",
+      "message": "비밀번호 변경이 완료되었습니다.",
+      "loginMessage": "회원아이디와 변경된 비밀번호로 로그인 하시기 바랍니다.",
+      "securityMessage": "보안을 위해 로그인 후 새로운 비밀번호로 변경해 주시기 바랍니다.",
+      "goToLogin": "로그인 페이지로 이동"
+    },
+    "failure": {
+      "title": "비밀번호 변경 실패",
+      "subtitle": "비밀번호 변경 중 문제가 발생했습니다.",
+      "errorLabel": "오류:",
+      "linkExpiredMessage": "인증 링크가 만료되었거나 이미 사용된 링크일 수 있습니다.",
+      "tryAgain": "다시 시도",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "errors": {
+      "invalidAccess": "잘못된 접근입니다.",
+      "resetFailed": "비밀번호 변경에 실패했습니다.",
+      "requestError": "요청 처리 중 오류가 발생했습니다."
+    }
+  },
+  "profile": {
+    "edit": {
+      "title": "회원정보 수정",
+      "subtitle": "회원정보를 수정하실 수 있습니다.",
+      "loadingMessage": "사용자 정보를 불러오는 중...",
+      "successTitle": "성공",
+      "successMessage": "회원정보가 성공적으로 수정되었습니다.",
+      "fields": {
+        "userId": "아이디",
+        "userIdNotEditable": "아이디는 변경할 수 없습니다.",
+        "name": "이름",
+        "nameNotEditable": "이름은 변경할 수 없습니다.",
+        "email": "이메일",
+        "emailPlaceholder": "이메일을 입력해주세요",
+        "phone": "휴대폰 번호",
+        "phonePlaceholder": "예: 01012345678 (숫자만 입력)",
+        "newPassword": "새 비밀번호",
+        "newPasswordPlaceholder": "변경하지 않으려면 비워두세요",
+        "confirmPassword": "새 비밀번호 확인",
+        "confirmPasswordPlaceholder": "새 비밀번호를 다시 입력하세요",
+        "marketingConsent": "광고성 정보 수신 동의",
+        "marketingConsentDesc": "이벤트, 할인 혜택 등의 정보를 받아보시겠습니까?"
+      },
+      "buttons": {
+        "cancel": "취소",
+        "submit": "수정하기",
+        "submitting": "수정 중..."
+      },
+      "errors": {
+        "emailRequired": "이메일을 입력해주세요.",
+        "phoneRequired": "휴대폰 번호를 입력해주세요.",
+        "invalidEmail": "올바른 이메일 주소를 입력해주세요.",
+        "invalidPhone": "휴대폰 번호는 01로 시작하는 11자리 숫자로 입력해주세요.",
+        "passwordMismatch": "새 비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+        "updateFailed": "회원정보 수정 중 오류가 발생했습니다.",
+        "loadFailed": "사용자 정보를 불러오는 중 오류가 발생했습니다."
+      }
+    },
+    "confirm": {
+      "title": "회원정보 수정",
+      "subtitle": "회원정보를 수정하려면 현재 비밀번호를 입력해주세요.",
+      "fields": {
+        "password": "비밀번호",
+        "passwordPlaceholder": "현재 비밀번호를 입력하세요"
+      },
+      "buttons": {
+        "cancel": "취소",
+        "confirm": "확인",
+        "confirming": "확인 중..."
+      },
+      "errors": {
+        "invalidPassword": "비밀번호가 올바르지 않습니다.",
+        "confirmFailed": "비밀번호 확인 중 오류가 발생했습니다."
+      }
+    }
   }
 }
