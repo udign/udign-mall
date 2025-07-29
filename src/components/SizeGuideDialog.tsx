@@ -8,10 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/primitives/dialog';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface SizeGuideDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  dictionary: Dictionary;
 }
 
 interface SizeGuideData {
@@ -24,7 +26,7 @@ interface SizeGuideData {
   is_active: boolean;
 }
 
-export default function SizeGuideDialog({ open, onOpenChange }: SizeGuideDialogProps) {
+export default function SizeGuideDialog({ open, onOpenChange, dictionary }: SizeGuideDialogProps) {
   const [sizeData, setSizeData] = useState<SizeGuideData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
@@ -66,25 +68,29 @@ export default function SizeGuideDialog({ open, onOpenChange }: SizeGuideDialogP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-w-lg'>
         <DialogHeader>
-          <DialogTitle className='text-center'>사이즈 가이드</DialogTitle>
+          <DialogTitle className='text-center'>
+            {dictionary.productDetail.sizeGuide.title}
+          </DialogTitle>
           <DialogDescription className='text-center text-sm text-gray-600'>
-            정확한 사이즈 선택을 위한 측정 가이드입니다
+            {dictionary.productDetail.sizeGuide.description}
           </DialogDescription>
         </DialogHeader>
 
         <div>
           {loading ? (
             <div className='py-8 text-center'>
-              <div className='mb-4 text-sm text-gray-600'>사이즈 가이드를 불러오는 중...</div>
+              <div className='mb-4 text-sm text-gray-600'>
+                {dictionary.productDetail.sizeGuide.loading}
+              </div>
             </div>
           ) : hasError || sizeData.length === 0 ? (
             <div className='py-8 text-center'>
               <div className='mb-4 text-lg font-medium text-gray-900'>📏</div>
               <div className='mb-2 text-base font-medium text-gray-900'>
-                사이즈 가이드 지원 안함
+                {dictionary.productDetail.sizeGuide.notSupported}
               </div>
               <div className='text-sm text-gray-600'>
-                이 작품은 사이즈 가이드를 지원하지 않습니다.
+                {dictionary.productDetail.sizeGuide.notSupportedDesc}
               </div>
             </div>
           ) : (
@@ -94,7 +100,7 @@ export default function SizeGuideDialog({ open, onOpenChange }: SizeGuideDialogP
                   <thead className='sticky top-0 z-10'>
                     <tr className='bg-gray-50'>
                       <th className='px-4 py-3 text-left text-sm font-medium text-gray-700'>
-                        구역
+                        {dictionary.productDetail.sizeGuide.area}
                       </th>
                       <th className='px-4 py-3 text-center text-sm font-medium text-gray-700'>
                         S (KR 90)
@@ -127,20 +133,24 @@ export default function SizeGuideDialog({ open, onOpenChange }: SizeGuideDialogP
               </div>
 
               <div className='mt-6 rounded-lg bg-blue-50 p-4'>
-                <h4 className='mb-2 text-sm font-medium text-blue-900'>📏 측정 방법</h4>
+                <h4 className='mb-2 text-sm font-medium text-blue-900'>
+                  {dictionary.productDetail.sizeGuide.measurementMethod}
+                </h4>
                 <ul className='space-y-1 text-xs text-blue-800'>
-                  <li>• 평평한 곳에 옷을 펼쳐놓고 측정해주세요</li>
-                  <li>• 신축성이 있는 원단의 경우 자연스럽게 놓인 상태에서 측정</li>
-                  <li>• 모든 수치는 cm 단위입니다</li>
+                  {dictionary.productDetail.sizeGuide.measurementTips.map((tip, index) => (
+                    <li key={index}>• {tip}</li>
+                  ))}
                 </ul>
               </div>
 
               <div className='mt-4 rounded-lg bg-yellow-50 p-4'>
-                <h4 className='mb-2 text-sm font-medium text-yellow-900'>⚠️ 주의사항</h4>
+                <h4 className='mb-2 text-sm font-medium text-yellow-900'>
+                  {dictionary.productDetail.sizeGuide.precautions}
+                </h4>
                 <ul className='space-y-1 text-xs text-yellow-800'>
-                  <li>• 측정 방법에 따라 1-3cm 차이가 날 수 있습니다</li>
-                  <li>• 모니터 환경에 따라 색상이 다르게 보일 수 있습니다</li>
-                  <li>• 세탁 후 약간의 수축이 있을 수 있습니다</li>
+                  {dictionary.productDetail.sizeGuide.precautionsList.map((precaution, index) => (
+                    <li key={index}>• {precaution}</li>
+                  ))}
                 </ul>
               </div>
             </>

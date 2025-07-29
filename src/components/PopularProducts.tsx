@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ProductGrid from '@/components/ProductGrid';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface ApiPopularProduct {
   it_id: string;
@@ -48,9 +49,10 @@ interface PopularProduct {
 
 interface PopularProductsProps {
   excludeProductId?: string; // 현재 상품은 제외
+  dictionary: Dictionary;
 }
 
-export default function PopularProducts({ excludeProductId }: PopularProductsProps) {
+export default function PopularProducts({ excludeProductId, dictionary }: PopularProductsProps) {
   const [products, setProducts] = useState<PopularProduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -119,7 +121,9 @@ export default function PopularProducts({ excludeProductId }: PopularProductsPro
 
   return loading ? (
     <div className='mt-12 border-t border-gray-200 pt-8'>
-      <h2 className='mb-6 text-xl font-bold text-gray-900'>인기 작품</h2>
+      <h2 className='mb-6 text-xl font-bold text-gray-900'>
+        {dictionary.productDetail.popularProducts.title}
+      </h2>
       <div className='grid grid-cols-2 gap-6 md:grid-cols-4'>
         {[...Array(4)].map((_, index) => (
           <div key={index} className='animate-pulse'>
@@ -133,7 +137,9 @@ export default function PopularProducts({ excludeProductId }: PopularProductsPro
     </div>
   ) : error || products.length === 0 ? null : (
     <div className='mt-12 border-t border-gray-200 pt-8'>
-      <h2 className='mb-6 text-xl font-bold text-gray-900'>인기 작품</h2>
+      <h2 className='mb-6 text-xl font-bold text-gray-900'>
+        {dictionary.productDetail.popularProducts.title}
+      </h2>
       <ProductGrid products={products} className='grid-cols-2 md:grid-cols-4' />
     </div>
   );

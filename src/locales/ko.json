@@ -140,5 +140,105 @@
         "space": "공간"
       }
     }
+  },
+  "productDetail": {
+    "loading": {
+      "authCheck": "인증 정보를 확인하는 중...",
+      "productInfo": "작품 정보를 불러오는 중..."
+    },
+    "notFound": "상품을 찾을 수 없습니다",
+    "status": {
+      "fullAndUnderReview": "full & under review",
+      "reviewInProgress": "🔍 현재 심의 진행 중입니다",
+      "reviewInProgressDesc": "심의 완료 후 구매 가능합니다.",
+      "manualReview": "수동 심의",
+      "autoReview": "자동 심의 (목표 달성시 즉시 진행)",
+      "collectingLikes": "📝 좋아요 모집 중입니다",
+      "collectingLikesDesc": "목표 인원 달성시 {{type}} 심의로 진행됩니다.",
+      "reviewCompleted": "✅ 심의가 완료되었습니다",
+      "purchaseAvailable": "구매 가능한 상품입니다.",
+      "daysRemaining": "{{days}}일 후 자동 진행"
+    },
+    "navigation": {
+      "previous": "previous",
+      "next": "next",
+      "noPrevious": "이전 작품 없음",
+      "noNext": "다음 작품 없음"
+    },
+    "price": {
+      "title": "가격 정보",
+      "originalPrice": "시중가격",
+      "salePrice": "판매가격",
+      "basePrice": "기본 가격",
+      "optionPrice": "옵션 추가금액",
+      "quantity": "수량",
+      "totalPrice": "총 금액"
+    },
+    "options": {
+      "title": "옵션 선택",
+      "selectPlaceholder": "{{option}}을(를) 선택해주세요",
+      "selectedOptions": "선택된 옵션",
+      "stock": "재고 {{count}}개",
+      "allOptionsRequired": "⚠️ 모든 옵션을 선택해주세요"
+    },
+    "quantity": {
+      "title": "수량 선택",
+      "label": "구매 수량"
+    },
+    "purchase": {
+      "buyNow": "구매하기",
+      "sizeGuide": "사이즈 가이드 보기"
+    },
+    "sizeGuide": {
+      "title": "사이즈 가이드",
+      "description": "정확한 사이즈 선택을 위한 측정 가이드입니다",
+      "loading": "사이즈 가이드를 불러오는 중...",
+      "notSupported": "사이즈 가이드 지원 안함",
+      "notSupportedDesc": "이 작품은 사이즈 가이드를 지원하지 않습니다.",
+      "area": "구역",
+      "measurementMethod": "📏 측정 방법",
+      "measurementTips": [
+        "평평한 곳에 옷을 펼쳐놓고 측정해주세요",
+        "신축성이 있는 원단의 경우 자연스럽게 놓인 상태에서 측정",
+        "모든 수치는 cm 단위입니다"
+      ],
+      "precautions": "⚠️ 주의사항",
+      "precautionsList": [
+        "측정 방법에 따라 1-3cm 차이가 날 수 있습니다",
+        "모니터 환경에 따라 색상이 다르게 보일 수 있습니다",
+        "세탁 후 약간의 수축이 있을 수 있습니다"
+      ]
+    },
+    "imageMagnifier": {
+      "title": "이미지 확대보기",
+      "instruction": "마우스를 이미지 위에 올려서 확대해보세요"
+    },
+    "description": {
+      "title": "작품 설명",
+      "designer": "디자이너:",
+      "productDetailInfo": "상품 상세 정보"
+    },
+    "magnifier": {
+      "enlargeImage": "이미지 확대보기"
+    },
+    "dialog": {
+      "loginRequired": "로그인 필요",
+      "loginRequiredDesc": "상품 상세 정보를 보시려면 로그인이 필요합니다.",
+      "likeCompleted": "좋아요 등록 완료",
+      "likeCompletedDesc": "고객님은 {{productName}}의 **No. {{orderNumber}}** 컬렉터입니다.\n\n단 몇 명만을 위한 이 창작의 여정에 함께 해주셔서 진심으로 감사드립니다.",
+      "confirm": "확인"
+    },
+    "popularProducts": {
+      "title": "인기 작품"
+    }
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류 발생",
+    "notFound": "페이지를 찾을 수 없습니다",
+    "goHome": "홈으로 돌아가기",
+    "retry": "다시 시도",
+    "login": "로그인",
+    "logout": "로그아웃"
   }
 }

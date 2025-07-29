@@ -140,5 +140,105 @@
         "space": "Space"
       }
     }
+  },
+  "productDetail": {
+    "loading": {
+      "authCheck": "Checking authentication...",
+      "productInfo": "Loading product information..."
+    },
+    "notFound": "Product not found",
+    "status": {
+      "fullAndUnderReview": "full & under review",
+      "reviewInProgress": "🔍 Currently under review",
+      "reviewInProgressDesc": "Available for purchase after review completion.",
+      "manualReview": "Manual review",
+      "autoReview": "Automatic review (proceeds immediately upon goal achievement)",
+      "collectingLikes": "📝 Collecting likes",
+      "collectingLikesDesc": "Will proceed to {{type}} review when target is reached.",
+      "reviewCompleted": "✅ Review completed",
+      "purchaseAvailable": "Available for purchase.",
+      "daysRemaining": "Auto-proceed in {{days}} days"
+    },
+    "navigation": {
+      "previous": "previous",
+      "next": "next",
+      "noPrevious": "No previous product",
+      "noNext": "No next product"
+    },
+    "price": {
+      "title": "Price Information",
+      "originalPrice": "Original Price",
+      "salePrice": "Sale Price",
+      "basePrice": "Base Price",
+      "optionPrice": "Option Additional Cost",
+      "quantity": "Quantity",
+      "totalPrice": "Total Price"
+    },
+    "options": {
+      "title": "Select Options",
+      "selectPlaceholder": "Please select {{option}}",
+      "selectedOptions": "Selected Options",
+      "stock": "{{count}} in stock",
+      "allOptionsRequired": "⚠️ Please select all options"
+    },
+    "quantity": {
+      "title": "Select Quantity",
+      "label": "Purchase Quantity"
+    },
+    "purchase": {
+      "buyNow": "Buy Now",
+      "sizeGuide": "View Size Guide"
+    },
+    "sizeGuide": {
+      "title": "Size Guide",
+      "description": "Measurement guide for accurate size selection",
+      "loading": "Loading size guide...",
+      "notSupported": "Size Guide Not Supported",
+      "notSupportedDesc": "This item does not support size guide.",
+      "area": "Area",
+      "measurementMethod": "📏 Measurement Method",
+      "measurementTips": [
+        "Lay the garment flat and measure",
+        "For stretch fabrics, measure in a natural relaxed state",
+        "All measurements are in cm"
+      ],
+      "precautions": "⚠️ Precautions",
+      "precautionsList": [
+        "Measurements may vary by 1-3cm depending on method",
+        "Colors may appear different depending on monitor settings",
+        "Slight shrinkage may occur after washing"
+      ]
+    },
+    "imageMagnifier": {
+      "title": "Image Magnifier",
+      "instruction": "Hover your mouse over the image to magnify"
+    },
+    "description": {
+      "title": "Product Description",
+      "designer": "Designer:",
+      "productDetailInfo": "Product Detail Information"
+    },
+    "magnifier": {
+      "enlargeImage": "Enlarge Image"
+    },
+    "dialog": {
+      "loginRequired": "Login Required",
+      "loginRequiredDesc": "Please log in to view product details.",
+      "likeCompleted": "Like Registration Completed",
+      "likeCompletedDesc": "You are collector **No. {{orderNumber}}** of {{productName}}.\n\nThank you sincerely for joining this creative journey designed for only a few.",
+      "confirm": "Confirm"
+    },
+    "popularProducts": {
+      "title": "Popular Works"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error Occurred",
+    "notFound": "Page Not Found",
+    "goHome": "Go Home",
+    "retry": "Retry",
+    "login": "Login",
+    "logout": "Logout"
   }
 }
