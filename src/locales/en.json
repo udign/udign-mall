@@ -371,6 +371,91 @@
       "error": {
         "general": "An error occurred while processing your request."
       }
+    },
+    "login": {
+      "title": "Be sure your design",
+      "subtitle": "Your design becomes the highest value.",
+      "fields": {
+        "id": "ID",
+        "password": "Password",
+        "idPlaceholder": "Enter your ID",
+        "passwordPlaceholder": "Enter your password",
+        "required": "*"
+      },
+      "buttons": {
+        "login": "Login",
+        "loggingIn": "Logging in...",
+        "register": "Sign Up"
+      },
+      "autoLogin": {
+        "label": "Auto Login",
+        "confirmTitle": "Auto Login Confirmation",
+        "confirmMessage": "If you use auto login, you won't need to enter your member ID and password next time. However, please refrain from using it in public places as personal information may be leaked. Do you want to use auto login?"
+      },
+      "links": {
+        "forgotPassword": "Find ID/Password"
+      },
+      "errors": {
+        "general": "An error occurred while logging in."
+      }
+    },
+    "register": {
+      "title": "Welcome to UDIGN.",
+      "fields": {
+        "id": "ID",
+        "password": "Password",
+        "passwordConfirm": "Confirm Password",
+        "name": "Name",
+        "phone": "Phone Number",
+        "email": "Email",
+        "birth": "Date of Birth",
+        "required": "*",
+        "idPlaceholder": "Enter your ID",
+        "passwordPlaceholder": "Password (6-15 characters, including uppercase, lowercase, numbers, and special characters)",
+        "passwordConfirmPlaceholder": "Confirm your password",
+        "namePlaceholder": "Enter your name",
+        "phonePlaceholder": "Phone number (without dashes)",
+        "emailPlaceholder": "Enter your email",
+        "birthPlaceholder": "Select your date of birth"
+      },
+      "agreements": {
+        "allAgree": "Agree to all terms",
+        "termsRequired": "Agree to Terms of Service and Required Personal Information Collection",
+        "marketing": "Agree to receive promotional information",
+        "marketingNote": "(Service usage may be limited if not agreed.)"
+      },
+      "buttons": {
+        "register": "Sign Up",
+        "registering": "Signing up...",
+        "loginLink": "Login"
+      },
+      "messages": {
+        "alreadyHaveAccount": "Already have an account?",
+        "ageRestrictionTitle": "Registration Restriction",
+        "ageRestrictionMessage": "Sorry. Only users aged 19 and over can register."
+      },
+      "errors": {
+        "general": "An error occurred during registration.",
+        "termsRequired": "Agreement to Terms of Service and Personal Information Collection is required.",
+        "passwordMismatch": "Password and confirm password do not match.",
+        "passwordRules": "Password must be 6-15 characters and include uppercase, lowercase, numbers, and special characters."
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "subtitle": "Please agree to the terms to use the service.",
+      "allAgree": "Agree to all terms",
+      "termsAgree": "(Required) Agree to Terms of Service",
+      "privacyAgree": "(Required) Agree to Privacy Policy",
+      "viewFull": "View Full Text",
+      "buttons": {
+        "cancel": "Cancel",
+        "createAccount": "Create Account"
+      },
+      "dialog": {
+        "title": "Notice",
+        "message": "Please agree to the required terms."
+      }
     }
   },
   "guide": {

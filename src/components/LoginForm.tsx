@@ -7,8 +7,10 @@ import { Switch } from '@/components/ui/primitives/switch';
 import { Button } from '@/components/ui/primitives/button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { ROUTES } from '@/lib/routes';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface LoginFormProps {
+  dictionary: Dictionary;
   onSuccess?: () => void;
   onSwitchToRegister?: () => void;
 }
@@ -18,7 +20,7 @@ interface LoginFormData {
   password: string;
 }
 
-export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
+export default function LoginForm({ dictionary, onSuccess, onSwitchToRegister }: LoginFormProps) {
   const [formData, setFormData] = useState<LoginFormData>({
     mb_id: '',
     password: '',
@@ -74,7 +76,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
         setError(result.message);
       }
     } catch {
-      setError('로그인 중 오류가 발생했습니다.');
+      setError(dictionary.auth.login.errors.general);
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +86,8 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
     <div className='w-full'>
       <div className='rounded-lg border border-gray-600 bg-black/80 p-8 backdrop-blur-sm'>
         <div className='mb-6'>
-          <h2 className='mb-2 text-2xl font-semibold text-white'>Be sure your design</h2>
-          <p className='text-base text-gray-300'>여러분의 디자인은 최고의 가치가 됩니다.</p>
+          <h2 className='mb-2 text-2xl font-semibold text-white'>{dictionary.auth.login.title}</h2>
+          <p className='text-base text-gray-300'>{dictionary.auth.login.subtitle}</p>
         </div>
 
         {error && (
@@ -97,14 +99,15 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_id'>
-              아이디 <span className='text-red-400'>*</span>
+              {dictionary.auth.login.fields.id}{' '}
+              <span className='text-red-400'>{dictionary.auth.login.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_id'
               name='mb_id'
               type='text'
-              placeholder='아이디'
+              placeholder={dictionary.auth.login.fields.idPlaceholder}
               value={formData.mb_id}
               onChange={handleChange}
               required
@@ -113,14 +116,15 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='password'>
-              비밀번호 <span className='text-red-400'>*</span>
+              {dictionary.auth.login.fields.password}{' '}
+              <span className='text-red-400'>{dictionary.auth.login.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='password'
               name='password'
               type='password'
-              placeholder='비밀번호'
+              placeholder={dictionary.auth.login.fields.passwordPlaceholder}
               value={formData.password}
               onChange={handleChange}
               required
@@ -133,7 +137,9 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
             disabled={isLoading}
             variant={isAllFieldsFilled ? 'default' : 'secondary'}
           >
-            {isLoading ? '로그인 중...' : '로그인'}
+            {isLoading
+              ? dictionary.auth.login.buttons.loggingIn
+              : dictionary.auth.login.buttons.login}
           </Button>
 
           <div className='flex items-center justify-between text-sm'>
@@ -143,11 +149,11 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
                 onCheckedChange={handleAutoLoginToggle}
                 className='mr-2'
               />
-              <span>자동로그인</span>
+              <span>{dictionary.auth.login.autoLogin.label}</span>
             </div>
             <div className='text-gray-300'>
               <Link href={ROUTES.FORGOT_PASSWORD} className='cursor-pointer hover:text-white'>
-                아이디/비밀번호 찾기
+                {dictionary.auth.login.links.forgotPassword}
               </Link>
               <span className='mx-2'>|</span>
               {onSwitchToRegister && (
@@ -157,7 +163,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
                   variant='link'
                   className='h-auto p-0 text-gray-300 hover:text-white'
                 >
-                  회원가입
+                  {dictionary.auth.login.buttons.register}
                 </Button>
               )}
             </div>
@@ -168,8 +174,10 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
       <ConfirmDialog
         open={showAutoLoginDialog}
         onOpenChange={setShowAutoLoginDialog}
-        title='자동로그인 사용 확인'
-        description='자동로그인을 사용하시면 다음부터 회원아이디와 패스워드를 입력하실 필요가 없습니다. 그러나 공공장소에서는 개인정보가 유출될 수 있으니 사용을 자제하여 주십시오. 자동로그인을 사용하시겠습니까?'
+        title={dictionary.auth.login.autoLogin.confirmTitle}
+        description={dictionary.auth.login.autoLogin.confirmMessage}
+        confirmText={dictionary.common.confirm}
+        cancelText={dictionary.common.cancel}
         onConfirm={handleAutoLoginConfirm}
         onCancel={handleAutoLoginCancel}
       />

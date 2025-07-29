@@ -1,30 +1,14 @@
-'use client';
+import { getDictionary } from '@/lib/dictionaries';
+import { Locale } from '../../../../../i18n.config';
+import RegisterPageClient from '@/components/RegisterPageClient';
 
-import { useRouter } from 'next/navigation';
-import RegisterForm from '@/components/RegisterForm';
-import { ROUTES } from '@/lib/routes';
+interface RegisterPageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-export default function RegisterPage() {
-  const router = useRouter();
+export default async function RegisterPage({ params }: RegisterPageProps) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
 
-  const handleAuthSuccess = () => router.push(ROUTES.HOME);
-
-  return (
-    <div
-      className='flex min-h-screen flex-col bg-cover bg-fixed bg-center bg-no-repeat'
-      style={{
-        backgroundImage: 'url(/images/auth-bg.png)',
-        backgroundColor: '#1a2332',
-      }}
-    >
-      <div className='relative z-10 mt-10 flex flex-1 justify-center p-4'>
-        <div className='w-full max-w-lg'>
-          <RegisterForm
-            onSuccess={handleAuthSuccess}
-            onSwitchToLogin={() => router.push(ROUTES.LOGIN)}
-          />
-        </div>
-      </div>
-    </div>
-  );
+  return <RegisterPageClient dictionary={dictionary} />;
 }

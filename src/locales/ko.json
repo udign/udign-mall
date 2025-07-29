@@ -62,6 +62,91 @@
       "error": {
         "general": "요청 처리 중 오류가 발생했습니다."
       }
+    },
+    "login": {
+      "title": "Be sure your design",
+      "subtitle": "여러분의 디자인은 최고의 가치가 됩니다.",
+      "fields": {
+        "id": "아이디",
+        "password": "비밀번호",
+        "idPlaceholder": "아이디",
+        "passwordPlaceholder": "비밀번호",
+        "required": "*"
+      },
+      "buttons": {
+        "login": "로그인",
+        "loggingIn": "로그인 중...",
+        "register": "회원가입"
+      },
+      "autoLogin": {
+        "label": "자동로그인",
+        "confirmTitle": "자동로그인 사용 확인",
+        "confirmMessage": "자동로그인을 사용하시면 다음부터 회원아이디와 패스워드를 입력하실 필요가 없습니다. 그러나 공공장소에서는 개인정보가 유출될 수 있으니 사용을 자제하여 주십시오. 자동로그인을 사용하시겠습니까?"
+      },
+      "links": {
+        "forgotPassword": "아이디/비밀번호 찾기"
+      },
+      "errors": {
+        "general": "로그인 중 오류가 발생했습니다."
+      }
+    },
+    "register": {
+      "title": "유다인에 오신 것을 환영합니다.",
+      "fields": {
+        "id": "아이디",
+        "password": "비밀번호",
+        "passwordConfirm": "비밀번호 확인",
+        "name": "이름",
+        "phone": "휴대폰번호",
+        "email": "이메일",
+        "birth": "생년월일",
+        "required": "*",
+        "idPlaceholder": "아이디",
+        "passwordPlaceholder": "비밀번호(6~15자 이내 영문(대소문자), 숫자, 특수문자 조합)",
+        "passwordConfirmPlaceholder": "비밀번호 확인",
+        "namePlaceholder": "이름",
+        "phonePlaceholder": "휴대폰 번호(- 제외 입력)",
+        "emailPlaceholder": "E-mail",
+        "birthPlaceholder": "생년월일을 선택하세요"
+      },
+      "agreements": {
+        "allAgree": "모든 항목에 동의",
+        "termsRequired": "이용약관 및 필수 개인정보 수집에 대한 동의",
+        "marketing": "광고성 정보 수신에 대한 동의",
+        "marketingNote": "(미 동의시 서비스 이용에 제한이 있을 수도 있습니다.)"
+      },
+      "buttons": {
+        "register": "회원가입",
+        "registering": "가입 중...",
+        "loginLink": "로그인"
+      },
+      "messages": {
+        "alreadyHaveAccount": "이미 계정이 있으신가요?",
+        "ageRestrictionTitle": "회원가입 제한",
+        "ageRestrictionMessage": "죄송합니다. 만 19세 이상만 회원가입이 가능합니다."
+      },
+      "errors": {
+        "general": "회원가입 중 오류가 발생했습니다.",
+        "termsRequired": "이용약관 및 개인정보 수집 동의는 필수입니다.",
+        "passwordMismatch": "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+        "passwordRules": "비밀번호는 6~15자 이내 영문(대소문자), 숫자, 특수문자를 모두 포함해야 합니다."
+      }
+    },
+    "terms": {
+      "title": "이용약관",
+      "subtitle": "서비스 이용을 위해 약관에 동의해주세요.",
+      "allAgree": "이용약관 전체 동의",
+      "termsAgree": "(필수)회원가입약관 동의",
+      "privacyAgree": "(필수)개인정보 처리방침 안내 동의",
+      "viewFull": "전문",
+      "buttons": {
+        "cancel": "취소",
+        "createAccount": "신규계정 생성"
+      },
+      "dialog": {
+        "title": "알림",
+        "message": "필수 약관에 동의해주세요."
+      }
     }
   },
   "guide": {
