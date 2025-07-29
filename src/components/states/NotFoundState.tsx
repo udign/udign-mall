@@ -17,9 +17,7 @@ export default function NotFoundState({
 }: NotFoundStateProps) {
   const router = useRouter();
 
-  const handleGoHome = () => {
-    router.push(ROUTES.HOME);
-  };
+  const handleGoHome = () => router.push(ROUTES.HOME);
 
   const containerClass = 'flex min-h-[32rem] items-center justify-center py-24';
 

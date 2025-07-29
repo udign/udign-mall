@@ -16,15 +16,18 @@ import {
 } from '@/components/ui/primitives/sheet';
 import { Separator } from '@/components/ui/primitives/separator';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface TodayViewedProductsSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  dictionary: Dictionary;
 }
 
 export default function TodayViewedProductsSidebar({
   isOpen,
   onClose,
+  dictionary,
 }: TodayViewedProductsSidebarProps) {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
@@ -55,15 +58,15 @@ export default function TodayViewedProductsSidebar({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side='right' className='w-96 p-0 [&>button]:hidden'>
         <SheetHeader className='sr-only'>
-          <SheetTitle>오늘 본 작품</SheetTitle>
-          <SheetDescription>오늘 확인한 작품 목록을 표시합니다.</SheetDescription>
+          <SheetTitle>{dictionary.sidebar.todayViewed.title}</SheetTitle>
+          <SheetDescription>{dictionary.sidebar.todayViewed.description}</SheetDescription>
         </SheetHeader>
 
         <div className='flex h-full flex-col'>
           <div className='flex items-center justify-between border-b p-4'>
             <div className='flex items-center gap-2'>
               <ShoppingBag className='h-5 w-5 text-gray-600' />
-              <h2 className='text-lg font-semibold'>오늘 본 작품</h2>
+              <h2 className='text-lg font-semibold'>{dictionary.sidebar.todayViewed.title}</h2>
               <span className='rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600'>
                 {viewedProducts.length}
               </span>
@@ -81,13 +84,18 @@ export default function TodayViewedProductsSidebar({
             ) : viewedProducts.length === 0 ? (
               <div className='flex flex-col items-center justify-center p-8 text-center'>
                 <ShoppingBag className='mb-2 h-12 w-12 text-gray-300' />
-                <h3 className='mb-2 text-lg font-medium text-gray-900'>아직 본 작품이 없습니다</h3>
+                <h3 className='mb-2 text-lg font-medium text-gray-900'>
+                  {dictionary.sidebar.todayViewed.empty}
+                </h3>
               </div>
             ) : (
               <div className='space-y-1 p-4'>
                 <div className='mb-3 flex items-center justify-between'>
                   <p className='text-sm text-gray-600'>
-                    최근 확인한 작품 {viewedProducts.length}개
+                    {dictionary.sidebar.todayViewed.recentCount.replace(
+                      '{{count}}',
+                      viewedProducts.length.toString(),
+                    )}
                   </p>
                   <Button
                     variant='ghost'
@@ -95,7 +103,7 @@ export default function TodayViewedProductsSidebar({
                     onClick={handleClearAll}
                     className='text-xs text-red-500 hover:text-red-700'
                   >
-                    전체 삭제
+                    {dictionary.sidebar.todayViewed.clearAll}
                   </Button>
                 </div>
 
@@ -118,7 +126,9 @@ export default function TodayViewedProductsSidebar({
                             />
                           ) : (
                             <div className='flex h-full w-full items-center justify-center bg-gray-200'>
-                              <span className='text-xs text-gray-400'>이미지 없음</span>
+                              <span className='text-xs text-gray-400'>
+                                {dictionary.sidebar.todayViewed.noImage}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -154,7 +164,7 @@ export default function TodayViewedProductsSidebar({
               <Separator />
               <div className='p-4'>
                 <p className='text-center text-xs text-gray-500'>
-                  상품은 하루 동안 최대 {10}개까지 저장됩니다
+                  {dictionary.sidebar.todayViewed.storageInfo.replace('{{max}}', '10')}
                 </p>
               </div>
             </>

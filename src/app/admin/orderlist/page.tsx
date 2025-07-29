@@ -104,7 +104,7 @@ export default function OrderListPage() {
     }
 
     if (!PERMISSION_CHECKS.isAdmin(user.mb_level)) {
-      router.push(ROUTES.HOME);
+      router.push(ROUTES.SHOP);
       return;
     }
   }, [user, authLoading, router]);

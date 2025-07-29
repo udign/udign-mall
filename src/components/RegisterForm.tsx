@@ -8,9 +8,11 @@ import { Calendar } from '@/components/ui/primitives/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/primitives/popover';
 import { CalendarIcon } from 'lucide-react';
 import MessageDialog from '@/components/ui/MessageDialog';
+import { Dictionary } from '@/lib/dictionaries';
 import dayjs from 'dayjs';
 
 interface RegisterFormProps {
+  dictionary: Dictionary;
   onSuccess?: () => void;
   onSwitchToLogin?: () => void;
 }
@@ -47,7 +49,11 @@ const formatDateDisplay = (dateStr: string): string => {
   return dayjs(dateStr).format('YYYY년 MM월 DD일');
 };
 
-export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) {
+export default function RegisterForm({
+  dictionary,
+  onSuccess,
+  onSwitchToLogin,
+}: RegisterFormProps) {
   const [formData, setFormData] = useState<RegisterFormData>({
     mb_id: '',
     mb_password: '',
@@ -145,13 +151,13 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
     // 필수 동의 항목 체크
     if (!agreements.termsAgree) {
-      setError('이용약관 및 개인정보 수집 동의는 필수입니다.');
+      setError(dictionary.auth.register.errors.termsRequired);
       setIsLoading(false);
       return;
     }
 
     if (formData.mb_password !== formData.mb_password_confirm) {
-      setError('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+      setError(dictionary.auth.register.errors.passwordMismatch);
       setIsLoading(false);
       return;
     }
@@ -159,7 +165,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     // 비밀번호 규칙 검사
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,15}$/;
     if (!passwordRegex.test(formData.mb_password)) {
-      setError('비밀번호는 6~15자 이내 영문(대소문자), 숫자, 특수문자를 모두 포함해야 합니다.');
+      setError(dictionary.auth.register.errors.passwordRules);
       setIsLoading(false);
       return;
     }
@@ -182,7 +188,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
         setError(result.message);
       }
     } catch {
-      setError('회원가입 중 오류가 발생했습니다.');
+      setError(dictionary.auth.register.errors.general);
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +199,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
       <div className='rounded-lg border border-gray-600 bg-black/80 p-8 backdrop-blur-sm'>
         <div className='mb-6'>
           <h2 className='mb-2 text-center text-2xl font-semibold text-white'>
-            유다인에 오신 것을 환영합니다.
+            {dictionary.auth.register.title}
           </h2>
         </div>
 
@@ -206,14 +212,15 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_id'>
-              아이디 <span className='text-red-400'>*</span>
+              {dictionary.auth.register.fields.id}{' '}
+              <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_id'
               name='mb_id'
               type='text'
-              placeholder='아이디'
+              placeholder={dictionary.auth.register.fields.idPlaceholder}
               value={formData.mb_id}
               onChange={handleChange}
               required
@@ -222,14 +229,15 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_password'>
-              비밀번호 <span className='text-red-400'>*</span>
+              {dictionary.auth.register.fields.password}{' '}
+              <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_password'
               name='mb_password'
               type='password'
-              placeholder='비밀번호(6~15자 이내 영문(대소문자), 숫자, 특수문자 조합)'
+              placeholder={dictionary.auth.register.fields.passwordPlaceholder}
               value={formData.mb_password}
               onChange={handleChange}
               required
@@ -238,14 +246,15 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_password_confirm'>
-              비밀번호 확인 <span className='text-red-400'>*</span>
+              {dictionary.auth.register.fields.passwordConfirm}{' '}
+              <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_password_confirm'
               name='mb_password_confirm'
               type='password'
-              placeholder='비밀번호 확인'
+              placeholder={dictionary.auth.register.fields.passwordConfirmPlaceholder}
               value={formData.mb_password_confirm}
               onChange={handleChange}
               required
@@ -254,14 +263,15 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_name'>
-              이름 <span className='text-red-400'>*</span>
+              {dictionary.auth.register.fields.name}{' '}
+              <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_name'
               name='mb_name'
               type='text'
-              placeholder='이름'
+              placeholder={dictionary.auth.register.fields.namePlaceholder}
               value={formData.mb_name}
               onChange={handleChange}
               required
@@ -270,14 +280,15 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_hp'>
-              휴대폰번호 <span className='text-red-400'>*</span>
+              {dictionary.auth.register.fields.phone}{' '}
+              <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_hp'
               name='mb_hp'
               type='tel'
-              placeholder='휴대폰 번호(- 제외 입력)'
+              placeholder={dictionary.auth.register.fields.phonePlaceholder}
               value={formData.mb_hp}
               onChange={handleChange}
               required
@@ -286,14 +297,15 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_email'>
-              이메일 <span className='text-red-400'>*</span>
+              {dictionary.auth.register.fields.email}{' '}
+              <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_email'
               name='mb_email'
               type='email'
-              placeholder='E-mail'
+              placeholder={dictionary.auth.register.fields.emailPlaceholder}
               value={formData.mb_email}
               onChange={handleChange}
               required
@@ -302,7 +314,8 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_birth'>
-              생년월일 <span className='text-red-400'>*</span>
+              {dictionary.auth.register.fields.birth}{' '}
+              <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
             </label>
             <Popover>
               <PopoverTrigger asChild>
@@ -313,7 +326,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
                   <CalendarIcon className='mr-2 h-4 w-4' />
                   {formData.mb_birth
                     ? formatDateDisplay(formData.mb_birth)
-                    : '생년월일을 선택하세요'}
+                    : dictionary.auth.register.fields.birthPlaceholder}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className='w-auto p-0'>
@@ -338,7 +351,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
           <div className='space-y-4 border-t border-gray-600 pt-6'>
             <div className='flex items-center justify-between rounded-lg bg-gray-800/50 p-4'>
               <label className='flex-1 cursor-pointer text-sm font-medium text-white'>
-                모든 항목에 동의
+                {dictionary.auth.register.agreements.allAgree}
               </label>
               <Switch
                 checked={agreements.allAgree}
@@ -349,7 +362,8 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             <div className='space-y-3 px-4'>
               <div className='flex items-center justify-between'>
                 <label className='flex-1 cursor-pointer text-sm text-gray-300'>
-                  이용약관 및 필수 개인정보 수집에 대한 동의 <span className='text-red-400'>*</span>
+                  {dictionary.auth.register.agreements.termsRequired}{' '}
+                  <span className='text-red-400'>{dictionary.auth.register.fields.required}</span>
                 </label>
                 <Switch
                   checked={agreements.termsAgree}
@@ -360,10 +374,10 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
               <div className='flex items-center justify-between'>
                 <div className='flex-1'>
                   <label className='cursor-pointer text-sm text-gray-300'>
-                    광고성 정보 수신에 대한 동의
+                    {dictionary.auth.register.agreements.marketing}
                   </label>
                   <p className='mt-1 text-xs text-gray-400'>
-                    (미 동의시 서비스 이용에 제한이 있을 수도 있습니다.)
+                    {dictionary.auth.register.agreements.marketingNote}
                   </p>
                 </div>
                 <Switch
@@ -380,11 +394,13 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             disabled={isLoading || !isAllFieldsFilled || !isRequiredAgreementsFilled}
             variant={isAllFieldsFilled && isRequiredAgreementsFilled ? 'default' : 'secondary'}
           >
-            {isLoading ? '가입 중...' : '회원가입'}
+            {isLoading
+              ? dictionary.auth.register.buttons.registering
+              : dictionary.auth.register.buttons.register}
           </Button>
 
           <div className='text-center text-sm text-gray-300'>
-            이미 계정이 있으신가요?{' '}
+            {dictionary.auth.register.messages.alreadyHaveAccount}{' '}
             {onSwitchToLogin && (
               <Button
                 type='button'
@@ -392,7 +408,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
                 variant='link'
                 className='hover:text-primary h-auto p-0 font-medium text-white'
               >
-                로그인
+                {dictionary.auth.register.buttons.loginLink}
               </Button>
             )}
           </div>
@@ -402,9 +418,10 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
       <MessageDialog
         open={showAgeDialog}
         onOpenChange={setShowAgeDialog}
-        title='회원가입 제한'
-        description='죄송합니다. 만 19세 이상만 회원가입이 가능합니다.'
-        confirmText='확인'
+        title={dictionary.auth.register.messages.ageRestrictionTitle}
+        description={dictionary.auth.register.messages.ageRestrictionMessage}
+        confirmText={dictionary.common.confirm}
+        dictionary={dictionary}
       />
     </div>
   );

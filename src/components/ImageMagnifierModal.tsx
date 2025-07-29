@@ -8,12 +8,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/primitives/dialog';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface ImageMagnifierModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   imageUrl: string;
   productName: string;
+  dictionary: Dictionary;
 }
 
 interface MagnifierPosition {
@@ -29,6 +31,7 @@ export default function ImageMagnifierModal({
   onOpenChange,
   imageUrl,
   productName,
+  dictionary,
 }: ImageMagnifierModalProps) {
   const [showMagnifier, setShowMagnifier] = useState<boolean>(false);
   const [magnifierPosition, setMagnifierPosition] = useState<MagnifierPosition>({
@@ -77,7 +80,9 @@ export default function ImageMagnifierModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-w-4xl p-6'>
         <DialogHeader>
-          <DialogTitle>{productName} - 이미지 확대보기</DialogTitle>
+          <DialogTitle>
+            {productName} - {dictionary.productDetail.imageMagnifier.title}
+          </DialogTitle>
         </DialogHeader>
 
         <div className='relative'>
@@ -111,7 +116,7 @@ export default function ImageMagnifierModal({
           </div>
 
           <div className='mt-4 text-center text-sm text-gray-600'>
-            마우스를 이미지 위에 올려서 확대해보세요
+            {dictionary.productDetail.imageMagnifier.instruction}
           </div>
         </div>
       </DialogContent>

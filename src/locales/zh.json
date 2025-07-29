@@ -1,0 +1,942 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "发生错误",
+    "retry": "重试",
+    "upload": "上传",
+    "search": "搜索",
+    "all": "全部",
+    "login": "登录",
+    "logout": "注销",
+    "register": "注册",
+    "profile": "个人信息",
+    "close": "关闭",
+    "confirm": "确认",
+    "cancel": "取消",
+    "goHome": "返回首页",
+    "noData": "暂无数据"
+  },
+  "shop": {
+    "title": "购物商城",
+    "uploadProduct": "设计上传",
+    "categories": {
+      "all": "全部",
+      "fashion": "时尚",
+      "shoes": "鞋类",
+      "others": "其他",
+      "accessory": "配饰",
+      "home": "家居装饰",
+      "beauty": "美妆",
+      "art": "艺术作品",
+      "digital": "数码",
+      "lifestyle": "生活方式"
+    },
+    "noProducts": "暂无注册作品",
+    "loadMore": "正在加载更多作品...",
+    "allLoaded": "已加载所有作品",
+    "loadingProducts": "正在加载作品...",
+    "designDescription": "选择专属于您的设计。打造最完美的礼品。",
+    "loginRequired": "设计上传",
+    "loginRequiredMessage": "上传设计需要登录。",
+    "goToLogin": "前往登录"
+  },
+  "auth": {
+    "forgotPassword": {
+      "title": "找回账号/密码",
+      "description": "请输入注册时填写的邮箱地址。",
+      "descriptionLine2": "我们将向该邮箱发送账号和密码信息。",
+      "emailLabel": "邮箱地址",
+      "emailPlaceholder": "请输入邮箱地址",
+      "required": "*",
+      "sendButton": "发送验证邮件",
+      "sendingButton": "处理中...",
+      "backToLogin": "返回登录",
+      "success": {
+        "title": "邮件发送完成",
+        "message": "验证会员账号和密码的邮件已发送至 {{email}}。",
+        "checkEmail": "请查收邮件。",
+        "checkSpam": "如果在邮箱中没有看到邮件，请检查垃圾邮件文件夹。",
+        "backToLogin": "返回登录",
+        "tryAgain": "重新尝试"
+      },
+      "error": {
+        "general": "处理请求时发生错误。"
+      }
+    },
+    "login": {
+      "title": "Be sure your design",
+      "subtitle": "您的设计将成为最高价值。",
+      "fields": {
+        "id": "账号",
+        "password": "密码",
+        "idPlaceholder": "账号",
+        "passwordPlaceholder": "密码",
+        "required": "*"
+      },
+      "buttons": {
+        "login": "登录",
+        "loggingIn": "登录中...",
+        "register": "注册"
+      },
+      "autoLogin": {
+        "label": "自动登录",
+        "confirmTitle": "自动登录使用确认",
+        "confirmMessage": "使用自动登录后，下次无需输入会员账号和密码。但在公共场所可能泄露个人信息，请谨慎使用。是否使用自动登录？"
+      },
+      "links": {
+        "forgotPassword": "找回账号/密码"
+      },
+      "errors": {
+        "general": "登录时发生错误。"
+      }
+    },
+    "register": {
+      "title": "欢迎来到UDIGN。",
+      "fields": {
+        "id": "账号",
+        "password": "密码",
+        "passwordConfirm": "确认密码",
+        "name": "姓名",
+        "phone": "手机号码",
+        "email": "邮箱",
+        "birth": "出生日期",
+        "required": "*",
+        "idPlaceholder": "账号",
+        "passwordPlaceholder": "密码（6-15位英文大小写、数字、特殊字符组合）",
+        "passwordConfirmPlaceholder": "确认密码",
+        "namePlaceholder": "姓名",
+        "phonePlaceholder": "手机号码（不含-）",
+        "emailPlaceholder": "E-mail",
+        "birthPlaceholder": "请选择出生日期"
+      },
+      "agreements": {
+        "allAgree": "同意所有条款",
+        "termsRequired": "同意使用条款及必要个人信息收集",
+        "marketing": "同意接收广告信息",
+        "marketingNote": "（不同意可能限制服务使用。）"
+      },
+      "buttons": {
+        "register": "注册",
+        "registering": "注册中...",
+        "loginLink": "登录"
+      },
+      "messages": {
+        "alreadyHaveAccount": "已有账户？",
+        "ageRestrictionTitle": "注册限制",
+        "ageRestrictionMessage": "抱歉，仅限19岁以上注册。"
+      },
+      "errors": {
+        "general": "注册时发生错误。",
+        "termsRequired": "必须同意使用条款及个人信息收集。",
+        "passwordMismatch": "密码与确认密码不一致。",
+        "passwordRules": "密码必须包含6-15位英文大小写、数字、特殊字符。"
+      }
+    },
+    "terms": {
+      "title": "使用条款",
+      "subtitle": "请同意条款以使用服务。",
+      "allAgree": "同意所有使用条款",
+      "termsAgree": "（必须）同意会员注册条款",
+      "privacyAgree": "（必须）同意个人信息处理方针说明",
+      "viewFull": "全文",
+      "buttons": {
+        "cancel": "取消",
+        "createAccount": "创建新账户"
+      },
+      "dialog": {
+        "title": "提示",
+        "message": "请同意必要条款。"
+      }
+    }
+  },
+  "guide": {
+    "title": "使用指南",
+    "progressInfo": "UDIGN的所有进度可在MY UDIGN中查看。",
+    "myUdign": "MY UDIGN",
+    "steps": {
+      "designLike": "设计点赞",
+      "productionReview": "制作审核",
+      "purchaseProgress": "购买进行",
+      "orderConfirmation": "订单确认",
+      "productManufacturing": "商品制作",
+      "deliveryProgress": "配送进行",
+      "receiptComplete": "收货完成"
+    },
+    "sections": {
+      "section1": {
+        "title": "1. 请为喜欢的设计点赞♥～",
+        "content1": "当选择的设计\"点赞♥\"达到规定数量时，将通过制作审核获得制作成商品的机会。（限量制作）",
+        "content2": "按照\"点赞♥\"的顺序获得限量的唯一编号，该编号将延续为后续制作商品的唯一编号。",
+        "note": "（制作审核阶段前可取消点赞。）"
+      },
+      "section2": {
+        "title": "2. 制作审核阶段的设计由UDIGN进行商品制作可行性审核及整体商品化准备。",
+        "content": "作为商品化准备过程进行内部审核。但根据设计的内外部要求，制作进行可能困难，不可理由将单独说明。"
+      },
+      "section3": {
+        "title": "3. 制作确定及商品化准备完成后，设计详情页面将变更为商品购买页面，可进行支付。",
+        "content1": "随着购买指导消息，MY UDIGN中购买按钮将激活。点击购买按钮移动到购买页面，确认商品说明及配送相关内容后进行支付即订单确认!!",
+        "content2": "您是商品的第N位主人!!"
+      },
+      "section4": {
+        "title": "4. 支付全部到齐的订单确认阶段。",
+        "content1": "在购买支付全部进行的一定期间中，可在订单确认阶段取消订单。（※制作中无法取消。）",
+        "content2": "订单取消时，无法再次购买且商品唯一编号也将删除，请慎重选择。",
+        "content3": "如因后续发现的设计问题等部分因素导致制作进行困难，将单独说明并立即退款。"
+      },
+      "section5": {
+        "title": "5. 全部支付OK！制作仅限点赞♥会员的商品。UDIGN let's go!",
+        "content": "由于UDIGN追求限量、最高品质，制作期间可能较长，敬请谅解。我们将用热情回报您!!"
+      },
+      "section6": {
+        "title": "6. 制作完成后，检验、包装后迅速发往客户家中。",
+        "content1": "感谢您的等待。制作完成后，通过专业物流团队包装出货，快递配送。",
+        "content2": "基本配送所需时间按相应快递公司的配送所需时间标准，可能因地区、天气、快递公司情况而有差异，请务必参考～"
+      },
+      "section7": {
+        "title": "7. 配送完成及商品确认后确认购买，MY UDIGN的所有过程结束!!",
+        "content1": "收到商品后请立即确认状态，务必确认购买。",
+        "content2": "如需进行交换/退货，请连同理由申请，我们将协助快速进行。",
+        "content3": "但由于UDIGN商品的限定订单制作和追求最高品质的特性，一定期间过后可能无法处理退货、交换。",
+        "content4": "请务必参考以下说明事项。",
+        "notes": {
+          "note1": "所有交换退货费用免费。",
+          "note2": "退货确定后，会员的相应商品序列号（唯一编号）将删除。",
+          "note3": "交换进行时，商品序列号（唯一编号）保持不变。"
+        }
+      }
+    }
+  },
+  "language": {
+    "select": "选择语言",
+    "korean": "한국어",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "changeLanguage": "是否更换语言？",
+    "languageChanged": "语言已更换"
+  },
+  "header": {
+    "admin": "管理员",
+    "editProfile": "修改会员信息",
+    "loginRequired": "需要登录",
+    "loginRequiredDesc": "使用此功能需要登录。",
+    "purchaseAvailable": "有{{count}}件可购买商品。"
+  },
+  "footer": {
+    "aboutUdign": "about UDIGN",
+    "userGuide": "使用指南",
+    "termsOfUse": "使用条款",
+    "privacyPolicy": "个人信息处理方针",
+    "vendorPage": "供应商页面",
+    "copyrightReport": "版权举报",
+    "company": {
+      "representative": "代表",
+      "phone": "电话",
+      "fax": "传真",
+      "address": "营业地址",
+      "addressValue": "首尔市恩平区镇关3路32，恩平新城公园塔B栋6层618号",
+      "businessNumber": "营业执照号",
+      "ecommerceNumber": "通信销售业申报号",
+      "privacyManager": "个人信息管理负责人",
+      "email": "E-MAIL"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "phone": "1577-4215",
+      "operatingHours": "营业时间：平日 09:00 ～ 17:00",
+      "lunchTime": "午休时间：平日 12:00 ～ 13:00",
+      "holiday": "周六、周日 / 节假日休息",
+      "followUs": "Follow Us"
+    }
+  },
+  "sidebar": {
+    "todayViewed": {
+      "title": "今日浏览作品",
+      "description": "显示今日查看的作品列表。",
+      "empty": "还没有浏览过作品",
+      "recentCount": "最近查看的作品{{count}}件",
+      "clearAll": "全部删除",
+      "noImage": "无图片",
+      "storageInfo": "商品每日最多保存{{max}}件"
+    },
+    "search": {
+      "title": "作品搜索",
+      "description": "可以搜索作品。",
+      "placeholder": "搜索您要找的作品",
+      "button": "搜索",
+      "hint": "可通过作品名、作者名等搜索"
+    },
+    "navigation": {
+      "menu": "菜单",
+      "description": "网站导航菜单",
+      "category": "CATEGORY",
+      "siteMenu": "SITE MENU",
+      "aboutUs": "ABOUT US",
+      "all": "全部",
+      "vendorPage": "供应商页面",
+      "copyrightReport": "版权举报",
+      "siteIntro": "网站介绍",
+      "serviceTerms": "服务使用条款",
+      "privacyPolicy": "个人信息处理方针",
+      "designUpload": "设计上传",
+      "userGuide": "使用指南",
+      "categories": {
+        "fashion": "时尚",
+        "shoes": "鞋类",
+        "others": "其他",
+        "men": "男性",
+        "women": "女性"
+      },
+      "fashionItems": {
+        "top": "上衣",
+        "bottom": "下装",
+        "outer": "外套",
+        "product": "产品",
+        "space": "空间"
+      },
+      "shoeItems": {
+        "sneakers": "运动鞋",
+        "dressShoes": "皮鞋/休闲鞋",
+        "walker": "步行鞋",
+        "sandals": "凉鞋/拖鞋",
+        "rainBoots": "雨靴",
+        "boots": "靴子"
+      },
+      "otherItems": {
+        "top": "上衣",
+        "bottom": "下装",
+        "graphic": "图形",
+        "product": "产品",
+        "space": "空间"
+      }
+    }
+  },
+  "productDetail": {
+    "loading": {
+      "authCheck": "正在确认认证信息...",
+      "productInfo": "正在加载作品信息..."
+    },
+    "notFound": "找不到商品",
+    "status": {
+      "fullAndUnderReview": "full & under review",
+      "reviewInProgress": "🔍 目前正在进行审议",
+      "reviewInProgressDesc": "审议完成后可购买。",
+      "manualReview": "手动审议",
+      "autoReview": "自动审议（达成目标时立即进行）",
+      "collectingLikes": "📝 正在征集点赞",
+      "collectingLikesDesc": "达成目标人数时以{{type}}审议进行。",
+      "reviewCompleted": "✅ 审议已完成",
+      "purchaseAvailable": "可购买商品。",
+      "daysRemaining": "{{days}}天后自动进行"
+    },
+    "navigation": {
+      "previous": "previous",
+      "next": "next",
+      "noPrevious": "无上一作品",
+      "noNext": "无下一作品"
+    },
+    "price": {
+      "title": "价格信息",
+      "originalPrice": "市场价格",
+      "salePrice": "销售价格",
+      "basePrice": "基本价格",
+      "optionPrice": "选项追加金额",
+      "quantity": "数量",
+      "totalPrice": "总金额"
+    },
+    "options": {
+      "title": "选择选项",
+      "selectPlaceholder": "请选择{{option}}",
+      "selectedOptions": "已选择选项",
+      "stock": "库存{{count}}件",
+      "allOptionsRequired": "⚠️ 请选择所有选项"
+    },
+    "quantity": {
+      "title": "选择数量",
+      "label": "购买数量"
+    },
+    "purchase": {
+      "buyNow": "购买",
+      "sizeGuide": "查看尺寸指南"
+    },
+    "sizeGuide": {
+      "title": "尺寸指南",
+      "description": "准确选择尺寸的测量指南",
+      "loading": "正在加载尺寸指南...",
+      "notSupported": "不支持尺寸指南",
+      "notSupportedDesc": "此作品不支持尺寸指南。",
+      "area": "区域",
+      "measurementMethod": "📏 测量方法",
+      "measurementTips": [
+        "请在平坦的地方展开衣服测量",
+        "有弹性的面料请在自然放置状态下测量",
+        "所有数值单位为cm"
+      ],
+      "precautions": "⚠️ 注意事项",
+      "precautionsList": [
+        "根据测量方法可能有1-3cm差异",
+        "根据显示器环境颜色可能看起来不同",
+        "洗涤后可能有轻微收缩"
+      ]
+    },
+    "imageMagnifier": {
+      "title": "图片放大查看",
+      "instruction": "将鼠标移至图片上放大查看"
+    },
+    "description": {
+      "title": "作品说明",
+      "designer": "设计师：",
+      "productDetailInfo": "商品详细信息"
+    },
+    "magnifier": {
+      "enlargeImage": "图片放大查看"
+    },
+    "dialog": {
+      "loginRequired": "需要登录",
+      "loginRequiredDesc": "查看商品详细信息需要登录。",
+      "likeCompleted": "点赞注册完成",
+      "likeCompletedDesc": "您是{{productName}}的**No. {{orderNumber}}**收藏家。\n\n非常感谢您与我们一起踏上这段仅为少数人准备的创作旅程。",
+      "confirm": "确认"
+    },
+    "popularProducts": {
+      "title": "热门作品"
+    }
+  },
+  "myUdign": {
+    "title": "My UDIGN",
+    "subtitle": "我的专属设计旅程",
+    "welcome": "{{name}}先生/女士",
+    "welcomeMessage": "欢迎来到UDIGN",
+    "preorderSystem": "UDIGN 预售系统",
+    "systemDescription": {
+      "artwork": "作品：主页的设计师草图",
+      "like": "点赞：对喜欢作品的制作希望意思表达",
+      "product": "商品：实际制作的作品（仅限点赞会员购买）"
+    },
+    "reviewProcess": {
+      "title": "审议进行方式：",
+      "auto": "自动审议：达成目标点赞人数时自动进行审议阶段",
+      "manual": "手动审议：管理员设定期间后进行审议阶段"
+    },
+    "steps": {
+      "collection": "设计点赞",
+      "review": "制作审核",
+      "payment": "购买进行",
+      "paymentWaiting": "支付等待",
+      "paymentCompleted": "支付完成",
+      "making": "商品制作",
+      "shipping": "配送进行",
+      "completed": "收货完成"
+    },
+    "statusGroups": {
+      "all": "全部",
+      "collection": "设计点赞",
+      "review": "制作审核",
+      "payment": "购买进行",
+      "paymentCompleted": "订单确认",
+      "making": "商品制作",
+      "shipping": "配送进行",
+      "completed": "收货完成",
+      "cancelled": "取消/退货/缺货"
+    },
+    "artworkStatus": "我的作品现状",
+    "noArtworks": "该状态下没有作品。",
+    "loadingMore": "正在加载更多作品...",
+    "allLoaded": "已加载所有作品。",
+    "notification": "通知",
+    "artwork": {
+      "noImage": "无图片",
+      "price": "{{price}}元",
+      "likeCount": "点赞{{count}}个",
+      "orderDate": "订单日期：{{date}}",
+      "paymentMethod": "支付方式：{{method}}",
+      "paymentAmount": "支付金额：{{amount}}元",
+      "options": "选项：{{options}}",
+      "quantity": "数量：{{quantity}}件",
+      "actions": {
+        "toggleInterest": "关注商品切换",
+        "cancelOrder": "取消订单",
+        "confirmPurchase": "确认购买",
+        "requestReturn": "交换/退货"
+      },
+      "status": {
+        "collection": "收藏",
+        "review": "审议中",
+        "payment": "购买进行",
+        "paymentCompleted": "订单确认",
+        "making": "商品制作",
+        "shipping": "配送进行",
+        "completed": "收货完成",
+        "cancelled": "订单取消"
+      }
+    },
+    "dialogs": {
+      "interest": {
+        "add": "添加关注商品",
+        "remove": "取消关注商品",
+        "addMessage": "是否将此商品添加到关注商品？",
+        "removeMessage": "是否从关注商品中删除此商品？",
+        "addButton": "添加",
+        "removeButton": "删除"
+      },
+      "purchase": {
+        "confirm": "确认购买",
+        "confirmMessage": "是否确认购买？",
+        "confirmButton": "确认"
+      },
+      "cancel": {
+        "title": "取消订单",
+        "reasonLabel": "取消理由",
+        "reasonPlaceholder": "请输入取消理由",
+        "reasonRequired": "请输入取消理由。",
+        "confirmTitle": "确认取消订单",
+        "confirmMessage": "确定要取消订单吗？",
+        "submitButton": "取消"
+      },
+      "return": {
+        "title": "申请交换/退货",
+        "nameLabel": "申请人姓名",
+        "namePlaceholder": "请输入姓名",
+        "phoneLabel": "联系方式",
+        "phonePlaceholder": "请输入联系方式",
+        "typeLabel": "申请类型",
+        "exchange": "交换",
+        "return": "退货",
+        "reasonLabel": "理由",
+        "reasonPlaceholder": "请详细输入交换/退货理由",
+        "submitButton": "申请",
+        "allFieldsRequired": "请填写所有字段。"
+      }
+    },
+    "admin": {
+      "reviewStatus": "审议状态",
+      "approveReview": "审议批准",
+      "rejectReview": "审议拒绝"
+    }
+  },
+  "search": {
+    "title": "搜索结果",
+    "emptyQuery": "请输入搜索词。",
+    "loading": "正在加载搜索结果...",
+    "noResults": "没有搜索结果。",
+    "noResultsDesc": "请尝试其他搜索词。",
+    "resultsCount": "共搜索到{{count}}件作品。",
+    "searchFor": "'{{query}}'的搜索结果"
+  },
+  "company": {
+    "title": "公司介绍",
+    "images": {
+      "alt1": "UDIGN公司图片1",
+      "alt2": "UDIGN公司图片2"
+    },
+    "mainMessage": "UDIGN致力于创造作家价值，\n向世界各地传播新文化",
+    "welcome": {
+      "title": "欢迎访问设计制作销售平台UDIGN。",
+      "paragraph1": "由精致时尚的设计布局的主页和总计60余页反映多样化形式的内容页面组成，能够进一步提高客户满意度。",
+      "paragraph2": "可查看模板上传的样本，选择适合行业的页面和希望的形式构成网站，如果希望还可以无额外费用使用完整版本。",
+      "paragraph3": "得益于解决方案开发，能够大幅降低成本提供服务，以低廉费用在短期内制作高质量网站。",
+      "paragraph4": "承诺制作能够满足期待的高品格网站。希望通过网站制作与客户的梦想和未来一起创造。",
+      "paragraph5": "将持续努力成为受客户信赖和喜爱的健康企业UDIGN。",
+      "logoMessage": "UDIGN公司标志象征财富和幸运，包含祈愿事业繁荣的意义。祈愿客户持续的事业繁荣和成功。谢谢。"
+    },
+    "visionMission": {
+      "title": "经营理念及愿景",
+      "subtitle1": "Ethical Management, the Foundation of",
+      "subtitle2": "Trust the Ground for Sustainable Growth",
+      "sustainability": {
+        "title": "可持续",
+        "description": "实践可持续发展的企业经营。"
+      },
+      "fairCompetition": {
+        "title": "公平竞争",
+        "description": "遵守公平商业交易秩序维护法规及社会常规。"
+      },
+      "transparency": {
+        "title": "透明经营",
+        "description": "与成员及利益相关者信息共享，事前预防风险"
+      }
+    },
+    "coreValues": {
+      "title": "核心价值",
+      "customerSatisfaction": {
+        "title": "实现客户满意",
+        "description": "重视客户意见，以一如既往的心态实现客户价值经营，为提供更大满意而努力。重视客户意见，以一如既往的心态实现客户价值经营，为提供更大满意而努力。重视客户意见，以一如既往的心态实现客户价值经营，为提供更大满意而努力。"
+      },
+      "fairManagement": {
+        "title": "公正透明的经营",
+        "description": "遵守法规，创造公正清洁的经营环境。遵守法规，创造公正清洁的经营环境。遵守法规，创造公正清洁的经营环境。遵守法规，创造公正清洁的经营环境。遵守法规，创造公正清洁的经营环境。"
+      },
+      "ecoFriendly": {
+        "title": "环境友好的经营",
+        "description": "通过环境友好的事业活动为经济发展和地区社会发展而努力。通过环境友好的事业活动为经济发展和地区社会发展而努力。通过环境友好的事业活动为经济发展和地区社会发展而努力。通过环境友好的事业活动为经济发展和地区社会发展而努力。"
+      },
+      "qualityManagement": {
+        "title": "质量经营",
+        "description": "以最高技术力追求高质量高附加值，在安全管理方面尽最大努力。以最高技术力追求高质量高附加值，在安全管理方面尽最大努力。以最高技术力追求高质量高附加值，在安全管理方面尽最大努力。以最高技术力追求高质量高附加值，在安全管理方面尽最大努力。"
+      }
+    }
+  },
+  "copyrightReport": {
+    "title": "版权侵害举报",
+    "loadingMessage": "加载中...",
+    "productSelector": {
+      "title": "选择要举报版权的产品",
+      "loadingProducts": "正在加载产品...",
+      "noProducts": "没有产品。",
+      "categories": {
+        "all": "全部",
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others"
+      },
+      "myProduct": "我的作品",
+      "pagination": {
+        "previous": "上一页",
+        "next": "下一页"
+      },
+      "cancelButton": "取消"
+    },
+    "reportForm": {
+      "title": "版权侵害举报",
+      "contentLabel": "举报内容 *",
+      "contentPlaceholder": "请详细输入版权侵害内容。（原著作物信息、侵害内容等）",
+      "evidenceFiles": "证据文件（最多3个，每个5MB以下）",
+      "fileTypesInfo": "可上传图片（JPG、PNG、GIF、WebP）或PDF文件。",
+      "backButton": "上一步",
+      "submitButton": "举报",
+      "submitting": "提交中...",
+      "uploading": "文件上传中...",
+      "uploadingFiles": "正在上传文件...",
+      "submittingReport": "正在提交举报...",
+      "errors": {
+        "maxFiles": "最多只能上传3个文件。",
+        "fileSize": "有超过5MB的文件。",
+        "uploadFailed": "文件上传失败",
+        "uploadError": "文件上传时发生错误。",
+        "contentRequired": "请输入举报内容。",
+        "submitFailed": "举报提交失败。",
+        "submitError": "举报提交时发生错误。"
+      }
+    }
+  },
+  "checkout": {
+    "title": "订单/支付",
+    "preparingPage": "正在准备支付页面...",
+    "orderProducts": "订单商品",
+    "noImage": "无图片",
+    "deliveryInfo": "配送信息",
+    "recipientName": "收货人",
+    "required": "*",
+    "contactNumber": "联系方式",
+    "contactPlaceholder": "01012345678",
+    "email": "邮箱",
+    "zipCode": "邮编",
+    "zipCodePlaceholder": "12345",
+    "address": "地址",
+    "detailAddress": "详细地址",
+    "paymentMethod": "支付方式",
+    "creditCard": "信用卡",
+    "bankTransfer": "银行转账",
+    "bankTransferInfo": "银行转账指南",
+    "bankTransferGuide": "订单完成后将通过短信指导转账账户号码。",
+    "bankTransferGuideDetail": "确认转账后准备商品。",
+    "paymentAmount": "支付金额",
+    "productAmount": "商品金额",
+    "optionAmount": "选项追加金额",
+    "shippingFee": "配送费",
+    "free": "免费",
+    "totalAmount": "总支付金额",
+    "termsAgreement": "使用条款同意",
+    "financeTerms": "[必须] 电子金融交易使用条款",
+    "financeTermsDetail": "同意根据电子金融交易法的使用条款。",
+    "privacyTerms": "[必须] 个人信息收集及使用",
+    "privacyTermsDetail": "同意为支付处理收集及使用个人信息。",
+    "payButton": "支付{{amount}}元",
+    "processing": "支付处理中...",
+    "cancelButton": "取消",
+    "errors": {
+      "noProductInfo": "没有商品信息。",
+      "failedToLoadProduct": "无法加载商品信息。",
+      "serverError": "发生服务器错误。",
+      "paymentSystemError": "无法加载支付系统。",
+      "invalidPhone": "请输入不含连字符的正确电话号码。（例：01012345678）",
+      "paymentFailed": "支付请求失败。请重试。",
+      "paymentCancelled": "支付已取消。"
+    },
+    "messages": {
+      "inputError": "输入错误",
+      "paymentCancel": "支付取消",
+      "paymentFail": "支付失败",
+      "orderCompleted": "订单已完成",
+      "bankTransferCompleted": "已通过短信指导转账账户号码。确认转账后准备商品。"
+    }
+  },
+  "paymentSuccess": {
+    "title": "支付已完成！",
+    "subtitle": "订单已正常受理。",
+    "processingResult": "正在处理支付结果...",
+    "orderInfo": "订单信息",
+    "orderId": "订单号",
+    "customer": "订购人",
+    "paymentDate": "支付日期",
+    "paymentMethod": "支付方式",
+    "paymentKey": "支付密钥",
+    "paymentAmount": "支付金额",
+    "orderDetailsButton": "确认订单明细",
+    "continueShopping": "继续购物",
+    "notices": {
+      "orderHistory": "• 可在个人页面确认订单明细。",
+      "shippingInquiry": "• 配送相关咨询请联系客服中心。",
+      "receiptInquiry": "• 如需发票请咨询客服中心。",
+      "paymentInquiry": "• 支付相关咨询请联系Toss Payments客服中心1899-4905。"
+    },
+    "errors": {
+      "missingPaymentInfo": "支付信息不足。",
+      "approvalFailed": "支付批准失败。",
+      "processingError": "支付批准处理时发生错误。"
+    }
+  },
+  "paymentFail": {
+    "title": "支付失败",
+    "subtitle": "抱歉，支付处理时发生问题。",
+    "checkingResult": "正在确认支付结果...",
+    "failureReason": "失败原因",
+    "unknownError": "发生未知错误。",
+    "retryPayment": "重新支付",
+    "continueShopping": "继续购物",
+    "troubleshooting": {
+      "checkBalance": "• 请确认卡片限额或余额。",
+      "checkInfo": "• 请再次确认输入信息是否正确。",
+      "contactSupport": "• 如问题持续请联系客服中心。",
+      "tryOtherMethod": "• 请尝试其他支付方式。"
+    }
+  },
+  "vendorRegister": {
+    "title": {
+      "create": "供应商信息输入",
+      "update": "供应商信息修改"
+    },
+    "subtitle": "为营业者认证请填写以下项目。",
+    "fields": {
+      "vendorName": "商号名",
+      "vendorClass": "个人/法人区分",
+      "personal": "个人",
+      "corporate": "法人",
+      "representative": "代表人姓名",
+      "contact": "联系方式",
+      "email": "邮箱",
+      "fax": "传真",
+      "businessNumber": "营业执照号",
+      "address": "地址",
+      "zipCode": "邮编",
+      "basicAddress": "基本地址",
+      "detailAddress": "详细地址",
+      "companyIntro": "公司介绍",
+      "required": "*"
+    },
+    "placeholders": {
+      "vendorName": "商号名",
+      "representative": "代表人姓名",
+      "contact": "联系方式（不含-）",
+      "email": "邮箱地址",
+      "fax": "传真号码（不含-）",
+      "businessNumber": "营业执照号（不含-）",
+      "zipCode": "邮编",
+      "basicAddress": "基本地址",
+      "detailAddress": "详细地址",
+      "companyIntro": "请输入公司介绍。"
+    },
+    "buttons": {
+      "verify": "营业者认证",
+      "verifying": "确认中...",
+      "verified": "认证完成",
+      "addressSearch": "地址搜索",
+      "cancel": "取消",
+      "register": "注册",
+      "update": "修改",
+      "processing": "处理中..."
+    },
+    "privacy": {
+      "agree": "同意个人信息处理方针"
+    },
+    "errors": {
+      "businessNumberLength": "营业执照号必须是10位数字。",
+      "businessNumberInvalid": "无效的营业执照号。",
+      "businessNumberVerifyError": "营业执照号验证时发生错误。",
+      "businessNumberVerifyRequired": "请完成营业执照号认证。",
+      "privacyAgreeRequired": "请同意个人信息处理方针。",
+      "vendorRegisterError": "供应商注册时发生错误。",
+      "vendorInfoLoadError": "供应商信息加载失败："
+    }
+  },
+  "upload": {
+    "title": "等待您的珍贵作品",
+    "subtitle": "非常感谢设计师们分享创意设计。",
+    "checkBeforeUpload": "设计上传前请仔细确认以下事项。",
+    "requiredCheck": "上传前必须确认事项",
+    "guidelines": {
+      "item1": {
+        "title": "1. 必须填写项目",
+        "content": "作品注册时请完整填写提供的所有输入栏。"
+      },
+      "item2": {
+        "title": "2. 图片上传构成",
+        "content": "主图片1张和副图片1-3张，总共最多可上传4张图片。"
+      },
+      "item3": {
+        "title": "3. 图片规格及格式",
+        "content": "• 必须正方形比例\n• 推荐尺寸：800 x 800以上\n• 容量：5MB以下\n• 格式：PNG、JPG、JPEG"
+      },
+      "item4": {
+        "title": "4. 准确的类别设置",
+        "content": "请选择符合设计性质的类别。"
+      },
+      "item5": {
+        "title": "5. 管理员批准后展示",
+        "content": "注册的作品经内部审核后展示。（工作日基准2-3天所需）"
+      }
+    },
+    "form": {
+      "mainImage": "代表图片",
+      "additionalImages": "追加图片",
+      "category": "作品类别",
+      "artworkName": "作品名",
+      "description": "作品说明",
+      "terms": "条款/指导事项",
+      "required": "*",
+      "selectMainImage": "代表图片选择",
+      "selectCategory": "请选择作品类别。",
+      "artworkNamePlaceholder": "作品名",
+      "descriptionPlaceholder": "请输入关于作品的详细说明。",
+      "agreeToTerms": "同意条款/指导事项内容。",
+      "uploadButton": "上传",
+      "uploading": "上传中...",
+      "imageSpecs": "推荐尺寸：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG",
+      "additionalImageSpecs": "推荐尺寸：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG\n最多可选择3张。",
+      "additionalImageCount": "追加图片（{{count}}/3张）",
+      "imageNumber": "图片{{number}}"
+    },
+    "messages": {
+      "fileSizeExceeded": "文件容量超过",
+      "fileSizeExceededDesc": "文件容量必须在5MB以下。",
+      "invalidFileType": "文件格式错误",
+      "invalidFileTypeDesc": "只能上传图片文件。",
+      "mainImageRequired": "代表图片必须",
+      "mainImageRequiredDesc": "请选择代表图片。",
+      "categoryRequired": "类别必须",
+      "categoryRequiredDesc": "请选择类别。",
+      "artworkNameRequired": "作品名必须",
+      "artworkNameRequiredDesc": "请输入作品名。",
+      "descriptionRequired": "作品说明必须",
+      "descriptionRequiredDesc": "请输入作品说明。",
+      "termsRequired": "条款同意必须",
+      "termsRequiredDesc": "请同意条款。",
+      "uploadSuccess": "上传完成",
+      "uploadSuccessDesc": "作品已成功上传。管理员批准后在网站展示。",
+      "uploadFailed": "上传失败",
+      "uploadFailedDesc": "上传时发生错误。",
+      "uploadError": "上传错误",
+      "finalConfirmTitle": "是否确认了设计上传时的最终条款？",
+      "finalConfirmDesc": "上传的设计经管理员批准后在网站展示。请同意条款后进行上传。"
+    },
+    "loginRequired": {
+      "title": "需要登录",
+      "description": "设计上传仅限会员使用。请登录后使用。"
+    }
+  },
+  "resetPassword": {
+    "success": {
+      "title": "密码更改完成",
+      "subtitle": "密码已成功更改。",
+      "message": "密码更改已完成。",
+      "loginMessage": "请使用会员账号和更改的密码登录。",
+      "securityMessage": "为了安全，请登录后更改为新密码。",
+      "goToLogin": "前往登录页面"
+    },
+    "failure": {
+      "title": "密码更改失败",
+      "subtitle": "密码更改时发生问题。",
+      "errorLabel": "错误：",
+      "linkExpiredMessage": "认证链接可能已过期或已使用过的链接。",
+      "tryAgain": "重试",
+      "backToLogin": "返回登录"
+    },
+    "errors": {
+      "invalidAccess": "非法访问。",
+      "resetFailed": "密码更改失败。",
+      "requestError": "请求处理时发生错误。"
+    }
+  },
+  "profile": {
+    "edit": {
+      "title": "修改会员信息",
+      "subtitle": "可修改会员信息。",
+      "loadingMessage": "正在加载用户信息...",
+      "successTitle": "成功",
+      "successMessage": "会员信息已成功修改。",
+      "fields": {
+        "userId": "账号",
+        "userIdNotEditable": "账号无法更改。",
+        "name": "姓名",
+        "nameNotEditable": "姓名无法更改。",
+        "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱",
+        "phone": "手机号码",
+        "phonePlaceholder": "例：01012345678（仅输入数字）",
+        "newPassword": "新密码",
+        "newPasswordPlaceholder": "不更改请留空",
+        "confirmPassword": "新密码确认",
+        "confirmPasswordPlaceholder": "请重新输入新密码",
+        "marketingConsent": "同意接收广告信息",
+        "marketingConsentDesc": "是否接收活动、折扣优惠等信息？"
+      },
+      "buttons": {
+        "cancel": "取消",
+        "submit": "修改",
+        "submitting": "修改中..."
+      },
+      "errors": {
+        "emailRequired": "请输入邮箱。",
+        "phoneRequired": "请输入手机号码。",
+        "invalidEmail": "请输入正确的邮箱地址。",
+        "invalidPhone": "手机号码请输入以01开头的11位数字。",
+        "passwordMismatch": "新密码与密码确认不一致。",
+        "updateFailed": "修改会员信息时发生错误。",
+        "loadFailed": "加载用户信息时发生错误。"
+      }
+    },
+    "confirm": {
+      "title": "修改会员信息",
+      "subtitle": "修改会员信息需要输入当前密码。",
+      "fields": {
+        "password": "密码",
+        "passwordPlaceholder": "请输入当前密码"
+      },
+      "buttons": {
+        "cancel": "取消",
+        "confirm": "确认",
+        "confirming": "确认中..."
+      },
+      "errors": {
+        "invalidPassword": "密码不正确。",
+        "confirmFailed": "密码确认时发生错误。"
+      }
+    }
+  },
+  "privacy": {
+    "title": "个人信息处理方针",
+    "supplementary": {
+      "title": "附则",
+      "content": "本方针自OOOO年OO月OO日起施行。"
+    }
+  },
+  "provision": {
+    "title": "服务使用条款",
+    "supplementary": {
+      "title": "附则",
+      "content1": "1. 本条款自2024年01月01日起施行。",
+      "content2": "2. 本条款遵守电子商务（互联网网络商城）标准条款第10023号（2014. 9. 19. 修订）。"
+    }
+  }
+}

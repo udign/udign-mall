@@ -316,7 +316,7 @@ export default function AdminLayoutClient({ children, user }: AdminLayoutClientP
 
           <div className='flex items-center gap-2'>
             <Button
-              onClick={() => router.push(ROUTES.SHOP)}
+              onClick={() => router.push('/ko/shop')}
               variant='ghost'
               size='sm'
               className='flex items-center gap-2'

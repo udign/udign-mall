@@ -3,7 +3,7 @@ export const ROUTES = {
   HOME: '/',
   SHOP: '/shop',
 
-  // 관리자 페이지
+  // 관리자 페이지 (다국어 지원 안함)
   ADMIN: '/admin',
   ADMIN_MEMBER: '/admin/member',
   ADMIN_VENDOR: '/admin/vendor',

@@ -23,11 +23,17 @@ import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
 import NavigationSidebar from '@/components/NavigationSidebar';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/primitives/button';
 import { MEMBER_LEVELS } from '@/lib/constants';
+import { Dictionary } from '@/lib/dictionaries';
 import Link from 'next/link';
 
-export default function Header() {
+interface HeaderProps {
+  dictionary: Dictionary;
+}
+
+export default function Header({ dictionary }: HeaderProps) {
   const [hideHeader, setHideHeader] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
@@ -37,6 +43,7 @@ export default function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
+
   const { user, isLoading, logout } = useAuth();
 
   useEffect(() => {
@@ -124,7 +131,7 @@ export default function Header() {
                   onClick={handleTodayViewedClick}
                   size='icon'
                   variant='ghost'
-                  className='hover:text-white hover:bg-white/10'
+                  className='hover:bg-white/10 hover:text-white'
                 >
                   <FiClock className='text-xl text-white' />
                 </Button>
@@ -132,7 +139,7 @@ export default function Header() {
                   onClick={handleSearchClick}
                   size='icon'
                   variant='ghost'
-                  className='hover:text-white hover:bg-white/10'
+                  className='hover:bg-white/10 hover:text-white'
                 >
                   <FiSearch className='text-xl text-white' />
                 </Button>
@@ -140,9 +147,9 @@ export default function Header() {
                   <Button
                     onClick={() => router.push(ROUTES.ADMIN)}
                     variant='ghost'
-                    className='hover:text-white hover:bg-white/10 text-base text-white'
+                    className='text-base text-white hover:bg-white/10 hover:text-white'
                   >
-                    <span>관리자</span>
+                    <span>{dictionary.header.admin}</span>
                   </Button>
                 )}
                 {user ? (
@@ -150,7 +157,7 @@ export default function Header() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant='ghost'
-                        className='hover:text-white hover:bg-white/10 text-base text-white'
+                        className='text-base text-white hover:bg-white/10 hover:text-white'
                       >
                         <span>{user.mb_name}</span>
                       </Button>
@@ -160,10 +167,10 @@ export default function Header() {
                         onClick={() => router.push(ROUTES.PROFILE_CONFIRM)}
                         className='cursor-pointer'
                       >
-                        회원정보 수정
+                        {dictionary.header.editProfile}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
-                        로그아웃
+                        {dictionary.common.logout}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -171,15 +178,17 @@ export default function Header() {
                   <Button
                     onClick={() => router.push(ROUTES.LOGIN)}
                     variant='ghost'
-                    className='hover:text-white hover:bg-white/10 text-base text-white'
+                    className='text-base text-white hover:bg-white/10 hover:text-white'
                   >
-                    <span>로그인</span>
+                    <span>{dictionary.common.login}</span>
                   </Button>
                 )}
 
+                <LanguageSwitcher />
+
                 <Button
                   variant='ghost'
-                  className='hover:text-white hover:bg-white/10'
+                  className='hover:bg-white/10 hover:text-white'
                   onClick={handleNavigationClick}
                 >
                   <HiOutlineMenu className='text-xl text-white' />
@@ -188,18 +197,18 @@ export default function Header() {
             </div>
             {/* 데스크톱 네비게이션 메뉴 제거 */}
             {user && (
-              <div className='flex justify-end -mt-4 -mb-4'>
+              <div className='-mt-4 -mb-4 flex justify-end'>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
                         variant='ghost'
-                        className='text-white hover:text-white hover:bg-white/10 h-10 text-lg font-semibold relative'
+                        className='relative h-10 text-lg font-semibold text-white hover:bg-white/10 hover:text-white'
                       >
                         My UDIGN
                         {purchaseCount > 0 && (
-                          <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center'>
+                          <span className='absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white'>
                             {purchaseCount}
                           </span>
                         )}
@@ -207,7 +216,12 @@ export default function Header() {
                     </TooltipTrigger>
                     {purchaseCount > 0 && (
                       <TooltipContent side='bottom' className='bg-gray-800 text-white'>
-                        <p>구매가능한 상품이 {purchaseCount}개 있습니다.</p>
+                        <p>
+                          {dictionary.header.purchaseAvailable.replace(
+                            '{{count}}',
+                            purchaseCount.toString(),
+                          )}
+                        </p>
                       </TooltipContent>
                     )}
                   </Tooltip>
@@ -220,23 +234,26 @@ export default function Header() {
         <TodayViewedProductsSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          dictionary={dictionary}
         />
 
         <SearchSidebar
           isOpen={isSearchSidebarOpen}
           onClose={() => setIsSearchSidebarOpen(false)}
+          dictionary={dictionary}
         />
 
         <NavigationSidebar
           isOpen={isNavigationSidebarOpen}
           onClose={() => setIsNavigationSidebarOpen(false)}
+          dictionary={dictionary}
         />
 
         <LoginRequiredDialog
           open={showLoginDialog}
           onOpenChange={setShowLoginDialog}
-          title='로그인이 필요합니다'
-          description='이 기능을 사용하시려면 로그인이 필요합니다.'
+          title={dictionary.header.loginRequired}
+          description={dictionary.header.loginRequiredDesc}
         />
       </>
     )

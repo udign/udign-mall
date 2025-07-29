@@ -1,0 +1,940 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "upload": "업로드",
+    "search": "검색",
+    "all": "전체",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "register": "회원가입",
+    "profile": "프로필",
+    "close": "닫기",
+    "confirm": "확인",
+    "cancel": "취소",
+    "goHome": "홈으로 돌아가기",
+    "noData": "데이터가 없습니다"
+  },
+  "shop": {
+    "title": "쇼핑몰",
+    "uploadProduct": "디자인 업로드",
+    "categories": {
+      "all": "전체",
+      "fashion": "패션",
+      "shoes": "신발",
+      "others": "기타",
+      "accessory": "액세서리",
+      "home": "홈인테리어",
+      "beauty": "뷰티",
+      "art": "예술작품",
+      "digital": "디지털",
+      "lifestyle": "라이프스타일"
+    },
+    "noProducts": "등록된 작품이 없습니다",
+    "loadMore": "추가 작품을 불러오는 중...",
+    "allLoaded": "모든 작품을 불러왔습니다",
+    "loadingProducts": "작품을 불러오는 중입니다...",
+    "designDescription": "오직 당신만을 위한 디자인을 선택하세요. 최고의 선물이 완성됩니다.",
+    "loginRequired": "디자인 업로드",
+    "loginRequiredMessage": "디자인을 업로드하시려면 로그인이 필요합니다.",
+    "goToLogin": "로그인하러 가기"
+  },
+  "auth": {
+    "forgotPassword": {
+      "title": "아이디/비밀번호 찾기",
+      "description": "회원가입 시 등록하신 이메일 주소를 입력해 주세요.",
+      "descriptionLine2": "해당 이메일로 아이디와 비밀번호 정보를 보내드립니다.",
+      "emailLabel": "이메일 주소",
+      "emailPlaceholder": "이메일 주소를 입력하세요",
+      "required": "*",
+      "sendButton": "인증메일 보내기",
+      "sendingButton": "처리 중...",
+      "backToLogin": "로그인으로 돌아가기",
+      "success": {
+        "title": "메일 발송 완료",
+        "message": "{{email}} 메일로 회원아이디와 비밀번호를 인증할 수 있는 메일이 발송되었습니다.",
+        "checkEmail": "메일을 확인하여 주십시오.",
+        "checkSpam": "메일함에서 메일이 보이지 않는다면 스팸함도 확인해 주세요.",
+        "backToLogin": "로그인으로 돌아가기",
+        "tryAgain": "다시 시도"
+      },
+      "error": {
+        "general": "요청 처리 중 오류가 발생했습니다."
+      }
+    },
+    "login": {
+      "title": "Be sure your design",
+      "subtitle": "여러분의 디자인은 최고의 가치가 됩니다.",
+      "fields": {
+        "id": "아이디",
+        "password": "비밀번호",
+        "idPlaceholder": "아이디",
+        "passwordPlaceholder": "비밀번호",
+        "required": "*"
+      },
+      "buttons": {
+        "login": "로그인",
+        "loggingIn": "로그인 중...",
+        "register": "회원가입"
+      },
+      "autoLogin": {
+        "label": "자동로그인",
+        "confirmTitle": "자동로그인 사용 확인",
+        "confirmMessage": "자동로그인을 사용하시면 다음부터 회원아이디와 패스워드를 입력하실 필요가 없습니다. 그러나 공공장소에서는 개인정보가 유출될 수 있으니 사용을 자제하여 주십시오. 자동로그인을 사용하시겠습니까?"
+      },
+      "links": {
+        "forgotPassword": "아이디/비밀번호 찾기"
+      },
+      "errors": {
+        "general": "로그인 중 오류가 발생했습니다."
+      }
+    },
+    "register": {
+      "title": "유다인에 오신 것을 환영합니다.",
+      "fields": {
+        "id": "아이디",
+        "password": "비밀번호",
+        "passwordConfirm": "비밀번호 확인",
+        "name": "이름",
+        "phone": "휴대폰번호",
+        "email": "이메일",
+        "birth": "생년월일",
+        "required": "*",
+        "idPlaceholder": "아이디",
+        "passwordPlaceholder": "비밀번호(6~15자 이내 영문(대소문자), 숫자, 특수문자 조합)",
+        "passwordConfirmPlaceholder": "비밀번호 확인",
+        "namePlaceholder": "이름",
+        "phonePlaceholder": "휴대폰 번호(- 제외 입력)",
+        "emailPlaceholder": "E-mail",
+        "birthPlaceholder": "생년월일을 선택하세요"
+      },
+      "agreements": {
+        "allAgree": "모든 항목에 동의",
+        "termsRequired": "이용약관 및 필수 개인정보 수집에 대한 동의",
+        "marketing": "광고성 정보 수신에 대한 동의",
+        "marketingNote": "(미 동의시 서비스 이용에 제한이 있을 수도 있습니다.)"
+      },
+      "buttons": {
+        "register": "회원가입",
+        "registering": "가입 중...",
+        "loginLink": "로그인"
+      },
+      "messages": {
+        "alreadyHaveAccount": "이미 계정이 있으신가요?",
+        "ageRestrictionTitle": "회원가입 제한",
+        "ageRestrictionMessage": "죄송합니다. 만 19세 이상만 회원가입이 가능합니다."
+      },
+      "errors": {
+        "general": "회원가입 중 오류가 발생했습니다.",
+        "termsRequired": "이용약관 및 개인정보 수집 동의는 필수입니다.",
+        "passwordMismatch": "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+        "passwordRules": "비밀번호는 6~15자 이내 영문(대소문자), 숫자, 특수문자를 모두 포함해야 합니다."
+      }
+    },
+    "terms": {
+      "title": "이용약관",
+      "subtitle": "서비스 이용을 위해 약관에 동의해주세요.",
+      "allAgree": "이용약관 전체 동의",
+      "termsAgree": "(필수)회원가입약관 동의",
+      "privacyAgree": "(필수)개인정보 처리방침 안내 동의",
+      "viewFull": "전문",
+      "buttons": {
+        "cancel": "취소",
+        "createAccount": "신규계정 생성"
+      },
+      "dialog": {
+        "title": "알림",
+        "message": "필수 약관에 동의해주세요."
+      }
+    }
+  },
+  "guide": {
+    "title": "이용안내",
+    "progressInfo": "유다인의 모든 진행상황은 MY UDIGN 에서 확인하실 수 있습니다.",
+    "myUdign": "MY UDIGN",
+    "steps": {
+      "designLike": "디자인 좋아요",
+      "productionReview": "제작 검토",
+      "purchaseProgress": "구매진행",
+      "orderConfirmation": "주문확정",
+      "productManufacturing": "상품제작",
+      "deliveryProgress": "배송진행",
+      "receiptComplete": "수령완료"
+    },
+    "sections": {
+      "section1": {
+        "title": "1. 맘에 드는 디자인에는 \"좋아요♥\"를 꼭 눌러주세요~",
+        "content1": "선택하신 디자인의 \"좋아요♥\" 가 정해진 수량만큼 모아지면 제작 검토를 통하여 상품으로 제작될 기회가 주어집니다. (한정 수량 제작)",
+        "content2": "\"좋아요♥\"를 한 순서에 따라 한정된 수량의 고유번호를 받게 되며, 이 번호는 차후 제작되는 상품 고유번호로 이어집니다.",
+        "note": "( 제작검토 단계 전까지 좋아요 취소도 가능해요. )"
+      },
+      "section2": {
+        "title": "2. 제작검토 단계의 디자인은 UDIGN 에서 상품 제작 여부 검토 및 전반적인 상품화 준비를 합니다.",
+        "content": "상품화 준비 과정으로 내부 검토가 진행됩니다. 그러나, 디자인의 내ㆍ외부 요건에 따라 제작 진행이 어려울 수 있으며, 불가 사유는 개별 안내 드립니다."
+      },
+      "section3": {
+        "title": "3. 제작 확정 및 상품화 준비가 완료되면 디자인 상세페이지가 상품 구매페이지로 변경되어 결제가 가능합니다.",
+        "content1": "구매 안내 메시지와 함께 MY UDIGN에서 구매버튼이 활성화됩니다. 구매버튼을 누르면 구매페이지로 이동하며 상품설명 및 배송관련 내용을 확인하시고 결제진행 하시면 주문확정!!",
+        "content2": "여러분은 상품의 N번째 주인!!"
+      },
+      "section4": {
+        "title": "4. 결제가 모두 모여지고 있는 주문확정 단계.",
+        "content1": "구매 결제가 모두 진행되는 일정 기간 동안 주문확정 단계에서 주문취소를 할 수 있습니다. (※ 제작 중에는 취소 불가합니다.)",
+        "content2": "주문 취소 시 재구매는 불가하며 상품 고유번호도 삭제되므로 신중한 선택 부탁드려요.",
+        "content3": "차후 발견되는 디자인의 문제를 포함한 일부 요인에 의해 제작 진행이 어려워질 경우 개별 안내와 함께 즉시 환불해 드립니다."
+      },
+      "section5": {
+        "title": "5. 모두 결제 OK! 좋아요♥ 해 주신 회원들만의 상품이 제작됩니다. UDIGN let's go!",
+        "content": "한정 수량 , 최고의 품질을 추구하는 UDIGN 이기에 제작 기간이 오래 걸릴 수 있는 점 양해 부탁드려요. 열정을 다해 보답하겠습니다!!"
+      },
+      "section6": {
+        "title": "6. 제작 완료되면 검수, 포장 후 신속하게 고객님의 집 앞으로 출발합니다.",
+        "content1": "기다려주셔서 정말 감사드립니다. 제작이 완료되면 전문 물류팀을 통해 포장되어 출고, 택배로 배송됩니다.",
+        "content2": "기본 배송 소요기간은 해당 택배사의 배송소요기간 기준에 준하며 지역 및 날씨, 택배사의 사정에 따라 차이가 있을 수 있으니 꼭 참고해주세요~"
+      },
+      "section7": {
+        "title": "7. 배송완료 및 상품을 확인하시고 구매확정을 하시면 MY UDIGN의 모든 과정이 끝!!",
+        "content1": "상품을 수령하시면 바로 상태 확인 부탁드리며 구매확정 꼭! 부탁드립니다.",
+        "content2": "만약 교환/반품을 진행하실 경우 사유와 함께 신청해주시면 빠른 진행 도와드릴께요.",
+        "content3": "다만, 한정된 주문 제작과 최고의 품질을 추구하는 유다인 상품의 특성상 일정 기간이 지나면 반품, 교환처리가 불가할 수 있습니다.",
+        "content4": "다음 안내사항을 꼭 참고해 주세요.",
+        "notes": {
+          "note1": "모든 교환 반품비는 부담없이 무료입니다.",
+          "note2": "반품이 확정되면 회원님의 해당 상품 시리얼번호(고유번호)는 삭제됩니다.",
+          "note3": "교환 진행할 경우 상품 시리얼번호(고유번호)는 그대로 유지됩니다."
+        }
+      }
+    }
+  },
+  "language": {
+    "select": "언어 선택",
+    "korean": "한국어",
+    "english": "English",
+    "changeLanguage": "언어를 변경하시겠습니까?",
+    "languageChanged": "언어가 변경되었습니다"
+  },
+  "header": {
+    "admin": "관리자",
+    "editProfile": "회원정보 수정",
+    "loginRequired": "로그인이 필요합니다",
+    "loginRequiredDesc": "이 기능을 사용하시려면 로그인이 필요합니다.",
+    "purchaseAvailable": "구매가능한 상품이 {{count}}개 있습니다."
+  },
+  "footer": {
+    "aboutUdign": "about UDIGN",
+    "userGuide": "이용안내",
+    "termsOfUse": "이용약관",
+    "privacyPolicy": "개인정보처리방침",
+    "vendorPage": "벤더페이지",
+    "copyrightReport": "저작권 신고",
+    "company": {
+      "representative": "대표",
+      "phone": "전화",
+      "fax": "팩스",
+      "address": "사업장주소",
+      "addressValue": "서울시 은평구 진관3로 32, 은평뉴타운파크앤타워 B동 6층 618호",
+      "businessNumber": "사업자등록번호",
+      "ecommerceNumber": "통신판매업신고번호",
+      "privacyManager": "개인정보관리책임자",
+      "email": "E-MAIL"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "phone": "1577-4215",
+      "operatingHours": "운영시간 : 평일 09:00 ~ 17:00",
+      "lunchTime": "점심시간 : 평일 12:00 ~ 13:00",
+      "holiday": "토, 일요일 / 공휴일 휴무",
+      "followUs": "Follow Us"
+    }
+  },
+  "sidebar": {
+    "todayViewed": {
+      "title": "오늘 본 작품",
+      "description": "오늘 확인한 작품 목록을 표시합니다.",
+      "empty": "아직 본 작품이 없습니다",
+      "recentCount": "최근 확인한 작품 {{count}}개",
+      "clearAll": "전체 삭제",
+      "noImage": "이미지 없음",
+      "storageInfo": "상품은 하루 동안 최대 {{max}}개까지 저장됩니다"
+    },
+    "search": {
+      "title": "작품 검색",
+      "description": "작품을 검색할 수 있습니다.",
+      "placeholder": "찾으시는 작품을 검색해보세요",
+      "button": "검색",
+      "hint": "작품명, 작가명 등으로 검색해보세요"
+    },
+    "navigation": {
+      "menu": "메뉴",
+      "description": "사이트 네비게이션 메뉴",
+      "category": "CATEGORY",
+      "siteMenu": "SITE MENU",
+      "aboutUs": "ABOUT US",
+      "all": "전체",
+      "vendorPage": "벤더페이지",
+      "copyrightReport": "저작권 신고",
+      "siteIntro": "사이트 소개",
+      "serviceTerms": "서비스 이용약관",
+      "privacyPolicy": "개인정보 처리방침",
+      "designUpload": "디자인 업로드",
+      "userGuide": "이용안내",
+      "categories": {
+        "fashion": "패션",
+        "shoes": "신발",
+        "others": "기타",
+        "men": "남성",
+        "women": "여성"
+      },
+      "fashionItems": {
+        "top": "상의",
+        "bottom": "하의",
+        "outer": "아우터",
+        "product": "제품",
+        "space": "공간"
+      },
+      "shoeItems": {
+        "sneakers": "운동화",
+        "dressShoes": "구두/스니커즈",
+        "walker": "워커",
+        "sandals": "샌들/슬리퍼",
+        "rainBoots": "레인부츠",
+        "boots": "부츠"
+      },
+      "otherItems": {
+        "top": "상의",
+        "bottom": "하의",
+        "graphic": "그래픽",
+        "product": "제품",
+        "space": "공간"
+      }
+    }
+  },
+  "productDetail": {
+    "loading": {
+      "authCheck": "인증 정보를 확인하는 중...",
+      "productInfo": "작품 정보를 불러오는 중..."
+    },
+    "notFound": "상품을 찾을 수 없습니다",
+    "status": {
+      "fullAndUnderReview": "full & under review",
+      "reviewInProgress": "🔍 현재 심의 진행 중입니다",
+      "reviewInProgressDesc": "심의 완료 후 구매 가능합니다.",
+      "manualReview": "수동 심의",
+      "autoReview": "자동 심의 (목표 달성시 즉시 진행)",
+      "collectingLikes": "📝 좋아요 모집 중입니다",
+      "collectingLikesDesc": "목표 인원 달성시 {{type}} 심의로 진행됩니다.",
+      "reviewCompleted": "✅ 심의가 완료되었습니다",
+      "purchaseAvailable": "구매 가능한 상품입니다.",
+      "daysRemaining": "{{days}}일 후 자동 진행"
+    },
+    "navigation": {
+      "previous": "previous",
+      "next": "next",
+      "noPrevious": "이전 작품 없음",
+      "noNext": "다음 작품 없음"
+    },
+    "price": {
+      "title": "가격 정보",
+      "originalPrice": "시중가격",
+      "salePrice": "판매가격",
+      "basePrice": "기본 가격",
+      "optionPrice": "옵션 추가금액",
+      "quantity": "수량",
+      "totalPrice": "총 금액"
+    },
+    "options": {
+      "title": "옵션 선택",
+      "selectPlaceholder": "{{option}}을(를) 선택해주세요",
+      "selectedOptions": "선택된 옵션",
+      "stock": "재고 {{count}}개",
+      "allOptionsRequired": "⚠️ 모든 옵션을 선택해주세요"
+    },
+    "quantity": {
+      "title": "수량 선택",
+      "label": "구매 수량"
+    },
+    "purchase": {
+      "buyNow": "구매하기",
+      "sizeGuide": "사이즈 가이드 보기"
+    },
+    "sizeGuide": {
+      "title": "사이즈 가이드",
+      "description": "정확한 사이즈 선택을 위한 측정 가이드입니다",
+      "loading": "사이즈 가이드를 불러오는 중...",
+      "notSupported": "사이즈 가이드 지원 안함",
+      "notSupportedDesc": "이 작품은 사이즈 가이드를 지원하지 않습니다.",
+      "area": "구역",
+      "measurementMethod": "📏 측정 방법",
+      "measurementTips": [
+        "평평한 곳에 옷을 펼쳐놓고 측정해주세요",
+        "신축성이 있는 원단의 경우 자연스럽게 놓인 상태에서 측정",
+        "모든 수치는 cm 단위입니다"
+      ],
+      "precautions": "⚠️ 주의사항",
+      "precautionsList": [
+        "측정 방법에 따라 1-3cm 차이가 날 수 있습니다",
+        "모니터 환경에 따라 색상이 다르게 보일 수 있습니다",
+        "세탁 후 약간의 수축이 있을 수 있습니다"
+      ]
+    },
+    "imageMagnifier": {
+      "title": "이미지 확대보기",
+      "instruction": "마우스를 이미지 위에 올려서 확대해보세요"
+    },
+    "description": {
+      "title": "작품 설명",
+      "designer": "디자이너:",
+      "productDetailInfo": "상품 상세 정보"
+    },
+    "magnifier": {
+      "enlargeImage": "이미지 확대보기"
+    },
+    "dialog": {
+      "loginRequired": "로그인 필요",
+      "loginRequiredDesc": "상품 상세 정보를 보시려면 로그인이 필요합니다.",
+      "likeCompleted": "좋아요 등록 완료",
+      "likeCompletedDesc": "고객님은 {{productName}}의 **No. {{orderNumber}}** 컬렉터입니다.\n\n단 몇 명만을 위한 이 창작의 여정에 함께 해주셔서 진심으로 감사드립니다.",
+      "confirm": "확인"
+    },
+    "popularProducts": {
+      "title": "인기 작품"
+    }
+  },
+  "myUdign": {
+    "title": "My UDIGN",
+    "subtitle": "나만의 특별한 디자인 여정",
+    "welcome": "{{name}}님",
+    "welcomeMessage": "유다인에 오신 것을 환영합니다",
+    "preorderSystem": "UDIGN 프리오더 시스템",
+    "systemDescription": {
+      "artwork": "작품: 메인 페이지의 디자이너 스케치",
+      "like": "좋아요: 마음에 드는 작품에 대한 제작 희망 의사표현",
+      "product": "상품: 실제 제작된 작품 (좋아요한 회원만 구매 가능)"
+    },
+    "reviewProcess": {
+      "title": "심의 진행 방식:",
+      "auto": "자동 심의: 목표 좋아요 인원 달성 시 자동으로 심의 단계 진행",
+      "manual": "수동 심의: 관리자가 설정한 기간 후 심의 단계 진행"
+    },
+    "steps": {
+      "collection": "디자인 좋아요",
+      "review": "제작 검토",
+      "payment": "구매 진행",
+      "paymentWaiting": "결제대기",
+      "paymentCompleted": "결제완료",
+      "making": "상품 제작",
+      "shipping": "배송 진행",
+      "completed": "수령 완료"
+    },
+    "statusGroups": {
+      "all": "전체",
+      "collection": "디자인 좋아요",
+      "review": "제작 검토",
+      "payment": "구매 진행",
+      "paymentCompleted": "주문 확정",
+      "making": "상품 제작",
+      "shipping": "배송 진행",
+      "completed": "수령 완료",
+      "cancelled": "취소/반품/품절"
+    },
+    "artworkStatus": "나의 작품 현황",
+    "noArtworks": "해당 상태의 작품이 없습니다.",
+    "loadingMore": "더 많은 작품을 불러오는 중...",
+    "allLoaded": "모든 작품을 불러왔습니다.",
+    "notification": "알림",
+    "artwork": {
+      "noImage": "이미지 없음",
+      "price": "{{price}}원",
+      "likeCount": "좋아요 {{count}}개",
+      "orderDate": "주문일: {{date}}",
+      "paymentMethod": "결제방법: {{method}}",
+      "paymentAmount": "결제금액: {{amount}}원",
+      "options": "옵션: {{options}}",
+      "quantity": "수량: {{quantity}}개",
+      "actions": {
+        "toggleInterest": "관심상품 토글",
+        "cancelOrder": "주문 취소",
+        "confirmPurchase": "구매 확정",
+        "requestReturn": "교환/반품"
+      },
+      "status": {
+        "collection": "컬렉션",
+        "review": "심의중",
+        "payment": "구매 진행",
+        "paymentCompleted": "주문 확정",
+        "making": "상품 제작",
+        "shipping": "배송 진행",
+        "completed": "수령 완료",
+        "cancelled": "주문취소"
+      }
+    },
+    "dialogs": {
+      "interest": {
+        "add": "관심상품 추가",
+        "remove": "관심상품 취소",
+        "addMessage": "이 상품을 관심상품에 추가하시겠습니까?",
+        "removeMessage": "이 상품을 관심상품에서 제거하시겠습니까?",
+        "addButton": "추가하기",
+        "removeButton": "제거하기"
+      },
+      "purchase": {
+        "confirm": "구매확정",
+        "confirmMessage": "구매 확정 하시겠습니까?",
+        "confirmButton": "확정하기"
+      },
+      "cancel": {
+        "title": "주문 취소",
+        "reasonLabel": "취소 사유",
+        "reasonPlaceholder": "취소 사유를 입력해주세요",
+        "reasonRequired": "취소 사유를 입력해주세요.",
+        "confirmTitle": "주문 취소 확인",
+        "confirmMessage": "정말로 주문을 취소하시겠습니까?",
+        "submitButton": "취소하기"
+      },
+      "return": {
+        "title": "교환/반품 신청",
+        "nameLabel": "신청자명",
+        "namePlaceholder": "이름을 입력해주세요",
+        "phoneLabel": "연락처",
+        "phonePlaceholder": "연락처를 입력해주세요",
+        "typeLabel": "신청 구분",
+        "exchange": "교환",
+        "return": "반품",
+        "reasonLabel": "사유",
+        "reasonPlaceholder": "교환/반품 사유를 상세히 입력해주세요",
+        "submitButton": "신청하기",
+        "allFieldsRequired": "모든 필드를 입력해주세요."
+      }
+    },
+    "admin": {
+      "reviewStatus": "심의 상태",
+      "approveReview": "심의 승인",
+      "rejectReview": "심의 거부"
+    }
+  },
+  "search": {
+    "title": "검색 결과",
+    "emptyQuery": "검색어를 입력해주세요.",
+    "loading": "검색 결과를 불러오는 중...",
+    "noResults": "검색 결과가 없습니다.",
+    "noResultsDesc": "다른 검색어로 시도해보세요.",
+    "resultsCount": "총 {{count}}개의 작품이 검색되었습니다.",
+    "searchFor": "'{{query}}'에 대한 검색 결과"
+  },
+  "company": {
+    "title": "회사소개",
+    "images": {
+      "alt1": "유다인 회사 이미지 1",
+      "alt2": "유다인 회사 이미지 2"
+    },
+    "mainMessage": "유다인은 작가의 가치를 창출하고 새로운 문화를\n전 세계 곳곳에 전파하기 위해 노력합니다",
+    "welcome": {
+      "title": "디자인 제작판매 플랫폼 유다인 방문을 환영합니다.",
+      "paragraph1": "세련되고 트렌디한 디자인으로 레이아웃된 메인페이지와 총 60여 페이지에 달하는 다양한 폼이 반영된 콘텐츠페이지로 구성되어 고객만족도를 한층 더 높이는 것이 가능해졌습니다.",
+      "paragraph2": "탬플릿에 올려진 샘플을 보고 업종에 맞는 페이지와 원하는 폼을 선택하여 홈페이지를 구성할 수 있으며, 희망하는 경우 비용추가 없이 풀 버전 전체 사용도 가능합니다.",
+      "paragraph3": "솔루션 개발 덕분에 원가를 대폭 낮추어 서비스 공급하는 것이 가능해져서 저렴한 비용으로 高 퀄리티 홈페이지를 짧은 기간 내 제작할 수 있습니다.",
+      "paragraph4": "기대에 충족될 수 있도록 고품격 홈페이지 제작을 약속드립니다. 홈페이지 제작을 통해 고객님의 꿈과 미래를 함께 만들어 가시길 바랍니다.",
+      "paragraph5": "고객으로부터 신뢰와 사랑을 받는 건강한 기업 유다인이 되고자 끊임없는 노력을 경주 하겠습니다.",
+      "logoMessage": "유다인 회사 로고는 부와 행운을 상징하는 것으로 사업번창을 기원하는 의미를 담고 있습니다. 고객님의 지속적인 사업번창과 성공을 기원합니다. 감사합니다."
+    },
+    "visionMission": {
+      "title": "경영이념 및 비전",
+      "subtitle1": "Ethical Management, the Foundation of",
+      "subtitle2": "Trust the Ground for Sustainable Growth",
+      "sustainability": {
+        "title": "지속가능",
+        "description": "지속가능한 성장을 위한 기업경영을 실천합니다."
+      },
+      "fairCompetition": {
+        "title": "공정경쟁",
+        "description": "공정한 상거래 질서 유지 법규 및 사회상규를 준수합니다."
+      },
+      "transparency": {
+        "title": "투명경영",
+        "description": "구성원 및 이해관계자 정보공유, 리스크 사전예방"
+      }
+    },
+    "coreValues": {
+      "title": "핵심 가치",
+      "customerSatisfaction": {
+        "title": "고객만족 실현",
+        "description": "고객의 의견을 중시하고, 더 큰 만족을 드리기 위해 한결같은 마음으로 고객가치 경영을 실현 합니다. 고객의 의견을 중시하고, 더 큰 만족을 드리기 위해 한결같은 마음으로 고객가치 경영을 실현 합니다. 고객의 의견을 중시하고, 더 큰 만족을 드리기 위해 한결같은 마음으로 고객가치 경영을 실현 합니다."
+      },
+      "fairManagement": {
+        "title": "공정하고 투명한 경영",
+        "description": "법규를 준수하고 공정하고 깨끗한 경영환경을 만들어 갑니다. 법규를 준수하고 공정하고 깨끗한 경영환경을 만들어 갑니다. 법규를 준수하고 공정하고 깨끗한 경영환경을 만들어 갑니다. 법규를 준수하고 공정하고 깨끗한 경영환경을 만들어 갑니다. 법규를 준수하고 공정하고 깨끗한 경영환경을 만들어 갑니다."
+      },
+      "ecoFriendly": {
+        "title": "환경친화적인 경영",
+        "description": "환경친화적인 사업활동을 통해 경제발전과 지역 사회 발전을 위해 노력합니다. 환경친화적인 사업활동을 통해 경제발전과 지역 사회 발전을 위해 노력합니다. 환경친화적인 사업활동을 통해 경제발전과 지역 사회 발전을 위해 노력합니다. 환경친화적인 사업활동을 통해 경제발전과 지역 사회 발전을 위해 노력합니다."
+      },
+      "qualityManagement": {
+        "title": "품질경영",
+        "description": "최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다. 최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다. 최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다. 최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다."
+      }
+    }
+  },
+  "copyrightReport": {
+    "title": "저작권 침해 신고",
+    "loadingMessage": "로딩 중...",
+    "productSelector": {
+      "title": "저작권 신고할 제품 선택",
+      "loadingProducts": "제품을 불러오는 중...",
+      "noProducts": "제품이 없습니다.",
+      "categories": {
+        "all": "전체",
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others"
+      },
+      "myProduct": "내 작품",
+      "pagination": {
+        "previous": "이전",
+        "next": "다음"
+      },
+      "cancelButton": "취소"
+    },
+    "reportForm": {
+      "title": "저작권 침해 신고",
+      "contentLabel": "신고 내용 *",
+      "contentPlaceholder": "저작권 침해 내용을 상세히 입력해주세요. (원저작물 정보, 침해 내용 등)",
+      "evidenceFiles": "증거 파일 (최대 3개, 각 5MB 이하)",
+      "fileTypesInfo": "이미지(JPG, PNG, GIF, WebP) 또는 PDF 파일을 업로드할 수 있습니다.",
+      "backButton": "이전",
+      "submitButton": "신고하기",
+      "submitting": "제출 중...",
+      "uploading": "파일 업로드 중...",
+      "uploadingFiles": "파일을 업로드하는 중...",
+      "submittingReport": "신고를 제출하는 중...",
+      "errors": {
+        "maxFiles": "최대 3개의 파일만 업로드할 수 있습니다.",
+        "fileSize": "5MB를 초과하는 파일이 있습니다.",
+        "uploadFailed": "파일 업로드 실패",
+        "uploadError": "파일 업로드 중 오류가 발생했습니다.",
+        "contentRequired": "신고 내용을 입력해주세요.",
+        "submitFailed": "신고 제출에 실패했습니다.",
+        "submitError": "신고 제출 중 오류가 발생했습니다."
+      }
+    }
+  },
+  "checkout": {
+    "title": "주문/결제",
+    "preparingPage": "결제 페이지를 준비하는 중...",
+    "orderProducts": "주문 상품",
+    "noImage": "이미지 없음",
+    "deliveryInfo": "배송 정보",
+    "recipientName": "받는 분",
+    "required": "*",
+    "contactNumber": "연락처",
+    "contactPlaceholder": "01012345678",
+    "email": "이메일",
+    "zipCode": "우편번호",
+    "zipCodePlaceholder": "12345",
+    "address": "주소",
+    "detailAddress": "상세 주소",
+    "paymentMethod": "결제 방식",
+    "creditCard": "신용카드",
+    "bankTransfer": "무통장입금",
+    "bankTransferInfo": "무통장입금 안내",
+    "bankTransferGuide": "주문 완료 후 SMS로 입금 계좌번호를 안내해드립니다.",
+    "bankTransferGuideDetail": "입금 확인 후 상품을 준비해드립니다.",
+    "paymentAmount": "결제 금액",
+    "productAmount": "상품 금액",
+    "optionAmount": "옵션 추가 금액",
+    "shippingFee": "배송비",
+    "free": "무료",
+    "totalAmount": "총 결제 금액",
+    "termsAgreement": "이용약관 동의",
+    "financeTerms": "[필수] 전자금융거래 이용약관",
+    "financeTermsDetail": "전자금융거래법에 따른 이용약관에 동의합니다.",
+    "privacyTerms": "[필수] 개인정보 수집 및 이용",
+    "privacyTermsDetail": "결제 처리를 위한 개인정보 수집 및 이용에 동의합니다.",
+    "payButton": "{{amount}}원 결제하기",
+    "processing": "결제 처리 중...",
+    "cancelButton": "취소",
+    "errors": {
+      "noProductInfo": "상품 정보가 없습니다.",
+      "failedToLoadProduct": "상품 정보를 불러올 수 없습니다.",
+      "serverError": "서버 오류가 발생했습니다.",
+      "paymentSystemError": "결제 시스템을 불러올 수 없습니다.",
+      "invalidPhone": "하이픈을 제외한 올바른 전화번호를 입력해주세요. (예: 01012345678)",
+      "paymentFailed": "결제 요청에 실패했습니다. 다시 시도해 주세요.",
+      "paymentCancelled": "결제가 취소되었습니다."
+    },
+    "messages": {
+      "inputError": "입력 오류",
+      "paymentCancel": "결제 취소",
+      "paymentFail": "결제 실패",
+      "orderCompleted": "주문이 완료되었습니다",
+      "bankTransferCompleted": "SMS로 입금 계좌번호를 안내해드렸습니다. 입금 확인 후 상품을 준비해드립니다."
+    }
+  },
+  "paymentSuccess": {
+    "title": "결제가 완료되었습니다!",
+    "subtitle": "주문이 정상적으로 접수되었습니다.",
+    "processingResult": "결제 결과를 처리하는 중...",
+    "orderInfo": "주문 정보",
+    "orderId": "주문번호",
+    "customer": "주문자",
+    "paymentDate": "결제일시",
+    "paymentMethod": "결제수단",
+    "paymentKey": "결제키",
+    "paymentAmount": "결제 금액",
+    "orderDetailsButton": "주문 내역 확인",
+    "continueShopping": "쇼핑 계속하기",
+    "notices": {
+      "orderHistory": "• 주문 내역은 마이페이지에서 확인하실 수 있습니다.",
+      "shippingInquiry": "• 배송 관련 문의는 고객센터로 연락해 주세요.",
+      "receiptInquiry": "• 영수증이 필요하신 경우 고객센터로 문의해 주세요.",
+      "paymentInquiry": "• 결제 관련 문의는 토스페이먼츠 고객센터 1899-4905로 연락해 주세요."
+    },
+    "errors": {
+      "missingPaymentInfo": "결제 정보가 누락되었습니다.",
+      "approvalFailed": "결제 승인에 실패했습니다.",
+      "processingError": "결제 승인 처리 중 오류가 발생했습니다."
+    }
+  },
+  "paymentFail": {
+    "title": "결제에 실패했습니다",
+    "subtitle": "죄송합니다. 결제 처리 중 문제가 발생했습니다.",
+    "checkingResult": "결제 결과를 확인하는 중...",
+    "failureReason": "실패 사유",
+    "unknownError": "알 수 없는 오류가 발생했습니다.",
+    "retryPayment": "다시 결제하기",
+    "continueShopping": "쇼핑 계속하기",
+    "troubleshooting": {
+      "checkBalance": "• 카드 한도나 잔액을 확인해 주세요.",
+      "checkInfo": "• 입력 정보가 정확한지 다시 한 번 확인해 주세요.",
+      "contactSupport": "• 문제가 지속되면 고객센터로 문의해 주세요.",
+      "tryOtherMethod": "• 다른 결제 수단을 이용해 보세요."
+    }
+  },
+  "vendorRegister": {
+    "title": {
+      "create": "벤더 정보 입력",
+      "update": "벤더 정보 수정"
+    },
+    "subtitle": "사업자 인증을 위해 아래 항목을 작성해주세요.",
+    "fields": {
+      "vendorName": "상호명",
+      "vendorClass": "개인/법인 구분",
+      "personal": "개인",
+      "corporate": "법인",
+      "representative": "대표자명",
+      "contact": "연락처",
+      "email": "이메일",
+      "fax": "FAX",
+      "businessNumber": "사업자등록번호",
+      "address": "주소",
+      "zipCode": "우편번호",
+      "basicAddress": "기본주소",
+      "detailAddress": "상세주소",
+      "companyIntro": "회사소개",
+      "required": "*"
+    },
+    "placeholders": {
+      "vendorName": "상호명",
+      "representative": "대표자 이름",
+      "contact": "연락처 (- 제외 입력)",
+      "email": "이메일 주소",
+      "fax": "팩스 번호 (- 제외 입력)",
+      "businessNumber": "사업자등록번호 (- 제외 입력)",
+      "zipCode": "우편번호",
+      "basicAddress": "기본주소",
+      "detailAddress": "상세주소",
+      "companyIntro": "회사 소개를 입력해주세요."
+    },
+    "buttons": {
+      "verify": "사업자 인증하기",
+      "verifying": "확인 중...",
+      "verified": "인증완료",
+      "addressSearch": "주소검색",
+      "cancel": "취소",
+      "register": "등록하기",
+      "update": "수정하기",
+      "processing": "처리 중..."
+    },
+    "privacy": {
+      "agree": "개인정보처리방침에 동의합니다"
+    },
+    "errors": {
+      "businessNumberLength": "사업자등록번호는 10자리 숫자여야 합니다.",
+      "businessNumberInvalid": "유효하지 않은 사업자등록번호입니다.",
+      "businessNumberVerifyError": "사업자등록번호 검증 중 오류가 발생했습니다.",
+      "businessNumberVerifyRequired": "사업자등록번호 인증을 완료해주세요.",
+      "privacyAgreeRequired": "개인정보처리방침에 동의해주세요.",
+      "vendorRegisterError": "벤더 등록 중 오류가 발생했습니다.",
+      "vendorInfoLoadError": "벤더 정보 로드 실패:"
+    }
+  },
+  "upload": {
+    "title": "여러분의 소중한 작품을 기다립니다",
+    "subtitle": "디자이너 여러분의 창의적인 디자인을 공유해 주셔서 진심으로 감사드립니다.",
+    "checkBeforeUpload": "디자인 업로드 전 아래의 사항을 꼼꼼히 확인해주시기 바랍니다.",
+    "requiredCheck": "업로드 전 필수 확인사항",
+    "guidelines": {
+      "item1": {
+        "title": "1. 필수 작성 항목 기재",
+        "content": "작품 등록 시 제공되는 모든 입력란을 빠짐없이 작성해 주시기 바랍니다."
+      },
+      "item2": {
+        "title": "2. 이미지 업로드 구성",
+        "content": "메인 이미지 1개와 서브 이미지 1~3개, 총 최대 4개의 이미지를 업로드 하실 수 있습니다."
+      },
+      "item3": {
+        "title": "3. 이미지 규격 및 형식",
+        "content": "• 정사각형 비율 필수\n• 권장 크기: 800 x 800 이상\n• 용량: 5MB 이하\n• 형식: PNG, JPG, JPEG"
+      },
+      "item4": {
+        "title": "4. 정확한 카테고리 설정",
+        "content": "디자인의 성격에 맞는 카테고리를 선택해 주세요."
+      },
+      "item5": {
+        "title": "5. 관리자 승인 후 노출",
+        "content": "등록된 작품은 내부 검토 후 노출됩니다. (영업일 기준 2~3일 소요)"
+      }
+    },
+    "form": {
+      "mainImage": "대표 이미지",
+      "additionalImages": "추가 이미지",
+      "category": "작품 카테고리",
+      "artworkName": "작품명",
+      "description": "작품설명",
+      "terms": "약관/안내사항",
+      "required": "*",
+      "selectMainImage": "대표 이미지 선택",
+      "selectCategory": "작품 카테고리를 선택해주세요.",
+      "artworkNamePlaceholder": "작품명",
+      "descriptionPlaceholder": "작품에 대한 상세한 설명을 입력해주세요.",
+      "agreeToTerms": "약관/안내사항의 내용에 동의합니다.",
+      "uploadButton": "업로드하기",
+      "uploading": "업로드 중...",
+      "imageSpecs": "권장 크기: 800 x 800 이상\n용량: 5MB 이하\nPNG, JPG, JPEG",
+      "additionalImageSpecs": "권장 크기: 800 x 800 이상\n용량: 5MB 이하\nPNG, JPG, JPEG\n최대 3장까지 선택 가능합니다.",
+      "additionalImageCount": "추가 이미지 ({{count}}/3개)",
+      "imageNumber": "이미지 {{number}}"
+    },
+    "messages": {
+      "fileSizeExceeded": "파일 용량 초과",
+      "fileSizeExceededDesc": "파일 용량은 5MB 이하여야 합니다.",
+      "invalidFileType": "파일 형식 오류",
+      "invalidFileTypeDesc": "이미지 파일만 업로드 가능합니다.",
+      "mainImageRequired": "대표 이미지 필수",
+      "mainImageRequiredDesc": "대표 이미지를 선택해주세요.",
+      "categoryRequired": "카테고리 필수",
+      "categoryRequiredDesc": "카테고리를 선택해주세요.",
+      "artworkNameRequired": "작품명 필수",
+      "artworkNameRequiredDesc": "작품명을 입력해주세요.",
+      "descriptionRequired": "작품설명 필수",
+      "descriptionRequiredDesc": "작품설명을 입력해주세요.",
+      "termsRequired": "약관 동의 필수",
+      "termsRequiredDesc": "약관에 동의해주세요.",
+      "uploadSuccess": "업로드 완료",
+      "uploadSuccessDesc": "작품이 성공적으로 업로드되었습니다. 관리자 승인 후 사이트에 노출됩니다.",
+      "uploadFailed": "업로드 실패",
+      "uploadFailedDesc": "업로드 중 오류가 발생했습니다.",
+      "uploadError": "업로드 오류",
+      "finalConfirmTitle": "디자인 업로드 시 최종 약관을 확인하셨습니까?",
+      "finalConfirmDesc": "업로드된 디자인은 관리자 승인 후 사이트에 노출됩니다. 약관에 동의하신 후 업로드를 진행해주세요."
+    },
+    "loginRequired": {
+      "title": "로그인이 필요합니다",
+      "description": "디자인 업로드는 회원만 이용하실 수 있습니다. 로그인 후 이용해 주시기 바랍니다."
+    }
+  },
+  "resetPassword": {
+    "success": {
+      "title": "비밀번호 변경 완료",
+      "subtitle": "비밀번호가 성공적으로 변경되었습니다.",
+      "message": "비밀번호 변경이 완료되었습니다.",
+      "loginMessage": "회원아이디와 변경된 비밀번호로 로그인 하시기 바랍니다.",
+      "securityMessage": "보안을 위해 로그인 후 새로운 비밀번호로 변경해 주시기 바랍니다.",
+      "goToLogin": "로그인 페이지로 이동"
+    },
+    "failure": {
+      "title": "비밀번호 변경 실패",
+      "subtitle": "비밀번호 변경 중 문제가 발생했습니다.",
+      "errorLabel": "오류:",
+      "linkExpiredMessage": "인증 링크가 만료되었거나 이미 사용된 링크일 수 있습니다.",
+      "tryAgain": "다시 시도",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "errors": {
+      "invalidAccess": "잘못된 접근입니다.",
+      "resetFailed": "비밀번호 변경에 실패했습니다.",
+      "requestError": "요청 처리 중 오류가 발생했습니다."
+    }
+  },
+  "profile": {
+    "edit": {
+      "title": "회원정보 수정",
+      "subtitle": "회원정보를 수정하실 수 있습니다.",
+      "loadingMessage": "사용자 정보를 불러오는 중...",
+      "successTitle": "성공",
+      "successMessage": "회원정보가 성공적으로 수정되었습니다.",
+      "fields": {
+        "userId": "아이디",
+        "userIdNotEditable": "아이디는 변경할 수 없습니다.",
+        "name": "이름",
+        "nameNotEditable": "이름은 변경할 수 없습니다.",
+        "email": "이메일",
+        "emailPlaceholder": "이메일을 입력해주세요",
+        "phone": "휴대폰 번호",
+        "phonePlaceholder": "예: 01012345678 (숫자만 입력)",
+        "newPassword": "새 비밀번호",
+        "newPasswordPlaceholder": "변경하지 않으려면 비워두세요",
+        "confirmPassword": "새 비밀번호 확인",
+        "confirmPasswordPlaceholder": "새 비밀번호를 다시 입력하세요",
+        "marketingConsent": "광고성 정보 수신 동의",
+        "marketingConsentDesc": "이벤트, 할인 혜택 등의 정보를 받아보시겠습니까?"
+      },
+      "buttons": {
+        "cancel": "취소",
+        "submit": "수정하기",
+        "submitting": "수정 중..."
+      },
+      "errors": {
+        "emailRequired": "이메일을 입력해주세요.",
+        "phoneRequired": "휴대폰 번호를 입력해주세요.",
+        "invalidEmail": "올바른 이메일 주소를 입력해주세요.",
+        "invalidPhone": "휴대폰 번호는 01로 시작하는 11자리 숫자로 입력해주세요.",
+        "passwordMismatch": "새 비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+        "updateFailed": "회원정보 수정 중 오류가 발생했습니다.",
+        "loadFailed": "사용자 정보를 불러오는 중 오류가 발생했습니다."
+      }
+    },
+    "confirm": {
+      "title": "회원정보 수정",
+      "subtitle": "회원정보를 수정하려면 현재 비밀번호를 입력해주세요.",
+      "fields": {
+        "password": "비밀번호",
+        "passwordPlaceholder": "현재 비밀번호를 입력하세요"
+      },
+      "buttons": {
+        "cancel": "취소",
+        "confirm": "확인",
+        "confirming": "확인 중..."
+      },
+      "errors": {
+        "invalidPassword": "비밀번호가 올바르지 않습니다.",
+        "confirmFailed": "비밀번호 확인 중 오류가 발생했습니다."
+      }
+    }
+  },
+  "privacy": {
+    "title": "개인정보 처리방침",
+    "supplementary": {
+      "title": "부칙",
+      "content": "본 방침은 OOOO년 OO월 OO일부터 시행합니다."
+    }
+  },
+  "provision": {
+    "title": "서비스 이용약관",
+    "supplementary": {
+      "title": "부칙",
+      "content1": "1. 이 약관은 2024년 01월 01일부터 시행합니다.",
+      "content2": "2. 이 약관은 전자상거래(인터넷사이버몰) 표준약관 제10023호(2014. 9. 19. 개정)를 준수합니다."
+    }
+  }
+}

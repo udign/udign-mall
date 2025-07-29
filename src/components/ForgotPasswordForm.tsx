@@ -4,8 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
+import { Dictionary } from '@/lib/dictionaries';
 
-export default function ForgotPasswordForm() {
+interface ForgotPasswordFormProps {
+  dictionary: Dictionary;
+}
+
+export default function ForgotPasswordForm({ dictionary }: ForgotPasswordFormProps) {
   const [email, setEmail] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -35,7 +40,7 @@ export default function ForgotPasswordForm() {
         setError(data.message);
       }
     } catch {
-      setError('요청 처리 중 오류가 발생했습니다.');
+      setError(dictionary.auth.forgotPassword.error.general);
     } finally {
       setIsLoading(false);
     }
@@ -45,21 +50,23 @@ export default function ForgotPasswordForm() {
     <div className='w-full'>
       <div className='rounded-lg border border-gray-600 bg-black/80 p-8 backdrop-blur-sm'>
         <div className='mb-6 text-center'>
-          <h2 className='mb-2 text-2xl font-semibold text-white'>메일 발송 완료</h2>
+          <h2 className='mb-2 text-2xl font-semibold text-white'>
+            {dictionary.auth.forgotPassword.success.title}
+          </h2>
           <p className='text-base text-gray-300'>
-            {email} 메일로 회원아이디와 비밀번호를 인증할 수 있는 메일이 발송되었습니다.
+            {dictionary.auth.forgotPassword.success.message.replace('{{email}}', email)}
           </p>
         </div>
 
         <div className='space-y-4'>
           <div className='rounded border border-blue-500/50 bg-blue-500/20 p-4 text-sm text-blue-300'>
-            <p className='mb-2'>메일을 확인하여 주십시오.</p>
-            <p>메일함에서 메일이 보이지 않는다면 스팸함도 확인해 주세요.</p>
+            <p className='mb-2'>{dictionary.auth.forgotPassword.success.checkEmail}</p>
+            <p>{dictionary.auth.forgotPassword.success.checkSpam}</p>
           </div>
 
           <div className='flex space-x-3'>
             <Button onClick={() => router.push(ROUTES.LOGIN)} variant='outline' className='flex-1'>
-              로그인으로 돌아가기
+              {dictionary.auth.forgotPassword.success.backToLogin}
             </Button>
             <Button
               onClick={() => {
@@ -68,7 +75,7 @@ export default function ForgotPasswordForm() {
               }}
               className='flex-1'
             >
-              다시 시도
+              {dictionary.auth.forgotPassword.success.tryAgain}
             </Button>
           </div>
         </div>
@@ -78,11 +85,13 @@ export default function ForgotPasswordForm() {
     <div className='w-full'>
       <div className='rounded-lg border border-gray-600 bg-black/80 p-8 backdrop-blur-sm'>
         <div className='mb-6'>
-          <h2 className='mb-2 text-2xl font-semibold text-white'>아이디/비밀번호 찾기</h2>
+          <h2 className='mb-2 text-2xl font-semibold text-white'>
+            {dictionary.auth.forgotPassword.title}
+          </h2>
           <p className='text-base text-gray-300'>
-            회원가입 시 등록하신 이메일 주소를 입력해 주세요.
+            {dictionary.auth.forgotPassword.description}
             <br />
-            해당 이메일로 아이디와 비밀번호 정보를 보내드립니다.
+            {dictionary.auth.forgotPassword.descriptionLine2}
           </p>
         </div>
 
@@ -95,14 +104,15 @@ export default function ForgotPasswordForm() {
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label className='mb-1 block text-sm text-gray-300' htmlFor='mb_email'>
-              이메일 주소 <span className='text-red-400'>*</span>
+              {dictionary.auth.forgotPassword.emailLabel}{' '}
+              <span className='text-red-400'>{dictionary.auth.forgotPassword.required}</span>
             </label>
             <input
               className='focus:ring-primary w-full rounded border-0 bg-gray-100 px-3 py-2.5 text-gray-800 placeholder-gray-500 focus:ring-2 focus:outline-none'
               id='mb_email'
               name='mb_email'
               type='email'
-              placeholder='이메일 주소를 입력하세요'
+              placeholder={dictionary.auth.forgotPassword.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -115,7 +125,9 @@ export default function ForgotPasswordForm() {
             disabled={isLoading || !email.trim()}
             variant={email.trim() ? 'default' : 'secondary'}
           >
-            {isLoading ? '처리 중...' : '인증메일 보내기'}
+            {isLoading
+              ? dictionary.auth.forgotPassword.sendingButton
+              : dictionary.auth.forgotPassword.sendButton}
           </Button>
 
           <div className='mt-4 text-center'>
@@ -125,7 +137,7 @@ export default function ForgotPasswordForm() {
               variant='link'
               className='text-gray-300 hover:text-white'
             >
-              로그인으로 돌아가기
+              {dictionary.auth.forgotPassword.backToLogin}
             </Button>
           </div>
         </form>

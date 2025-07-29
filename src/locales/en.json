@@ -1,0 +1,940 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "upload": "Upload",
+    "search": "Search",
+    "all": "All",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "profile": "Profile",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "goHome": "Go Home",
+    "noData": "No data available"
+  },
+  "myUdign": {
+    "title": "My UDIGN",
+    "subtitle": "Your exclusive design journey",
+    "welcome": "{{name}}",
+    "welcomeMessage": "Welcome to UDIGN",
+    "preorderSystem": "UDIGN Pre-order System",
+    "systemDescription": {
+      "artwork": "Artwork: Designer sketches on the main page",
+      "like": "Like: Expression of interest in production",
+      "product": "Product: Actually produced artwork (only purchasable by users who liked)"
+    },
+    "reviewProcess": {
+      "title": "Review Process:",
+      "auto": "Automatic Review: Automatically proceeds to review stage when target likes are reached",
+      "manual": "Manual Review: Proceeds to review stage after administrator-set period"
+    },
+    "steps": {
+      "collection": "Design Like",
+      "review": "Production Review",
+      "payment": "Purchase Process",
+      "paymentWaiting": "Payment Pending",
+      "paymentCompleted": "Payment Completed",
+      "making": "Product Manufacturing",
+      "shipping": "Shipping Process",
+      "completed": "Delivery Completed"
+    },
+    "statusGroups": {
+      "all": "All",
+      "collection": "Design Like",
+      "review": "Production Review",
+      "payment": "Purchase Process",
+      "paymentCompleted": "Order Confirmed",
+      "making": "Product Manufacturing",
+      "shipping": "Shipping Process",
+      "completed": "Delivery Completed",
+      "cancelled": "Cancelled/Returned/Out of Stock"
+    },
+    "artworkStatus": "My Artwork Status",
+    "noArtworks": "No artworks in this status.",
+    "loadingMore": "Loading more artworks...",
+    "allLoaded": "All artworks have been loaded.",
+    "notification": "Notification",
+    "artwork": {
+      "noImage": "No Image",
+      "price": "{{price}} KRW",
+      "likeCount": "{{count}} likes",
+      "orderDate": "Order Date: {{date}}",
+      "paymentMethod": "Payment Method: {{method}}",
+      "paymentAmount": "Payment Amount: {{amount}} KRW",
+      "options": "Options: {{options}}",
+      "quantity": "Quantity: {{quantity}}",
+      "actions": {
+        "toggleInterest": "Toggle Interest",
+        "cancelOrder": "Cancel Order",
+        "confirmPurchase": "Confirm Purchase",
+        "requestReturn": "Request Exchange/Return"
+      },
+      "status": {
+        "collection": "Collection",
+        "review": "Under Review",
+        "payment": "Purchase Process",
+        "paymentCompleted": "Order Confirmed",
+        "making": "Manufacturing",
+        "shipping": "Shipping",
+        "completed": "Completed",
+        "cancelled": "Order Cancelled"
+      }
+    },
+    "dialogs": {
+      "interest": {
+        "add": "Add to Wishlist",
+        "remove": "Remove from Wishlist",
+        "addMessage": "Would you like to add this item to your wishlist?",
+        "removeMessage": "Would you like to remove this item from your wishlist?",
+        "addButton": "Add",
+        "removeButton": "Remove"
+      },
+      "purchase": {
+        "confirm": "Purchase Confirmation",
+        "confirmMessage": "Would you like to confirm this purchase?",
+        "confirmButton": "Confirm"
+      },
+      "cancel": {
+        "title": "Cancel Order",
+        "reasonLabel": "Cancellation Reason",
+        "reasonPlaceholder": "Please enter the reason for cancellation",
+        "reasonRequired": "Please enter the cancellation reason.",
+        "confirmTitle": "Confirm Order Cancellation",
+        "confirmMessage": "Are you sure you want to cancel this order?",
+        "submitButton": "Cancel Order"
+      },
+      "return": {
+        "title": "Exchange/Return Request",
+        "nameLabel": "Applicant Name",
+        "namePlaceholder": "Please enter your name",
+        "phoneLabel": "Contact Number",
+        "phonePlaceholder": "Please enter your contact number",
+        "typeLabel": "Request Type",
+        "exchange": "Exchange",
+        "return": "Return",
+        "reasonLabel": "Reason",
+        "reasonPlaceholder": "Please enter the reason for exchange/return in detail",
+        "submitButton": "Submit Request",
+        "allFieldsRequired": "Please fill in all fields."
+      }
+    },
+    "admin": {
+      "reviewStatus": "Review Status",
+      "approveReview": "Approve Review",
+      "rejectReview": "Reject Review"
+    }
+  },
+  "search": {
+    "title": "Search Results",
+    "emptyQuery": "Please enter a search term.",
+    "loading": "Loading search results...",
+    "noResults": "No search results found.",
+    "noResultsDesc": "Please try a different search term.",
+    "resultsCount": "{{count}} artworks found.",
+    "searchFor": "Search results for '{{query}}'"
+  },
+  "company": {
+    "title": "About Us",
+    "images": {
+      "alt1": "UDIGN Company Image 1",
+      "alt2": "UDIGN Company Image 2"
+    },
+    "mainMessage": "UDIGN strives to create value for artists and\nspread new culture to every corner of the world",
+    "welcome": {
+      "title": "Welcome to UDIGN, the design production and sales platform.",
+      "paragraph1": "With a stylishly and trendily designed main page and various content pages with diverse forms spanning over 60 pages, it has become possible to further enhance customer satisfaction.",
+      "paragraph2": "You can view samples uploaded to the template and select pages and desired forms suitable for your industry to configure your homepage, and if desired, full version usage is also possible without additional cost.",
+      "paragraph3": "Thanks to solution development, it has become possible to significantly reduce costs and provide services, allowing for the creation of high-quality websites at low cost within a short period.",
+      "paragraph4": "We promise to create high-quality websites that can meet your expectations. We hope to create your dreams and future together through website creation.",
+      "paragraph5": "We will make continuous efforts to become a healthy company UDIGN that receives trust and love from customers.",
+      "logoMessage": "The UDIGN company logo symbolizes wealth and good fortune, containing the meaning of wishing for business prosperity. We wish for your continued business prosperity and success. Thank you."
+    },
+    "visionMission": {
+      "title": "Management Philosophy & Vision",
+      "subtitle1": "Ethical Management, the Foundation of",
+      "subtitle2": "Trust the Ground for Sustainable Growth",
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "We practice corporate management for sustainable growth."
+      },
+      "fairCompetition": {
+        "title": "Fair Competition",
+        "description": "We maintain fair trade order and comply with laws and social norms."
+      },
+      "transparency": {
+        "title": "Transparent Management",
+        "description": "Information sharing with members and stakeholders, proactive risk prevention"
+      }
+    },
+    "coreValues": {
+      "title": "Core Values",
+      "customerSatisfaction": {
+        "title": "Customer Satisfaction",
+        "description": "We value customer opinions and realize customer value management with a consistent heart to provide greater satisfaction. We value customer opinions and realize customer value management with a consistent heart to provide greater satisfaction. We value customer opinions and realize customer value management with a consistent heart to provide greater satisfaction."
+      },
+      "fairManagement": {
+        "title": "Fair and Transparent Management",
+        "description": "We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment."
+      },
+      "ecoFriendly": {
+        "title": "Eco-Friendly Management",
+        "description": "We strive for economic development and local community development through eco-friendly business activities. We strive for economic development and local community development through eco-friendly business activities. We strive for economic development and local community development through eco-friendly business activities. We strive for economic development and local community development through eco-friendly business activities."
+      },
+      "qualityManagement": {
+        "title": "Quality Management",
+        "description": "With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management."
+      }
+    }
+  },
+  "copyrightReport": {
+    "title": "Copyright Infringement Report",
+    "loadingMessage": "Loading...",
+    "productSelector": {
+      "title": "Select Product to Report",
+      "loadingProducts": "Loading products...",
+      "noProducts": "No products available.",
+      "categories": {
+        "all": "All",
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others"
+      },
+      "myProduct": "My Artwork",
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "cancelButton": "Cancel"
+    },
+    "reportForm": {
+      "title": "Copyright Infringement Report",
+      "contentLabel": "Report Content *",
+      "contentPlaceholder": "Please describe the copyright infringement in detail. (Original work information, infringement details, etc.)",
+      "evidenceFiles": "Evidence Files (Max 3 files, each under 5MB)",
+      "fileTypesInfo": "You can upload image files (JPG, PNG, GIF, WebP) or PDF files.",
+      "backButton": "Back",
+      "submitButton": "Submit Report",
+      "submitting": "Submitting...",
+      "uploading": "Uploading...",
+      "uploadingFiles": "Uploading files...",
+      "submittingReport": "Submitting report...",
+      "errors": {
+        "maxFiles": "You can upload a maximum of 3 files.",
+        "fileSize": "Some files exceed 5MB.",
+        "uploadFailed": "File upload failed",
+        "uploadError": "An error occurred while uploading files.",
+        "contentRequired": "Please enter the report content.",
+        "submitFailed": "Failed to submit the report.",
+        "submitError": "An error occurred while submitting the report."
+      }
+    }
+  },
+  "checkout": {
+    "title": "Order/Payment",
+    "preparingPage": "Preparing payment page...",
+    "orderProducts": "Order Items",
+    "noImage": "No Image",
+    "deliveryInfo": "Delivery Information",
+    "recipientName": "Recipient",
+    "required": "*",
+    "contactNumber": "Contact Number",
+    "contactPlaceholder": "01012345678",
+    "email": "Email",
+    "zipCode": "Zip Code",
+    "zipCodePlaceholder": "12345",
+    "address": "Address",
+    "detailAddress": "Detail Address",
+    "paymentMethod": "Payment Method",
+    "creditCard": "Credit Card",
+    "bankTransfer": "Bank Transfer",
+    "bankTransferInfo": "Bank Transfer Information",
+    "bankTransferGuide": "Account details will be sent via SMS after order completion.",
+    "bankTransferGuideDetail": "Products will be prepared after payment confirmation.",
+    "paymentAmount": "Payment Amount",
+    "productAmount": "Product Amount",
+    "optionAmount": "Option Additional Cost",
+    "shippingFee": "Shipping Fee",
+    "free": "Free",
+    "totalAmount": "Total Payment Amount",
+    "termsAgreement": "Terms Agreement",
+    "financeTerms": "[Required] Electronic Financial Transaction Terms",
+    "financeTermsDetail": "I agree to the terms of electronic financial transactions.",
+    "privacyTerms": "[Required] Personal Information Collection and Use",
+    "privacyTermsDetail": "I agree to the collection and use of personal information for payment processing.",
+    "payButton": "Pay {{amount}} KRW",
+    "processing": "Processing payment...",
+    "cancelButton": "Cancel",
+    "errors": {
+      "noProductInfo": "No product information available.",
+      "failedToLoadProduct": "Failed to load product information.",
+      "serverError": "A server error occurred.",
+      "paymentSystemError": "Failed to load payment system.",
+      "invalidPhone": "Please enter a valid phone number without hyphens (e.g., 01012345678)",
+      "paymentFailed": "Payment request failed. Please try again.",
+      "paymentCancelled": "Payment was cancelled."
+    },
+    "messages": {
+      "inputError": "Input Error",
+      "paymentCancel": "Payment Cancelled",
+      "paymentFail": "Payment Failed",
+      "orderCompleted": "Order completed",
+      "bankTransferCompleted": "Account details have been sent via SMS. Products will be prepared after payment confirmation."
+    }
+  },
+  "paymentSuccess": {
+    "title": "Payment Completed!",
+    "subtitle": "Your order has been successfully placed.",
+    "processingResult": "Processing payment result...",
+    "orderInfo": "Order Information",
+    "orderId": "Order Number",
+    "customer": "Customer",
+    "paymentDate": "Payment Date",
+    "paymentMethod": "Payment Method",
+    "paymentKey": "Payment Key",
+    "paymentAmount": "Payment Amount",
+    "orderDetailsButton": "Check Order Details",
+    "continueShopping": "Continue Shopping",
+    "notices": {
+      "orderHistory": "• You can check your order history in My Page.",
+      "shippingInquiry": "• For shipping inquiries, please contact customer service.",
+      "receiptInquiry": "• If you need a receipt, please contact customer service.",
+      "paymentInquiry": "• For payment inquiries, please contact TossPayments customer service at 1899-4905."
+    },
+    "errors": {
+      "missingPaymentInfo": "Payment information is missing.",
+      "approvalFailed": "Payment approval failed.",
+      "processingError": "An error occurred while processing payment approval."
+    }
+  },
+  "paymentFail": {
+    "title": "Payment Failed",
+    "subtitle": "Sorry, there was a problem processing your payment.",
+    "checkingResult": "Checking payment result...",
+    "failureReason": "Failure Reason",
+    "unknownError": "An unknown error occurred.",
+    "retryPayment": "Try Payment Again",
+    "continueShopping": "Continue Shopping",
+    "troubleshooting": {
+      "checkBalance": "• Please check your card limit or balance.",
+      "checkInfo": "• Please double-check that your information is correct.",
+      "contactSupport": "• If the problem persists, please contact customer service.",
+      "tryOtherMethod": "• Please try using a different payment method."
+    }
+  },
+  "shop": {
+    "title": "Shop",
+    "uploadProduct": "Upload Design",
+    "categories": {
+      "all": "All",
+      "fashion": "Fashion",
+      "shoes": "Shoes",
+      "others": "Others",
+      "accessory": "Accessory",
+      "home": "Home Interior",
+      "beauty": "Beauty",
+      "art": "Art",
+      "digital": "Digital",
+      "lifestyle": "Lifestyle"
+    },
+    "noProducts": "No artworks registered",
+    "loadMore": "Loading more artworks...",
+    "allLoaded": "All artworks have been loaded",
+    "loadingProducts": "Loading artworks...",
+    "designDescription": "Choose a design made just for you. The perfect gift will be completed.",
+    "loginRequired": "Upload Design",
+    "loginRequiredMessage": "You need to login to upload a design.",
+    "goToLogin": "Go to Login"
+  },
+  "auth": {
+    "forgotPassword": {
+      "title": "Find ID/Password",
+      "description": "Please enter the email address you registered when signing up.",
+      "descriptionLine2": "We will send ID and password information to that email.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "required": "*",
+      "sendButton": "Send Authentication Email",
+      "sendingButton": "Processing...",
+      "backToLogin": "Back to Login",
+      "success": {
+        "title": "Email Sent Successfully",
+        "message": "An email to verify your member ID and password has been sent to {{email}}.",
+        "checkEmail": "Please check your email.",
+        "checkSpam": "If you don't see the email in your inbox, please check your spam folder as well.",
+        "backToLogin": "Back to Login",
+        "tryAgain": "Try Again"
+      },
+      "error": {
+        "general": "An error occurred while processing your request."
+      }
+    },
+    "login": {
+      "title": "Be sure your design",
+      "subtitle": "Your design becomes the highest value.",
+      "fields": {
+        "id": "ID",
+        "password": "Password",
+        "idPlaceholder": "Enter your ID",
+        "passwordPlaceholder": "Enter your password",
+        "required": "*"
+      },
+      "buttons": {
+        "login": "Login",
+        "loggingIn": "Logging in...",
+        "register": "Sign Up"
+      },
+      "autoLogin": {
+        "label": "Auto Login",
+        "confirmTitle": "Auto Login Confirmation",
+        "confirmMessage": "If you use auto login, you won't need to enter your member ID and password next time. However, please refrain from using it in public places as personal information may be leaked. Do you want to use auto login?"
+      },
+      "links": {
+        "forgotPassword": "Find ID/Password"
+      },
+      "errors": {
+        "general": "An error occurred while logging in."
+      }
+    },
+    "register": {
+      "title": "Welcome to UDIGN.",
+      "fields": {
+        "id": "ID",
+        "password": "Password",
+        "passwordConfirm": "Confirm Password",
+        "name": "Name",
+        "phone": "Phone Number",
+        "email": "Email",
+        "birth": "Date of Birth",
+        "required": "*",
+        "idPlaceholder": "Enter your ID",
+        "passwordPlaceholder": "Password (6-15 characters, including uppercase, lowercase, numbers, and special characters)",
+        "passwordConfirmPlaceholder": "Confirm your password",
+        "namePlaceholder": "Enter your name",
+        "phonePlaceholder": "Phone number (without dashes)",
+        "emailPlaceholder": "Enter your email",
+        "birthPlaceholder": "Select your date of birth"
+      },
+      "agreements": {
+        "allAgree": "Agree to all terms",
+        "termsRequired": "Agree to Terms of Service and Required Personal Information Collection",
+        "marketing": "Agree to receive promotional information",
+        "marketingNote": "(Service usage may be limited if not agreed.)"
+      },
+      "buttons": {
+        "register": "Sign Up",
+        "registering": "Signing up...",
+        "loginLink": "Login"
+      },
+      "messages": {
+        "alreadyHaveAccount": "Already have an account?",
+        "ageRestrictionTitle": "Registration Restriction",
+        "ageRestrictionMessage": "Sorry. Only users aged 19 and over can register."
+      },
+      "errors": {
+        "general": "An error occurred during registration.",
+        "termsRequired": "Agreement to Terms of Service and Personal Information Collection is required.",
+        "passwordMismatch": "Password and confirm password do not match.",
+        "passwordRules": "Password must be 6-15 characters and include uppercase, lowercase, numbers, and special characters."
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "subtitle": "Please agree to the terms to use the service.",
+      "allAgree": "Agree to all terms",
+      "termsAgree": "(Required) Agree to Terms of Service",
+      "privacyAgree": "(Required) Agree to Privacy Policy",
+      "viewFull": "View Full Text",
+      "buttons": {
+        "cancel": "Cancel",
+        "createAccount": "Create Account"
+      },
+      "dialog": {
+        "title": "Notice",
+        "message": "Please agree to the required terms."
+      }
+    }
+  },
+  "guide": {
+    "title": "User Guide",
+    "progressInfo": "All progress in UDIGN can be checked in MY UDIGN.",
+    "myUdign": "MY UDIGN",
+    "steps": {
+      "designLike": "Design Like",
+      "productionReview": "Production Review",
+      "purchaseProgress": "Purchase Progress",
+      "orderConfirmation": "Order Confirmation",
+      "productManufacturing": "Product Manufacturing",
+      "deliveryProgress": "Delivery Progress",
+      "receiptComplete": "Receipt Complete"
+    },
+    "sections": {
+      "section1": {
+        "title": "1. Please be sure to click \"Like♥\" on designs you like~",
+        "content1": "When the selected design's \"Like♥\" reaches the predetermined quantity, it will be given the opportunity to be produced as a product through production review. (Limited quantity production)",
+        "content2": "You will receive a limited unique number according to the order of \"Like♥\", and this number will be connected to the unique number of the product to be produced later.",
+        "note": "( You can cancel likes until the production review stage. )"
+      },
+      "section2": {
+        "title": "2. For designs in the production review stage, UDIGN reviews whether to produce the product and prepares for overall commercialization.",
+        "content": "Internal review is conducted as part of the commercialization preparation process. However, production may be difficult depending on the internal and external requirements of the design, and reasons for impossibility will be individually notified."
+      },
+      "section3": {
+        "title": "3. When production is confirmed and commercialization preparation is completed, the design detail page is changed to a product purchase page where payment is possible.",
+        "content1": "The purchase button is activated in MY UDIGN along with purchase guidance messages. Clicking the purchase button moves you to the purchase page where you can check product descriptions and delivery-related content and proceed with payment to confirm your order!!",
+        "content2": "You are the Nth owner of the product!!"
+      },
+      "section4": {
+        "title": "4. Order confirmation stage where all payments are being collected.",
+        "content1": "You can cancel your order during the order confirmation stage for a certain period while all purchase payments are being processed. (※ Cancellation is not possible during production.)",
+        "content2": "When canceling an order, repurchase is not possible and the product unique number is also deleted, so please make a careful choice.",
+        "content3": "If production becomes difficult due to some factors including design issues discovered later, we will immediately refund with individual notification."
+      },
+      "section5": {
+        "title": "5. All payments OK! Products exclusively for members who liked♥ are being produced. UDIGN let's go!",
+        "content": "Because UDIGN pursues limited quantities and the highest quality, the production period may take a long time. Please understand. We will repay you with all our passion!!"
+      },
+      "section6": {
+        "title": "6. Once production is completed, inspection and packaging are done, then it quickly departs to your doorstep.",
+        "content1": "Thank you so much for waiting. When production is completed, it is packaged through a professional logistics team and shipped by courier.",
+        "content2": "The basic delivery time is based on the delivery time standard of the relevant courier company, and there may be differences depending on region, weather, and courier company circumstances, so please take note~"
+      },
+      "section7": {
+        "title": "7. Once delivery is completed and you check the product and confirm your purchase, all processes in MY UDIGN are finished!!",
+        "content1": "When you receive the product, please check its condition immediately and please confirm your purchase!",
+        "content2": "If you want to proceed with exchange/return, please apply with the reason and we will help you proceed quickly.",
+        "content3": "However, due to the characteristics of UDIGN products that pursue limited order production and the highest quality, return and exchange processing may not be possible after a certain period.",
+        "content4": "Please be sure to refer to the following information.",
+        "notes": {
+          "note1": "All exchange and return costs are free of charge.",
+          "note2": "If a return is confirmed, your product serial number (unique number) will be deleted.",
+          "note3": "If you proceed with an exchange, the product serial number (unique number) will be maintained as is."
+        }
+      }
+    }
+  },
+  "language": {
+    "select": "Select Language",
+    "korean": "한국어",
+    "english": "English",
+    "changeLanguage": "Would you like to change the language?",
+    "languageChanged": "Language has been changed"
+  },
+  "header": {
+    "admin": "Admin",
+    "editProfile": "Edit Profile",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "You need to login to use this feature.",
+    "purchaseAvailable": "You have {{count}} products available for purchase."
+  },
+  "footer": {
+    "aboutUdign": "about UDIGN",
+    "userGuide": "User Guide",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "vendorPage": "Vendor Page",
+    "copyrightReport": "Copyright Report",
+    "company": {
+      "representative": "Representative",
+      "phone": "Phone",
+      "fax": "Fax",
+      "address": "Business Address",
+      "addressValue": "Building B, 6th Floor, Room 618, 32 Jingwan 3-ro, Eunpyeong-gu, Seoul, Republic of Korea",
+      "businessNumber": "Business Registration Number",
+      "ecommerceNumber": "E-commerce Registration Number",
+      "privacyManager": "Privacy Manager",
+      "email": "E-MAIL"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "phone": "1577-4215",
+      "operatingHours": "Operating Hours: Weekdays 09:00 ~ 17:00",
+      "lunchTime": "Lunch Time: Weekdays 12:00 ~ 13:00",
+      "holiday": "Sat, Sun / Public Holiday Closed",
+      "followUs": "Follow Us"
+    }
+  },
+  "sidebar": {
+    "todayViewed": {
+      "title": "Today Viewed",
+      "description": "Shows the list of artworks viewed today.",
+      "empty": "No artworks viewed yet",
+      "recentCount": "{{count}} recently viewed artworks",
+      "clearAll": "Clear All",
+      "noImage": "No Image",
+      "storageInfo": "Up to {{max}} products can be stored for one day"
+    },
+    "search": {
+      "title": "Search Artworks",
+      "description": "You can search for artworks.",
+      "placeholder": "Search for the artwork you're looking for",
+      "button": "Search",
+      "hint": "Search by artwork name, artist name, etc."
+    },
+    "navigation": {
+      "menu": "Menu",
+      "description": "Site navigation menu",
+      "category": "CATEGORY",
+      "siteMenu": "SITE MENU",
+      "aboutUs": "ABOUT US",
+      "all": "All",
+      "vendorPage": "Vendor Page",
+      "copyrightReport": "Copyright Report",
+      "siteIntro": "About Site",
+      "serviceTerms": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "designUpload": "Design Upload",
+      "userGuide": "User Guide",
+      "categories": {
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others",
+        "men": "Men",
+        "women": "Women"
+      },
+      "fashionItems": {
+        "top": "Top",
+        "bottom": "Bottom",
+        "outer": "Outer",
+        "product": "Product",
+        "space": "Space"
+      },
+      "shoeItems": {
+        "sneakers": "Sneakers",
+        "dressShoes": "Dress Shoes/Sneakers",
+        "walker": "Walker",
+        "sandals": "Sandals/Slippers",
+        "rainBoots": "Rain Boots",
+        "boots": "Boots"
+      },
+      "otherItems": {
+        "top": "Top",
+        "bottom": "Bottom",
+        "graphic": "Graphic",
+        "product": "Product",
+        "space": "Space"
+      }
+    }
+  },
+  "productDetail": {
+    "loading": {
+      "authCheck": "Checking authentication...",
+      "productInfo": "Loading product information..."
+    },
+    "notFound": "Product not found",
+    "status": {
+      "fullAndUnderReview": "full & under review",
+      "reviewInProgress": "🔍 Currently under review",
+      "reviewInProgressDesc": "Available for purchase after review completion.",
+      "manualReview": "Manual review",
+      "autoReview": "Automatic review (proceeds immediately upon goal achievement)",
+      "collectingLikes": "📝 Collecting likes",
+      "collectingLikesDesc": "Will proceed to {{type}} review when target is reached.",
+      "reviewCompleted": "✅ Review completed",
+      "purchaseAvailable": "Available for purchase.",
+      "daysRemaining": "Auto-proceed in {{days}} days"
+    },
+    "navigation": {
+      "previous": "previous",
+      "next": "next",
+      "noPrevious": "No previous product",
+      "noNext": "No next product"
+    },
+    "price": {
+      "title": "Price Information",
+      "originalPrice": "Original Price",
+      "salePrice": "Sale Price",
+      "basePrice": "Base Price",
+      "optionPrice": "Option Additional Cost",
+      "quantity": "Quantity",
+      "totalPrice": "Total Price"
+    },
+    "options": {
+      "title": "Select Options",
+      "selectPlaceholder": "Please select {{option}}",
+      "selectedOptions": "Selected Options",
+      "stock": "{{count}} in stock",
+      "allOptionsRequired": "⚠️ Please select all options"
+    },
+    "quantity": {
+      "title": "Select Quantity",
+      "label": "Purchase Quantity"
+    },
+    "purchase": {
+      "buyNow": "Buy Now",
+      "sizeGuide": "View Size Guide"
+    },
+    "sizeGuide": {
+      "title": "Size Guide",
+      "description": "Measurement guide for accurate size selection",
+      "loading": "Loading size guide...",
+      "notSupported": "Size Guide Not Supported",
+      "notSupportedDesc": "This item does not support size guide.",
+      "area": "Area",
+      "measurementMethod": "📏 Measurement Method",
+      "measurementTips": [
+        "Lay the garment flat and measure",
+        "For stretch fabrics, measure in a natural relaxed state",
+        "All measurements are in cm"
+      ],
+      "precautions": "⚠️ Precautions",
+      "precautionsList": [
+        "Measurements may vary by 1-3cm depending on method",
+        "Colors may appear different depending on monitor settings",
+        "Slight shrinkage may occur after washing"
+      ]
+    },
+    "imageMagnifier": {
+      "title": "Image Magnifier",
+      "instruction": "Hover your mouse over the image to magnify"
+    },
+    "description": {
+      "title": "Product Description",
+      "designer": "Designer:",
+      "productDetailInfo": "Product Detail Information"
+    },
+    "magnifier": {
+      "enlargeImage": "Enlarge Image"
+    },
+    "dialog": {
+      "loginRequired": "Login Required",
+      "loginRequiredDesc": "Please log in to view product details.",
+      "likeCompleted": "Like Registration Completed",
+      "likeCompletedDesc": "You are collector **No. {{orderNumber}}** of {{productName}}.\n\nThank you sincerely for joining this creative journey designed for only a few.",
+      "confirm": "Confirm"
+    },
+    "popularProducts": {
+      "title": "Popular Works"
+    }
+  },
+  "vendorRegister": {
+    "title": {
+      "create": "Vendor Information Registration",
+      "update": "Vendor Information Update"
+    },
+    "subtitle": "Please fill out the following information for business verification.",
+    "fields": {
+      "vendorName": "Business Name",
+      "vendorClass": "Individual/Corporate",
+      "personal": "Individual",
+      "corporate": "Corporate",
+      "representative": "Representative",
+      "contact": "Contact",
+      "email": "Email",
+      "fax": "FAX",
+      "businessNumber": "Business Registration Number",
+      "address": "Address",
+      "zipCode": "Zip Code",
+      "basicAddress": "Basic Address",
+      "detailAddress": "Detail Address",
+      "companyIntro": "Company Introduction",
+      "required": "*"
+    },
+    "placeholders": {
+      "vendorName": "Business Name",
+      "representative": "Representative Name",
+      "contact": "Contact Number (without dashes)",
+      "email": "Email Address",
+      "fax": "Fax Number (without dashes)",
+      "businessNumber": "Business Registration Number (without dashes)",
+      "zipCode": "Zip Code",
+      "basicAddress": "Basic Address",
+      "detailAddress": "Detail Address",
+      "companyIntro": "Please enter company introduction."
+    },
+    "buttons": {
+      "verify": "Verify Business Number",
+      "verifying": "Verifying...",
+      "verified": "Verified",
+      "addressSearch": "Search Address",
+      "cancel": "Cancel",
+      "register": "Register",
+      "update": "Update",
+      "processing": "Processing..."
+    },
+    "privacy": {
+      "agree": "I agree to the privacy policy"
+    },
+    "errors": {
+      "businessNumberLength": "Business registration number must be 10 digits.",
+      "businessNumberInvalid": "Invalid business registration number.",
+      "businessNumberVerifyError": "An error occurred while verifying the business registration number.",
+      "businessNumberVerifyRequired": "Please complete business registration number verification.",
+      "privacyAgreeRequired": "Please agree to the privacy policy.",
+      "vendorRegisterError": "An error occurred during vendor registration.",
+      "vendorInfoLoadError": "Failed to load vendor information:"
+    }
+  },
+  "upload": {
+    "title": "We are waiting for your precious works",
+    "subtitle": "Thank you sincerely for sharing your creative designs, designers.",
+    "checkBeforeUpload": "Please carefully check the following before uploading your design.",
+    "requiredCheck": "Required items to check before upload",
+    "guidelines": {
+      "item1": {
+        "title": "1. Fill in all required fields",
+        "content": "Please fill in all input fields provided when registering your artwork."
+      },
+      "item2": {
+        "title": "2. Image upload composition",
+        "content": "You can upload up to 4 images in total: 1 main image and 1-3 sub images."
+      },
+      "item3": {
+        "title": "3. Image specifications and format",
+        "content": "• Square ratio required\n• Recommended size: 800 x 800 or higher\n• Size: 5MB or less\n• Format: PNG, JPG, JPEG"
+      },
+      "item4": {
+        "title": "4. Accurate category setting",
+        "content": "Please select a category that matches the nature of your design."
+      },
+      "item5": {
+        "title": "5. Display after admin approval",
+        "content": "Registered works will be displayed after internal review. (2-3 business days required)"
+      }
+    },
+    "form": {
+      "mainImage": "Main Image",
+      "additionalImages": "Additional Images",
+      "category": "Artwork Category",
+      "artworkName": "Artwork Name",
+      "description": "Artwork Description",
+      "terms": "Terms/Guidelines",
+      "required": "*",
+      "selectMainImage": "Select Main Image",
+      "selectCategory": "Please select an artwork category.",
+      "artworkNamePlaceholder": "Artwork Name",
+      "descriptionPlaceholder": "Please enter a detailed description of your artwork.",
+      "agreeToTerms": "I agree to the terms and guidelines.",
+      "uploadButton": "Upload",
+      "uploading": "Uploading...",
+      "imageSpecs": "Recommended size: 800 x 800 or higher\nSize: 5MB or less\nPNG, JPG, JPEG",
+      "additionalImageSpecs": "Recommended size: 800 x 800 or higher\nSize: 5MB or less\nPNG, JPG, JPEG\nUp to 3 images can be selected.",
+      "additionalImageCount": "Additional Images ({{count}}/3)",
+      "imageNumber": "Image {{number}}"
+    },
+    "messages": {
+      "fileSizeExceeded": "File Size Exceeded",
+      "fileSizeExceededDesc": "File size must be 5MB or less.",
+      "invalidFileType": "Invalid File Type",
+      "invalidFileTypeDesc": "Only image files can be uploaded.",
+      "mainImageRequired": "Main Image Required",
+      "mainImageRequiredDesc": "Please select a main image.",
+      "categoryRequired": "Category Required",
+      "categoryRequiredDesc": "Please select a category.",
+      "artworkNameRequired": "Artwork Name Required",
+      "artworkNameRequiredDesc": "Please enter an artwork name.",
+      "descriptionRequired": "Description Required",
+      "descriptionRequiredDesc": "Please enter an artwork description.",
+      "termsRequired": "Terms Agreement Required",
+      "termsRequiredDesc": "Please agree to the terms.",
+      "uploadSuccess": "Upload Completed",
+      "uploadSuccessDesc": "Your artwork has been successfully uploaded. It will be displayed on the site after admin approval.",
+      "uploadFailed": "Upload Failed",
+      "uploadFailedDesc": "An error occurred during upload.",
+      "uploadError": "Upload Error",
+      "finalConfirmTitle": "Have you confirmed the final terms for design upload?",
+      "finalConfirmDesc": "Uploaded designs will be displayed on the site after admin approval. Please proceed with upload after agreeing to the terms."
+    },
+    "loginRequired": {
+      "title": "Login Required",
+      "description": "Design upload is only available to members. Please log in to use this service."
+    }
+  },
+  "resetPassword": {
+    "success": {
+      "title": "Password Reset Complete",
+      "subtitle": "Your password has been successfully changed.",
+      "message": "Password reset has been completed.",
+      "loginMessage": "Please log in with your member ID and the new password.",
+      "securityMessage": "For security reasons, please change to a new password after logging in.",
+      "goToLogin": "Go to Login Page"
+    },
+    "failure": {
+      "title": "Password Reset Failed",
+      "subtitle": "There was a problem changing your password.",
+      "errorLabel": "Error:",
+      "linkExpiredMessage": "The authentication link may have expired or already been used.",
+      "tryAgain": "Try Again",
+      "backToLogin": "Back to Login"
+    },
+    "errors": {
+      "invalidAccess": "Invalid access.",
+      "resetFailed": "Password reset failed.",
+      "requestError": "An error occurred while processing the request."
+    }
+  },
+  "profile": {
+    "edit": {
+      "title": "Edit Profile",
+      "subtitle": "You can edit your profile information.",
+      "loadingMessage": "Loading user information...",
+      "successTitle": "Success",
+      "successMessage": "Profile information has been successfully updated.",
+      "fields": {
+        "userId": "User ID",
+        "userIdNotEditable": "User ID cannot be changed.",
+        "name": "Name",
+        "nameNotEditable": "Name cannot be changed.",
+        "email": "Email",
+        "emailPlaceholder": "Please enter your email",
+        "phone": "Phone Number",
+        "phonePlaceholder": "e.g. 01012345678 (numbers only)",
+        "newPassword": "New Password",
+        "newPasswordPlaceholder": "Leave empty if you don't want to change",
+        "confirmPassword": "Confirm New Password",
+        "confirmPasswordPlaceholder": "Re-enter your new password",
+        "marketingConsent": "Marketing Information Consent",
+        "marketingConsentDesc": "Would you like to receive information about events and discount offers?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "submit": "Update",
+        "submitting": "Updating..."
+      },
+      "errors": {
+        "emailRequired": "Please enter your email.",
+        "phoneRequired": "Please enter your phone number.",
+        "invalidEmail": "Please enter a valid email address.",
+        "invalidPhone": "Phone number must be 11 digits starting with 01.",
+        "passwordMismatch": "New password and password confirmation do not match.",
+        "updateFailed": "An error occurred while updating profile information.",
+        "loadFailed": "An error occurred while loading user information."
+      }
+    },
+    "confirm": {
+      "title": "Edit Profile",
+      "subtitle": "Please enter your current password to edit profile information.",
+      "fields": {
+        "password": "Password",
+        "passwordPlaceholder": "Enter your current password"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "confirming": "Confirming..."
+      },
+      "errors": {
+        "invalidPassword": "Password is incorrect.",
+        "confirmFailed": "An error occurred while confirming password."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "supplementary": {
+      "title": "Supplementary Provisions",
+      "content": "This policy comes into effect from YYYY-MM-DD."
+    }
+  },
+  "provision": {
+    "title": "Terms of Service",
+    "supplementary": {
+      "title": "Supplementary Provisions",
+      "content1": "1. These terms come into effect from January 1, 2024.",
+      "content2": "2. These terms comply with the E-commerce (Internet Cyber Mall) Standard Terms No. 10023 (revised September 19, 2014)."
+    }
+  }
+}
