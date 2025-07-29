@@ -8,17 +8,28 @@ import { Card } from '@/components/ui/primitives/card';
 import { Label } from '@/components/ui/primitives/label';
 import { Input } from '@/components/ui/primitives/input';
 import LoadingState from '@/components/states/LoadingState';
-import { ProductForReport, FileUploadResponse, CopyrightReportResponse } from '@/types/copyright-report';
+import {
+  ProductForReport,
+  FileUploadResponse,
+  CopyrightReportResponse,
+} from '@/types/copyright-report';
 import { XIcon } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface CopyrightReportFormProps {
   product: ProductForReport;
   onSuccess: () => void;
   onCancel: () => void;
+  dictionary: Dictionary;
 }
 
-export default function CopyrightReportForm({ product, onSuccess, onCancel }: CopyrightReportFormProps) {
+export default function CopyrightReportForm({
+  product,
+  onSuccess,
+  onCancel,
+  dictionary,
+}: CopyrightReportFormProps) {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
@@ -28,18 +39,18 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    
+
     // 최대 3개 파일 제한
     if (files.length + selectedFiles.length > 3) {
-      setError('최대 3개의 파일만 업로드할 수 있습니다.');
+      setError(dictionary.copyrightReport.reportForm.errors.maxFiles);
       return;
     }
 
     // 파일 크기 검증
     const maxSize = 5 * 1024 * 1024; // 5MB
-    const oversizedFiles = selectedFiles.filter(file => file.size > maxSize);
+    const oversizedFiles = selectedFiles.filter((file) => file.size > maxSize);
     if (oversizedFiles.length > 0) {
-      setError('5MB를 초과하는 파일이 있습니다.');
+      setError(dictionary.copyrightReport.reportForm.errors.fileSize);
       return;
     }
 
@@ -72,7 +83,7 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
         if (data.success && data.url) {
           urls.push(data.url);
         } else {
-          throw new Error(data.error || '파일 업로드 실패');
+          throw new Error(data.error || dictionary.copyrightReport.reportForm.errors.uploadFailed);
         }
       }
 
@@ -80,7 +91,7 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
       return urls;
     } catch (error) {
       console.error('Error uploading files:', error);
-      setError('파일 업로드 중 오류가 발생했습니다.');
+      setError(dictionary.copyrightReport.reportForm.errors.uploadError);
       return null;
     } finally {
       setUploading(false);
@@ -89,7 +100,7 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
 
   const handleSubmit = async () => {
     if (!content.trim()) {
-      setError('신고 내용을 입력해주세요.');
+      setError(dictionary.copyrightReport.reportForm.errors.contentRequired);
       return;
     }
 
@@ -128,11 +139,11 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
       if (data.success) {
         onSuccess();
       } else {
-        setError(data.error || '신고 제출에 실패했습니다.');
+        setError(data.error || dictionary.copyrightReport.reportForm.errors.submitFailed);
       }
     } catch (error) {
       console.error('Error submitting report:', error);
-      setError('신고 제출 중 오류가 발생했습니다.');
+      setError(dictionary.copyrightReport.reportForm.errors.submitError);
     } finally {
       setSubmitting(false);
     }
@@ -142,23 +153,20 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
 
   return (
     <div className='rounded-lg bg-white p-6 shadow-xl'>
-      <h2 className='mb-6 text-2xl font-bold text-gray-900'>저작권 침해 신고</h2>
+      <h2 className='mb-6 text-2xl font-bold text-gray-900'>
+        {dictionary.copyrightReport.reportForm.title}
+      </h2>
 
       {/* 선택한 제품 정보 */}
       <Card className='mb-6 p-4'>
         <div className='flex gap-4'>
           <div className='relative h-24 w-24 flex-shrink-0'>
-            <Image
-              src={imageUrl}
-              alt={product.it_name}
-              fill
-              className='object-cover rounded'
-            />
+            <Image src={imageUrl} alt={product.it_name} fill className='rounded object-cover' />
           </div>
           <div>
             <h3 className='font-semibold'>{product.it_name}</h3>
             <p className='text-sm text-gray-600'>{product.creator_name}</p>
-            <p className='text-sm text-gray-500 mt-1'>{product.it_basic}</p>
+            <p className='mt-1 text-sm text-gray-500'>{product.it_basic}</p>
           </div>
         </div>
       </Card>
@@ -166,10 +174,10 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
       {/* 신고 내용 입력 */}
       <div className='space-y-4'>
         <div>
-          <Label htmlFor='content'>신고 내용 *</Label>
+          <Label htmlFor='content'>{dictionary.copyrightReport.reportForm.contentLabel}</Label>
           <Textarea
             id='content'
-            placeholder='저작권 침해 내용을 상세히 입력해주세요. (원저작물 정보, 침해 내용 등)'
+            placeholder={dictionary.copyrightReport.reportForm.contentPlaceholder}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={6}
@@ -179,7 +187,7 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
 
         {/* 증거 파일 업로드 */}
         <div>
-          <Label htmlFor='files'>증거 파일 (최대 3개, 각 5MB 이하)</Label>
+          <Label htmlFor='files'>{dictionary.copyrightReport.reportForm.evidenceFiles}</Label>
           <Input
             id='files'
             type='file'
@@ -189,8 +197,8 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
             className='mt-2'
             disabled={files.length >= 3}
           />
-          <p className='text-sm text-gray-500 mt-1'>
-            이미지(JPG, PNG, GIF, WebP) 또는 PDF 파일을 업로드할 수 있습니다.
+          <p className='mt-1 text-sm text-gray-500'>
+            {dictionary.copyrightReport.reportForm.fileTypesInfo}
           </p>
         </div>
 
@@ -198,8 +206,8 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
         {files.length > 0 && (
           <div className='space-y-2'>
             {files.map((file, index) => (
-              <div key={index} className='flex items-center justify-between bg-gray-50 p-2 rounded'>
-                <span className='text-sm truncate'>{file.name}</span>
+              <div key={index} className='flex items-center justify-between rounded bg-gray-50 p-2'>
+                <span className='truncate text-sm'>{file.name}</span>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -214,31 +222,35 @@ export default function CopyrightReportForm({ product, onSuccess, onCancel }: Co
         )}
 
         {/* 에러 메시지 */}
-        {error && (
-          <div className='text-red-500 text-sm p-3 bg-red-50 rounded'>
-            {error}
-          </div>
-        )}
+        {error && <div className='rounded bg-red-50 p-3 text-sm text-red-500'>{error}</div>}
       </div>
 
       {/* 버튼 영역 */}
       <div className='mt-6 flex justify-end gap-3'>
         <Button variant='outline' onClick={onCancel} disabled={submitting || uploading}>
-          이전
+          {dictionary.copyrightReport.reportForm.backButton}
         </Button>
-        <Button 
-          onClick={handleSubmit} 
-          disabled={submitting || uploading || !content.trim()}
-        >
-          {submitting ? '제출 중...' : uploading ? '파일 업로드 중...' : '신고하기'}
+        <Button onClick={handleSubmit} disabled={submitting || uploading || !content.trim()}>
+          {submitting
+            ? dictionary.copyrightReport.reportForm.submitting
+            : uploading
+              ? dictionary.copyrightReport.reportForm.uploading
+              : dictionary.copyrightReport.reportForm.submitButton}
         </Button>
       </div>
 
       {(submitting || uploading) && (
         <div className='mt-4'>
-          <LoadingState message={uploading ? '파일을 업로드하는 중...' : '신고를 제출하는 중...'} />
+          <LoadingState
+            message={
+              uploading
+                ? dictionary.copyrightReport.reportForm.uploadingFiles
+                : dictionary.copyrightReport.reportForm.submittingReport
+            }
+            dictionary={dictionary}
+          />
         </div>
       )}
     </div>
   );
-} 
+}

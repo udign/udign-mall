@@ -9,21 +9,21 @@ import LoadingState from '@/components/states/LoadingState';
 import EmptyState from '@/components/states/EmptyState';
 import { ProductForReport, ProductSearchResponse } from '@/types/copyright-report';
 import { getImageUrl } from '@/lib/utils';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface ProductSelectorProps {
   onSelect: (product: ProductForReport) => void;
   onCancel: () => void;
   currentUserId: string;
+  dictionary: Dictionary;
 }
 
-const CATEGORIES = [
-  { id: '', name: '전체' },
-  { id: '10', name: 'Fashion' },
-  { id: '20', name: 'Shoes' },
-  { id: '30', name: 'Others' },
-];
-
-export default function ProductSelector({ onSelect, onCancel, currentUserId }: ProductSelectorProps) {
+export default function ProductSelector({
+  onSelect,
+  onCancel,
+  currentUserId,
+  dictionary,
+}: ProductSelectorProps) {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<ProductForReport[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -33,6 +33,13 @@ export default function ProductSelector({ onSelect, onCancel, currentUserId }: P
     hasNext: false,
     hasPrev: false,
   });
+
+  const CATEGORIES = [
+    { id: '', name: dictionary.copyrightReport.productSelector.categories.all },
+    { id: '10', name: dictionary.copyrightReport.productSelector.categories.fashion },
+    { id: '20', name: dictionary.copyrightReport.productSelector.categories.shoes },
+    { id: '30', name: dictionary.copyrightReport.productSelector.categories.others },
+  ];
 
   const fetchProducts = async (categoryId: string, pageNum: number) => {
     setLoading(true);
@@ -71,7 +78,9 @@ export default function ProductSelector({ onSelect, onCancel, currentUserId }: P
 
   return (
     <div className='rounded-lg bg-white p-6 shadow-xl'>
-      <h2 className='mb-6 text-2xl font-bold text-gray-900'>저작권 신고할 제품 선택</h2>
+      <h2 className='mb-6 text-2xl font-bold text-gray-900'>
+        {dictionary.copyrightReport.productSelector.title}
+      </h2>
 
       <Tabs value={selectedCategory} onValueChange={handleCategoryChange} className='mb-6'>
         <TabsList className='grid w-full grid-cols-4'>
@@ -84,42 +93,43 @@ export default function ProductSelector({ onSelect, onCancel, currentUserId }: P
       </Tabs>
 
       {loading ? (
-        <LoadingState message='제품을 불러오는 중...' />
+        <LoadingState
+          message={dictionary.copyrightReport.productSelector.loadingProducts}
+          dictionary={dictionary}
+        />
       ) : products.length === 0 ? (
-        <EmptyState message='제품이 없습니다.' />
+        <EmptyState
+          message={dictionary.copyrightReport.productSelector.noProducts}
+          dictionary={dictionary}
+        />
       ) : (
         <>
           <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4'>
             {products.map((product) => {
               const isOwnProduct = product.creator_id === currentUserId;
               const imageUrl = getImageUrl(product.it_img1) || '/images/logo.png';
-              
+
               return (
                 <Card
                   key={product.it_id}
                   className={`cursor-pointer overflow-hidden transition-all ${
-                    isOwnProduct 
-                      ? 'opacity-50 cursor-not-allowed' 
-                      : 'hover:shadow-lg'
+                    isOwnProduct ? 'cursor-not-allowed opacity-50' : 'hover:shadow-lg'
                   }`}
                   onClick={() => !isOwnProduct && onSelect(product)}
                 >
-                  <div className='aspect-square relative'>
-                    <Image
-                      src={imageUrl}
-                      alt={product.it_name}
-                      fill
-                      className='object-cover'
-                    />
+                  <div className='relative aspect-square'>
+                    <Image src={imageUrl} alt={product.it_name} fill className='object-cover' />
                     {isOwnProduct && (
-                      <div className='absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-                        <p className='text-white text-sm font-medium'>내 작품</p>
+                      <div className='bg-opacity-50 absolute inset-0 flex items-center justify-center bg-black'>
+                        <p className='text-sm font-medium text-white'>
+                          {dictionary.copyrightReport.productSelector.myProduct}
+                        </p>
                       </div>
                     )}
                   </div>
                   <div className='p-3'>
-                    <h3 className='font-medium text-sm truncate'>{product.it_name}</h3>
-                    <p className='text-xs text-gray-500 truncate'>{product.creator_name}</p>
+                    <h3 className='truncate text-sm font-medium'>{product.it_name}</h3>
+                    <p className='truncate text-xs text-gray-500'>{product.creator_name}</p>
                   </div>
                 </Card>
               );
@@ -134,7 +144,7 @@ export default function ProductSelector({ onSelect, onCancel, currentUserId }: P
                 onClick={() => setPage(page - 1)}
                 disabled={!pagination.hasPrev}
               >
-                이전
+                {dictionary.copyrightReport.productSelector.pagination.previous}
               </Button>
               <span className='flex items-center px-4'>
                 {page} / {pagination.totalPages}
@@ -144,7 +154,7 @@ export default function ProductSelector({ onSelect, onCancel, currentUserId }: P
                 onClick={() => setPage(page + 1)}
                 disabled={!pagination.hasNext}
               >
-                다음
+                {dictionary.copyrightReport.productSelector.pagination.next}
               </Button>
             </div>
           )}
@@ -153,9 +163,9 @@ export default function ProductSelector({ onSelect, onCancel, currentUserId }: P
 
       <div className='mt-6 flex justify-end gap-3'>
         <Button variant='outline' onClick={onCancel}>
-          취소
+          {dictionary.copyrightReport.productSelector.cancelButton}
         </Button>
       </div>
     </div>
   );
-} 
+}

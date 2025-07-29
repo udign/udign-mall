@@ -13,7 +13,8 @@
     "close": "닫기",
     "confirm": "확인",
     "cancel": "취소",
-    "goHome": "홈으로 돌아가기"
+    "goHome": "홈으로 돌아가기",
+    "noData": "데이터가 없습니다"
   },
   "shop": {
     "title": "쇼핑몰",
@@ -404,6 +405,49 @@
       "qualityManagement": {
         "title": "품질경영",
         "description": "최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다. 최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다. 최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다. 최고의 기술력으로 고품질 고부가가치를 지향하고 안전관리에 최선을 다합니다."
+      }
+    }
+  },
+  "copyrightReport": {
+    "title": "저작권 침해 신고",
+    "loadingMessage": "로딩 중...",
+    "productSelector": {
+      "title": "저작권 신고할 제품 선택",
+      "loadingProducts": "제품을 불러오는 중...",
+      "noProducts": "제품이 없습니다.",
+      "categories": {
+        "all": "전체",
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others"
+      },
+      "myProduct": "내 작품",
+      "pagination": {
+        "previous": "이전",
+        "next": "다음"
+      },
+      "cancelButton": "취소"
+    },
+    "reportForm": {
+      "title": "저작권 침해 신고",
+      "contentLabel": "신고 내용 *",
+      "contentPlaceholder": "저작권 침해 내용을 상세히 입력해주세요. (원저작물 정보, 침해 내용 등)",
+      "evidenceFiles": "증거 파일 (최대 3개, 각 5MB 이하)",
+      "fileTypesInfo": "이미지(JPG, PNG, GIF, WebP) 또는 PDF 파일을 업로드할 수 있습니다.",
+      "backButton": "이전",
+      "submitButton": "신고하기",
+      "submitting": "제출 중...",
+      "uploading": "파일 업로드 중...",
+      "uploadingFiles": "파일을 업로드하는 중...",
+      "submittingReport": "신고를 제출하는 중...",
+      "errors": {
+        "maxFiles": "최대 3개의 파일만 업로드할 수 있습니다.",
+        "fileSize": "5MB를 초과하는 파일이 있습니다.",
+        "uploadFailed": "파일 업로드 실패",
+        "uploadError": "파일 업로드 중 오류가 발생했습니다.",
+        "contentRequired": "신고 내용을 입력해주세요.",
+        "submitFailed": "신고 제출에 실패했습니다.",
+        "submitError": "신고 제출 중 오류가 발생했습니다."
       }
     }
   },

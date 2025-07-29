@@ -1,77 +1,24 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { ROUTES } from '@/lib/routes';
+import { Suspense } from 'react';
 import LoadingState from '@/components/states/LoadingState';
-import ProductSelector from '@/components/ProductSelector';
-import CopyrightReportForm from '@/components/CopyrightReportForm';
-import { ProductForReport } from '@/types/copyright-report';
+import CopyrightReportContent from '@/components/CopyrightReportContent';
+import { getDictionary } from '@/lib/dictionaries';
+import { Locale } from '../../../../../i18n.config';
 
-export default function CopyrightReportPage() {
-  const router = useRouter();
-  const { user, isLoading } = useAuth();
-  const [step, setStep] = useState<1 | 2>(1);
-  const [selectedProduct, setSelectedProduct] = useState<ProductForReport | null>(null);
+interface CopyrightReportPageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push(ROUTES.LOGIN);
-    }
-  }, [user, isLoading, router]);
-
-  const handleProductSelect = (product: ProductForReport) => {
-    setSelectedProduct(product);
-    setStep(2);
-  };
-
-  const handleBack = () => {
-    if (step === 2) {
-      setStep(1);
-      setSelectedProduct(null);
-    } else {
-      router.back();
-    }
-  };
-
-  const handleSuccess = () => {
-    router.push(ROUTES.HOME);
-  };
-
-  if (isLoading) {
-    return <LoadingState message='로딩 중...' />;
-  }
-
-  if (!user) {
-    return null;
-  }
+export default async function CopyrightReportPage({ params }: CopyrightReportPageProps) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
 
   return (
-    <div
-      className='flex min-h-screen flex-col bg-cover bg-fixed bg-center bg-no-repeat'
-      style={{
-        backgroundImage: 'url(/images/auth-bg.png)',
-        backgroundColor: '#1a2332',
-      }}
+    <Suspense
+      fallback={
+        <LoadingState message={dictionary.copyrightReport.loadingMessage} dictionary={dictionary} />
+      }
     >
-      <div className='relative z-10 mt-10 flex flex-1 justify-center p-4'>
-        <div className='w-full max-w-6xl'>
-          {step === 1 ? (
-            <ProductSelector
-              onSelect={handleProductSelect}
-              onCancel={handleBack}
-              currentUserId={user.mb_id}
-            />
-          ) : (
-            <CopyrightReportForm
-              product={selectedProduct!}
-              onSuccess={handleSuccess}
-              onCancel={handleBack}
-            />
-          )}
-        </div>
-      </div>
-    </div>
+      <CopyrightReportContent dictionary={dictionary} />
+    </Suspense>
   );
-} 
+}

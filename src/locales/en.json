@@ -13,7 +13,8 @@
     "close": "Close",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "goHome": "Go Home"
+    "goHome": "Go Home",
+    "noData": "No data available"
   },
   "myUdign": {
     "title": "My UDIGN",
@@ -186,6 +187,49 @@
       "qualityManagement": {
         "title": "Quality Management",
         "description": "With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management."
+      }
+    }
+  },
+  "copyrightReport": {
+    "title": "Copyright Infringement Report",
+    "loadingMessage": "Loading...",
+    "productSelector": {
+      "title": "Select Product to Report",
+      "loadingProducts": "Loading products...",
+      "noProducts": "No products available.",
+      "categories": {
+        "all": "All",
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others"
+      },
+      "myProduct": "My Artwork",
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "cancelButton": "Cancel"
+    },
+    "reportForm": {
+      "title": "Copyright Infringement Report",
+      "contentLabel": "Report Content *",
+      "contentPlaceholder": "Please describe the copyright infringement in detail. (Original work information, infringement details, etc.)",
+      "evidenceFiles": "Evidence Files (Max 3 files, each under 5MB)",
+      "fileTypesInfo": "You can upload image files (JPG, PNG, GIF, WebP) or PDF files.",
+      "backButton": "Back",
+      "submitButton": "Submit Report",
+      "submitting": "Submitting...",
+      "uploading": "Uploading...",
+      "uploadingFiles": "Uploading files...",
+      "submittingReport": "Submitting report...",
+      "errors": {
+        "maxFiles": "You can upload a maximum of 3 files.",
+        "fileSize": "Some files exceed 5MB.",
+        "uploadFailed": "File upload failed",
+        "uploadError": "An error occurred while uploading files.",
+        "contentRequired": "Please enter the report content.",
+        "submitFailed": "Failed to submit the report.",
+        "submitError": "An error occurred while submitting the report."
       }
     }
   },
