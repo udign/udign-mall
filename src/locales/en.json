@@ -373,6 +373,64 @@
       }
     }
   },
+  "guide": {
+    "title": "User Guide",
+    "progressInfo": "All progress in UDIGN can be checked in MY UDIGN.",
+    "myUdign": "MY UDIGN",
+    "steps": {
+      "designLike": "Design Like",
+      "productionReview": "Production Review",
+      "purchaseProgress": "Purchase Progress",
+      "orderConfirmation": "Order Confirmation",
+      "productManufacturing": "Product Manufacturing",
+      "deliveryProgress": "Delivery Progress",
+      "receiptComplete": "Receipt Complete"
+    },
+    "sections": {
+      "section1": {
+        "title": "1. Please be sure to click \"Like♥\" on designs you like~",
+        "content1": "When the selected design's \"Like♥\" reaches the predetermined quantity, it will be given the opportunity to be produced as a product through production review. (Limited quantity production)",
+        "content2": "You will receive a limited unique number according to the order of \"Like♥\", and this number will be connected to the unique number of the product to be produced later.",
+        "note": "( You can cancel likes until the production review stage. )"
+      },
+      "section2": {
+        "title": "2. For designs in the production review stage, UDIGN reviews whether to produce the product and prepares for overall commercialization.",
+        "content": "Internal review is conducted as part of the commercialization preparation process. However, production may be difficult depending on the internal and external requirements of the design, and reasons for impossibility will be individually notified."
+      },
+      "section3": {
+        "title": "3. When production is confirmed and commercialization preparation is completed, the design detail page is changed to a product purchase page where payment is possible.",
+        "content1": "The purchase button is activated in MY UDIGN along with purchase guidance messages. Clicking the purchase button moves you to the purchase page where you can check product descriptions and delivery-related content and proceed with payment to confirm your order!!",
+        "content2": "You are the Nth owner of the product!!"
+      },
+      "section4": {
+        "title": "4. Order confirmation stage where all payments are being collected.",
+        "content1": "You can cancel your order during the order confirmation stage for a certain period while all purchase payments are being processed. (※ Cancellation is not possible during production.)",
+        "content2": "When canceling an order, repurchase is not possible and the product unique number is also deleted, so please make a careful choice.",
+        "content3": "If production becomes difficult due to some factors including design issues discovered later, we will immediately refund with individual notification."
+      },
+      "section5": {
+        "title": "5. All payments OK! Products exclusively for members who liked♥ are being produced. UDIGN let's go!",
+        "content": "Because UDIGN pursues limited quantities and the highest quality, the production period may take a long time. Please understand. We will repay you with all our passion!!"
+      },
+      "section6": {
+        "title": "6. Once production is completed, inspection and packaging are done, then it quickly departs to your doorstep.",
+        "content1": "Thank you so much for waiting. When production is completed, it is packaged through a professional logistics team and shipped by courier.",
+        "content2": "The basic delivery time is based on the delivery time standard of the relevant courier company, and there may be differences depending on region, weather, and courier company circumstances, so please take note~"
+      },
+      "section7": {
+        "title": "7. Once delivery is completed and you check the product and confirm your purchase, all processes in MY UDIGN are finished!!",
+        "content1": "When you receive the product, please check its condition immediately and please confirm your purchase!",
+        "content2": "If you want to proceed with exchange/return, please apply with the reason and we will help you proceed quickly.",
+        "content3": "However, due to the characteristics of UDIGN products that pursue limited order production and the highest quality, return and exchange processing may not be possible after a certain period.",
+        "content4": "Please be sure to refer to the following information.",
+        "notes": {
+          "note1": "All exchange and return costs are free of charge.",
+          "note2": "If a return is confirmed, your product serial number (unique number) will be deleted.",
+          "note3": "If you proceed with an exchange, the product serial number (unique number) will be maintained as is."
+        }
+      }
+    }
+  },
   "language": {
     "select": "Select Language",
     "korean": "한국어",
