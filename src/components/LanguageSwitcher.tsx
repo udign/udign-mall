@@ -14,6 +14,7 @@ import { i18n, type Locale } from '../../i18n.config';
 const languageNames = {
   ko: '한국어',
   en: 'English',
+  ja: '日本語',
 };
 
 export default function LanguageSwitcher() {

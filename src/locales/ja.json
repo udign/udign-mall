@@ -1,0 +1,941 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行",
+    "upload": "アップロード",
+    "search": "検索",
+    "all": "全体",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "register": "会員登録",
+    "profile": "プロフィール",
+    "close": "閉じる",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "goHome": "ホームに戻る",
+    "noData": "データがありません"
+  },
+  "shop": {
+    "title": "ショッピングモール",
+    "uploadProduct": "デザインアップロード",
+    "categories": {
+      "all": "全体",
+      "fashion": "ファッション",
+      "shoes": "シューズ",
+      "others": "その他",
+      "accessory": "アクセサリー",
+      "home": "ホームインテリア",
+      "beauty": "ビューティー",
+      "art": "芸術作品",
+      "digital": "デジタル",
+      "lifestyle": "ライフスタイル"
+    },
+    "noProducts": "登録された作品がありません",
+    "loadMore": "追加作品を読み込み中...",
+    "allLoaded": "すべての作品を読み込みました",
+    "loadingProducts": "作品を読み込み中です...",
+    "designDescription": "あなただけのデザインを選択してください。最高のギフトが完成します。",
+    "loginRequired": "デザインアップロード",
+    "loginRequiredMessage": "デザインをアップロードするにはログインが必要です。",
+    "goToLogin": "ログインする"
+  },
+  "auth": {
+    "forgotPassword": {
+      "title": "ID・パスワード検索",
+      "description": "会員登録時に登録されたメールアドレスを入力してください。",
+      "descriptionLine2": "該当メールにIDとパスワード情報をお送りします。",
+      "emailLabel": "メールアドレス",
+      "emailPlaceholder": "メールアドレスを入力してください",
+      "required": "*",
+      "sendButton": "認証メール送信",
+      "sendingButton": "処理中...",
+      "backToLogin": "ログインに戻る",
+      "success": {
+        "title": "メール送信完了",
+        "message": "{{email}} メールに会員IDとパスワードを認証できるメールを送信しました。",
+        "checkEmail": "メールをご確認ください。",
+        "checkSpam": "メールボックスにメールが見当たらない場合は、スパムフォルダもご確認ください。",
+        "backToLogin": "ログインに戻る",
+        "tryAgain": "再試行"
+      },
+      "error": {
+        "general": "リクエスト処理中にエラーが発生しました。"
+      }
+    },
+    "login": {
+      "title": "Be sure your design",
+      "subtitle": "皆様のデザインは最高の価値となります。",
+      "fields": {
+        "id": "ID",
+        "password": "パスワード",
+        "idPlaceholder": "ID",
+        "passwordPlaceholder": "パスワード",
+        "required": "*"
+      },
+      "buttons": {
+        "login": "ログイン",
+        "loggingIn": "ログイン中...",
+        "register": "会員登録"
+      },
+      "autoLogin": {
+        "label": "自動ログイン",
+        "confirmTitle": "自動ログイン使用確認",
+        "confirmMessage": "自動ログインを使用すると、次回から会員IDとパスワードを入力する必要がありません。ただし、公共の場所では個人情報が漏洩する可能性がありますので、使用をお控えください。自動ログインを使用しますか？"
+      },
+      "links": {
+        "forgotPassword": "ID・パスワード検索"
+      },
+      "errors": {
+        "general": "ログイン中にエラーが発生しました。"
+      }
+    },
+    "register": {
+      "title": "ユダインへようこそ。",
+      "fields": {
+        "id": "ID",
+        "password": "パスワード",
+        "passwordConfirm": "パスワード確認",
+        "name": "名前",
+        "phone": "携帯電話番号",
+        "email": "メール",
+        "birth": "生年月日",
+        "required": "*",
+        "idPlaceholder": "ID",
+        "passwordPlaceholder": "パスワード（6～15文字以内 英文（大小文字）、数字、特殊文字の組み合わせ）",
+        "passwordConfirmPlaceholder": "パスワード確認",
+        "namePlaceholder": "名前",
+        "phonePlaceholder": "携帯電話番号（- 除く入力）",
+        "emailPlaceholder": "E-mail",
+        "birthPlaceholder": "生年月日を選択してください"
+      },
+      "agreements": {
+        "allAgree": "すべての項目に同意",
+        "termsRequired": "利用規約および必須個人情報収集に関する同意",
+        "marketing": "広告性情報受信に関する同意",
+        "marketingNote": "（同意しない場合、サービス利用に制限がある場合があります。）"
+      },
+      "buttons": {
+        "register": "会員登録",
+        "registering": "登録中...",
+        "loginLink": "ログイン"
+      },
+      "messages": {
+        "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
+        "ageRestrictionTitle": "会員登録制限",
+        "ageRestrictionMessage": "申し訳ございません。満19歳以上のみ会員登録が可能です。"
+      },
+      "errors": {
+        "general": "会員登録中にエラーが発生しました。",
+        "termsRequired": "利用規約および個人情報収集同意は必須です。",
+        "passwordMismatch": "パスワードとパスワード確認が一致しません。",
+        "passwordRules": "パスワードは6～15文字以内で英文（大小文字）、数字、特殊文字をすべて含む必要があります。"
+      }
+    },
+    "terms": {
+      "title": "利用規約",
+      "subtitle": "サービス利用のため規約に同意してください。",
+      "allAgree": "利用規約全体同意",
+      "termsAgree": "（必須）会員登録規約同意",
+      "privacyAgree": "（必須）個人情報処理方針案内同意",
+      "viewFull": "全文",
+      "buttons": {
+        "cancel": "キャンセル",
+        "createAccount": "新規アカウント作成"
+      },
+      "dialog": {
+        "title": "お知らせ",
+        "message": "必須規約に同意してください。"
+      }
+    }
+  },
+  "guide": {
+    "title": "利用案内",
+    "progressInfo": "ユダインのすべての進行状況はMY UDIGNで確認できます。",
+    "myUdign": "MY UDIGN",
+    "steps": {
+      "designLike": "デザインいいね",
+      "productionReview": "製作検討",
+      "purchaseProgress": "購入進行",
+      "orderConfirmation": "注文確定",
+      "productManufacturing": "商品製作",
+      "deliveryProgress": "配送進行",
+      "receiptComplete": "受領完了"
+    },
+    "sections": {
+      "section1": {
+        "title": "1. お気に入りのデザインには「いいね♥」を必ず押してください～",
+        "content1": "選択されたデザインの「いいね♥」が決められた数量分集まると、製作検討を通じて商品として製作される機会が与えられます。（限定数量製作）",
+        "content2": "「いいね♥」をした順序によって限定された数量の固有番号を受け取り、この番号は後に製作される商品固有番号につながります。",
+        "note": "（製作検討段階前まではいいねキャンセルも可能です。）"
+      },
+      "section2": {
+        "title": "2. 製作検討段階のデザインはUDIGNで商品製作可否検討および全般的な商品化準備をします。",
+        "content": "商品化準備過程として内部検討が進行されます。ただし、デザインの内・外部要件により製作進行が困難な場合があり、不可理由は個別にご案内いたします。"
+      },
+      "section3": {
+        "title": "3. 製作確定および商品化準備が完了すると、デザイン詳細ページが商品購入ページに変更され、決済が可能です。",
+        "content1": "購入案内メッセージとともにMY UDIGNで購入ボタンが有効化されます。購入ボタンを押すと購入ページに移動し、商品説明および配送関連内容を確認して決済を進行すると注文確定!!",
+        "content2": "皆様は商品のN番目の主人!!"
+      },
+      "section4": {
+        "title": "4. 決済がすべて集まっている注文確定段階。",
+        "content1": "購入決済がすべて進行される一定期間中、注文確定段階で注文キャンセルができます。（※製作中はキャンセル不可です。）",
+        "content2": "注文キャンセル時、再購入は不可で商品固有番号も削除されますので、慎重な選択をお願いします。",
+        "content3": "後に発見されるデザインの問題を含む一部要因により製作進行が困難になった場合、個別案内とともに即座に返金いたします。"
+      },
+      "section5": {
+        "title": "5. みんな決済OK！いいね♥してくださった会員だけの商品が製作されます。UDIGN let's go!",
+        "content": "限定数量、最高の品質を追求するUDIGNなので製作期間が長くかかる場合がありますが、ご了承ください。情熱を込めてお応えいたします!!"
+      },
+      "section6": {
+        "title": "6. 製作完了後、検査・梱包後、迅速にお客様のご自宅に向けて出発します。",
+        "content1": "お待ちいただき誠にありがとうございます。製作完了後、専門物流チームを通じて梱包され出荷、宅配で配送されます。",
+        "content2": "基本配送所要期間は該当宅配会社の配送所要期間基準に準じ、地域および天気、宅配会社の事情により差がある場合がありますので、必ずご参考ください～"
+      },
+      "section7": {
+        "title": "7. 配送完了および商品を確認して購入確定をするとMY UDIGNのすべての過程が終了!!",
+        "content1": "商品を受領されたら、すぐに状態確認をお願いし、購入確定を必ずお願いします。",
+        "content2": "もし交換・返品を進行される場合、理由とともに申請していただければ迅速な進行をお手伝いします。",
+        "content3": "ただし、限定された注文製作と最高の品質を追求するユダイン商品の特性上、一定期間が過ぎると返品・交換処理が不可能な場合があります。",
+        "content4": "次の案内事項を必ずご参考ください。",
+        "notes": {
+          "note1": "すべての交換返品費は負担なく無料です。",
+          "note2": "返品が確定すると、会員様の該当商品シリアル番号（固有番号）は削除されます。",
+          "note3": "交換進行する場合、商品シリアル番号（固有番号）はそのまま維持されます。"
+        }
+      }
+    }
+  },
+  "language": {
+    "select": "言語選択",
+    "korean": "한국어",
+    "english": "English",
+    "japanese": "日本語",
+    "changeLanguage": "言語を変更しますか？",
+    "languageChanged": "言語が変更されました"
+  },
+  "header": {
+    "admin": "管理者",
+    "editProfile": "会員情報修正",
+    "loginRequired": "ログインが必要です",
+    "loginRequiredDesc": "この機能を使用するにはログインが必要です。",
+    "purchaseAvailable": "購入可能な商品が{{count}}個あります。"
+  },
+  "footer": {
+    "aboutUdign": "about UDIGN",
+    "userGuide": "利用案内",
+    "termsOfUse": "利用規約",
+    "privacyPolicy": "個人情報処理方針",
+    "vendorPage": "ベンダーページ",
+    "copyrightReport": "著作権申告",
+    "company": {
+      "representative": "代表",
+      "phone": "電話",
+      "fax": "ファックス",
+      "address": "事業場住所",
+      "addressValue": "ソウル市恩平区鎮関3路32、恩平ニュータウンパーク＆タワーB棟6階618号",
+      "businessNumber": "事業者登録番号",
+      "ecommerceNumber": "通信販売業申告番号",
+      "privacyManager": "個人情報管理責任者",
+      "email": "E-MAIL"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "phone": "1577-4215",
+      "operatingHours": "営業時間：平日 09:00 ～ 17:00",
+      "lunchTime": "昼休み：平日 12:00 ～ 13:00",
+      "holiday": "土・日曜日 / 祝日休業",
+      "followUs": "Follow Us"
+    }
+  },
+  "sidebar": {
+    "todayViewed": {
+      "title": "今日見た作品",
+      "description": "今日確認した作品リストを表示します。",
+      "empty": "まだ見た作品がありません",
+      "recentCount": "最近確認した作品{{count}}個",
+      "clearAll": "全体削除",
+      "noImage": "画像なし",
+      "storageInfo": "商品は一日間最大{{max}}個まで保存されます"
+    },
+    "search": {
+      "title": "作品検索",
+      "description": "作品を検索できます。",
+      "placeholder": "お探しの作品を検索してみてください",
+      "button": "検索",
+      "hint": "作品名、作家名などで検索してみてください"
+    },
+    "navigation": {
+      "menu": "メニュー",
+      "description": "サイトナビゲーションメニュー",
+      "category": "CATEGORY",
+      "siteMenu": "SITE MENU",
+      "aboutUs": "ABOUT US",
+      "all": "全体",
+      "vendorPage": "ベンダーページ",
+      "copyrightReport": "著作権申告",
+      "siteIntro": "サイト紹介",
+      "serviceTerms": "サービス利用規約",
+      "privacyPolicy": "個人情報処理方針",
+      "designUpload": "デザインアップロード",
+      "userGuide": "利用案内",
+      "categories": {
+        "fashion": "ファッション",
+        "shoes": "シューズ",
+        "others": "その他",
+        "men": "男性",
+        "women": "女性"
+      },
+      "fashionItems": {
+        "top": "トップス",
+        "bottom": "ボトムス",
+        "outer": "アウター",
+        "product": "製品",
+        "space": "空間"
+      },
+      "shoeItems": {
+        "sneakers": "スニーカー",
+        "dressShoes": "革靴・スニーカー",
+        "walker": "ウォーカー",
+        "sandals": "サンダル・スリッパ",
+        "rainBoots": "レインブーツ",
+        "boots": "ブーツ"
+      },
+      "otherItems": {
+        "top": "トップス",
+        "bottom": "ボトムス",
+        "graphic": "グラフィック",
+        "product": "製品",
+        "space": "空間"
+      }
+    }
+  },
+  "productDetail": {
+    "loading": {
+      "authCheck": "認証情報を確認中...",
+      "productInfo": "作品情報を読み込み中..."
+    },
+    "notFound": "商品が見つかりません",
+    "status": {
+      "fullAndUnderReview": "full & under review",
+      "reviewInProgress": "🔍 現在審議進行中です",
+      "reviewInProgressDesc": "審議完了後購入可能です。",
+      "manualReview": "手動審議",
+      "autoReview": "自動審議（目標達成時即時進行）",
+      "collectingLikes": "📝 いいね募集中です",
+      "collectingLikesDesc": "目標人員達成時{{type}}審議で進行されます。",
+      "reviewCompleted": "✅ 審議が完了しました",
+      "purchaseAvailable": "購入可能な商品です。",
+      "daysRemaining": "{{days}}日後自動進行"
+    },
+    "navigation": {
+      "previous": "previous",
+      "next": "next",
+      "noPrevious": "前の作品なし",
+      "noNext": "次の作品なし"
+    },
+    "price": {
+      "title": "価格情報",
+      "originalPrice": "市中価格",
+      "salePrice": "販売価格",
+      "basePrice": "基本価格",
+      "optionPrice": "オプション追加金額",
+      "quantity": "数量",
+      "totalPrice": "総額"
+    },
+    "options": {
+      "title": "オプション選択",
+      "selectPlaceholder": "{{option}}を選択してください",
+      "selectedOptions": "選択されたオプション",
+      "stock": "在庫{{count}}個",
+      "allOptionsRequired": "⚠️ すべてのオプションを選択してください"
+    },
+    "quantity": {
+      "title": "数量選択",
+      "label": "購入数量"
+    },
+    "purchase": {
+      "buyNow": "購入する",
+      "sizeGuide": "サイズガイドを見る"
+    },
+    "sizeGuide": {
+      "title": "サイズガイド",
+      "description": "正確なサイズ選択のための測定ガイドです",
+      "loading": "サイズガイドを読み込み中...",
+      "notSupported": "サイズガイド非対応",
+      "notSupportedDesc": "この作品はサイズガイドに対応していません。",
+      "area": "区域",
+      "measurementMethod": "📏 測定方法",
+      "measurementTips": [
+        "平らな場所に服を広げて測定してください",
+        "伸縮性のある生地の場合、自然に置いた状態で測定",
+        "すべての数値はcm単位です"
+      ],
+      "precautions": "⚠️ 注意事項",
+      "precautionsList": [
+        "測定方法により1-3cmの差が生じる場合があります",
+        "モニター環境により色が異なって見える場合があります",
+        "洗濯後わずかな縮みがある場合があります"
+      ]
+    },
+    "imageMagnifier": {
+      "title": "画像拡大表示",
+      "instruction": "マウスを画像の上に置いて拡大してみてください"
+    },
+    "description": {
+      "title": "作品説明",
+      "designer": "デザイナー：",
+      "productDetailInfo": "商品詳細情報"
+    },
+    "magnifier": {
+      "enlargeImage": "画像拡大表示"
+    },
+    "dialog": {
+      "loginRequired": "ログイン必要",
+      "loginRequiredDesc": "商品詳細情報をご覧になるにはログインが必要です。",
+      "likeCompleted": "いいね登録完了",
+      "likeCompletedDesc": "お客様は{{productName}}の**No. {{orderNumber}}**コレクターです。\n\nほんの数名だけのためのこの創作の旅にご一緒いただき、心から感謝いたします。",
+      "confirm": "確認"
+    },
+    "popularProducts": {
+      "title": "人気作品"
+    }
+  },
+  "myUdign": {
+    "title": "My UDIGN",
+    "subtitle": "私だけの特別なデザインの旅",
+    "welcome": "{{name}}様",
+    "welcomeMessage": "ユダインへようこそ",
+    "preorderSystem": "UDIGN プリオーダーシステム",
+    "systemDescription": {
+      "artwork": "作品：メインページのデザイナースケッチ",
+      "like": "いいね：お気に入りの作品に対する製作希望意思表現",
+      "product": "商品：実際に製作された作品（いいねした会員のみ購入可能）"
+    },
+    "reviewProcess": {
+      "title": "審議進行方式：",
+      "auto": "自動審議：目標いいね人員達成時、自動で審議段階進行",
+      "manual": "手動審議：管理者が設定した期間後審議段階進行"
+    },
+    "steps": {
+      "collection": "デザインいいね",
+      "review": "製作検討",
+      "payment": "購入進行",
+      "paymentWaiting": "決済待機",
+      "paymentCompleted": "決済完了",
+      "making": "商品製作",
+      "shipping": "配送進行",
+      "completed": "受領完了"
+    },
+    "statusGroups": {
+      "all": "全体",
+      "collection": "デザインいいね",
+      "review": "製作検討",
+      "payment": "購入進行",
+      "paymentCompleted": "注文確定",
+      "making": "商品製作",
+      "shipping": "配送進行",
+      "completed": "受領完了",
+      "cancelled": "キャンセル・返品・品切れ"
+    },
+    "artworkStatus": "私の作品現況",
+    "noArtworks": "該当状態の作品がありません。",
+    "loadingMore": "より多くの作品を読み込み中...",
+    "allLoaded": "すべての作品を読み込みました。",
+    "notification": "お知らせ",
+    "artwork": {
+      "noImage": "画像なし",
+      "price": "{{price}}円",
+      "likeCount": "いいね{{count}}個",
+      "orderDate": "注文日：{{date}}",
+      "paymentMethod": "決済方法：{{method}}",
+      "paymentAmount": "決済金額：{{amount}}円",
+      "options": "オプション：{{options}}",
+      "quantity": "数量：{{quantity}}個",
+      "actions": {
+        "toggleInterest": "関心商品トグル",
+        "cancelOrder": "注文キャンセル",
+        "confirmPurchase": "購入確定",
+        "requestReturn": "交換・返品"
+      },
+      "status": {
+        "collection": "コレクション",
+        "review": "審議中",
+        "payment": "購入進行",
+        "paymentCompleted": "注文確定",
+        "making": "商品製作",
+        "shipping": "配送進行",
+        "completed": "受領完了",
+        "cancelled": "注文キャンセル"
+      }
+    },
+    "dialogs": {
+      "interest": {
+        "add": "関心商品追加",
+        "remove": "関心商品キャンセル",
+        "addMessage": "この商品を関心商品に追加しますか？",
+        "removeMessage": "この商品を関心商品から削除しますか？",
+        "addButton": "追加する",
+        "removeButton": "削除する"
+      },
+      "purchase": {
+        "confirm": "購入確定",
+        "confirmMessage": "購入確定しますか？",
+        "confirmButton": "確定する"
+      },
+      "cancel": {
+        "title": "注文キャンセル",
+        "reasonLabel": "キャンセル理由",
+        "reasonPlaceholder": "キャンセル理由を入力してください",
+        "reasonRequired": "キャンセル理由を入力してください。",
+        "confirmTitle": "注文キャンセル確認",
+        "confirmMessage": "本当に注文をキャンセルしますか？",
+        "submitButton": "キャンセルする"
+      },
+      "return": {
+        "title": "交換・返品申請",
+        "nameLabel": "申請者名",
+        "namePlaceholder": "名前を入力してください",
+        "phoneLabel": "連絡先",
+        "phonePlaceholder": "連絡先を入力してください",
+        "typeLabel": "申請区分",
+        "exchange": "交換",
+        "return": "返品",
+        "reasonLabel": "理由",
+        "reasonPlaceholder": "交換・返品理由を詳しく入力してください",
+        "submitButton": "申請する",
+        "allFieldsRequired": "すべてのフィールドを入力してください。"
+      }
+    },
+    "admin": {
+      "reviewStatus": "審議状態",
+      "approveReview": "審議承認",
+      "rejectReview": "審議拒否"
+    }
+  },
+  "search": {
+    "title": "検索結果",
+    "emptyQuery": "検索語を入力してください。",
+    "loading": "検索結果を読み込み中...",
+    "noResults": "検索結果がありません。",
+    "noResultsDesc": "他の検索語で試してみてください。",
+    "resultsCount": "総{{count}}個の作品が検索されました。",
+    "searchFor": "'{{query}}'に対する検索結果"
+  },
+  "company": {
+    "title": "会社紹介",
+    "images": {
+      "alt1": "ユダイン会社画像1",
+      "alt2": "ユダイン会社画像2"
+    },
+    "mainMessage": "ユダインは作家の価値を創出し、新しい文化を\n世界各地に伝播するため努力します",
+    "welcome": {
+      "title": "デザイン製作販売プラットフォーム ユダイン訪問を歓迎します。",
+      "paragraph1": "洗練されトレンディなデザインでレイアウトされたメインページと総60余ページに及ぶ多様なフォームが反映されたコンテンツページで構成され、顧客満足度をさらに高めることが可能になりました。",
+      "paragraph2": "テンプレートに掲載されたサンプルを見て業種に合ったページと希望するフォームを選択してホームページを構成でき、希望する場合費用追加なしでフルバージョン全体使用も可能です。",
+      "paragraph3": "ソリューション開発のおかげで原価を大幅に下げてサービス供給することが可能になり、安価な費用で高品質ホームページを短期間内に製作できます。",
+      "paragraph4": "期待に充足できるよう高品格ホームページ製作をお約束します。ホームページ製作を通じてお客様の夢と未来を一緒に作っていかれることを願います。",
+      "paragraph5": "顧客から信頼と愛を受ける健康な企業ユダインになろうと絶え間ない努力を傾注いたします。",
+      "logoMessage": "ユダイン会社ロゴは富と幸運を象徴するもので事業繁栄を祈願する意味を込めています。お客様の持続的な事業繁栄と成功を祈願します。ありがとうございます。"
+    },
+    "visionMission": {
+      "title": "経営理念およびビジョン",
+      "subtitle1": "Ethical Management, the Foundation of",
+      "subtitle2": "Trust the Ground for Sustainable Growth",
+      "sustainability": {
+        "title": "持続可能",
+        "description": "持続可能な成長のための企業経営を実践します。"
+      },
+      "fairCompetition": {
+        "title": "公正競争",
+        "description": "公正な商取引秩序維持法規および社会常規を遵守します。"
+      },
+      "transparency": {
+        "title": "透明経営",
+        "description": "構成員および利害関係者情報共有、リスク事前予防"
+      }
+    },
+    "coreValues": {
+      "title": "核心価値",
+      "customerSatisfaction": {
+        "title": "顧客満足実現",
+        "description": "顧客の意見を重視し、より大きな満足をお届けするため一途な心で顧客価値経営を実現します。顧客の意見を重視し、より大きな満足をお届けするため一途な心で顧客価値経営を実現します。顧客の意見を重視し、より大きな満足をお届けするため一途な心で顧客価値経営を実現します。"
+      },
+      "fairManagement": {
+        "title": "公正で透明な経営",
+        "description": "法規を遵守し、公正できれいな経営環境を作っていきます。法規を遵守し、公正できれいな経営環境を作っていきます。法規を遵守し、公正できれいな経営環境を作っていきます。法規を遵守し、公正できれいな経営環境を作っていきます。法規を遵守し、公正できれいな経営環境を作っていきます。"
+      },
+      "ecoFriendly": {
+        "title": "環境親和的な経営",
+        "description": "環境親和的な事業活動を通じて経済発展と地域社会発展のため努力します。環境親和的な事業活動を通じて経済発展と地域社会発展のため努力します。環境親和的な事業活動を通じて経済発展と地域社会発展のため努力します。環境親和的な事業活動を通じて経済発展と地域社会発展のため努力します。"
+      },
+      "qualityManagement": {
+        "title": "品質経営",
+        "description": "最高の技術力で高品質高付加価値を指向し、安全管理に最善を尽くします。最高の技術力で高品質高付加価値を指向し、安全管理に最善を尽くします。最高の技術力で高品質高付加価値を指向し、安全管理に最善を尽くします。最高の技術力で高品質高付加価値を指向し、安全管理に最善を尽くします。"
+      }
+    }
+  },
+  "copyrightReport": {
+    "title": "著作権侵害申告",
+    "loadingMessage": "読み込み中...",
+    "productSelector": {
+      "title": "著作権申告する製品選択",
+      "loadingProducts": "製品を読み込み中...",
+      "noProducts": "製品がありません。",
+      "categories": {
+        "all": "全体",
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others"
+      },
+      "myProduct": "私の作品",
+      "pagination": {
+        "previous": "前",
+        "next": "次"
+      },
+      "cancelButton": "キャンセル"
+    },
+    "reportForm": {
+      "title": "著作権侵害申告",
+      "contentLabel": "申告内容 *",
+      "contentPlaceholder": "著作権侵害内容を詳しく入力してください。（原著作物情報、侵害内容など）",
+      "evidenceFiles": "証拠ファイル（最大3個、各5MB以下）",
+      "fileTypesInfo": "画像（JPG、PNG、GIF、WebP）またはPDFファイルをアップロードできます。",
+      "backButton": "前",
+      "submitButton": "申告する",
+      "submitting": "提出中...",
+      "uploading": "ファイルアップロード中...",
+      "uploadingFiles": "ファイルをアップロード中...",
+      "submittingReport": "申告を提出中...",
+      "errors": {
+        "maxFiles": "最大3個のファイルのみアップロードできます。",
+        "fileSize": "5MBを超過するファイルがあります。",
+        "uploadFailed": "ファイルアップロード失敗",
+        "uploadError": "ファイルアップロード中にエラーが発生しました。",
+        "contentRequired": "申告内容を入力してください。",
+        "submitFailed": "申告提出に失敗しました。",
+        "submitError": "申告提出中にエラーが発生しました。"
+      }
+    }
+  },
+  "checkout": {
+    "title": "注文・決済",
+    "preparingPage": "決済ページを準備中...",
+    "orderProducts": "注文商品",
+    "noImage": "画像なし",
+    "deliveryInfo": "配送情報",
+    "recipientName": "受取人",
+    "required": "*",
+    "contactNumber": "連絡先",
+    "contactPlaceholder": "01012345678",
+    "email": "メール",
+    "zipCode": "郵便番号",
+    "zipCodePlaceholder": "12345",
+    "address": "住所",
+    "detailAddress": "詳細住所",
+    "paymentMethod": "決済方式",
+    "creditCard": "クレジットカード",
+    "bankTransfer": "銀行振込",
+    "bankTransferInfo": "銀行振込案内",
+    "bankTransferGuide": "注文完了後SMSで入金口座番号をご案内します。",
+    "bankTransferGuideDetail": "入金確認後商品をご準備します。",
+    "paymentAmount": "決済金額",
+    "productAmount": "商品金額",
+    "optionAmount": "オプション追加金額",
+    "shippingFee": "送料",
+    "free": "無料",
+    "totalAmount": "総決済金額",
+    "termsAgreement": "利用規約同意",
+    "financeTerms": "[必須] 電子金融取引利用規約",
+    "financeTermsDetail": "電子金融取引法による利用規約に同意します。",
+    "privacyTerms": "[必須] 個人情報収集および利用",
+    "privacyTermsDetail": "決済処理のための個人情報収集および利用に同意します。",
+    "payButton": "{{amount}}円決済する",
+    "processing": "決済処理中...",
+    "cancelButton": "キャンセル",
+    "errors": {
+      "noProductInfo": "商品情報がありません。",
+      "failedToLoadProduct": "商品情報を読み込めません。",
+      "serverError": "サーバーエラーが発生しました。",
+      "paymentSystemError": "決済システムを読み込めません。",
+      "invalidPhone": "ハイフンを除いた正しい電話番号を入力してください。（例：01012345678）",
+      "paymentFailed": "決済リクエストに失敗しました。再試行してください。",
+      "paymentCancelled": "決済がキャンセルされました。"
+    },
+    "messages": {
+      "inputError": "入力エラー",
+      "paymentCancel": "決済キャンセル",
+      "paymentFail": "決済失敗",
+      "orderCompleted": "注文が完了しました",
+      "bankTransferCompleted": "SMSで入金口座番号をご案内しました。入金確認後商品をご準備します。"
+    }
+  },
+  "paymentSuccess": {
+    "title": "決済が完了しました！",
+    "subtitle": "注文が正常に受付されました。",
+    "processingResult": "決済結果を処理中...",
+    "orderInfo": "注文情報",
+    "orderId": "注文番号",
+    "customer": "注文者",
+    "paymentDate": "決済日時",
+    "paymentMethod": "決済手段",
+    "paymentKey": "決済キー",
+    "paymentAmount": "決済金額",
+    "orderDetailsButton": "注文履歴確認",
+    "continueShopping": "ショッピング続行",
+    "notices": {
+      "orderHistory": "• 注文履歴はマイページで確認できます。",
+      "shippingInquiry": "• 配送関連お問い合わせはカスタマーセンターまでご連絡ください。",
+      "receiptInquiry": "• 領収書が必要な場合はカスタマーセンターまでお問い合わせください。",
+      "paymentInquiry": "• 決済関連お問い合わせはトスペイメンツカスタマーセンター1899-4905までご連絡ください。"
+    },
+    "errors": {
+      "missingPaymentInfo": "決済情報が不足しています。",
+      "approvalFailed": "決済承認に失敗しました。",
+      "processingError": "決済承認処理中にエラーが発生しました。"
+    }
+  },
+  "paymentFail": {
+    "title": "決済に失敗しました",
+    "subtitle": "申し訳ございません。決済処理中に問題が発生しました。",
+    "checkingResult": "決済結果を確認中...",
+    "failureReason": "失敗理由",
+    "unknownError": "不明なエラーが発生しました。",
+    "retryPayment": "再決済",
+    "continueShopping": "ショッピング続行",
+    "troubleshooting": {
+      "checkBalance": "• カード限度額や残高を確認してください。",
+      "checkInfo": "• 入力情報が正確かもう一度確認してください。",
+      "contactSupport": "• 問題が持続する場合はカスタマーセンターまでお問い合わせください。",
+      "tryOtherMethod": "• 他の決済手段をお試しください。"
+    }
+  },
+  "vendorRegister": {
+    "title": {
+      "create": "ベンダー情報入力",
+      "update": "ベンダー情報修正"
+    },
+    "subtitle": "事業者認証のため下記項目を作成してください。",
+    "fields": {
+      "vendorName": "商号名",
+      "vendorClass": "個人・法人区分",
+      "personal": "個人",
+      "corporate": "法人",
+      "representative": "代表者名",
+      "contact": "連絡先",
+      "email": "メール",
+      "fax": "FAX",
+      "businessNumber": "事業者登録番号",
+      "address": "住所",
+      "zipCode": "郵便番号",
+      "basicAddress": "基本住所",
+      "detailAddress": "詳細住所",
+      "companyIntro": "会社紹介",
+      "required": "*"
+    },
+    "placeholders": {
+      "vendorName": "商号名",
+      "representative": "代表者名前",
+      "contact": "連絡先（- 除く入力）",
+      "email": "メールアドレス",
+      "fax": "ファックス番号（- 除く入力）",
+      "businessNumber": "事業者登録番号（- 除く入力）",
+      "zipCode": "郵便番号",
+      "basicAddress": "基本住所",
+      "detailAddress": "詳細住所",
+      "companyIntro": "会社紹介を入力してください。"
+    },
+    "buttons": {
+      "verify": "事業者認証する",
+      "verifying": "確認中...",
+      "verified": "認証完了",
+      "addressSearch": "住所検索",
+      "cancel": "キャンセル",
+      "register": "登録する",
+      "update": "修正する",
+      "processing": "処理中..."
+    },
+    "privacy": {
+      "agree": "個人情報処理方針に同意します"
+    },
+    "errors": {
+      "businessNumberLength": "事業者登録番号は10桁の数字である必要があります。",
+      "businessNumberInvalid": "有効でない事業者登録番号です。",
+      "businessNumberVerifyError": "事業者登録番号検証中にエラーが発生しました。",
+      "businessNumberVerifyRequired": "事業者登録番号認証を完了してください。",
+      "privacyAgreeRequired": "個人情報処理方針に同意してください。",
+      "vendorRegisterError": "ベンダー登録中にエラーが発生しました。",
+      "vendorInfoLoadError": "ベンダー情報ロード失敗："
+    }
+  },
+  "upload": {
+    "title": "皆様の大切な作品をお待ちしています",
+    "subtitle": "デザイナーの皆様の創意的なデザインを共有していただき、心から感謝いたします。",
+    "checkBeforeUpload": "デザインアップロード前に下記事項を詳しくご確認ください。",
+    "requiredCheck": "アップロード前必須確認事項",
+    "guidelines": {
+      "item1": {
+        "title": "1. 必須作成項目記載",
+        "content": "作品登録時に提供されるすべての入力欄を漏れなく作成してください。"
+      },
+      "item2": {
+        "title": "2. 画像アップロード構成",
+        "content": "メイン画像1個とサブ画像1～3個、総最大4個の画像をアップロードできます。"
+      },
+      "item3": {
+        "title": "3. 画像規格および形式",
+        "content": "• 正方形比率必須\n• 推奨サイズ：800 x 800以上\n• 容量：5MB以下\n• 形式：PNG、JPG、JPEG"
+      },
+      "item4": {
+        "title": "4. 正確なカテゴリ設定",
+        "content": "デザインの性格に合ったカテゴリを選択してください。"
+      },
+      "item5": {
+        "title": "5. 管理者承認後露出",
+        "content": "登録された作品は内部検討後に露出されます。（営業日基準2～3日所要）"
+      }
+    },
+    "form": {
+      "mainImage": "代表画像",
+      "additionalImages": "追加画像",
+      "category": "作品カテゴリ",
+      "artworkName": "作品名",
+      "description": "作品説明",
+      "terms": "約款・案内事項",
+      "required": "*",
+      "selectMainImage": "代表画像選択",
+      "selectCategory": "作品カテゴリを選択してください。",
+      "artworkNamePlaceholder": "作品名",
+      "descriptionPlaceholder": "作品に関する詳細な説明を入力してください。",
+      "agreeToTerms": "約款・案内事項の内容に同意します。",
+      "uploadButton": "アップロードする",
+      "uploading": "アップロード中...",
+      "imageSpecs": "推奨サイズ：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG",
+      "additionalImageSpecs": "推奨サイズ：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG\n最大3枚まで選択可能です。",
+      "additionalImageCount": "追加画像（{{count}}/3個）",
+      "imageNumber": "画像{{number}}"
+    },
+    "messages": {
+      "fileSizeExceeded": "ファイル容量超過",
+      "fileSizeExceededDesc": "ファイル容量は5MB以下である必要があります。",
+      "invalidFileType": "ファイル形式エラー",
+      "invalidFileTypeDesc": "画像ファイルのみアップロード可能です。",
+      "mainImageRequired": "代表画像必須",
+      "mainImageRequiredDesc": "代表画像を選択してください。",
+      "categoryRequired": "カテゴリ必須",
+      "categoryRequiredDesc": "カテゴリを選択してください。",
+      "artworkNameRequired": "作品名必須",
+      "artworkNameRequiredDesc": "作品名を入力してください。",
+      "descriptionRequired": "作品説明必須",
+      "descriptionRequiredDesc": "作品説明を入力してください。",
+      "termsRequired": "約款同意必須",
+      "termsRequiredDesc": "約款に同意してください。",
+      "uploadSuccess": "アップロード完了",
+      "uploadSuccessDesc": "作品が正常にアップロードされました。管理者承認後サイトに露出されます。",
+      "uploadFailed": "アップロード失敗",
+      "uploadFailedDesc": "アップロード中にエラーが発生しました。",
+      "uploadError": "アップロードエラー",
+      "finalConfirmTitle": "デザインアップロード時の最終約款を確認されましたか？",
+      "finalConfirmDesc": "アップロードされたデザインは管理者承認後サイトに露出されます。約款に同意された後アップロードを進めてください。"
+    },
+    "loginRequired": {
+      "title": "ログインが必要です",
+      "description": "デザインアップロードは会員のみご利用いただけます。ログイン後にご利用ください。"
+    }
+  },
+  "resetPassword": {
+    "success": {
+      "title": "パスワード変更完了",
+      "subtitle": "パスワードが正常に変更されました。",
+      "message": "パスワード変更が完了しました。",
+      "loginMessage": "会員IDと変更されたパスワードでログインしてください。",
+      "securityMessage": "セキュリティのため、ログイン後新しいパスワードに変更してください。",
+      "goToLogin": "ログインページに移動"
+    },
+    "failure": {
+      "title": "パスワード変更失敗",
+      "subtitle": "パスワード変更中に問題が発生しました。",
+      "errorLabel": "エラー：",
+      "linkExpiredMessage": "認証リンクが期限切れまたは既に使用されたリンクの可能性があります。",
+      "tryAgain": "再試行",
+      "backToLogin": "ログインに戻る"
+    },
+    "errors": {
+      "invalidAccess": "不正なアクセスです。",
+      "resetFailed": "パスワード変更に失敗しました。",
+      "requestError": "リクエスト処理中にエラーが発生しました。"
+    }
+  },
+  "profile": {
+    "edit": {
+      "title": "会員情報修正",
+      "subtitle": "会員情報を修正できます。",
+      "loadingMessage": "ユーザー情報を読み込み中...",
+      "successTitle": "成功",
+      "successMessage": "会員情報が正常に修正されました。",
+      "fields": {
+        "userId": "ID",
+        "userIdNotEditable": "IDは変更できません。",
+        "name": "名前",
+        "nameNotEditable": "名前は変更できません。",
+        "email": "メール",
+        "emailPlaceholder": "メールを入力してください",
+        "phone": "携帯電話番号",
+        "phonePlaceholder": "例：01012345678（数字のみ入力）",
+        "newPassword": "新しいパスワード",
+        "newPasswordPlaceholder": "変更しない場合は空欄にしてください",
+        "confirmPassword": "新しいパスワード確認",
+        "confirmPasswordPlaceholder": "新しいパスワードを再入力してください",
+        "marketingConsent": "広告性情報受信同意",
+        "marketingConsentDesc": "イベント、割引特典などの情報を受け取りますか？"
+      },
+      "buttons": {
+        "cancel": "キャンセル",
+        "submit": "修正する",
+        "submitting": "修正中..."
+      },
+      "errors": {
+        "emailRequired": "メールを入力してください。",
+        "phoneRequired": "携帯電話番号を入力してください。",
+        "invalidEmail": "正しいメールアドレスを入力してください。",
+        "invalidPhone": "携帯電話番号は01から始まる11桁の数字で入力してください。",
+        "passwordMismatch": "新しいパスワードとパスワード確認が一致しません。",
+        "updateFailed": "会員情報修正中にエラーが発生しました。",
+        "loadFailed": "ユーザー情報の読み込み中にエラーが発生しました。"
+      }
+    },
+    "confirm": {
+      "title": "会員情報修正",
+      "subtitle": "会員情報を修正するには現在のパスワードを入力してください。",
+      "fields": {
+        "password": "パスワード",
+        "passwordPlaceholder": "現在のパスワードを入力してください"
+      },
+      "buttons": {
+        "cancel": "キャンセル",
+        "confirm": "確認",
+        "confirming": "確認中..."
+      },
+      "errors": {
+        "invalidPassword": "パスワードが正しくありません。",
+        "confirmFailed": "パスワード確認中にエラーが発生しました。"
+      }
+    }
+  },
+  "privacy": {
+    "title": "個人情報処理方針",
+    "supplementary": {
+      "title": "付則",
+      "content": "本方針はOOOO年OO月OO日から施行します。"
+    }
+  },
+  "provision": {
+    "title": "サービス利用約款",
+    "supplementary": {
+      "title": "付則",
+      "content1": "1. この約款は2024年01月01日から施行します。",
+      "content2": "2. この約款は電子商取引（インターネットサイバーモール）標準約款第10023号（2014年9月19日改正）を遵守します。"
+    }
+  }
+}
