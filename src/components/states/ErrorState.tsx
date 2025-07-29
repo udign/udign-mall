@@ -47,7 +47,7 @@ export default function ErrorState({
               variant={showRetry ? 'outline' : 'default'}
               className={!showRetry ? 'bg-primary hover:bg-primary-hover' : ''}
             >
-              홈으로 돌아가기
+              {dictionary?.common.goHome || '홈으로 돌아가기'}
             </Button>
           )}
         </div>

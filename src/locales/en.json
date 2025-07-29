@@ -12,7 +12,8 @@
     "profile": "Profile",
     "close": "Close",
     "confirm": "Confirm",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "goHome": "Go Home"
   },
   "myUdign": {
     "title": "My UDIGN",
@@ -134,6 +135,98 @@
     "noResultsDesc": "Please try a different search term.",
     "resultsCount": "{{count}} artworks found.",
     "searchFor": "Search results for '{{query}}'"
+  },
+  "checkout": {
+    "title": "Order/Payment",
+    "preparingPage": "Preparing payment page...",
+    "orderProducts": "Order Items",
+    "noImage": "No Image",
+    "deliveryInfo": "Delivery Information",
+    "recipientName": "Recipient",
+    "required": "*",
+    "contactNumber": "Contact Number",
+    "contactPlaceholder": "01012345678",
+    "email": "Email",
+    "zipCode": "Zip Code",
+    "zipCodePlaceholder": "12345",
+    "address": "Address",
+    "detailAddress": "Detail Address",
+    "paymentMethod": "Payment Method",
+    "creditCard": "Credit Card",
+    "bankTransfer": "Bank Transfer",
+    "bankTransferInfo": "Bank Transfer Information",
+    "bankTransferGuide": "Account details will be sent via SMS after order completion.",
+    "bankTransferGuideDetail": "Products will be prepared after payment confirmation.",
+    "paymentAmount": "Payment Amount",
+    "productAmount": "Product Amount",
+    "optionAmount": "Option Additional Cost",
+    "shippingFee": "Shipping Fee",
+    "free": "Free",
+    "totalAmount": "Total Payment Amount",
+    "termsAgreement": "Terms Agreement",
+    "financeTerms": "[Required] Electronic Financial Transaction Terms",
+    "financeTermsDetail": "I agree to the terms of electronic financial transactions.",
+    "privacyTerms": "[Required] Personal Information Collection and Use",
+    "privacyTermsDetail": "I agree to the collection and use of personal information for payment processing.",
+    "payButton": "Pay {{amount}} KRW",
+    "processing": "Processing payment...",
+    "cancelButton": "Cancel",
+    "errors": {
+      "noProductInfo": "No product information available.",
+      "failedToLoadProduct": "Failed to load product information.",
+      "serverError": "A server error occurred.",
+      "paymentSystemError": "Failed to load payment system.",
+      "invalidPhone": "Please enter a valid phone number without hyphens (e.g., 01012345678)",
+      "paymentFailed": "Payment request failed. Please try again.",
+      "paymentCancelled": "Payment was cancelled."
+    },
+    "messages": {
+      "inputError": "Input Error",
+      "paymentCancel": "Payment Cancelled",
+      "paymentFail": "Payment Failed",
+      "orderCompleted": "Order completed",
+      "bankTransferCompleted": "Account details have been sent via SMS. Products will be prepared after payment confirmation."
+    }
+  },
+  "paymentSuccess": {
+    "title": "Payment Completed!",
+    "subtitle": "Your order has been successfully placed.",
+    "processingResult": "Processing payment result...",
+    "orderInfo": "Order Information",
+    "orderId": "Order Number",
+    "customer": "Customer",
+    "paymentDate": "Payment Date",
+    "paymentMethod": "Payment Method",
+    "paymentKey": "Payment Key",
+    "paymentAmount": "Payment Amount",
+    "orderDetailsButton": "Check Order Details",
+    "continueShopping": "Continue Shopping",
+    "notices": {
+      "orderHistory": "• You can check your order history in My Page.",
+      "shippingInquiry": "• For shipping inquiries, please contact customer service.",
+      "receiptInquiry": "• If you need a receipt, please contact customer service.",
+      "paymentInquiry": "• For payment inquiries, please contact TossPayments customer service at 1899-4905."
+    },
+    "errors": {
+      "missingPaymentInfo": "Payment information is missing.",
+      "approvalFailed": "Payment approval failed.",
+      "processingError": "An error occurred while processing payment approval."
+    }
+  },
+  "paymentFail": {
+    "title": "Payment Failed",
+    "subtitle": "Sorry, there was a problem processing your payment.",
+    "checkingResult": "Checking payment result...",
+    "failureReason": "Failure Reason",
+    "unknownError": "An unknown error occurred.",
+    "retryPayment": "Try Payment Again",
+    "continueShopping": "Continue Shopping",
+    "troubleshooting": {
+      "checkBalance": "• Please check your card limit or balance.",
+      "checkInfo": "• Please double-check that your information is correct.",
+      "contactSupport": "• If the problem persists, please contact customer service.",
+      "tryOtherMethod": "• Please try using a different payment method."
+    }
   },
   "shop": {
     "title": "Shop",
