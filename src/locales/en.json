@@ -349,6 +349,30 @@
     "loginRequiredMessage": "You need to login to upload a design.",
     "goToLogin": "Go to Login"
   },
+  "auth": {
+    "forgotPassword": {
+      "title": "Find ID/Password",
+      "description": "Please enter the email address you registered when signing up.",
+      "descriptionLine2": "We will send ID and password information to that email.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "required": "*",
+      "sendButton": "Send Authentication Email",
+      "sendingButton": "Processing...",
+      "backToLogin": "Back to Login",
+      "success": {
+        "title": "Email Sent Successfully",
+        "message": "An email to verify your member ID and password has been sent to {{email}}.",
+        "checkEmail": "Please check your email.",
+        "checkSpam": "If you don't see the email in your inbox, please check your spam folder as well.",
+        "backToLogin": "Back to Login",
+        "tryAgain": "Try Again"
+      },
+      "error": {
+        "general": "An error occurred while processing your request."
+      }
+    }
+  },
   "language": {
     "select": "Select Language",
     "korean": "한국어",

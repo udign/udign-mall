@@ -40,6 +40,30 @@
     "loginRequiredMessage": "디자인을 업로드하시려면 로그인이 필요합니다.",
     "goToLogin": "로그인하러 가기"
   },
+  "auth": {
+    "forgotPassword": {
+      "title": "아이디/비밀번호 찾기",
+      "description": "회원가입 시 등록하신 이메일 주소를 입력해 주세요.",
+      "descriptionLine2": "해당 이메일로 아이디와 비밀번호 정보를 보내드립니다.",
+      "emailLabel": "이메일 주소",
+      "emailPlaceholder": "이메일 주소를 입력하세요",
+      "required": "*",
+      "sendButton": "인증메일 보내기",
+      "sendingButton": "처리 중...",
+      "backToLogin": "로그인으로 돌아가기",
+      "success": {
+        "title": "메일 발송 완료",
+        "message": "{{email}} 메일로 회원아이디와 비밀번호를 인증할 수 있는 메일이 발송되었습니다.",
+        "checkEmail": "메일을 확인하여 주십시오.",
+        "checkSpam": "메일함에서 메일이 보이지 않는다면 스팸함도 확인해 주세요.",
+        "backToLogin": "로그인으로 돌아가기",
+        "tryAgain": "다시 시도"
+      },
+      "error": {
+        "general": "요청 처리 중 오류가 발생했습니다."
+      }
+    }
+  },
   "language": {
     "select": "언어 선택",
     "korean": "한국어",
