@@ -136,6 +136,59 @@
     "resultsCount": "{{count}} artworks found.",
     "searchFor": "Search results for '{{query}}'"
   },
+  "company": {
+    "title": "About Us",
+    "images": {
+      "alt1": "UDIGN Company Image 1",
+      "alt2": "UDIGN Company Image 2"
+    },
+    "mainMessage": "UDIGN strives to create value for artists and\nspread new culture to every corner of the world",
+    "welcome": {
+      "title": "Welcome to UDIGN, the design production and sales platform.",
+      "paragraph1": "With a stylishly and trendily designed main page and various content pages with diverse forms spanning over 60 pages, it has become possible to further enhance customer satisfaction.",
+      "paragraph2": "You can view samples uploaded to the template and select pages and desired forms suitable for your industry to configure your homepage, and if desired, full version usage is also possible without additional cost.",
+      "paragraph3": "Thanks to solution development, it has become possible to significantly reduce costs and provide services, allowing for the creation of high-quality websites at low cost within a short period.",
+      "paragraph4": "We promise to create high-quality websites that can meet your expectations. We hope to create your dreams and future together through website creation.",
+      "paragraph5": "We will make continuous efforts to become a healthy company UDIGN that receives trust and love from customers.",
+      "logoMessage": "The UDIGN company logo symbolizes wealth and good fortune, containing the meaning of wishing for business prosperity. We wish for your continued business prosperity and success. Thank you."
+    },
+    "visionMission": {
+      "title": "Management Philosophy & Vision",
+      "subtitle1": "Ethical Management, the Foundation of",
+      "subtitle2": "Trust the Ground for Sustainable Growth",
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "We practice corporate management for sustainable growth."
+      },
+      "fairCompetition": {
+        "title": "Fair Competition",
+        "description": "We maintain fair trade order and comply with laws and social norms."
+      },
+      "transparency": {
+        "title": "Transparent Management",
+        "description": "Information sharing with members and stakeholders, proactive risk prevention"
+      }
+    },
+    "coreValues": {
+      "title": "Core Values",
+      "customerSatisfaction": {
+        "title": "Customer Satisfaction",
+        "description": "We value customer opinions and realize customer value management with a consistent heart to provide greater satisfaction. We value customer opinions and realize customer value management with a consistent heart to provide greater satisfaction. We value customer opinions and realize customer value management with a consistent heart to provide greater satisfaction."
+      },
+      "fairManagement": {
+        "title": "Fair and Transparent Management",
+        "description": "We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment. We comply with laws and regulations and create a fair and clean business environment."
+      },
+      "ecoFriendly": {
+        "title": "Eco-Friendly Management",
+        "description": "We strive for economic development and local community development through eco-friendly business activities. We strive for economic development and local community development through eco-friendly business activities. We strive for economic development and local community development through eco-friendly business activities. We strive for economic development and local community development through eco-friendly business activities."
+      },
+      "qualityManagement": {
+        "title": "Quality Management",
+        "description": "With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management. With the best technology, we aim for high-quality and high-value-added products and do our best in safety management."
+      }
+    }
+  },
   "checkout": {
     "title": "Order/Payment",
     "preparingPage": "Preparing payment page...",
