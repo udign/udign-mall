@@ -767,5 +767,80 @@
       "vendorRegisterError": "An error occurred during vendor registration.",
       "vendorInfoLoadError": "Failed to load vendor information:"
     }
+  },
+  "upload": {
+    "title": "We are waiting for your precious works",
+    "subtitle": "Thank you sincerely for sharing your creative designs, designers.",
+    "checkBeforeUpload": "Please carefully check the following before uploading your design.",
+    "requiredCheck": "Required items to check before upload",
+    "guidelines": {
+      "item1": {
+        "title": "1. Fill in all required fields",
+        "content": "Please fill in all input fields provided when registering your artwork."
+      },
+      "item2": {
+        "title": "2. Image upload composition",
+        "content": "You can upload up to 4 images in total: 1 main image and 1-3 sub images."
+      },
+      "item3": {
+        "title": "3. Image specifications and format",
+        "content": "• Square ratio required\n• Recommended size: 800 x 800 or higher\n• Size: 5MB or less\n• Format: PNG, JPG, JPEG"
+      },
+      "item4": {
+        "title": "4. Accurate category setting",
+        "content": "Please select a category that matches the nature of your design."
+      },
+      "item5": {
+        "title": "5. Display after admin approval",
+        "content": "Registered works will be displayed after internal review. (2-3 business days required)"
+      }
+    },
+    "form": {
+      "mainImage": "Main Image",
+      "additionalImages": "Additional Images",
+      "category": "Artwork Category",
+      "artworkName": "Artwork Name",
+      "description": "Artwork Description",
+      "terms": "Terms/Guidelines",
+      "required": "*",
+      "selectMainImage": "Select Main Image",
+      "selectCategory": "Please select an artwork category.",
+      "artworkNamePlaceholder": "Artwork Name",
+      "descriptionPlaceholder": "Please enter a detailed description of your artwork.",
+      "agreeToTerms": "I agree to the terms and guidelines.",
+      "uploadButton": "Upload",
+      "uploading": "Uploading...",
+      "imageSpecs": "Recommended size: 800 x 800 or higher\nSize: 5MB or less\nPNG, JPG, JPEG",
+      "additionalImageSpecs": "Recommended size: 800 x 800 or higher\nSize: 5MB or less\nPNG, JPG, JPEG\nUp to 3 images can be selected.",
+      "additionalImageCount": "Additional Images ({{count}}/3)",
+      "imageNumber": "Image {{number}}"
+    },
+    "messages": {
+      "fileSizeExceeded": "File Size Exceeded",
+      "fileSizeExceededDesc": "File size must be 5MB or less.",
+      "invalidFileType": "Invalid File Type",
+      "invalidFileTypeDesc": "Only image files can be uploaded.",
+      "mainImageRequired": "Main Image Required",
+      "mainImageRequiredDesc": "Please select a main image.",
+      "categoryRequired": "Category Required",
+      "categoryRequiredDesc": "Please select a category.",
+      "artworkNameRequired": "Artwork Name Required",
+      "artworkNameRequiredDesc": "Please enter an artwork name.",
+      "descriptionRequired": "Description Required",
+      "descriptionRequiredDesc": "Please enter an artwork description.",
+      "termsRequired": "Terms Agreement Required",
+      "termsRequiredDesc": "Please agree to the terms.",
+      "uploadSuccess": "Upload Completed",
+      "uploadSuccessDesc": "Your artwork has been successfully uploaded. It will be displayed on the site after admin approval.",
+      "uploadFailed": "Upload Failed",
+      "uploadFailedDesc": "An error occurred during upload.",
+      "uploadError": "Upload Error",
+      "finalConfirmTitle": "Have you confirmed the final terms for design upload?",
+      "finalConfirmDesc": "Uploaded designs will be displayed on the site after admin approval. Please proceed with upload after agreeing to the terms."
+    },
+    "loginRequired": {
+      "title": "Login Required",
+      "description": "Design upload is only available to members. Please log in to use this service."
+    }
   }
 }
