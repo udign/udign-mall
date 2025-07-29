@@ -709,5 +709,63 @@
       "contactSupport": "• 문제가 지속되면 고객센터로 문의해 주세요.",
       "tryOtherMethod": "• 다른 결제 수단을 이용해 보세요."
     }
+  },
+  "vendorRegister": {
+    "title": {
+      "create": "벤더 정보 입력",
+      "update": "벤더 정보 수정"
+    },
+    "subtitle": "사업자 인증을 위해 아래 항목을 작성해주세요.",
+    "fields": {
+      "vendorName": "상호명",
+      "vendorClass": "개인/법인 구분",
+      "personal": "개인",
+      "corporate": "법인",
+      "representative": "대표자명",
+      "contact": "연락처",
+      "email": "이메일",
+      "fax": "FAX",
+      "businessNumber": "사업자등록번호",
+      "address": "주소",
+      "zipCode": "우편번호",
+      "basicAddress": "기본주소",
+      "detailAddress": "상세주소",
+      "companyIntro": "회사소개",
+      "required": "*"
+    },
+    "placeholders": {
+      "vendorName": "상호명",
+      "representative": "대표자 이름",
+      "contact": "연락처 (- 제외 입력)",
+      "email": "이메일 주소",
+      "fax": "팩스 번호 (- 제외 입력)",
+      "businessNumber": "사업자등록번호 (- 제외 입력)",
+      "zipCode": "우편번호",
+      "basicAddress": "기본주소",
+      "detailAddress": "상세주소",
+      "companyIntro": "회사 소개를 입력해주세요."
+    },
+    "buttons": {
+      "verify": "사업자 인증하기",
+      "verifying": "확인 중...",
+      "verified": "인증완료",
+      "addressSearch": "주소검색",
+      "cancel": "취소",
+      "register": "등록하기",
+      "update": "수정하기",
+      "processing": "처리 중..."
+    },
+    "privacy": {
+      "agree": "개인정보처리방침에 동의합니다"
+    },
+    "errors": {
+      "businessNumberLength": "사업자등록번호는 10자리 숫자여야 합니다.",
+      "businessNumberInvalid": "유효하지 않은 사업자등록번호입니다.",
+      "businessNumberVerifyError": "사업자등록번호 검증 중 오류가 발생했습니다.",
+      "businessNumberVerifyRequired": "사업자등록번호 인증을 완료해주세요.",
+      "privacyAgreeRequired": "개인정보처리방침에 동의해주세요.",
+      "vendorRegisterError": "벤더 등록 중 오류가 발생했습니다.",
+      "vendorInfoLoadError": "벤더 정보 로드 실패:"
+    }
   }
 }

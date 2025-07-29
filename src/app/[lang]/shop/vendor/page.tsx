@@ -1,50 +1,14 @@
-'use client';
+import { getDictionary } from '@/lib/dictionaries';
+import { Locale } from '../../../../../i18n.config';
+import VendorRegisterPageClient from '@/components/VendorRegisterForm';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import VendorRegisterForm from '@/components/VendorRegisterForm';
-import { ROUTES } from '@/lib/routes';
-import LoadingState from '@/components/states/LoadingState';
+interface VendorRegisterPageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-export default function VendorRegisterPage() {
-  const router = useRouter();
-  const { user, isLoading } = useAuth();
+export default async function VendorRegisterPage({ params }: VendorRegisterPageProps) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push(ROUTES.LOGIN);
-    }
-  }, [user, isLoading, router]);
-
-  const handleSuccess = () => {
-    router.push(ROUTES.MY_UDIGN);
-  };
-
-  if (isLoading) {
-    return <LoadingState message='로딩 중...' />;
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  return (
-    <div
-      className='flex min-h-screen flex-col bg-cover bg-fixed bg-center bg-no-repeat'
-      style={{
-        backgroundImage: 'url(/images/auth-bg.png)',
-        backgroundColor: '#1a2332',
-      }}
-    >
-      <div className='relative z-10 mt-10 flex flex-1 justify-center p-4'>
-        <div className='w-full max-w-2xl'>
-          <VendorRegisterForm
-            onSuccess={handleSuccess}
-            onCancel={() => router.back()}
-          />
-        </div>
-      </div>
-    </div>
-  );
-} 
+  return <VendorRegisterPageClient dictionary={dictionary} />;
+}

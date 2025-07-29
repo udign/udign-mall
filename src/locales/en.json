@@ -709,5 +709,63 @@
     "popularProducts": {
       "title": "Popular Works"
     }
+  },
+  "vendorRegister": {
+    "title": {
+      "create": "Vendor Information Registration",
+      "update": "Vendor Information Update"
+    },
+    "subtitle": "Please fill out the following information for business verification.",
+    "fields": {
+      "vendorName": "Business Name",
+      "vendorClass": "Individual/Corporate",
+      "personal": "Individual",
+      "corporate": "Corporate",
+      "representative": "Representative",
+      "contact": "Contact",
+      "email": "Email",
+      "fax": "FAX",
+      "businessNumber": "Business Registration Number",
+      "address": "Address",
+      "zipCode": "Zip Code",
+      "basicAddress": "Basic Address",
+      "detailAddress": "Detail Address",
+      "companyIntro": "Company Introduction",
+      "required": "*"
+    },
+    "placeholders": {
+      "vendorName": "Business Name",
+      "representative": "Representative Name",
+      "contact": "Contact Number (without dashes)",
+      "email": "Email Address",
+      "fax": "Fax Number (without dashes)",
+      "businessNumber": "Business Registration Number (without dashes)",
+      "zipCode": "Zip Code",
+      "basicAddress": "Basic Address",
+      "detailAddress": "Detail Address",
+      "companyIntro": "Please enter company introduction."
+    },
+    "buttons": {
+      "verify": "Verify Business Number",
+      "verifying": "Verifying...",
+      "verified": "Verified",
+      "addressSearch": "Search Address",
+      "cancel": "Cancel",
+      "register": "Register",
+      "update": "Update",
+      "processing": "Processing..."
+    },
+    "privacy": {
+      "agree": "I agree to the privacy policy"
+    },
+    "errors": {
+      "businessNumberLength": "Business registration number must be 10 digits.",
+      "businessNumberInvalid": "Invalid business registration number.",
+      "businessNumberVerifyError": "An error occurred while verifying the business registration number.",
+      "businessNumberVerifyRequired": "Please complete business registration number verification.",
+      "privacyAgreeRequired": "Please agree to the privacy policy.",
+      "vendorRegisterError": "An error occurred during vendor registration.",
+      "vendorInfoLoadError": "Failed to load vendor information:"
+    }
   }
 }
