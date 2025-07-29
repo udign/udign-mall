@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
@@ -9,6 +9,7 @@ import CommonPagination from '@/components/CommonPagination';
 import ProductGrid from '@/components/ProductGrid';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 import { ROUTES } from '@/lib/routes';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface SearchProduct {
   it_id: string;
@@ -52,9 +53,10 @@ interface SearchResponse {
 
 interface SearchResultsProps {
   searchQuery: string;
+  dictionary: Dictionary;
 }
 
-export default function SearchResults({ searchQuery }: SearchResultsProps) {
+export default function SearchResults({ searchQuery, dictionary }: SearchResultsProps) {
   const [searchData, setSearchData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,28 +65,31 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1');
 
-  const fetchSearchResults = async (query: string, page: number = 1) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const fetchSearchResults = useCallback(
+    async (query: string, page: number = 1) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const response = await fetch(
-        `/api/search?q=${encodeURIComponent(query)}&page=${page}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
-      );
-      const data: SearchResponse = await response.json();
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(query)}&page=${page}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`,
+        );
+        const data: SearchResponse = await response.json();
 
-      if (data.success) {
-        setSearchData(data);
-      } else {
-        setError(data.error || '검색 중 오류가 발생했습니다.');
+        if (data.success) {
+          setSearchData(data);
+        } else {
+          setError(data.error || dictionary.common.error);
+        }
+      } catch (err) {
+        console.error('검색 오류:', err);
+        setError(dictionary.common.error);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('검색 오류:', err);
-      setError('검색 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [dictionary.common.error],
+  );
 
   useEffect(() => {
     if (searchQuery?.trim()) {
@@ -97,19 +102,20 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
         fetchSearchResults(searchQuery.trim(), currentPage);
       }
     }
-  }, [searchQuery, currentPage, searchParams, router]);
+  }, [searchQuery, currentPage, searchParams, router, fetchSearchResults]);
 
   return (
     <div className='px-6 py-8 sm:px-10'>
       <div className='mb-6'>
-        <h1 className='text-2xl font-bold text-gray-900'>
-          &lsquo;<span className='text-primary'>{searchQuery}</span>&rsquo; 검색 결과
+        <h1 className='text-2xl font-bold text-white'>
+          {dictionary.search.searchFor.replace('{{query}}', searchQuery)}
         </h1>
         {!loading && !error && searchData && searchData.items.length > 0 && (
-          <p className='mt-2 text-gray-600'>
-            총{' '}
-            <span className='font-semibold text-gray-900'>{searchData.pagination.totalCount}</span>
-            개의 작품이 검색되었습니다.
+          <p className='mt-2 text-white'>
+            {dictionary.search.resultsCount.replace(
+              '{{count}}',
+              searchData.pagination.totalCount.toString(),
+            )}
           </p>
         )}
       </div>
@@ -120,14 +126,16 @@ export default function SearchResults({ searchQuery }: SearchResultsProps) {
         </div>
       ) : error ? (
         <div className='flex min-h-96 items-center justify-center'>
-          <ErrorState message={error} showGoHome={false} />
+          <ErrorState message={error} showGoHome={false} dictionary={dictionary} />
         </div>
       ) : !searchData || searchData.items.length === 0 ? (
         <div className='flex min-h-96 items-center justify-center'>
           <div className='flex flex-col items-center justify-center py-12 text-center'>
             <Search className='mb-4 h-16 w-16 text-gray-300' />
-            <h3 className='mb-2 text-lg font-medium text-gray-900'>검색 결과가 없습니다</h3>
-            <p className='text-gray-600'>다른 검색어로 시도해보세요.</p>
+            <h3 className='mb-2 text-lg font-medium text-gray-900'>
+              {dictionary.search.noResults}
+            </h3>
+            <p className='text-gray-600'>{dictionary.search.noResultsDesc}</p>
           </div>
         </div>
       ) : (

@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface ErrorStateProps {
   title?: string;
@@ -9,15 +10,17 @@ interface ErrorStateProps {
   showGoHome?: boolean;
   onRetry?: () => void;
   className?: string;
+  dictionary?: Dictionary;
 }
 
 export default function ErrorState({
-  title = '오류 발생',
+  title,
   message,
   showRetry = false,
   showGoHome = true,
   onRetry,
   className = '',
+  dictionary,
 }: ErrorStateProps) {
   const router = useRouter();
 
@@ -28,12 +31,14 @@ export default function ErrorState({
   return (
     <div className={`${containerClass} ${className}`}>
       <div className='text-center'>
-        <h2 className='mb-4 text-2xl font-bold text-red-600'>{title}</h2>
+        <h2 className='mb-4 text-2xl font-bold text-red-600'>
+          {title || dictionary?.common.error || '오류 발생'}
+        </h2>
         <p className='mb-4 text-gray-600'>{message}</p>
         <div className='flex justify-center gap-3'>
           {showRetry && onRetry && (
             <Button onClick={onRetry} className='bg-primary hover:bg-primary-hover'>
-              다시 시도
+              {dictionary?.common.retry || '다시 시도'}
             </Button>
           )}
           {showGoHome && (

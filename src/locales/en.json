@@ -126,6 +126,15 @@
       "rejectReview": "Reject Review"
     }
   },
+  "search": {
+    "title": "Search Results",
+    "emptyQuery": "Please enter a search term.",
+    "loading": "Loading search results...",
+    "noResults": "No search results found.",
+    "noResultsDesc": "Please try a different search term.",
+    "resultsCount": "{{count}} artworks found.",
+    "searchFor": "Search results for '{{query}}'"
+  },
   "shop": {
     "title": "Shop",
     "uploadProduct": "Upload Design",
