@@ -4,10 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
-import { useLocalePath } from '@/hooks/useLocalePath';
 
 export default function ForgotPasswordForm() {
-  const addLocalePath = useLocalePath();
   const [email, setEmail] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -60,11 +58,7 @@ export default function ForgotPasswordForm() {
           </div>
 
           <div className='flex space-x-3'>
-            <Button
-              onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}
-              variant='outline'
-              className='flex-1'
-            >
+            <Button onClick={() => router.push(ROUTES.LOGIN)} variant='outline' className='flex-1'>
               로그인으로 돌아가기
             </Button>
             <Button
@@ -127,7 +121,7 @@ export default function ForgotPasswordForm() {
           <div className='mt-4 text-center'>
             <Button
               type='button'
-              onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}
+              onClick={() => router.push(ROUTES.LOGIN)}
               variant='link'
               className='text-gray-300 hover:text-white'
             >

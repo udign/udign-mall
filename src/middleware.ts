@@ -15,10 +15,10 @@ function getLocale(request: NextRequest): string {
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
   // @ts-expect-error locales are readonly
-  const locales: string[] = i18n.locales;
+  const supportedLocales: string[] = i18n.locales;
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
 
-  const locale = matchLocale(languages, locales, i18n.defaultLocale);
+  const locale = matchLocale(languages, supportedLocales, i18n.defaultLocale);
   return locale;
 }
 

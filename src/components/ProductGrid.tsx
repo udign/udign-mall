@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/primitives/button';
 import { Progress } from '@/components/ui/primitives/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
-import { useLocalePath } from '@/hooks/useLocalePath';
 import { shouldBlurProduct, isCollectionStatus } from '@/lib/artwork-helpers';
 
 interface ProductGridProps {
@@ -60,13 +59,13 @@ export default function ProductGrid({ products, className = '' }: ProductGridPro
   );
 
   const router = useRouter();
+
   const { user } = useAuth();
-  const addLocalePath = useLocalePath();
 
   const handleProductClick = (e: React.MouseEvent, productId: string) => {
     e.preventDefault();
 
-    router.push(addLocalePath(`${ROUTES.PRODUCT}/${productId}`));
+    router.push(`${ROUTES.PRODUCT}/${productId}`);
   };
 
   const handleLikeToggle = async (e: React.MouseEvent, productId: string) => {

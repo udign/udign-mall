@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/primitives/button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { ROUTES } from '@/lib/routes';
-import { useLocalePath } from '@/hooks/useLocalePath';
 
 interface ArtworkCardProps {
   artwork: ArtworkStatus;
@@ -53,7 +52,6 @@ export default function ArtworkCard({
   const [showPurchaseConfirmDialog, setShowPurchaseConfirmDialog] = useState<boolean>(false);
 
   const router = useRouter();
-  const addLocalePath = useLocalePath();
 
   const isClickable = artwork._status_text === '컬렉션' || artwork._status_text === '심의중';
 
@@ -115,11 +113,7 @@ export default function ArtworkCard({
     <>
       <div
         className={`rounded-lg border border-gray-200 bg-white p-4 ${isClickable && 'cursor-pointer'}`}
-        onClick={
-          isClickable
-            ? () => router.push(addLocalePath(`${ROUTES.PRODUCT}/${artwork.it_id}`))
-            : undefined
-        }
+        onClick={isClickable ? () => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`) : undefined}
       >
         <div className='relative'>
           <div className='flex flex-col space-y-4 lg:flex-row lg:items-start lg:space-y-0 lg:space-x-6 lg:pr-32'>
@@ -192,7 +186,7 @@ export default function ArtworkCard({
               {/* 구매 진행 */}
               {artwork._status_text === '구매 진행' && (
                 <Button
-                  onClick={() => router.push(addLocalePath(`${ROUTES.PRODUCT}/${artwork.it_id}`))}
+                  onClick={() => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`)}
                   variant='default'
                   size='sm'
                   className='whitespace-nowrap'
@@ -204,7 +198,7 @@ export default function ArtworkCard({
               {/* 결제대기 */}
               {artwork._status_text === '결제대기' && artwork.od_settle_case !== '무통장' && (
                 <Button
-                  onClick={() => router.push(addLocalePath(`${ROUTES.PRODUCT}/${artwork.it_id}`))}
+                  onClick={() => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`)}
                   variant='default'
                   size='sm'
                   className='whitespace-nowrap'
@@ -262,7 +256,7 @@ export default function ArtworkCard({
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(addLocalePath(`/product/${artwork.it_id}/qa`));
+                    router.push(`/product/${artwork.it_id}/qa`);
                   }}
                   variant='default'
                   size='sm'

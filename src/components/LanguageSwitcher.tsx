@@ -11,6 +11,11 @@ import {
 } from '@/components/ui/primitives/dropdown-menu';
 import { i18n, type Locale } from '../../i18n.config';
 
+const languageNames = {
+  ko: '한국어',
+  en: 'English',
+};
+
 export default function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
@@ -56,11 +61,6 @@ export default function LanguageSwitcher() {
 
   const currentLocale = getCurrentLocale();
 
-  const languageNames = {
-    ko: '한국어',
-    en: 'English',
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -73,9 +73,7 @@ export default function LanguageSwitcher() {
           <DropdownMenuItem
             key={locale}
             onClick={() => switchLanguage(locale)}
-            className={`cursor-pointer ${
-              currentLocale === locale ? 'bg-gray-100 font-semibold' : ''
-            }`}
+            className={`cursor-pointer ${currentLocale === locale && 'bg-gray-100 font-semibold'}`}
           >
             {languageNames[locale]}
           </DropdownMenuItem>

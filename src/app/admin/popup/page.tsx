@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/primitives/button';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 import { formatDate, truncateText } from '@/lib/utils';
-import { useLocalePath } from '@/hooks/useLocalePath';
 
 const tableHeaders = [
   'ID',
@@ -41,7 +40,6 @@ export default function PopupListPage() {
   const searchParams = useSearchParams();
 
   const { user, isLoading: authLoading } = useAuth();
-  const addLocalePath = useLocalePath();
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
@@ -49,15 +47,15 @@ export default function PopupListPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push(addLocalePath(ROUTES.LOGIN));
+      router.push(ROUTES.LOGIN);
       return;
     }
 
     if (!PERMISSION_CHECKS.isAdmin(user.mb_level)) {
-      router.push(addLocalePath(ROUTES.SHOP));
+      router.push(ROUTES.SHOP);
       return;
     }
-  }, [user, authLoading, router, addLocalePath]);
+  }, [user, authLoading, router]);
 
   const fetchData = async (page: number = 1) => {
     try {
@@ -135,7 +133,7 @@ export default function PopupListPage() {
     <div className='flex min-h-screen items-center justify-center'>
       <div className='text-center'>
         <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
-        <Button onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}>로그인하기</Button>
+        <Button onClick={() => router.push(ROUTES.LOGIN)}>로그인하기</Button>
       </div>
     </div>
   ) : loading ? (

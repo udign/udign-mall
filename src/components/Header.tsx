@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/primitives/tooltip';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLocalePath } from '@/hooks/useLocalePath';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
@@ -27,9 +26,14 @@ import NavigationSidebar from '@/components/NavigationSidebar';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/primitives/button';
 import { MEMBER_LEVELS } from '@/lib/constants';
+import { Dictionary } from '@/lib/dictionaries';
 import Link from 'next/link';
 
-export default function Header() {
+interface HeaderProps {
+  dictionary: Dictionary;
+}
+
+export default function Header({ dictionary }: HeaderProps) {
   const [hideHeader, setHideHeader] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
@@ -39,7 +43,6 @@ export default function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
-  const addLocalePath = useLocalePath();
 
   const { user, isLoading, logout } = useAuth();
 
@@ -79,7 +82,7 @@ export default function Header() {
       if (response.ok) {
         logout();
         console.log('로그아웃 되었습니다.');
-        router.push(addLocalePath(ROUTES.SHOP));
+        router.push(ROUTES.SHOP);
       }
     } catch (error) {
       console.error('로그아웃 오류:', error);
@@ -96,7 +99,7 @@ export default function Header() {
     if (!user) {
       setShowLoginDialog(true);
     } else {
-      router.push(addLocalePath(href));
+      router.push(href);
     }
   };
 
@@ -119,7 +122,7 @@ export default function Header() {
           <div className='space-y-5 px-6 py-5 sm:px-10'>
             <div className='flex items-center gap-3'>
               <div className='non-login'>
-                <Link href={addLocalePath(ROUTES.HOME)}>
+                <Link href={ROUTES.HOME}>
                   <Image src='/images/udign-white.png' alt='logo' width={103} height={35} />
                 </Link>
               </div>
@@ -146,7 +149,7 @@ export default function Header() {
                     variant='ghost'
                     className='text-base text-white hover:bg-white/10 hover:text-white'
                   >
-                    <span>관리자</span>
+                    <span>{dictionary.header.admin}</span>
                   </Button>
                 )}
                 {user ? (
@@ -161,23 +164,23 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end' className='w-48'>
                       <DropdownMenuItem
-                        onClick={() => router.push(addLocalePath(ROUTES.PROFILE_CONFIRM))}
+                        onClick={() => router.push(ROUTES.PROFILE_CONFIRM)}
                         className='cursor-pointer'
                       >
-                        회원정보 수정
+                        {dictionary.header.editProfile}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
-                        로그아웃
+                        {dictionary.common.logout}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
                   <Button
-                    onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}
+                    onClick={() => router.push(ROUTES.LOGIN)}
                     variant='ghost'
                     className='text-base text-white hover:bg-white/10 hover:text-white'
                   >
-                    <span>로그인</span>
+                    <span>{dictionary.common.login}</span>
                   </Button>
                 )}
 
@@ -213,7 +216,12 @@ export default function Header() {
                     </TooltipTrigger>
                     {purchaseCount > 0 && (
                       <TooltipContent side='bottom' className='bg-gray-800 text-white'>
-                        <p>구매가능한 상품이 {purchaseCount}개 있습니다.</p>
+                        <p>
+                          {dictionary.header.purchaseAvailable.replace(
+                            '{{count}}',
+                            purchaseCount.toString(),
+                          )}
+                        </p>
                       </TooltipContent>
                     )}
                   </Tooltip>
@@ -226,20 +234,26 @@ export default function Header() {
         <TodayViewedProductsSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          dictionary={dictionary}
         />
 
-        <SearchSidebar isOpen={isSearchSidebarOpen} onClose={() => setIsSearchSidebarOpen(false)} />
+        <SearchSidebar
+          isOpen={isSearchSidebarOpen}
+          onClose={() => setIsSearchSidebarOpen(false)}
+          dictionary={dictionary}
+        />
 
         <NavigationSidebar
           isOpen={isNavigationSidebarOpen}
           onClose={() => setIsNavigationSidebarOpen(false)}
+          dictionary={dictionary}
         />
 
         <LoginRequiredDialog
           open={showLoginDialog}
           onOpenChange={setShowLoginDialog}
-          title='로그인이 필요합니다'
-          description='이 기능을 사용하시려면 로그인이 필요합니다.'
+          title={dictionary.header.loginRequired}
+          description={dictionary.header.loginRequiredDesc}
         />
       </>
     )

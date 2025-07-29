@@ -36,7 +36,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primit
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/primitives/popover';
 import { Calendar } from '@/components/ui/primitives/calendar';
 import MessageDialog from '@/components/ui/MessageDialog';
-import { useLocalePath } from '@/hooks/useLocalePath';
 
 type PopupFormData = z.infer<typeof popupFormSchema>;
 
@@ -66,7 +65,6 @@ export default function PopupCreatePage() {
   });
 
   const router = useRouter();
-  const addLocalePath = useLocalePath();
 
   const { user, isLoading: authLoading } = useAuth();
 
@@ -91,15 +89,15 @@ export default function PopupCreatePage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push(addLocalePath(ROUTES.LOGIN));
+      router.push(ROUTES.LOGIN);
       return;
     }
 
     if (!PERMISSION_CHECKS.isAdmin(user.mb_level)) {
-      router.push(addLocalePath(ROUTES.SHOP));
+      router.push(ROUTES.SHOP);
       return;
     }
-  }, [user, authLoading, router, addLocalePath]);
+  }, [user, authLoading, router]);
 
   const handleTodayStart = (checked: boolean) => {
     if (checked) {
@@ -170,7 +168,7 @@ export default function PopupCreatePage() {
     <div className='flex min-h-screen items-center justify-center'>
       <div className='text-center'>
         <p className='mb-4 text-red-600'>관리자 권한이 필요합니다.</p>
-        <Button onClick={() => router.push(addLocalePath(ROUTES.LOGIN))}>로그인하기</Button>
+        <Button onClick={() => router.push(ROUTES.LOGIN)}>로그인하기</Button>
       </div>
     </div>
   ) : (

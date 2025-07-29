@@ -44,5 +44,101 @@
     "english": "English",
     "changeLanguage": "언어를 변경하시겠습니까?",
     "languageChanged": "언어가 변경되었습니다"
+  },
+  "header": {
+    "admin": "관리자",
+    "editProfile": "회원정보 수정",
+    "loginRequired": "로그인이 필요합니다",
+    "loginRequiredDesc": "이 기능을 사용하시려면 로그인이 필요합니다.",
+    "purchaseAvailable": "구매가능한 상품이 {{count}}개 있습니다."
+  },
+  "footer": {
+    "aboutUdign": "about UDIGN",
+    "userGuide": "이용안내",
+    "termsOfUse": "이용약관",
+    "privacyPolicy": "개인정보처리방침",
+    "vendorPage": "벤더페이지",
+    "copyrightReport": "저작권 신고",
+    "company": {
+      "representative": "대표",
+      "phone": "전화",
+      "fax": "팩스",
+      "address": "사업장주소",
+      "addressValue": "서울시 은평구 진관3로 32, 은평뉴타운파크앤타워 B동 6층 618호",
+      "businessNumber": "사업자등록번호",
+      "ecommerceNumber": "통신판매업신고번호",
+      "privacyManager": "개인정보관리책임자",
+      "email": "E-MAIL"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "phone": "1577-4215",
+      "operatingHours": "운영시간 : 평일 09:00 ~ 17:00",
+      "lunchTime": "점심시간 : 평일 12:00 ~ 13:00",
+      "holiday": "토, 일요일 / 공휴일 휴무",
+      "followUs": "Follow Us"
+    }
+  },
+  "sidebar": {
+    "todayViewed": {
+      "title": "오늘 본 작품",
+      "description": "오늘 확인한 작품 목록을 표시합니다.",
+      "empty": "아직 본 작품이 없습니다",
+      "recentCount": "최근 확인한 작품 {{count}}개",
+      "clearAll": "전체 삭제",
+      "noImage": "이미지 없음",
+      "storageInfo": "상품은 하루 동안 최대 {{max}}개까지 저장됩니다"
+    },
+    "search": {
+      "title": "작품 검색",
+      "description": "작품을 검색할 수 있습니다.",
+      "placeholder": "찾으시는 작품을 검색해보세요",
+      "button": "검색",
+      "hint": "작품명, 작가명 등으로 검색해보세요"
+    },
+    "navigation": {
+      "menu": "메뉴",
+      "description": "사이트 네비게이션 메뉴",
+      "category": "CATEGORY",
+      "siteMenu": "SITE MENU",
+      "aboutUs": "ABOUT US",
+      "all": "전체",
+      "vendorPage": "벤더페이지",
+      "copyrightReport": "저작권 신고",
+      "siteIntro": "사이트 소개",
+      "serviceTerms": "서비스 이용약관",
+      "privacyPolicy": "개인정보 처리방침",
+      "designUpload": "디자인 업로드",
+      "userGuide": "이용안내",
+      "categories": {
+        "fashion": "패션",
+        "shoes": "신발",
+        "others": "기타",
+        "men": "남성",
+        "women": "여성"
+      },
+      "fashionItems": {
+        "top": "상의",
+        "bottom": "하의",
+        "outer": "아우터",
+        "product": "제품",
+        "space": "공간"
+      },
+      "shoeItems": {
+        "sneakers": "운동화",
+        "dressShoes": "구두/스니커즈",
+        "walker": "워커",
+        "sandals": "샌들/슬리퍼",
+        "rainBoots": "레인부츠",
+        "boots": "부츠"
+      },
+      "otherItems": {
+        "top": "상의",
+        "bottom": "하의",
+        "graphic": "그래픽",
+        "product": "제품",
+        "space": "공간"
+      }
+    }
   }
 }

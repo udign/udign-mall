@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
-import { useLocalePath } from '@/hooks/useLocalePath';
 import { CATEGORY_IDS } from '@/lib/constants';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import ProductGrid from '@/components/ProductGrid';
@@ -33,8 +32,8 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
   const isLoadingRef = useRef(false);
 
   const router = useRouter();
+
   const { user, isLoading } = useAuth();
-  const addLocalePath = useLocalePath();
 
   const handleUploadClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,7 +45,7 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
     if (!user) {
       setShowLoginDialog(true);
     } else {
-      router.push(addLocalePath(ROUTES.UPLOAD));
+      router.push(ROUTES.UPLOAD);
     }
   };
 
@@ -157,7 +156,7 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`px-6 py-2 text-base font-medium transition-colors ${
+                  className={`cursor-pointer px-6 py-2 text-base font-medium transition-colors ${
                     selectedCategory === category.id
                       ? 'border-b-2 border-white text-white'
                       : 'text-white/60 hover:text-white'

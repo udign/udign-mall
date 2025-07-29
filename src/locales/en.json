@@ -44,5 +44,101 @@
     "english": "English",
     "changeLanguage": "Would you like to change the language?",
     "languageChanged": "Language has been changed"
+  },
+  "header": {
+    "admin": "Admin",
+    "editProfile": "Edit Profile",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "You need to login to use this feature.",
+    "purchaseAvailable": "You have {{count}} products available for purchase."
+  },
+  "footer": {
+    "aboutUdign": "about UDIGN",
+    "userGuide": "User Guide",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "vendorPage": "Vendor Page",
+    "copyrightReport": "Copyright Report",
+    "company": {
+      "representative": "Representative",
+      "phone": "Phone",
+      "fax": "Fax",
+      "address": "Business Address",
+      "addressValue": "Building B, 6th Floor, Room 618, 32 Jingwan 3-ro, Eunpyeong-gu, Seoul, Republic of Korea",
+      "businessNumber": "Business Registration Number",
+      "ecommerceNumber": "E-commerce Registration Number",
+      "privacyManager": "Privacy Manager",
+      "email": "E-MAIL"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "phone": "1577-4215",
+      "operatingHours": "Operating Hours: Weekdays 09:00 ~ 17:00",
+      "lunchTime": "Lunch Time: Weekdays 12:00 ~ 13:00",
+      "holiday": "Sat, Sun / Public Holiday Closed",
+      "followUs": "Follow Us"
+    }
+  },
+  "sidebar": {
+    "todayViewed": {
+      "title": "Today Viewed",
+      "description": "Shows the list of artworks viewed today.",
+      "empty": "No artworks viewed yet",
+      "recentCount": "{{count}} recently viewed artworks",
+      "clearAll": "Clear All",
+      "noImage": "No Image",
+      "storageInfo": "Up to {{max}} products can be stored for one day"
+    },
+    "search": {
+      "title": "Search Artworks",
+      "description": "You can search for artworks.",
+      "placeholder": "Search for the artwork you're looking for",
+      "button": "Search",
+      "hint": "Search by artwork name, artist name, etc."
+    },
+    "navigation": {
+      "menu": "Menu",
+      "description": "Site navigation menu",
+      "category": "CATEGORY",
+      "siteMenu": "SITE MENU",
+      "aboutUs": "ABOUT US",
+      "all": "All",
+      "vendorPage": "Vendor Page",
+      "copyrightReport": "Copyright Report",
+      "siteIntro": "About Site",
+      "serviceTerms": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "designUpload": "Design Upload",
+      "userGuide": "User Guide",
+      "categories": {
+        "fashion": "Fashion",
+        "shoes": "Shoes",
+        "others": "Others",
+        "men": "Men",
+        "women": "Women"
+      },
+      "fashionItems": {
+        "top": "Top",
+        "bottom": "Bottom",
+        "outer": "Outer",
+        "product": "Product",
+        "space": "Space"
+      },
+      "shoeItems": {
+        "sneakers": "Sneakers",
+        "dressShoes": "Dress Shoes/Sneakers",
+        "walker": "Walker",
+        "sandals": "Sandals/Slippers",
+        "rainBoots": "Rain Boots",
+        "boots": "Boots"
+      },
+      "otherItems": {
+        "top": "Top",
+        "bottom": "Bottom",
+        "graphic": "Graphic",
+        "product": "Product",
+        "space": "Space"
+      }
+    }
   }
 }

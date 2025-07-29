@@ -1,7 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/primitives/button';
 import { ROUTES } from '@/lib/routes';
-import { useLocalePath } from '@/hooks/useLocalePath';
 
 interface NotFoundStateProps {
   title?: string;
@@ -17,11 +16,8 @@ export default function NotFoundState({
   className = '',
 }: NotFoundStateProps) {
   const router = useRouter();
-  const addLocalePath = useLocalePath();
 
-  const handleGoHome = () => {
-    router.push(addLocalePath(ROUTES.HOME));
-  };
+  const handleGoHome = () => router.push(ROUTES.HOME);
 
   const containerClass = 'flex min-h-[32rem] items-center justify-center py-24';
 
