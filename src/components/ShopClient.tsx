@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/lib/routes';
 import { CATEGORY_IDS } from '@/lib/constants';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
+import LanguageSelectionDialog from '@/components/LanguageSelectionDialog';
 import ProductGrid from '@/components/ProductGrid';
 import LoadingSpinner from '@/components/states/LoadingSpinner';
 import ErrorState from '@/components/states/ErrorState';
@@ -21,6 +22,7 @@ interface ShopClientProps {
 
 export default function ShopClient({ dictionary }: ShopClientProps) {
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
+  const [showLanguageDialog, setShowLanguageDialog] = useState<boolean>(false);
   const [isButtonOpen, setIsButtonOpen] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [products, setProducts] = useState<Product[]>([]);
@@ -114,6 +116,20 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
     setHasMore(true);
     fetchProducts(1, true);
   }, [selectedCategory, fetchProducts]);
+
+  // 최초 방문 시 언어 선택 Dialog 표시
+  useEffect(() => {
+    // 클라이언트 사이드에서만 실행
+    if (typeof window !== 'undefined') {
+      const hasSelectedLanguage = localStorage.getItem('language_selected');
+      const hasCookie = document.cookie.includes('NEXT_LOCALE=');
+
+      // 언어를 한 번도 선택하지 않은 경우 Dialog 표시
+      if (!hasSelectedLanguage && !hasCookie) {
+        setShowLanguageDialog(true);
+      }
+    }
+  }, []);
 
   const categories = [
     { id: 'all', name: dictionary.shop.categories.all },
@@ -251,6 +267,11 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
         onOpenChange={setShowLoginDialog}
         title={dictionary.shop.loginRequired}
         description={dictionary.shop.loginRequiredMessage}
+      />
+
+      <LanguageSelectionDialog
+        open={showLanguageDialog}
+        onClose={() => setShowLanguageDialog(false)}
       />
     </>
   );
