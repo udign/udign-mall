@@ -921,5 +921,20 @@
         "confirmFailed": "비밀번호 확인 중 오류가 발생했습니다."
       }
     }
+  },
+  "privacy": {
+    "title": "개인정보 처리방침",
+    "supplementary": {
+      "title": "부칙",
+      "content": "본 방침은 OOOO년 OO월 OO일부터 시행합니다."
+    }
+  },
+  "provision": {
+    "title": "서비스 이용약관",
+    "supplementary": {
+      "title": "부칙",
+      "content1": "1. 이 약관은 2024년 01월 01일부터 시행합니다.",
+      "content2": "2. 이 약관은 전자상거래(인터넷사이버몰) 표준약관 제10023호(2014. 9. 19. 개정)를 준수합니다."
+    }
   }
 }

@@ -921,5 +921,20 @@
         "confirmFailed": "An error occurred while confirming password."
       }
     }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "supplementary": {
+      "title": "Supplementary Provisions",
+      "content": "This policy comes into effect from YYYY-MM-DD."
+    }
+  },
+  "provision": {
+    "title": "Terms of Service",
+    "supplementary": {
+      "title": "Supplementary Provisions",
+      "content1": "1. These terms come into effect from January 1, 2024.",
+      "content2": "2. These terms comply with the E-commerce (Internet Cyber Mall) Standard Terms No. 10023 (revised September 19, 2014)."
+    }
   }
 }

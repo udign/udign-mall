@@ -1,6 +1,15 @@
 import { privacyPolicy } from '@/lib/terms-content';
+import { getDictionary } from '@/lib/dictionaries';
+import { Locale } from '../../../../../i18n.config';
 
-export default function PrivacyPage() {
+interface PrivacyPageProps {
+  params: Promise<{ lang: Locale }>;
+}
+
+export default async function PrivacyPage({ params }: PrivacyPageProps) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
+
   // 개인정보 처리방침 내용을 조항별로 분리
   const sections = privacyPolicy.split(/(?=제\d+조)/g).filter((section) => section.trim());
 
@@ -8,7 +17,9 @@ export default function PrivacyPage() {
     <div className='min-h-screen bg-white'>
       <div className='px-6 py-8 sm:px-10'>
         <div className='mx-auto'>
-          <h1 className='mb-8 text-center text-2xl font-bold text-gray-900'>개인정보 처리방침</h1>
+          <h1 className='mb-8 text-center text-2xl font-bold text-gray-900'>
+            {dictionary.privacy.title}
+          </h1>
 
           <div className='space-y-6'>
             {sections.map((section, index) => {
@@ -90,9 +101,11 @@ export default function PrivacyPage() {
 
             {/* 부칙 */}
             <div className='rounded-lg border border-gray-200 bg-gray-50 p-6'>
-              <h2 className='mb-4 text-lg font-semibold text-gray-900'>부칙</h2>
+              <h2 className='mb-4 text-lg font-semibold text-gray-900'>
+                {dictionary.privacy.supplementary.title}
+              </h2>
               <div className='text-gray-700'>
-                <p>본 방침은 OOOO년 OO월 OO일부터 시행합니다.</p>
+                <p>{dictionary.privacy.supplementary.content}</p>
               </div>
             </div>
           </div>
