@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/primitives/dialog';
 import { Button } from '@/components/ui/primitives/button';
 
+import { Dictionary } from '@/lib/dictionaries';
+
 interface MessageDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -17,6 +19,7 @@ interface MessageDialogProps {
   description?: string;
   confirmText?: string;
   onConfirm?: () => void;
+  dictionary?: Dictionary;
 }
 
 export default function MessageDialog({
@@ -24,7 +27,7 @@ export default function MessageDialog({
   onOpenChange,
   title,
   description,
-  confirmText = '확인',
+  confirmText,
   onConfirm,
 }: MessageDialogProps) {
   const handleConfirm = () => {
@@ -45,7 +48,7 @@ export default function MessageDialog({
         </DialogHeader>
         <DialogFooter className='sm:justify-center'>
           <Button onClick={handleConfirm} variant='default' className='px-8'>
-            {confirmText}
+            {confirmText || '확인'}
           </Button>
         </DialogFooter>
       </DialogContent>

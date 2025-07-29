@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/primitives/button';
 import FormDialog from '@/components/ui/FormDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface ReturnModalProps {
   isOpen: boolean;
@@ -14,9 +15,16 @@ interface ReturnModalProps {
     reason: string;
   }) => Promise<void>;
   orderId: string;
+  dictionary: Dictionary;
 }
 
-export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: ReturnModalProps) {
+export default function ReturnModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  orderId,
+  dictionary,
+}: ReturnModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -31,7 +39,7 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
     e.preventDefault();
 
     if (!formData.name || !formData.phone || !formData.reason) {
-      setMessageContent('모든 필드를 입력해주세요.');
+      setMessageContent(dictionary.myUdign.dialogs.return.allFieldsRequired);
       setShowMessageDialog(true);
       return;
     }
@@ -53,33 +61,45 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
 
   return (
     <>
-      <FormDialog open={isOpen} onOpenChange={onClose} title='교환/반품 신청'>
+      <FormDialog
+        open={isOpen}
+        onOpenChange={onClose}
+        title={dictionary.myUdign.dialogs.return.title}
+      >
         <form onSubmit={handleSubmit}>
           <div className='space-y-4'>
             <div>
-              <label className='mb-1 block text-sm font-medium text-gray-700'>이름</label>
+              <label className='mb-1 block text-sm font-medium text-gray-700'>
+                {dictionary.myUdign.dialogs.return.nameLabel}
+              </label>
               <input
                 type='text'
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder={dictionary.myUdign.dialogs.return.namePlaceholder}
                 className='w-full rounded border border-gray-300 p-2 focus:border-purple-500 focus:ring-purple-500'
                 required
               />
             </div>
 
             <div>
-              <label className='mb-1 block text-sm font-medium text-gray-700'>전화번호</label>
+              <label className='mb-1 block text-sm font-medium text-gray-700'>
+                {dictionary.myUdign.dialogs.return.phoneLabel}
+              </label>
               <input
                 type='tel'
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder={dictionary.myUdign.dialogs.return.phonePlaceholder}
                 className='w-full rounded border border-gray-300 p-2 focus:border-purple-500 focus:ring-purple-500'
                 required
               />
             </div>
 
             <div>
-              <label className='mb-1 block text-sm font-medium text-gray-700'>교환/반품 선택</label>
+              <label className='mb-1 block text-sm font-medium text-gray-700'>
+                {dictionary.myUdign.dialogs.return.typeLabel}
+              </label>
               <div className='flex space-x-4'>
                 <label className='flex items-center'>
                   <input
@@ -94,7 +114,7 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
                     }
                     className='mr-2'
                   />
-                  교환
+                  {dictionary.myUdign.dialogs.return.exchange}
                 </label>
                 <label className='flex items-center'>
                   <input
@@ -109,16 +129,19 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
                     }
                     className='mr-2'
                   />
-                  반품
+                  {dictionary.myUdign.dialogs.return.return}
                 </label>
               </div>
             </div>
 
             <div>
-              <label className='mb-1 block text-sm font-medium text-gray-700'>사유</label>
+              <label className='mb-1 block text-sm font-medium text-gray-700'>
+                {dictionary.myUdign.dialogs.return.reasonLabel}
+              </label>
               <textarea
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                placeholder={dictionary.myUdign.dialogs.return.reasonPlaceholder}
                 rows={4}
                 className='w-full rounded border border-gray-300 p-2 focus:border-purple-500 focus:ring-purple-500'
                 required
@@ -137,7 +160,9 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
               취소
             </Button>
             <Button type='submit' variant='default' className='flex-1' disabled={isSubmitting}>
-              {isSubmitting ? '처리중...' : '제출'}
+              {isSubmitting
+                ? dictionary.common.loading
+                : dictionary.myUdign.dialogs.return.submitButton}
             </Button>
           </div>
         </form>
@@ -146,7 +171,7 @@ export default function ReturnModal({ isOpen, onClose, onSubmit, orderId }: Retu
       <MessageDialog
         open={showMessageDialog}
         onOpenChange={setShowMessageDialog}
-        title='알림'
+        title={dictionary.myUdign.notification}
         description={messageContent}
       />
     </>

@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/primitives/button';
 import FormDialog from '@/components/ui/FormDialog';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface CancelOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (orderId: string, cancelMemo: string) => Promise<void>;
   orderId: string;
+  dictionary: Dictionary;
 }
 
 export default function CancelOrderModal({
@@ -16,6 +18,7 @@ export default function CancelOrderModal({
   onClose,
   onSubmit,
   orderId,
+  dictionary,
 }: CancelOrderModalProps) {
   const [cancelMemo, setCancelMemo] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,7 +30,7 @@ export default function CancelOrderModal({
     e.preventDefault();
 
     if (!cancelMemo.trim()) {
-      setMessageContent('취소 사유를 입력해주세요.');
+      setMessageContent(dictionary.myUdign.dialogs.cancel.reasonRequired);
       setShowMessageDialog(true);
       return;
     }
@@ -50,15 +53,21 @@ export default function CancelOrderModal({
 
   return (
     <>
-      <FormDialog open={isOpen} onOpenChange={onClose} title='주문취소'>
+      <FormDialog
+        open={isOpen}
+        onOpenChange={onClose}
+        title={dictionary.myUdign.dialogs.cancel.title}
+      >
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
-            <label className='mb-2 block text-sm font-medium text-gray-700'>주문취소사유</label>
+            <label className='mb-2 block text-sm font-medium text-gray-700'>
+              {dictionary.myUdign.dialogs.cancel.reasonLabel}
+            </label>
             <input
               type='text'
               value={cancelMemo}
               onChange={(e) => setCancelMemo(e.target.value)}
-              placeholder='주문취소사유를 입력해주세요'
+              placeholder={dictionary.myUdign.dialogs.cancel.reasonPlaceholder}
               className='w-full rounded border border-gray-300 p-3 focus:border-purple-500 focus:ring-purple-500'
               maxLength={100}
               required
@@ -76,7 +85,9 @@ export default function CancelOrderModal({
               닫기
             </Button>
             <Button type='submit' variant='destructive' className='flex-1' disabled={isSubmitting}>
-              {isSubmitting ? '처리중...' : '주문취소'}
+              {isSubmitting
+                ? dictionary.common.loading
+                : dictionary.myUdign.dialogs.cancel.submitButton}
             </Button>
           </div>
         </form>
@@ -85,17 +96,17 @@ export default function CancelOrderModal({
       <ConfirmDialog
         open={showConfirmDialog}
         onOpenChange={setShowConfirmDialog}
-        title='주문취소 확인'
-        description='주문을 정말 취소하시겠습니까?'
+        title={dictionary.myUdign.dialogs.cancel.confirmTitle}
+        description={dictionary.myUdign.dialogs.cancel.confirmMessage}
         onConfirm={handleConfirmCancel}
         variant='destructive'
-        confirmText='취소하기'
+        confirmText={dictionary.myUdign.dialogs.cancel.submitButton}
       />
 
       <MessageDialog
         open={showMessageDialog}
         onOpenChange={setShowMessageDialog}
-        title='알림'
+        title={dictionary.myUdign.notification}
         description={messageContent}
       />
     </>

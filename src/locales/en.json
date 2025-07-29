@@ -14,6 +14,118 @@
     "confirm": "Confirm",
     "cancel": "Cancel"
   },
+  "myUdign": {
+    "title": "My UDIGN",
+    "subtitle": "Your exclusive design journey",
+    "welcome": "{{name}}",
+    "welcomeMessage": "Welcome to UDIGN",
+    "preorderSystem": "UDIGN Pre-order System",
+    "systemDescription": {
+      "artwork": "Artwork: Designer sketches on the main page",
+      "like": "Like: Expression of interest in production",
+      "product": "Product: Actually produced artwork (only purchasable by users who liked)"
+    },
+    "reviewProcess": {
+      "title": "Review Process:",
+      "auto": "Automatic Review: Automatically proceeds to review stage when target likes are reached",
+      "manual": "Manual Review: Proceeds to review stage after administrator-set period"
+    },
+    "steps": {
+      "collection": "Design Like",
+      "review": "Production Review",
+      "payment": "Purchase Process",
+      "paymentWaiting": "Payment Pending",
+      "paymentCompleted": "Payment Completed",
+      "making": "Product Manufacturing",
+      "shipping": "Shipping Process",
+      "completed": "Delivery Completed"
+    },
+    "statusGroups": {
+      "all": "All",
+      "collection": "Design Like",
+      "review": "Production Review",
+      "payment": "Purchase Process",
+      "paymentCompleted": "Order Confirmed",
+      "making": "Product Manufacturing",
+      "shipping": "Shipping Process",
+      "completed": "Delivery Completed",
+      "cancelled": "Cancelled/Returned/Out of Stock"
+    },
+    "artworkStatus": "My Artwork Status",
+    "noArtworks": "No artworks in this status.",
+    "loadingMore": "Loading more artworks...",
+    "allLoaded": "All artworks have been loaded.",
+    "notification": "Notification",
+    "artwork": {
+      "noImage": "No Image",
+      "price": "{{price}} KRW",
+      "likeCount": "{{count}} likes",
+      "orderDate": "Order Date: {{date}}",
+      "paymentMethod": "Payment Method: {{method}}",
+      "paymentAmount": "Payment Amount: {{amount}} KRW",
+      "options": "Options: {{options}}",
+      "quantity": "Quantity: {{quantity}}",
+      "actions": {
+        "toggleInterest": "Toggle Interest",
+        "cancelOrder": "Cancel Order",
+        "confirmPurchase": "Confirm Purchase",
+        "requestReturn": "Request Exchange/Return"
+      },
+      "status": {
+        "collection": "Collection",
+        "review": "Under Review",
+        "payment": "Purchase Process",
+        "paymentCompleted": "Order Confirmed",
+        "making": "Manufacturing",
+        "shipping": "Shipping",
+        "completed": "Completed",
+        "cancelled": "Order Cancelled"
+      }
+    },
+    "dialogs": {
+      "interest": {
+        "add": "Add to Wishlist",
+        "remove": "Remove from Wishlist",
+        "addMessage": "Would you like to add this item to your wishlist?",
+        "removeMessage": "Would you like to remove this item from your wishlist?",
+        "addButton": "Add",
+        "removeButton": "Remove"
+      },
+      "purchase": {
+        "confirm": "Purchase Confirmation",
+        "confirmMessage": "Would you like to confirm this purchase?",
+        "confirmButton": "Confirm"
+      },
+      "cancel": {
+        "title": "Cancel Order",
+        "reasonLabel": "Cancellation Reason",
+        "reasonPlaceholder": "Please enter the reason for cancellation",
+        "reasonRequired": "Please enter the cancellation reason.",
+        "confirmTitle": "Confirm Order Cancellation",
+        "confirmMessage": "Are you sure you want to cancel this order?",
+        "submitButton": "Cancel Order"
+      },
+      "return": {
+        "title": "Exchange/Return Request",
+        "nameLabel": "Applicant Name",
+        "namePlaceholder": "Please enter your name",
+        "phoneLabel": "Contact Number",
+        "phonePlaceholder": "Please enter your contact number",
+        "typeLabel": "Request Type",
+        "exchange": "Exchange",
+        "return": "Return",
+        "reasonLabel": "Reason",
+        "reasonPlaceholder": "Please enter the reason for exchange/return in detail",
+        "submitButton": "Submit Request",
+        "allFieldsRequired": "Please fill in all fields."
+      }
+    },
+    "admin": {
+      "reviewStatus": "Review Status",
+      "approveReview": "Approve Review",
+      "rejectReview": "Reject Review"
+    }
+  },
   "shop": {
     "title": "Shop",
     "uploadProduct": "Upload Design",
@@ -231,14 +343,5 @@
     "popularProducts": {
       "title": "Popular Works"
     }
-  },
-  "common": {
-    "loading": "Loading...",
-    "error": "Error Occurred",
-    "notFound": "Page Not Found",
-    "goHome": "Go Home",
-    "retry": "Retry",
-    "login": "Login",
-    "logout": "Logout"
   }
 }

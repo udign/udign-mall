@@ -11,9 +11,11 @@ import { Button } from '@/components/ui/primitives/button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
 import { ROUTES } from '@/lib/routes';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface ArtworkCardProps {
   artwork: ArtworkStatus;
+  dictionary: Dictionary;
   onInterestToggle: (itemId: string) => Promise<void>;
   onOrderCancel: (orderId: string, cancelMemo: string) => Promise<void>;
   onPurchaseConfirm: (orderId: string) => Promise<void>;
@@ -30,6 +32,7 @@ interface ArtworkCardProps {
 
 export default function ArtworkCard({
   artwork,
+  dictionary,
   onInterestToggle,
   onOrderCancel,
   onPurchaseConfirm,
@@ -131,14 +134,15 @@ export default function ArtworkCard({
                     target.style.display = 'none';
                     const parent = target.parentElement;
                     if (parent) {
-                      parent.innerHTML =
-                        '<div class="flex h-20 w-20 sm:h-24 sm:w-24 lg:h-28 lg:w-28 items-center justify-center bg-gray-200 rounded-lg"><span class="text-xs text-gray-400">이미지 없음</span></div>';
+                      parent.innerHTML = `<div class="flex h-20 w-20 sm:h-24 sm:w-24 lg:h-28 lg:w-28 items-center justify-center bg-gray-200 rounded-lg"><span class="text-xs text-gray-400">${dictionary.myUdign.artwork.noImage}</span></div>`;
                     }
                   }}
                 />
               ) : (
                 <div className='flex h-20 w-20 items-center justify-center rounded-lg bg-gray-200 sm:h-24 sm:w-24 lg:h-28 lg:w-28'>
-                  <span className='text-xs text-gray-400'>이미지 없음</span>
+                  <span className='text-xs text-gray-400'>
+                    {dictionary.myUdign.artwork.noImage}
+                  </span>
                 </div>
               )}
             </div>
@@ -325,6 +329,7 @@ export default function ArtworkCard({
         onClose={() => setShowReturnModal(false)}
         onSubmit={onReturnSubmit}
         orderId={artwork.od_id || ''}
+        dictionary={dictionary}
       />
 
       {/* 구매 취소 Dialog */}
@@ -333,6 +338,7 @@ export default function ArtworkCard({
         onClose={() => setShowCancelModal(false)}
         onSubmit={onOrderCancel}
         orderId={artwork.od_id || ''}
+        dictionary={dictionary}
       />
 
       {/* 확인 Dialog */}
@@ -357,25 +363,33 @@ export default function ArtworkCard({
       <ConfirmDialog
         open={showInterestConfirmDialog}
         onOpenChange={setShowInterestConfirmDialog}
-        title={artwork.ir_id ? '관심상품 취소' : '관심상품 추가'}
+        title={
+          artwork.ir_id
+            ? dictionary.myUdign.dialogs.interest.remove
+            : dictionary.myUdign.dialogs.interest.add
+        }
         description={
           artwork.ir_id
-            ? '이 상품을 관심상품에서 제거하시겠습니까?'
-            : '이 상품을 관심상품에 추가하시겠습니까?'
+            ? dictionary.myUdign.dialogs.interest.removeMessage
+            : dictionary.myUdign.dialogs.interest.addMessage
         }
         onConfirm={handleInterestConfirm}
         variant={artwork.ir_id ? 'destructive' : 'default'}
-        confirmText={artwork.ir_id ? '제거하기' : '추가하기'}
+        confirmText={
+          artwork.ir_id
+            ? dictionary.myUdign.dialogs.interest.removeButton
+            : dictionary.myUdign.dialogs.interest.addButton
+        }
       />
 
       {/* 구매확정 확인 Dialog */}
       <ConfirmDialog
         open={showPurchaseConfirmDialog}
         onOpenChange={setShowPurchaseConfirmDialog}
-        title='구매확정'
-        description='구매 확정 하시겠습니까?'
+        title={dictionary.myUdign.dialogs.purchase.confirm}
+        description={dictionary.myUdign.dialogs.purchase.confirmMessage}
         onConfirm={handlePurchaseConfirmAction}
-        confirmText='확정하기'
+        confirmText={dictionary.myUdign.dialogs.purchase.confirmButton}
       />
     </>
   );
