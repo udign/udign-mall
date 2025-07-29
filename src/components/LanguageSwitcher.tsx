@@ -18,6 +18,9 @@ export default function LanguageSwitcher() {
   const switchLanguage = (newLocale: Locale) => {
     if (!pathname) return;
 
+    // 쿠키에 언어 저장 (1년간 유지)
+    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
+
     // 현재 경로에서 언어 부분을 제거
     const segments = pathname.split('/');
 

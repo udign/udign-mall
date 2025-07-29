@@ -4,6 +4,13 @@ import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 
 function getLocale(request: NextRequest): string {
+  // 1. 쿠키에서 사용자가 선택한 언어 우선 확인
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
+  if (cookieLocale && (i18n.locales as readonly string[]).includes(cookieLocale)) {
+    return cookieLocale;
+  }
+
+  // 2. 브라우저 언어는 fallback으로만 사용
   const negotiatorHeaders: Record<string, string> = {};
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
