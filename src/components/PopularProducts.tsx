@@ -121,7 +121,7 @@ export default function PopularProducts({ excludeProductId, dictionary }: Popula
 
   return loading ? (
     <div className='mt-12 border-t border-gray-200 pt-8'>
-      <h2 className='mb-6 text-xl font-bold text-gray-900'>
+      <h2 className='mb-6 text-xl font-bold text-white'>
         {dictionary.productDetail.popularProducts.title}
       </h2>
       <div className='grid grid-cols-2 gap-6 md:grid-cols-4'>
@@ -137,7 +137,7 @@ export default function PopularProducts({ excludeProductId, dictionary }: Popula
     </div>
   ) : error || products.length === 0 ? null : (
     <div className='mt-12 border-t border-gray-200 pt-8'>
-      <h2 className='mb-6 text-xl font-bold text-gray-900'>
+      <h2 className='mb-6 text-xl font-bold text-white'>
         {dictionary.productDetail.popularProducts.title}
       </h2>
       <ProductGrid products={products} className='grid-cols-2 md:grid-cols-4' />

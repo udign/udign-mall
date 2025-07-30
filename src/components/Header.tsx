@@ -118,7 +118,7 @@ export default function Header({ dictionary }: HeaderProps) {
   return (
     !hideHeader && (
       <>
-        <header className='sticky top-0 z-50 bg-[#0e1731]'>
+        <header className='sticky top-0 z-50 -ml-[calc(50vw-50%)] w-screen bg-[#0e1731]'>
           <div className='space-y-5 px-6 py-5 sm:px-10'>
             <div className='flex items-center gap-3'>
               <div className='non-login'>

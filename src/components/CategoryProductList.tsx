@@ -33,19 +33,19 @@ export default function CategoryProductList({
   return (
     <div>
       <div className='mb-8'>
-        <h1 className='mb-2 text-3xl font-bold text-gray-900'>
+        <h1 className='mb-2 text-3xl font-bold text-white'>
           {categoryName || fallbackCategoryName}
         </h1>
-        <p className='text-gray-600'>
+        <p className='text-white'>
           {loading ? '작품을 불러오는 중...' : `총 ${categoryCount}개의 작품이 있습니다.`}
         </p>
       </div>
 
-      <div className='mb-8 rounded-lg bg-gray-50 p-6 text-center'>
-        <p className='mb-1 text-lg text-gray-700'>
-          마음에 드는 디자인에 <span className='text-red-500'>❤️</span>를 눌러주세요.
+      <div className='mb-12 text-center'>
+        <p className='mb-1 text-xl text-white'>
+          마음에 드는 디자인에 <span className='text-red-500'>❤️</span>를 눌러주세요. 디자인이
+          현실화되는 시작입니다.
         </p>
-        <p className='text-md text-gray-700'>디자인이 현실화되는 시작입니다.</p>
       </div>
 
       {loading ? (

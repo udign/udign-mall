@@ -359,7 +359,7 @@ export default function VendorRegisterForm({
                   onClick={verifyBusinessNumber}
                   disabled={isVerifying || isNumberVerified || mode === 'update'}
                   variant={isNumberVerified ? 'secondary' : 'default'}
-                  className='px-6'
+                  className={`px-6 ${!isNumberVerified ? 'bg-[#ec4ef3] hover:bg-[#d43de2]' : ''}`}
                 >
                   {isVerifying
                     ? dictionary.vendorRegister.buttons.verifying
@@ -389,7 +389,7 @@ export default function VendorRegisterForm({
                     type='button'
                     onClick={() => setIsPostcodeOpen(true)}
                     variant='default'
-                    className='px-6'
+                    className='bg-[#ec4ef3] px-6 hover:bg-[#d43de2]'
                   >
                     {dictionary.vendorRegister.buttons.addressSearch}
                   </Button>
@@ -446,7 +446,7 @@ export default function VendorRegisterForm({
               type='submit'
               disabled={isLoading || !isAllFieldsFilled}
               variant={isAllFieldsFilled ? 'default' : 'secondary'}
-              className='flex-1'
+              className={`flex-1 ${isAllFieldsFilled ? 'bg-[#ec4ef3] hover:bg-[#d43de2]' : ''}`}
             >
               {isLoading
                 ? dictionary.vendorRegister.buttons.processing
