@@ -9,7 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
 import { shouldBlurProduct, getProductStatus } from '@/lib/artwork-helpers';
-import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon, Share2Icon } from 'lucide-react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Progress } from '@/components/ui/primitives/progress';
 import { Button } from '@/components/ui/primitives/button';
@@ -195,6 +195,9 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: ItemOption }>({});
   const [showSizeGuide, setShowSizeGuide] = useState<boolean>(false);
+  const [isSharing, setIsSharing] = useState<boolean>(false);
+  const [showShareDialog, setShowShareDialog] = useState<boolean>(false);
+  const [shareMessage, setShareMessage] = useState<string>('');
 
   const params = useParams();
   const router = useRouter();
@@ -390,6 +393,22 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
 
   const handleQuantityDecrease = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleShare = async () => {
+    setIsSharing(true);
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareMessage('URL이 클립보드에 복사되었습니다.');
+      setShowShareDialog(true);
+    } catch (error) {
+      console.error('URL 복사 실패:', error);
+      setShareMessage('URL 복사에 실패했습니다.');
+      setShowShareDialog(true);
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   // 옵션을 그룹별로 분리하는 함수
@@ -631,23 +650,38 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
               </div>
 
               <div className='relative lg:w-1/2'>
-                <Button
-                  onClick={handleLikeToggle}
-                  variant='ghost'
-                  size='icon'
-                  disabled={
-                    likingInProgress || product.is_under_review || product.can_purchase || !user
-                  }
-                  className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
-                >
-                  {likingInProgress ? (
-                    <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
-                  ) : product.is_liked ? (
-                    <AiFillHeart className='text-red-500' />
-                  ) : (
-                    <AiOutlineHeart className='text-white' />
-                  )}
-                </Button>
+                <div className='absolute top-0 right-0 z-10 flex gap-2'>
+                  <Button
+                    onClick={handleShare}
+                    variant='ghost'
+                    size='icon'
+                    disabled={isSharing}
+                    className='h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent'
+                  >
+                    {isSharing ? (
+                      <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+                    ) : (
+                      <Share2Icon className='h-4 w-4 text-white' />
+                    )}
+                  </Button>
+                  <Button
+                    onClick={handleLikeToggle}
+                    variant='ghost'
+                    size='icon'
+                    disabled={
+                      likingInProgress || product.is_under_review || product.can_purchase || !user
+                    }
+                    className='h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
+                  >
+                    {likingInProgress ? (
+                      <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+                    ) : product.is_liked ? (
+                      <AiFillHeart className='text-red-500' />
+                    ) : (
+                      <AiOutlineHeart className='text-white' />
+                    )}
+                  </Button>
+                </div>
 
                 <h1 className='mb-6 pr-12 text-2xl font-bold text-white'>{product.it_name}</h1>
 
@@ -1083,6 +1117,16 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
       <SizeGuideDialog
         open={showSizeGuide}
         onOpenChange={setShowSizeGuide}
+        dictionary={dictionary}
+      />
+
+      {/* 공유 메시지 다이얼로그 */}
+      <MessageDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        title='공유'
+        description={shareMessage}
+        confirmText='확인'
         dictionary={dictionary}
       />
     </div>
