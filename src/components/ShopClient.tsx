@@ -141,8 +141,8 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
   return (
     <>
       <main>
-        <div className='py-5 xl:px-10'>
-          <div className='aspect-video overflow-hidden'>
+        <div className='py-5'>
+          <div className='relative left-1/2 aspect-video w-screen -translate-x-1/2 overflow-hidden'>
             <video
               src='/videos/main-banner-pc.mp4'
               autoPlay
