@@ -583,7 +583,10 @@
     "productSelector": {
       "title": "选择要举报版权的产品",
       "loadingProducts": "正在加载产品...",
-      "noProducts": "没有产品。",
+      "noProducts": "暂无产品。",
+      "noSearchResults": "未找到搜索结果。",
+      "searchPlaceholder": "按产品名称搜索",
+      "searchButton": "搜索",
       "categories": {
         "all": "全部",
         "fashion": "Fashion",

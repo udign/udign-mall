@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Card } from '@/components/ui/primitives/card';
 import { Button } from '@/components/ui/primitives/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/primitives/tabs';
+import { Input } from '@/components/ui/primitives/input';
+import { Search } from 'lucide-react';
 import LoadingState from '@/components/states/LoadingState';
 import EmptyState from '@/components/states/EmptyState';
 import { ProductForReport, ProductSearchResponse } from '@/types/copyright-report';
@@ -28,6 +30,7 @@ export default function ProductSelector({
   const [products, setProducts] = useState<ProductForReport[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState({
     totalPages: 0,
     hasNext: false,
@@ -41,13 +44,14 @@ export default function ProductSelector({
     { id: '30', name: dictionary.copyrightReport.productSelector.categories.others },
   ];
 
-  const fetchProducts = async (categoryId: string, pageNum: number) => {
+  const fetchProducts = async (categoryId: string, pageNum: number, search: string = '') => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (categoryId) params.append('ca_id', categoryId);
       params.append('page', pageNum.toString());
       params.append('limit', '12');
+      if (search) params.append('search', search);
 
       const response = await fetch(`/api/copyright-report/products?${params}`);
       const data: ProductSearchResponse = await response.json();
@@ -68,12 +72,24 @@ export default function ProductSelector({
   };
 
   useEffect(() => {
-    fetchProducts(selectedCategory, page);
-  }, [selectedCategory, page]);
+    fetchProducts(selectedCategory, page, searchTerm);
+  }, [selectedCategory, page, searchTerm]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
     setPage(1);
+    setSearchTerm('');
+  };
+
+  const handleSearch = () => {
+    setPage(1);
+    fetchProducts(selectedCategory, 1, searchTerm);
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -92,6 +108,21 @@ export default function ProductSelector({
         </TabsList>
       </Tabs>
 
+      {/* 검색 영역 추가 */}
+      <div className='mb-6 flex gap-2'>
+        <Input
+          placeholder={dictionary.copyrightReport.productSelector.searchPlaceholder || '제품명으로 검색'}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={handleSearchKeyPress}
+          className='flex-1'
+        />
+        <Button onClick={handleSearch} variant='outline'>
+          <Search className='h-4 w-4' />
+          {dictionary.copyrightReport.productSelector.searchButton || '검색'}
+        </Button>
+      </div>
+
       {loading ? (
         <LoadingState
           message={dictionary.copyrightReport.productSelector.loadingProducts}
@@ -99,7 +130,10 @@ export default function ProductSelector({
         />
       ) : products.length === 0 ? (
         <EmptyState
-          message={dictionary.copyrightReport.productSelector.noProducts}
+          message={searchTerm 
+            ? dictionary.copyrightReport.productSelector.noSearchResults || '검색 결과가 없습니다.'
+            : dictionary.copyrightReport.productSelector.noProducts
+          }
           dictionary={dictionary}
         />
       ) : (
@@ -129,7 +163,6 @@ export default function ProductSelector({
                   </div>
                   <div className='p-3'>
                     <h3 className='truncate text-sm font-medium'>{product.it_name}</h3>
-                    <p className='truncate text-xs text-gray-500'>{product.creator_name}</p>
                   </div>
                 </Card>
               );

@@ -582,6 +582,9 @@
       "title": "저작권 신고할 제품 선택",
       "loadingProducts": "제품을 불러오는 중...",
       "noProducts": "제품이 없습니다.",
+      "noSearchResults": "검색 결과가 없습니다.",
+      "searchPlaceholder": "제품명으로 검색",
+      "searchButton": "검색",
       "categories": {
         "all": "전체",
         "fashion": "Fashion",
