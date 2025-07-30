@@ -81,27 +81,8 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
     dictionary.myUdign.steps.completed,
   ];
 
-  useEffect(() => {
-    if (isLoading) return;
-
-    if (!authUser) {
-      router.push(ROUTES.LOGIN);
-      return;
-    }
-
-    // 탭 상태 초기화
-    const initialTabStates: TabPageStates = {};
-    Object.keys(STATUS_GROUPS).forEach((key) => {
-      initialTabStates[key] = initializeTabState();
-    });
-    setTabStates(initialTabStates);
-
-    // 모든 탭의 첫 페이지 데이터 미리 로드
-    fetchAllTabsInitialData();
-  }, [authUser, isLoading, router, initializeTabState]);
-
   // 모든 탭의 초기 데이터 로드
-  const fetchAllTabsInitialData = async () => {
+  const fetchAllTabsInitialData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -155,51 +136,73 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dictionary.common.error]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!authUser) {
+      router.push(ROUTES.LOGIN);
+      return;
+    }
+
+    // 탭 상태 초기화
+    const initialTabStates: TabPageStates = {};
+    Object.keys(STATUS_GROUPS).forEach((key) => {
+      initialTabStates[key] = initializeTabState();
+    });
+    setTabStates(initialTabStates);
+
+    // 모든 탭의 첫 페이지 데이터 미리 로드
+    fetchAllTabsInitialData();
+  }, [authUser, isLoading, router, initializeTabState, fetchAllTabsInitialData]);
 
   // 탭별 데이터 가져오기 (무한 스크롤용)
-  const fetchTabData = async (tab: string, page: number) => {
-    try {
-      setTabStates((prev) => ({
-        ...prev,
-        [tab]: { ...prev[tab], loading: true },
-      }));
-
-      const response = await fetch(
-        `/api/my-udign?page=${page}&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`,
-      );
-
-      if (!response.ok) {
-        throw new Error(dictionary.common.error);
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        // 탭 상태 업데이트 (기존 데이터에 추가)
+  const fetchTabData = useCallback(
+    async (tab: string, page: number) => {
+      try {
         setTabStates((prev) => ({
           ...prev,
-          [tab]: {
-            ...prev[tab],
-            page: page,
-            hasMore: result.data.hasMore,
-            loading: false,
-            data: [...(prev[tab]?.data || []), ...(result.data.products[tab] || [])],
-          },
+          [tab]: { ...prev[tab], loading: true },
         }));
-      } else {
-        setError(result.error || dictionary.common.error);
+
+        const response = await fetch(
+          `/api/my-udign?page=${page}&limit=${PAGINATION_CONFIG.MY_UDIGN_PAGE_SIZE}&tab=${tab}`,
+        );
+
+        if (!response.ok) {
+          throw new Error(dictionary.common.error);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          // 탭 상태 업데이트 (기존 데이터에 추가)
+          setTabStates((prev) => ({
+            ...prev,
+            [tab]: {
+              ...prev[tab],
+              page: page,
+              hasMore: result.data.hasMore,
+              loading: false,
+              data: [...(prev[tab]?.data || []), ...(result.data.products[tab] || [])],
+            },
+          }));
+        } else {
+          setError(result.error || dictionary.common.error);
+        }
+      } catch (err) {
+        console.error('탭 데이터 로드 실패:', err);
+        setError(err instanceof Error ? err.message : dictionary.common.error);
+      } finally {
+        setTabStates((prev) => ({
+          ...prev,
+          [tab]: { ...prev[tab], loading: false },
+        }));
       }
-    } catch (err) {
-      console.error('탭 데이터 로드 실패:', err);
-      setError(err instanceof Error ? err.message : dictionary.common.error);
-    } finally {
-      setTabStates((prev) => ({
-        ...prev,
-        [tab]: { ...prev[tab], loading: false },
-      }));
-    }
-  };
+    },
+    [dictionary.common.error],
+  );
 
   const handleTabChange = (tabId: string) => {
     setCurrentTab(tabId);
@@ -211,7 +214,7 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
     if (currentTabState && currentTabState.hasMore && !currentTabState.loading) {
       fetchTabData(currentTab, currentTabState.page + 1);
     }
-  }, [currentTab, tabStates]);
+  }, [currentTab, tabStates, fetchTabData]);
 
   const observerRef = useIntersectionObserver(loadMoreData);
 
@@ -661,7 +664,7 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
     }
   };
 
-  return isLoading || loading ? (
+  return isLoading || loading || (!user && !error) ? (
     <div className='flex min-h-screen items-center justify-center'>
       <LoadingSpinner size='lg' message={dictionary.common.loading} />
     </div>
@@ -677,158 +680,157 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
         </Button>
       </div>
     </div>
+  ) : !user ? (
+    <div className='flex min-h-screen items-center justify-center'>
+      <LoadingSpinner size='lg' message={dictionary.common.loading} />
+    </div>
   ) : (
-    user && (
-      <div className='min-h-screen'>
-        <div className='px-4 py-8 sm:px-6 lg:px-8'>
-          <div className='mb-6 rounded-none border border-gray-100 bg-white p-6'>
-            <div className='mb-6 rounded-lg p-4 sm:p-6' style={{ backgroundColor: '#17244c' }}>
-              <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
-                <div>
-                  <h1 className='mb-1 text-xl font-bold text-white sm:mb-2 sm:text-2xl'>
-                    {dictionary.myUdign.title}
-                  </h1>
-                  <p className='text-sm text-gray-300 sm:text-base'>
-                    {dictionary.myUdign.subtitle}
-                  </p>
-                </div>
-                <div className='text-left sm:text-right'>
-                  <p className='text-base font-semibold text-white sm:text-lg'>
-                    {dictionary.myUdign.welcome.replace('{{name}}', user.mb_name)}
-                  </p>
-                  <p className='text-sm text-gray-300 sm:text-base'>
-                    {dictionary.myUdign.welcomeMessage}
-                  </p>
-                </div>
+    <div className='min-h-screen'>
+      <div className='px-4 py-8 sm:px-6 lg:px-8'>
+        <div className='mb-6 rounded-none border border-gray-100 bg-white p-6'>
+          <div className='mb-6 rounded-lg p-4 sm:p-6' style={{ backgroundColor: '#17244c' }}>
+            <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
+              <div>
+                <h1 className='mb-1 text-xl font-bold text-white sm:mb-2 sm:text-2xl'>
+                  {dictionary.myUdign.title}
+                </h1>
+                <p className='text-sm text-gray-300 sm:text-base'>{dictionary.myUdign.subtitle}</p>
+              </div>
+              <div className='text-left sm:text-right'>
+                <p className='text-base font-semibold text-white sm:text-lg'>
+                  {dictionary.myUdign.welcome.replace('{{name}}', user.mb_name)}
+                </p>
+                <p className='text-sm text-gray-300 sm:text-base'>
+                  {dictionary.myUdign.welcomeMessage}
+                </p>
               </div>
             </div>
-            <h2 className='mb-4 flex items-center text-lg font-semibold'>
-              <FiAlertCircle className='mr-2' />
-              {dictionary.myUdign.preorderSystem}
-            </h2>
-            <div className='mb-4 space-y-2 text-sm text-gray-600'>
-              <p>
-                • <strong>{dictionary.myUdign.systemDescription.artwork.split(':')[0]}</strong>:{' '}
-                {dictionary.myUdign.systemDescription.artwork.split(':')[1]}
-              </p>
-              <p>
-                • <strong>{dictionary.myUdign.systemDescription.like.split(':')[0]}</strong>:{' '}
-                {dictionary.myUdign.systemDescription.like.split(':')[1]}
-              </p>
-              <p>
-                • <strong>{dictionary.myUdign.systemDescription.product.split(':')[0]}</strong>:{' '}
-                {dictionary.myUdign.systemDescription.product.split(':')[1]}
-              </p>
-            </div>
-
-            <div className='mb-4 rounded-lg bg-gray-100 p-4'>
-              <p className='text-sm text-gray-700'>
-                <span className='flex items-center'>
-                  <BsLightbulb className='mr-1' /> {dictionary.myUdign.reviewProcess.title}
-                </span>
-                <br />• <strong>{dictionary.myUdign.reviewProcess.auto.split(':')[0]}</strong>:{' '}
-                {dictionary.myUdign.reviewProcess.auto.split(':')[1]}
-                <br />• <strong>
-                  {dictionary.myUdign.reviewProcess.manual.split(':')[0]}
-                </strong>: {dictionary.myUdign.reviewProcess.manual.split(':')[1]}
-              </p>
-            </div>
-
-            <div className='scrollbar-hide flex items-center justify-between overflow-x-auto rounded-lg bg-gray-50 px-4 py-4 sm:px-6'>
-              {steps
-                .map((step, index) => [
-                  <div key={`step-${index}`} className='text-center'>
-                    <p className='min-w-20 text-xs font-medium whitespace-nowrap text-gray-700 sm:min-w-18'>
-                      {step}
-                    </p>
-                  </div>,
-                  index < steps.length - 1 && (
-                    <div key={`arrow-${index}`} className='mx-1 text-gray-400 sm:mx-2'>
-                      →
-                    </div>
-                  ),
-                ])
-                .flat()
-                .filter(Boolean)}
-            </div>
+          </div>
+          <h2 className='mb-4 flex items-center text-lg font-semibold'>
+            <FiAlertCircle className='mr-2' />
+            {dictionary.myUdign.preorderSystem}
+          </h2>
+          <div className='mb-4 space-y-2 text-sm text-gray-600'>
+            <p>
+              • <strong>{dictionary.myUdign.systemDescription.artwork.split(':')[0]}</strong>:{' '}
+              {dictionary.myUdign.systemDescription.artwork.split(':')[1]}
+            </p>
+            <p>
+              • <strong>{dictionary.myUdign.systemDescription.like.split(':')[0]}</strong>:{' '}
+              {dictionary.myUdign.systemDescription.like.split(':')[1]}
+            </p>
+            <p>
+              • <strong>{dictionary.myUdign.systemDescription.product.split(':')[0]}</strong>:{' '}
+              {dictionary.myUdign.systemDescription.product.split(':')[1]}
+            </p>
           </div>
 
-          <div className='rounded-none border border-gray-100 bg-white p-6'>
-            <div className='mb-6 flex items-center'>
-              <h2 className='text-xl font-semibold'>{dictionary.myUdign.artworkStatus}</h2>
-            </div>
+          <div className='mb-4 rounded-lg bg-gray-100 p-4'>
+            <p className='text-sm text-gray-700'>
+              <span className='flex items-center'>
+                <BsLightbulb className='mr-1' /> {dictionary.myUdign.reviewProcess.title}
+              </span>
+              <br />• <strong>{dictionary.myUdign.reviewProcess.auto.split(':')[0]}</strong>:{' '}
+              {dictionary.myUdign.reviewProcess.auto.split(':')[1]}
+              <br />• <strong>{dictionary.myUdign.reviewProcess.manual.split(':')[0]}</strong>:{' '}
+              {dictionary.myUdign.reviewProcess.manual.split(':')[1]}
+            </p>
+          </div>
 
-            <div className='border-b border-gray-100'>
-              <nav className='scrollbar-hide flex overflow-x-auto'>
-                {Object.entries(STATUS_GROUPS).map(([key, label]) => (
-                  <button
-                    key={key}
-                    onClick={() => handleTabChange(key)}
-                    className={`relative flex min-w-40 flex-shrink-0 cursor-pointer items-center justify-center gap-2 px-4 pb-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 hover:text-gray-900 ${
-                      currentTab === key ? 'text-gray-900' : 'text-gray-500'
-                    }`}
-                  >
-                    {dictionary.myUdign.statusGroups[
-                      key as keyof typeof dictionary.myUdign.statusGroups
-                    ] || label}
-                    {counts[key] > 0 && <span className='text-gray-400'>{counts[key]}</span>}
-                    {currentTab === key && (
-                      <div className='absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-gray-900' />
-                    )}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            <div className='mt-6'>
-              {currentTabData.length === 0 && !tabStates[currentTab]?.loading ? (
-                <div className='py-14 text-center'>
-                  <FiInbox className='mx-auto mb-4 h-14 w-14 text-gray-300' />
-                  <p className='text-gray-500'>{dictionary.myUdign.noArtworks}</p>
-                </div>
-              ) : (
-                <div className='space-y-4'>
-                  {currentTabData.map((artwork) => (
-                    <ArtworkCard
-                      key={artwork.it_id}
-                      artwork={artwork}
-                      dictionary={dictionary}
-                      onInterestToggle={handleInterestToggle}
-                      onOrderCancel={handleOrderCancel}
-                      onPurchaseConfirm={handlePurchaseConfirm}
-                      onReturnSubmit={handleReturnSubmit}
-                      onAdminToggle={handleAdminToggle}
-                      isAdmin={user.mb_level >= 10}
-                    />
-                  ))}
-
-                  {tabStates[currentTab]?.hasMore && (
-                    <div ref={observerRef} className='flex justify-center py-4'>
-                      {tabStates[currentTab]?.loading && (
-                        <LoadingSpinner size='sm' message={dictionary.myUdign.loadingMore} />
-                      )}
-                    </div>
-                  )}
-
-                  {!tabStates[currentTab]?.hasMore && currentTabData.length > 0 && (
-                    <div className='py-4 text-center text-sm text-gray-500'>
-                      {dictionary.myUdign.allLoaded}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+          <div className='scrollbar-hide flex items-center justify-between overflow-x-auto rounded-lg bg-gray-50 px-4 py-4 sm:px-6'>
+            {steps
+              .map((step, index) => [
+                <div key={`step-${index}`} className='text-center'>
+                  <p className='min-w-20 text-xs font-medium whitespace-nowrap text-gray-700 sm:min-w-18'>
+                    {step}
+                  </p>
+                </div>,
+                index < steps.length - 1 && (
+                  <div key={`arrow-${index}`} className='mx-1 text-gray-400 sm:mx-2'>
+                    →
+                  </div>
+                ),
+              ])
+              .flat()
+              .filter(Boolean)}
           </div>
         </div>
 
-        <MessageDialog
-          open={showMessageDialog}
-          onOpenChange={setShowMessageDialog}
-          title={dictionary.myUdign.notification}
-          description={messageContent}
-          dictionary={dictionary}
-        />
+        <div className='rounded-none border border-gray-100 bg-white p-6'>
+          <div className='mb-6 flex items-center'>
+            <h2 className='text-xl font-semibold'>{dictionary.myUdign.artworkStatus}</h2>
+          </div>
+
+          <div className='border-b border-gray-100'>
+            <nav className='scrollbar-hide flex overflow-x-auto'>
+              {Object.entries(STATUS_GROUPS).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => handleTabChange(key)}
+                  className={`relative flex min-w-40 flex-shrink-0 cursor-pointer items-center justify-center gap-2 px-4 pb-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 hover:text-gray-900 ${
+                    currentTab === key ? 'text-gray-900' : 'text-gray-500'
+                  }`}
+                >
+                  {dictionary.myUdign.statusGroups[
+                    key as keyof typeof dictionary.myUdign.statusGroups
+                  ] || label}
+                  {counts[key] > 0 && <span className='text-gray-400'>{counts[key]}</span>}
+                  {currentTab === key && (
+                    <div className='absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-gray-900' />
+                  )}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div className='mt-6'>
+            {currentTabData.length === 0 && !tabStates[currentTab]?.loading ? (
+              <div className='py-14 text-center'>
+                <FiInbox className='mx-auto mb-4 h-14 w-14 text-gray-300' />
+                <p className='text-gray-500'>{dictionary.myUdign.noArtworks}</p>
+              </div>
+            ) : (
+              <div className='space-y-4'>
+                {currentTabData.map((artwork) => (
+                  <ArtworkCard
+                    key={artwork.it_id}
+                    artwork={artwork}
+                    dictionary={dictionary}
+                    onInterestToggle={handleInterestToggle}
+                    onOrderCancel={handleOrderCancel}
+                    onPurchaseConfirm={handlePurchaseConfirm}
+                    onReturnSubmit={handleReturnSubmit}
+                    onAdminToggle={handleAdminToggle}
+                    isAdmin={user.mb_level >= 10}
+                  />
+                ))}
+
+                {tabStates[currentTab]?.hasMore && (
+                  <div ref={observerRef} className='flex justify-center py-4'>
+                    {tabStates[currentTab]?.loading && (
+                      <LoadingSpinner size='sm' message={dictionary.myUdign.loadingMore} />
+                    )}
+                  </div>
+                )}
+
+                {!tabStates[currentTab]?.hasMore && currentTabData.length > 0 && (
+                  <div className='py-4 text-center text-sm text-gray-500'>
+                    {dictionary.myUdign.allLoaded}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    )
+
+      <MessageDialog
+        open={showMessageDialog}
+        onOpenChange={setShowMessageDialog}
+        title={dictionary.myUdign.notification}
+        description={messageContent}
+        dictionary={dictionary}
+      />
+    </div>
   );
 }

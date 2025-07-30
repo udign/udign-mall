@@ -45,6 +45,18 @@ export const POST = async (request: NextRequest) => {
     const result = await registerUser(body);
 
     if (result.success) {
+      // 회원가입 성공 시 자동 로그인을 위한 토큰 쿠키 설정
+      const response = NextResponse.json(result, { status: 201 });
+
+      if (result.token) {
+        response.cookies.set('auth-token', result.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 24 * 60 * 60, // 24시간
+        });
+      }
+
       // 회원가입 성공 시 메일 발송
       try {
         // 신규 회원에게 축하 메일 발송
@@ -88,7 +100,7 @@ export const POST = async (request: NextRequest) => {
         }
       }
 
-      return NextResponse.json(result, { status: 201 });
+      return response;
     } else {
       return NextResponse.json(result, { status: 400 });
     }
