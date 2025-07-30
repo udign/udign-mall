@@ -23,7 +23,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { FiUpload, FiX, FiPlus } from 'react-icons/fi';
 import { CATEGORY_IDS } from '@/lib/constants';
 import { ROUTES } from '@/lib/routes';
-import { termsOfService } from '@/lib/terms-content';
+import { termsOfUpload } from '@/lib/terms-content';
 import { Dictionary } from '@/lib/dictionaries';
 
 interface UploadedFile {
@@ -276,17 +276,6 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
   return (
     <div className='min-h-screen px-6 py-8 sm:px-10'>
       <div>
-        <div className='mb-8'>
-          <Image
-            src='/images/upload-bg.png'
-            alt={dictionary.upload.form.mainImage}
-            width={1200}
-            height={400}
-            className='w-full rounded-lg object-cover'
-            priority
-          />
-        </div>
-
         <Card className='mb-8'>
           <CardContent className='p-8'>
             <h2 className='mb-6 text-center text-2xl font-bold'>{dictionary.upload.title}</h2>
@@ -562,7 +551,7 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                       <span className='text-red-500'>{dictionary.upload.form.required}</span>
                     </Label>
                     <div className='h-32 overflow-y-auto rounded-md border border-gray-300 bg-gray-50 px-3 text-sm whitespace-pre-line text-gray-700'>
-                      {termsOfService}
+                      {termsOfUpload}
                     </div>
                     <div className='flex items-center space-x-2'>
                       <Checkbox
