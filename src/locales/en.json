@@ -194,9 +194,12 @@
     "title": "Copyright Infringement Report",
     "loadingMessage": "Loading...",
     "productSelector": {
-      "title": "Select Product to Report",
+      "title": "Select Product for Copyright Report",
       "loadingProducts": "Loading products...",
       "noProducts": "No products available.",
+      "noSearchResults": "No search results found.",
+      "searchPlaceholder": "Search by product name",
+      "searchButton": "Search",
       "categories": {
         "all": "All",
         "fashion": "Fashion",

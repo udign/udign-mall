@@ -580,9 +580,12 @@
     "title": "著作権侵害申告",
     "loadingMessage": "読み込み中...",
     "productSelector": {
-      "title": "著作権申告する製品選択",
-      "loadingProducts": "製品を読み込み中...",
+      "title": "著作権申告する製品を選択",
+      "loadingProducts": "製品を読み込んでいます...",
       "noProducts": "製品がありません。",
+      "noSearchResults": "検索結果がありません。",
+      "searchPlaceholder": "製品名で検索",
+      "searchButton": "検索",
       "categories": {
         "all": "全体",
         "fashion": "Fashion",
