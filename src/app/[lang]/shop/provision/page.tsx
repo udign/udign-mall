@@ -14,10 +14,10 @@ export default async function ProvisionPage({ params }: ProvisionPageProps) {
   const sections = termsOfService.split(/(?=제\d+조)/g).filter((section) => section.trim());
 
   return (
-    <div className='min-h-screen bg-white'>
+    <div className='min-h-screen' style={{ backgroundColor: '#0e1731' }}>
       <div className='px-6 py-8 sm:px-10'>
         <div className='mx-auto'>
-          <h1 className='mb-8 text-center text-2xl font-bold text-gray-900'>
+          <h1 className='mb-8 text-center text-2xl font-bold text-white'>
             {dictionary.provision.title}
           </h1>
 
@@ -35,8 +35,8 @@ export default async function ProvisionPage({ params }: ProvisionPageProps) {
               if (!isArticle && index === 0) {
                 // 서문인 경우
                 return (
-                  <div key={index} className='rounded-lg border border-gray-200 p-6'>
-                    <div className='space-y-4 leading-relaxed text-gray-700'>
+                  <div key={index} className='rounded-lg border border-white/20 p-6'>
+                    <div className='space-y-4 leading-relaxed text-white/80'>
                       {lines.map((line, lineIndex) => (
                         <p key={lineIndex}>{line}</p>
                       ))}
@@ -51,9 +51,9 @@ export default async function ProvisionPage({ params }: ProvisionPageProps) {
               const content = lines.slice(1);
 
               return (
-                <div key={index} className='rounded-lg border border-gray-200 p-6'>
-                  <h2 className='mb-4 text-lg font-semibold text-gray-900'>{title}</h2>
-                  <div className='space-y-3 leading-relaxed text-gray-700'>
+                <div key={index} className='rounded-lg border border-white/20 p-6'>
+                  <h2 className='mb-4 text-lg font-semibold text-white'>{title}</h2>
+                  <div className='space-y-3 leading-relaxed text-white/80'>
                     {content.map((line, lineIndex) => {
                       // 숫자로 시작하는 목록 항목 처리
                       if (/^\d+\./.test(line.trim())) {
@@ -83,11 +83,11 @@ export default async function ProvisionPage({ params }: ProvisionPageProps) {
             })}
 
             {/* 부칙 */}
-            <div className='rounded-lg border border-gray-200 bg-gray-50 p-6'>
-              <h2 className='mb-4 text-lg font-semibold text-gray-900'>
+            <div className='rounded-lg border border-white/20 p-6'>
+              <h2 className='mb-4 text-lg font-semibold text-white'>
                 {dictionary.provision.supplementary.title}
               </h2>
-              <div className='space-y-2 text-gray-700'>
+              <div className='space-y-2 text-white/80'>
                 <p>{dictionary.provision.supplementary.content1}</p>
                 <p>{dictionary.provision.supplementary.content2}</p>
               </div>
