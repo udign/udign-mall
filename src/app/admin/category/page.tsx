@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
@@ -82,7 +82,7 @@ export default function CategoryManagePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<CategoryFilter>({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogDescription, setDialogDescription] = useState('');
@@ -158,10 +158,25 @@ export default function CategoryManagePage() {
     [filter, loadCategories, showAlert],
   );
 
-  // 검색어 변경 핸들러
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setFilter((prev) => ({ ...prev, search: value || undefined }));
+  // 검색 실행 핸들러
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    setFilter((prev) => ({ ...prev, search: searchValue || undefined }));
+  };
+
+  // 검색 초기화 핸들러
+  const handleClearSearch = () => {
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
+    }
+    setFilter((prev) => ({ ...prev, search: undefined }));
+  };
+
+  // Enter 키 검색 핸들러
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   const getLevelBadgeColor = (level: number) => {
@@ -207,16 +222,25 @@ export default function CategoryManagePage() {
 
       {/* 필터 및 검색 */}
       <div className='flex items-center gap-4 rounded-lg border bg-white p-4'>
-        <div className='flex-1'>
-          <div className='relative'>
+        <div className='flex flex-1 gap-2'>
+          <div className='relative flex-1'>
             <Search className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400' />
             <Input
+              ref={searchInputRef}
               placeholder='카테고리명으로 검색...'
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyDown={handleKeyDown}
               className='pl-10'
             />
           </div>
+          <Button onClick={handleSearch} size='sm' className='flex items-center gap-2'>
+            <Search className='h-4 w-4' />
+            검색
+          </Button>
+          {filter.search && (
+            <Button onClick={handleClearSearch} variant='outline' size='sm'>
+              초기화
+            </Button>
+          )}
         </div>
         <Select
           value={filter.level?.toString() || 'all'}
