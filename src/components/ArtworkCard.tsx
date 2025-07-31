@@ -230,7 +230,7 @@ export default function ArtworkCard({
 
         {/* 상품 정보 */}
         <div className='p-4'>
-          <h3 className='mb-8 text-center text-base font-bold text-gray-900'>{artwork.it_name}</h3>
+          <h3 className='text-center text-base font-bold text-gray-900'>{artwork.it_name}</h3>
 
           {/* 관리자 정보 */}
           {/* {isAdmin && (
@@ -259,7 +259,7 @@ export default function ArtworkCard({
 
           {/* 단계별 로고와 액션 버튼 */}
           {artwork._status_text !== '컬렉션' && (
-            <div className='flex items-center justify-between'>
+            <div className='mt-8 flex items-center justify-between'>
               {/* 현재 단계 로고와 단계 텍스트 */}
               <div className='flex items-center'>
                 {/* 현재 단계 로고 이미지 */}
