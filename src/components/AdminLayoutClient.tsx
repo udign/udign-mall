@@ -25,6 +25,7 @@ import {
   Send,
   Building,
   Shield,
+  FolderTree,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -88,6 +89,11 @@ const menuItems: MenuItem[] = [
     label: '쇼핑몰 관리',
     icon: <ShoppingBag className='h-4 w-4' />,
     subMenus: [
+      {
+        label: '카테고리 관리',
+        href: ROUTES.ADMIN_CATEGORY,
+        icon: <FolderTree className='h-4 w-4' />,
+      },
       {
         label: '디자인 관리',
         href: ROUTES.ADMIN_REVIEW,
