@@ -114,7 +114,7 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
   return (
     <>
       <main>
-        <div className='py-5'>
+        <div>
           <div className='relative left-1/2 aspect-video w-screen -translate-x-1/2 overflow-hidden'>
             <video
               src='/videos/main-banner-pc.mp4'
@@ -133,7 +133,7 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
             />
           </div>
         </div>
-        <section className='mb-10 px-6 py-14 sm:px-10 sm:py-20'>
+        <section className='mb-10 px-6 py-14 pt-24 sm:px-10 sm:py-20 sm:pt-32'>
           <div className='flex flex-col items-center gap-y-8'>
             <p className='text-center text-xl font-bold tracking-tight text-white sm:text-3xl'>
               {dictionary.shop.designDescription}

@@ -106,11 +106,11 @@ export default function PopularProducts({ excludeProductId, dictionary }: Popula
 
           setProducts(formattedProducts);
         } else {
-          setError(data.error || '인기 작품을 불러오는데 실패했습니다.');
+          setError(data.error || '인기 디자인을 불러오는데 실패했습니다.');
         }
       } catch (err) {
         setError('서버 오류가 발생했습니다.');
-        console.error('인기 작품 조회 오류:', err);
+        console.error('인기 디자인 조회 오류:', err);
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,5 @@
 /**
- * 작품 관련 헬퍼 함수들
+ * 디자인 관련 헬퍼 함수들
  */
 
 // 디자인 좋아요 이후 단계 상태 목록 (블러 처리 대상)
@@ -18,8 +18,8 @@ const POST_DESIGN_LIKE_STATUSES = [
 ];
 
 /**
- * 작품이 블러 처리되어야 하는지 판단하는 함수
- * @param product - 작품 정보
+ * 디자인이 블러 처리되어야 하는지 판단하는 함수
+ * @param product - 디자인 정보
  * @param isUserLiked - 사용자가 좋아요를 눌렀는지 여부
  * @returns 블러 처리 여부
  */
@@ -52,8 +52,8 @@ export const shouldBlurProduct = (
 };
 
 /**
- * 작품의 접근 가능 여부를 판단하는 함수 (상세 페이지용)
- * @param product - 작품 정보
+ * 디자인의 접근 가능 여부를 판단하는 함수 (상세 페이지용)
+ * @param product - 디자인 정보
  * @param isUserLiked - 사용자가 좋아요를 눌렀는지 여부
  * @returns 접근 가능 여부
  */
@@ -66,13 +66,13 @@ export const canAccessProduct = (
   },
   isUserLiked: boolean,
 ): boolean => {
-  // 블러 처리되는 작품은 접근 불가 (좋아요 안누른 경우)
+  // 블러 처리되는 디자인은 접근 불가 (좋아요 안누른 경우)
   return !shouldBlurProduct(product, isUserLiked);
 };
 
 /**
- * 작품 상태가 구매 가능한 단계인지 판단하는 함수
- * @param statusText - 작품 상태 텍스트
+ * 디자인 상태가 구매 가능한 단계인지 판단하는 함수
+ * @param statusText - 디자인 상태 텍스트
  * @returns 구매 가능 여부
  */
 export const isPurchasableStatus = (statusText: string): boolean => {
@@ -80,12 +80,12 @@ export const isPurchasableStatus = (statusText: string): boolean => {
 };
 
 /**
- * 작품 상태가 좋아요 모집 단계인지 판단하는 함수
- * @param statusText - 작품 상태 텍스트
+ * 디자인 상태가 좋아요 모집 단계인지 판단하는 함수
+ * @param statusText - 디자인 상태 텍스트
  * @returns 좋아요 모집 여부
  */
 export const isCollectionStatus = (statusText: string): boolean => {
-  return statusText === '컬렉션' || statusText === '디자인 좋아요' || statusText === '❤️ 디자인';
+  return statusText === '컬렉션' || statusText === '좋아요' || statusText === '❤️ 디자인';
 };
 
 /**

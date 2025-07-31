@@ -11,19 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/primitives/dropdown-menu';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/primitives/tooltip';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import TodayViewedProductsSidebar from '@/components/TodayViewedProductsSidebar';
 import SearchSidebar from '@/components/SearchSidebar';
 import NavigationSidebar from '@/components/NavigationSidebar';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/primitives/button';
 import { MEMBER_LEVELS } from '@/lib/constants';
 import { Dictionary } from '@/lib/dictionaries';
@@ -31,15 +24,20 @@ import Link from 'next/link';
 
 interface HeaderProps {
   dictionary: Dictionary;
+  transparent?: boolean;
 }
 
-export default function Header({ dictionary }: HeaderProps) {
+export default function Header({ dictionary, transparent = false }: HeaderProps) {
   const [hideHeader, setHideHeader] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
+
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState<boolean>(false);
   const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [purchaseCount, setPurchaseCount] = useState<number>(0);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isSearchSidebarOpen, setIsSearchSidebarOpen] = useState<boolean>(false);
+  const [showPurchaseNotification, setShowPurchaseNotification] = useState<boolean>(false);
+  const [hasSeenNotification, setHasSeenNotification] = useState<boolean>(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -49,6 +47,18 @@ export default function Header({ dictionary }: HeaderProps) {
   useEffect(() => {
     setHideHeader(pathname.includes('/admin'));
   }, [pathname]);
+
+  // 사용자가 변경될 때 알림 상태 초기화 (로그인/로그아웃 시)
+  useEffect(() => {
+    if (!isLoading) {
+      setHasSeenNotification(false);
+      setShowPurchaseNotification(false);
+    }
+  }, [user?.mb_no, isLoading]);
+
+  // shop 메인 페이지에서 투명 헤더 적용
+  const isShopMainPage = pathname.match(/^\/[a-z]{2}\/shop\/?$/);
+  const shouldBeTransparent = transparent || isShopMainPage;
 
   // 구매가능한 상품 수 조회
   useEffect(() => {
@@ -62,7 +72,15 @@ export default function Header({ dictionary }: HeaderProps) {
 
         if (response.ok) {
           const data = await response.json();
-          setPurchaseCount(data.data.count);
+          const newCount = data.data?.count || 0;
+          setPurchaseCount(newCount);
+
+          // 구매 가능한 상품이 있고 아직 확인하지 않았으면 알림 표시
+          if (newCount > 0 && !hasSeenNotification) {
+            setShowPurchaseNotification(true);
+          } else {
+            setShowPurchaseNotification(false);
+          }
         }
       } catch (error) {
         console.error('구매가능 상품 수 조회 오류:', error);
@@ -70,6 +88,7 @@ export default function Header({ dictionary }: HeaderProps) {
     };
 
     fetchPurchaseCount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isLoading]);
 
   const handleLogout = async () => {
@@ -81,6 +100,9 @@ export default function Header({ dictionary }: HeaderProps) {
 
       if (response.ok) {
         logout();
+        // 로그아웃 시 알림 확인 상태 초기화
+        setHasSeenNotification(false);
+        setShowPurchaseNotification(false);
         console.log('로그아웃 되었습니다.');
         router.push(ROUTES.SHOP);
       }
@@ -115,10 +137,32 @@ export default function Header({ dictionary }: HeaderProps) {
     setIsNavigationSidebarOpen(true);
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`${ROUTES.SEARCH}?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearchSubmit(e);
+    }
+  };
+
+  const handlePurchaseNotificationClick = () => {
+    // 알림을 확인했다고 표시하고 숨김 처리
+    setHasSeenNotification(true);
+    setShowPurchaseNotification(false);
+    router.push(ROUTES.MY_UDIGN);
+  };
+
   return (
     !hideHeader && (
       <>
-        <header className='sticky top-0 z-50 -ml-[calc(50vw-50%)] w-screen bg-[#0e1731]'>
+        <header
+          className={`${shouldBeTransparent ? 'absolute' : 'sticky'} top-0 z-50 ${shouldBeTransparent ? 'right-0 left-0' : '-ml-[calc(50vw-50%)]'} w-screen ${shouldBeTransparent ? 'bg-white/10' : 'bg-[#0e1731]'}`}
+        >
           <div className='space-y-5 px-6 py-5 sm:px-10'>
             <div className='flex items-center gap-3'>
               <div className='non-login'>
@@ -126,7 +170,40 @@ export default function Header({ dictionary }: HeaderProps) {
                   <Image src='/images/udign-white.png' alt='logo' width={103} height={35} />
                 </Link>
               </div>
+
+              {/* 검색바 - 데스크톱만 표시 */}
+              <div className='ml-6 hidden max-w-md flex-1 sm:block'>
+                <form onSubmit={handleSearchSubmit} className='relative'>
+                  <input
+                    type='text'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
+                    placeholder='검색어를 입력하세요'
+                    className='w-full rounded-full border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/60 focus:border-white/40 focus:ring-2 focus:ring-white/20 focus:outline-none'
+                  />
+                  <button
+                    type='submit'
+                    className='absolute top-1/2 right-3 -translate-y-1/2 text-white/60 hover:text-white'
+                  >
+                    <FiSearch className='text-lg' />
+                  </button>
+                </form>
+              </div>
+
               <div className='ml-auto flex flex-shrink-0 items-center gap-2'>
+                {/* 구매 가능한 디자인 개수 알림 */}
+                {user && showPurchaseNotification && purchaseCount > 0 && (
+                  <Button
+                    onClick={handlePurchaseNotificationClick}
+                    className='flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-white shadow-lg hover:from-purple-600 hover:to-pink-600'
+                  >
+                    <div className='h-2 w-2 animate-pulse rounded-full bg-yellow-300'></div>
+                    <span className='text-sm font-bold'>{purchaseCount}</span>
+                    <span className='text-sm'>구매가능</span>
+                  </Button>
+                )}
+
                 <Button
                   onClick={handleTodayViewedClick}
                   size='icon'
@@ -135,23 +212,15 @@ export default function Header({ dictionary }: HeaderProps) {
                 >
                   <FiClock className='text-xl text-white' />
                 </Button>
+                {/* 검색 버튼 - 모바일만 표시 */}
                 <Button
                   onClick={handleSearchClick}
                   size='icon'
                   variant='ghost'
-                  className='hover:bg-white/10 hover:text-white'
+                  className='flex items-center justify-center hover:bg-white/10 hover:text-white sm:hidden'
                 >
                   <FiSearch className='text-xl text-white' />
                 </Button>
-                {user && user.mb_level >= MEMBER_LEVELS.ADMIN && (
-                  <Button
-                    onClick={() => router.push(ROUTES.ADMIN)}
-                    variant='ghost'
-                    className='text-base text-white hover:bg-white/10 hover:text-white'
-                  >
-                    <span>{dictionary.header.admin}</span>
-                  </Button>
-                )}
                 {user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -162,7 +231,15 @@ export default function Header({ dictionary }: HeaderProps) {
                         <span>{user.mb_name}</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end' className='w-48'>
+                    <DropdownMenuContent align='end' className='w-32'>
+                      {user.mb_level >= MEMBER_LEVELS.ADMIN && (
+                        <DropdownMenuItem
+                          onClick={() => router.push(ROUTES.ADMIN)}
+                          className='cursor-pointer'
+                        >
+                          {dictionary.header.admin}
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem
                         onClick={() => router.push(ROUTES.PROFILE_CONFIRM)}
                         className='cursor-pointer'
@@ -184,7 +261,16 @@ export default function Header({ dictionary }: HeaderProps) {
                   </Button>
                 )}
 
-                <LanguageSwitcher />
+                {/* My UDIGN 버튼 */}
+                {user && (
+                  <Button
+                    onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
+                    variant='ghost'
+                    className='text-base font-semibold text-white hover:bg-white/10 hover:text-white'
+                  >
+                    My UDIGN
+                  </Button>
+                )}
 
                 <Button
                   variant='ghost'
@@ -195,39 +281,6 @@ export default function Header({ dictionary }: HeaderProps) {
                 </Button>
               </div>
             </div>
-            {/* 데스크톱 네비게이션 메뉴 제거 */}
-            {user && (
-              <div className='-mt-4 -mb-4 flex justify-end'>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={(e) => handleAuthRequiredClick(e, ROUTES.MY_UDIGN)}
-                        variant='ghost'
-                        className='relative h-10 text-lg font-semibold text-white hover:bg-white/10 hover:text-white'
-                      >
-                        My UDIGN
-                        {purchaseCount > 0 && (
-                          <span className='absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white'>
-                            {purchaseCount}
-                          </span>
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    {purchaseCount > 0 && (
-                      <TooltipContent side='bottom' className='bg-gray-800 text-white'>
-                        <p>
-                          {dictionary.header.purchaseAvailable.replace(
-                            '{{count}}',
-                            purchaseCount.toString(),
-                          )}
-                        </p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            )}
           </div>
         </header>
 

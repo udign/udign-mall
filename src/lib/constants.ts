@@ -7,7 +7,7 @@ export const STATUS_GROUPS = {
   making: '상품 제작',
   shipping: '배송 진행',
   completed: '수령 완료',
-  cancelled: '취소/반품/품절',
+  // cancelled: '취소/반품/품절',
 } as const;
 
 export const STATUS_MAPPING = {

@@ -21,7 +21,7 @@ export interface LikeStats {
 // 좋아요 통계를 가져오는 함수
 export const getLikeStats = async (): Promise<LikeStats> => {
   try {
-    // 현재 노출 중인 모든 작품과 좋아요 정보 조회
+    // 현재 노출 중인 모든 디자인과 좋아요 정보 조회
     const artworksQuery = `
       SELECT 
         i.it_id,

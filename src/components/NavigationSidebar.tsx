@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { NAV_MENU_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/routes';
+import { i18n, type Locale } from '../../i18n.config';
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +22,13 @@ import { Button } from '@/components/ui/primitives/button';
 import { X } from 'lucide-react';
 import { Dictionary } from '@/lib/dictionaries';
 
+const languageNames = {
+  ko: '한국어',
+  en: 'English',
+  ja: '日本語',
+  zh: '中文',
+};
+
 interface NavigationSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -29,8 +37,49 @@ interface NavigationSidebarProps {
 
 export default function NavigationSidebar({ isOpen, onClose, dictionary }: NavigationSidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const { user } = useAuth();
+
+  const switchLanguage = (newLocale: Locale) => {
+    if (!pathname) return;
+
+    // 쿠키에 언어 저장 (1년간 유지)
+    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
+
+    // 현재 경로에서 언어 부분을 제거
+    const segments = pathname.split('/');
+
+    // 첫 번째 세그먼트가 언어 코드인지 확인
+    const currentLocale = segments[1];
+    const isCurrentLocaleValid = i18n.locales.includes(currentLocale as Locale);
+
+    let newPath: string;
+    if (isCurrentLocaleValid) {
+      // 현재 언어를 새 언어로 교체
+      segments[1] = newLocale;
+      newPath = segments.join('/');
+    } else {
+      // 언어 코드가 없는 경우 앞에 추가
+      newPath = `/${newLocale}${pathname}`;
+    }
+
+    router.push(newPath);
+    onClose(); // 사이드바 닫기
+  };
+
+  const getCurrentLocale = (): Locale => {
+    if (!pathname) return i18n.defaultLocale;
+
+    const segments = pathname.split('/');
+    const currentLocale = segments[1];
+
+    if (i18n.locales.includes(currentLocale as Locale)) {
+      return currentLocale as Locale;
+    }
+
+    return i18n.defaultLocale;
+  };
 
   const handleAuthRequiredClick = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
@@ -276,6 +325,34 @@ export default function NavigationSidebar({ isOpen, onClose, dictionary }: Navig
                     {dictionary.sidebar.navigation.privacyPolicy}
                   </Button>
                 </div>
+              </div>
+            </div>
+
+            {/* 언어 선택 섹션 */}
+            <div className='mb-6'>
+              <h3 className='mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase'>
+                Language
+              </h3>
+              <div className='space-y-1'>
+                {i18n.locales.map((locale) => {
+                  const currentLocale = getCurrentLocale();
+                  const isSelected = currentLocale === locale;
+
+                  return (
+                    <div key={locale} className='py-2'>
+                      <Button
+                        variant='ghost'
+                        className={`hover:text-primary-hover w-full justify-start pl-4 text-left text-lg font-semibold hover:bg-gray-50 ${
+                          isSelected ? 'bg-gray-100 font-bold text-gray-900' : 'text-gray-700'
+                        }`}
+                        onClick={() => switchLanguage(locale)}
+                      >
+                        {languageNames[locale]}
+                        {isSelected && <span className='ml-auto text-sm text-gray-500'>✓</span>}
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

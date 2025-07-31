@@ -154,7 +154,7 @@
     "progressInfo": "유다인의 모든 진행상황은 MY UDIGN 에서 확인하실 수 있습니다.",
     "myUdign": "MY UDIGN",
     "steps": {
-      "designLike": "디자인 좋아요",
+      "designLike": "좋아요",
       "productionReview": "제작 검토",
       "purchaseProgress": "구매진행",
       "orderConfirmation": "주문확정",
@@ -240,7 +240,7 @@
       "email": "E-MAIL"
     },
     "contact": {
-      "title": "Contact Us",
+      "title": "contact Us",
       "phone": "1577-4215",
       "operatingHours": "운영시간 : 평일 09:00 ~ 17:00",
       "lunchTime": "점심시간 : 평일 12:00 ~ 13:00",
@@ -413,12 +413,12 @@
       "product": "상품: 실제 제작된 작품 (좋아요한 회원만 구매 가능)"
     },
     "reviewProcess": {
-      "title": "심의 진행 방식:",
-      "auto": "자동 심의: 목표 좋아요 인원 달성 시 자동으로 심의 단계 진행",
-      "manual": "수동 심의: 관리자가 설정한 기간 후 심의 단계 진행"
+      "title": "제작검토 진행 방식:",
+      "auto": "자동 검토(기본): 목표 좋아요 인원 달성 시 자동으로 검토 단계 진행",
+      "manual": "수동 검토: 목표가 미달되었으나 관리자 판단에 의한 수동으로 검토 단계 진행"
     },
     "steps": {
-      "collection": "디자인 좋아요",
+      "collection": "좋아요",
       "review": "제작 검토",
       "payment": "구매 진행",
       "paymentWaiting": "결제대기",
@@ -429,7 +429,7 @@
     },
     "statusGroups": {
       "all": "전체",
-      "collection": "디자인 좋아요",
+      "collection": "좋아요",
       "review": "제작 검토",
       "payment": "구매 진행",
       "paymentCompleted": "주문 확정",

@@ -490,7 +490,7 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
   ) : (
     <div>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
-        {/* 블러 처리 대상 작품 - 좋아요를 누르지 않은 사용자에게만 달성 UI 표시 */}
+        {/* 블러 처리 대상 디자인 - 좋아요를 누르지 않은 사용자에게만 달성 UI 표시 */}
         {shouldBlurProduct(
           {
             current_likes: product.current_likes,
@@ -929,7 +929,7 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     </div>
                   </div>
                 ) : (
-                  /* 구매 불가능한 상품 - 작품 정보 및 진행 상황 표시 */
+                  /* 구매 불가능한 상품 - 디자인 정보 및 진행 상황 표시 */
                   <div className='space-y-6'>
                     <div className='flex gap-6'>
                       <div className='flex-1'>
@@ -1074,7 +1074,7 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
               </div>
             )}
 
-            {/* 구매 불가능한 상품일 때만 인기 작품 표시 */}
+            {/* 구매 불가능한 상품일 때만 인기 디자인 표시 */}
             {!product.can_purchase && (
               <PopularProducts excludeProductId={product.it_id} dictionary={dictionary} />
             )}

@@ -14,10 +14,10 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
   const sections = privacyPolicy.split(/(?=제\d+조)/g).filter((section) => section.trim());
 
   return (
-    <div className='min-h-screen bg-white'>
+    <div className='min-h-screen' style={{ backgroundColor: '#0e1731' }}>
       <div className='px-6 py-8 sm:px-10'>
         <div className='mx-auto'>
-          <h1 className='mb-8 text-center text-2xl font-bold text-gray-900'>
+          <h1 className='mb-8 text-center text-2xl font-bold text-white'>
             {dictionary.privacy.title}
           </h1>
 
@@ -35,8 +35,8 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
               if (!isArticle && index === 0) {
                 // 서문인 경우
                 return (
-                  <div key={index} className='rounded-lg border border-gray-200 p-6'>
-                    <div className='space-y-4 leading-relaxed text-gray-700'>
+                  <div key={index} className='rounded-lg border border-white/20 p-6'>
+                    <div className='space-y-4 leading-relaxed text-white/80'>
                       {lines.map((line, lineIndex) => (
                         <p key={lineIndex}>{line}</p>
                       ))}
@@ -51,9 +51,9 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
               const content = lines.slice(1);
 
               return (
-                <div key={index} className='rounded-lg border border-gray-200 p-6'>
-                  <h2 className='mb-4 text-lg font-semibold text-gray-900'>{title}</h2>
-                  <div className='space-y-3 leading-relaxed text-gray-700'>
+                <div key={index} className='rounded-lg border border-white/20 p-6'>
+                  <h2 className='mb-4 text-lg font-semibold text-white'>{title}</h2>
+                  <div className='space-y-3 leading-relaxed text-white/80'>
                     {content.map((line, lineIndex) => {
                       // 목록 항목 처리 (보존 항목, 보존 근거 등)
                       if (
@@ -100,11 +100,11 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
             })}
 
             {/* 부칙 */}
-            <div className='rounded-lg border border-gray-200 bg-gray-50 p-6'>
-              <h2 className='mb-4 text-lg font-semibold text-gray-900'>
+            <div className='rounded-lg border border-white/20 p-6'>
+              <h2 className='mb-4 text-lg font-semibold text-white'>
                 {dictionary.privacy.supplementary.title}
               </h2>
-              <div className='text-gray-700'>
+              <div className='text-white/80'>
                 <p>{dictionary.privacy.supplementary.content}</p>
               </div>
             </div>
