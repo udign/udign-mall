@@ -43,7 +43,7 @@ export const useCategoryProducts = ({
         setLoading(true);
         setError(null);
 
-        // 카테고리별 작품 필터링
+        // 카테고리별 디자인 필터링
         const categoryParam = categoryId ? `&category=${categoryId}` : '';
         const subCategoryParam = subCategoryId ? `&subcategory=${subCategoryId}` : '';
         const thirdCategoryParam = thirdCategoryId ? `&thirdcategory=${thirdCategoryId}` : '';
@@ -62,7 +62,7 @@ export const useCategoryProducts = ({
           setTotalPages(data.pagination.totalPages);
 
           // 카테고리명 설정
-          let displayName = '모든 작품';
+          let displayName = '모든 디자인';
           if (categoryId && data.categoryCounts[categoryId]) {
             displayName = data.categoryCounts[categoryId].name;
 

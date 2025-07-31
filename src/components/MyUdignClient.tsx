@@ -236,7 +236,7 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
         let wasLiked = false;
         let isNowLiked = false;
 
-        // 현재 탭 데이터에서 작품 찾기
+        // 현재 탭 데이터에서 디자인 찾기
         const currentArtwork = currentTabData.find((artwork) => artwork.it_id === itemId);
 
         if (currentArtwork) {
@@ -249,11 +249,11 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
           const updated = { ...prev };
 
           if (wasLiked && !isNowLiked) {
-            // 좋아요 해제된 경우: 좋아요 관련 탭들에서 작품 제거
+            // 좋아요 해제된 경우: 좋아요 관련 탭들에서 디자인 제거
             Object.keys(updated).forEach((tab) => {
               if (updated[tab].data.length > 0) {
                 if (tab === 'all' || tab === 'collection') {
-                  // 전체 탭과 컬렉션(❤️ 디자인) 탭에서는 작품 완전 제거
+                  // 전체 탭과 컬렉션(❤️ 디자인) 탭에서는 디자인 완전 제거
                   updated[tab].data = updated[tab].data.filter(
                     (artwork) => artwork.it_id !== itemId,
                   );
@@ -327,7 +327,7 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
 
   const handleOrderCancel = async (orderId: string, cancelMemo: string) => {
     try {
-      // 먼저 현재 작품 상태 확인
+      // 먼저 현재 디자인 상태 확인
       const currentArtwork = currentTabData.find((artwork) => artwork.od_id === orderId);
       if (!currentArtwork) return;
 
@@ -356,12 +356,12 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
           Object.keys(updated).forEach((tab) => {
             if (updated[tab].data.length > 0) {
               if (tab === oldStatusKey) {
-                // 기존 탭에서는 작품 제거
+                // 기존 탭에서는 디자인 제거
                 updated[tab].data = updated[tab].data.filter(
                   (artwork) => artwork.od_id !== orderId,
                 );
               } else if (tab === newStatusKey) {
-                // 새로운 탭에 작품 추가 (이미 존재하지 않는 경우에만)
+                // 새로운 탭에 디자인 추가 (이미 존재하지 않는 경우에만)
                 const exists = updated[tab].data.some((artwork) => artwork.od_id === orderId);
                 if (!exists) {
                   const updatedArtwork = {
@@ -421,7 +421,7 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
 
   const handlePurchaseConfirm = async (orderId: string) => {
     try {
-      // 먼저 현재 작품 상태 확인
+      // 먼저 현재 디자인 상태 확인
       const currentArtwork = currentTabData.find((artwork) => artwork.od_id === orderId);
       if (!currentArtwork) return;
 
@@ -450,12 +450,12 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
           Object.keys(updated).forEach((tab) => {
             if (updated[tab].data.length > 0) {
               if (tab === oldStatusKey) {
-                // 기존 탭에서는 작품 제거
+                // 기존 탭에서는 디자인 제거
                 updated[tab].data = updated[tab].data.filter(
                   (artwork) => artwork.od_id !== orderId,
                 );
               } else if (tab === newStatusKey) {
-                // 새로운 탭에 작품 추가 (이미 존재하지 않는 경우에만)
+                // 새로운 탭에 디자인 추가 (이미 존재하지 않는 경우에만)
                 const exists = updated[tab].data.some((artwork) => artwork.od_id === orderId);
                 if (!exists) {
                   const updatedArtwork = {

@@ -55,7 +55,7 @@ export default function LikeStatsSection({ initialStats }: LikeStatsSectionProps
 
       <div className='mb-4 grid grid-cols-3 gap-4 rounded-lg bg-gray-50 p-3'>
         <div className='text-center'>
-          <div className='text-sm text-gray-600'>총 작품</div>
+          <div className='text-sm text-gray-600'>총 디자인</div>
           <div className='text-xl font-bold text-blue-600'>
             {stats.total_artworks.toLocaleString()}
           </div>
@@ -78,7 +78,7 @@ export default function LikeStatsSection({ initialStats }: LikeStatsSectionProps
         {stats.artworks.length === 0 ? (
           <div className='flex h-24 items-center justify-center text-gray-400'>
             <div className='text-center'>
-              <div className='text-sm'>작품이 없습니다</div>
+              <div className='text-sm'>디자인이 없습니다</div>
             </div>
           </div>
         ) : (

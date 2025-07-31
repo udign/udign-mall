@@ -88,8 +88,8 @@ export default function ArtworkCard({
   //   // PHP 로직과 동일: checked=true면 심의종료('N'), false면 심의중('Y')
   //   const newStatus = checked ? 'N' : 'Y';
   //   const confirmMsg = checked
-  //     ? '해당 작품의 상태를 구매 진행 단계로 변경하시겠습니까?'
-  //     : '해당 작품의 상태를 제작 검토 단계로 변경하시겠습니까?';
+  //     ? '해당 디자인의 상태를 구매 진행 단계로 변경하시겠습니까?'
+  //     : '해당 디자인의 상태를 제작 검토 단계로 변경하시겠습니까?';
 
   //   setConfirmMessage(confirmMsg);
   //   setPendingToggleAction(() => async () => {

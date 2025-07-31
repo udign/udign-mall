@@ -12,7 +12,7 @@ export interface DesignStats {
 // 디자인 통계를 가져오는 함수
 export const getDesignStats = async (): Promise<DesignStats> => {
   try {
-    // 1. 전체 - 모든 업로드된 작품 수 (it_name이 비어있지 않은 것들)
+    // 1. 전체 - 모든 업로드된 디자인 수 (it_name이 비어있지 않은 것들)
     const totalQuery = `
       SELECT COUNT(*) as count 
       FROM g5_shop_item 
@@ -21,7 +21,7 @@ export const getDesignStats = async (): Promise<DesignStats> => {
     const totalResult = (await executeQuery(totalQuery)) as Array<{ count: number }>;
     const total = totalResult[0]?.count || 0;
 
-    // 2. 신규 - 관리자 승인 안된 작품 (it_use = '0')
+    // 2. 신규 - 관리자 승인 안된 디자인 (it_use = '0')
     const newQuery = `
       SELECT COUNT(*) as count 
       FROM g5_shop_item 
@@ -30,7 +30,7 @@ export const getDesignStats = async (): Promise<DesignStats> => {
     const newResult = (await executeQuery(newQuery)) as Array<{ count: number }>;
     const newItems = newResult[0]?.count || 0;
 
-    // 3. 승인 - 관리자가 승인한 작품 (it_use = '1')
+    // 3. 승인 - 관리자가 승인한 디자인 (it_use = '1')
     const approvedQuery = `
       SELECT COUNT(*) as count 
       FROM g5_shop_item 
@@ -39,7 +39,7 @@ export const getDesignStats = async (): Promise<DesignStats> => {
     const approvedResult = (await executeQuery(approvedQuery)) as Array<{ count: number }>;
     const approved = approvedResult[0]?.count || 0;
 
-    // 4. 제작검토 - 목표 좋아요 수 달성했거나 관리자가 심의중으로 설정한 작품
+    // 4. 제작검토 - 목표 좋아요 수 달성했거나 관리자가 심의중으로 설정한 디자인
     const reviewQuery = `
       SELECT COUNT(DISTINCT it.it_id) as count
       FROM g5_shop_item it

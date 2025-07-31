@@ -192,7 +192,7 @@ export default function Header({ dictionary, transparent = false }: HeaderProps)
               </div>
 
               <div className='ml-auto flex flex-shrink-0 items-center gap-2'>
-                {/* 구매 가능한 작품 개수 알림 */}
+                {/* 구매 가능한 디자인 개수 알림 */}
                 {user && showPurchaseNotification && purchaseCount > 0 && (
                   <Button
                     onClick={handlePurchaseNotificationClick}

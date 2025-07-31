@@ -202,7 +202,7 @@ OptionGroupComponent.displayName = 'OptionGroupComponent';
 const ARTWORK_IMAGE_INDICES = [1, 2, 3, 4] as const;
 
 const artworkFormSchema = z.object({
-  it_name: z.string().min(1, '작품명을 입력해주세요.'),
+  it_name: z.string().min(1, '디자인명을 입력해주세요.'),
   it_1: z.string(),
   it_3: z.string(),
   it_4: z.number().min(0),
@@ -300,7 +300,7 @@ export default function ArtworkEditPage() {
         ]);
 
         if (!artworkRes.ok) {
-          throw new Error('작품 정보를 불러올 수 없습니다.');
+          throw new Error('디자인 정보를 불러올 수 없습니다.');
         }
 
         const artworkData = await artworkRes.json();
@@ -553,13 +553,13 @@ export default function ArtworkEditPage() {
       });
 
       if (!response.ok) {
-        throw new Error('작품 정보 수정에 실패했습니다.');
+        throw new Error('디자인 정보 수정에 실패했습니다.');
       }
 
       setShowSuccessDialog(true);
     } catch (error) {
       console.error('Error updating artwork:', error);
-      setErrorMessage('작품 정보 수정 중 오류가 발생했습니다.');
+      setErrorMessage('디자인 정보 수정 중 오류가 발생했습니다.');
       setShowErrorDialog(true);
     } finally {
       setSaving(false);
@@ -614,11 +614,11 @@ export default function ArtworkEditPage() {
 
   return loading ? (
     <div className='flex min-h-screen items-center justify-center'>
-      <LoadingSpinner size='lg' message='작품 정보를 불러오는 중...' />
+      <LoadingSpinner size='lg' message='디자인 정보를 불러오는 중...' />
     </div>
   ) : !artwork ? (
     <div className='flex min-h-screen items-center justify-center bg-gray-50'>
-      <div className='text-lg text-red-600'>작품을 찾을 수 없습니다.</div>
+      <div className='text-lg text-red-600'>디자인을 찾을 수 없습니다.</div>
     </div>
   ) : (
     <div className='min-h-screen'>
@@ -630,7 +630,7 @@ export default function ArtworkEditPage() {
                 <ArrowLeft className='h-4 w-4' />
               </Button>
             </Link>
-            <h1 className='text-2xl font-bold text-gray-900'>작품 설정</h1>
+            <h1 className='text-2xl font-bold text-gray-900'>디자인 설정</h1>
           </div>
         </div>
 
@@ -638,9 +638,9 @@ export default function ArtworkEditPage() {
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <Card>
               <CardHeader>
-                <CardTitle>작품분류</CardTitle>
+                <CardTitle>디자인분류</CardTitle>
                 <p className='text-sm text-gray-600'>
-                  1차 분류는 반드시 선택하셔야 합니다. 하나의 작품에 최대 3개의 다른 분류를 지정할
+                  1차 분류는 반드시 선택하셔야 합니다. 하나의 디자인에 최대 3개의 다른 분류를 지정할
                   수 있습니다.
                 </p>
                 <p className='text-xs text-gray-500'>
@@ -757,23 +757,23 @@ export default function ArtworkEditPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          작품명<span className='text-red-500'>*</span>
+                          디자인명<span className='text-red-500'>*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder='작품명을 입력하세요' {...field} />
+                          <Input placeholder='디자인명을 입력하세요' {...field} />
                         </FormControl>
                         <p className='text-xs text-gray-500'>
-                          고객에게 표시될 작품의 제목을 입력하세요.
+                          고객에게 표시될 디자인의 제목을 입력하세요.
                         </p>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <div className='space-y-2'>
-                    <Label>작품 코드</Label>
+                    <Label>디자인 코드</Label>
                     <p className='text-sm font-medium text-gray-900'>{artworkId}</p>
                     <p className='text-xs text-gray-500'>
-                      시스템에서 자동으로 생성된 작품의 고유 식별번호입니다.
+                      시스템에서 자동으로 생성된 디자인의 고유 식별번호입니다.
                     </p>
                   </div>
                   <div className='space-y-2'>
@@ -781,7 +781,7 @@ export default function ArtworkEditPage() {
                     <p className='text-sm font-medium text-gray-900'>
                       {form.getValues('it_1') || '-'}
                     </p>
-                    <p className='text-xs text-gray-500'>이 작품을 등록한 판매자의 ID입니다.</p>
+                    <p className='text-xs text-gray-500'>이 디자인을 등록한 판매자의 ID입니다.</p>
                   </div>
                 </div>
 
@@ -801,7 +801,9 @@ export default function ArtworkEditPage() {
                             onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           />
                         </FormControl>
-                        <p className='text-xs text-gray-500'>작품의 목표 좋아요 수를 설정하세요.</p>
+                        <p className='text-xs text-gray-500'>
+                          디자인의 목표 좋아요 수를 설정하세요.
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -821,7 +823,8 @@ export default function ArtworkEditPage() {
                           />
                         </FormControl>
                         <p className='text-xs text-gray-500'>
-                          작품 목록에서의 정렬 순서를 설정합니다. 숫자가 작을수록 상위에 표시됩니다.
+                          디자인 목록에서의 정렬 순서를 설정합니다. 숫자가 작을수록 상위에
+                          표시됩니다.
                         </p>
                         <FormMessage />
                       </FormItem>
@@ -834,16 +837,16 @@ export default function ArtworkEditPage() {
                   name='it_3'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>작품설명</FormLabel>
+                      <FormLabel>디자인설명</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder='작품에 대한 상세 설명을 입력하세요'
+                          placeholder='디자인에 대한 상세 설명을 입력하세요'
                           rows={4}
                           {...field}
                         />
                       </FormControl>
                       <p className='text-xs text-gray-500'>
-                        고객에게 표시될 작품의 상세 설명을 입력하세요.
+                        고객에게 표시될 디자인의 상세 설명을 입력하세요.
                       </p>
                       <FormMessage />
                     </FormItem>
@@ -960,7 +963,7 @@ export default function ArtworkEditPage() {
                           </SelectContent>
                         </Select>
                         <p className='text-xs text-gray-500'>
-                          고객이 작품 구매 시 받을 포인트의 계산 방식을 선택하세요.
+                          고객이 디자인 구매 시 받을 포인트의 계산 방식을 선택하세요.
                         </p>
                         <FormMessage />
                       </FormItem>
@@ -1017,7 +1020,7 @@ export default function ArtworkEditPage() {
                           <span className='text-sm text-gray-500'>개</span>
                         </div>
                         <p className='text-xs text-gray-500'>
-                          판매 가능한 작품의 재고 수량을 입력하세요. 0으로 설정 시 품절로
+                          판매 가능한 디자인의 재고 수량을 입력하세요. 0으로 설정 시 품절로
                           표시됩니다.
                         </p>
                         <FormMessage />
@@ -1109,7 +1112,7 @@ export default function ArtworkEditPage() {
                           <span className='text-sm text-gray-500'>개</span>
                         </div>
                         <p className='text-xs text-gray-500'>
-                          작품 구매 시 최소 구매 수량을 설정합니다. (0은 제한 없음)
+                          디자인 구매 시 최소 구매 수량을 설정합니다. (0은 제한 없음)
                         </p>
                         <FormMessage />
                       </FormItem>
@@ -1134,7 +1137,7 @@ export default function ArtworkEditPage() {
                           <span className='text-sm text-gray-500'>개</span>
                         </div>
                         <p className='text-xs text-gray-500'>
-                          작품 구매 시 최대 구매 수량을 설정합니다. (0은 제한 없음)
+                          디자인 구매 시 최대 구매 수량을 설정합니다. (0은 제한 없음)
                         </p>
                         <FormMessage />
                       </FormItem>
@@ -1161,7 +1164,7 @@ export default function ArtworkEditPage() {
                           </SelectContent>
                         </Select>
                         <p className='text-xs text-gray-500'>
-                          작품의 과세유형(과세, 비과세)을 설정합니다.
+                          디자인의 과세유형(과세, 비과세)을 설정합니다.
                         </p>
                         <FormMessage />
                       </FormItem>
@@ -1201,7 +1204,7 @@ export default function ArtworkEditPage() {
                           </SelectContent>
                         </Select>
                         <p className='text-xs text-gray-500'>
-                          이 작품의 배송비 계산 방식을 선택하세요.
+                          이 디자인의 배송비 계산 방식을 선택하세요.
                         </p>
                         <FormMessage />
                       </FormItem>
@@ -1327,7 +1330,7 @@ export default function ArtworkEditPage() {
                 <div className='flex items-center justify-between'>
                   <div>
                     <p className='text-sm text-gray-600'>
-                      작품에 옵션을 추가하여 다양한 선택사항을 제공할 수 있습니다.
+                      디자인에 옵션을 추가하여 다양한 선택사항을 제공할 수 있습니다.
                     </p>
                     <p className='text-xs text-gray-500'>
                       옵션명별로 여러 옵션값을 설정할 수 있습니다. (예: 사이즈 → S, M, L)
@@ -1366,7 +1369,7 @@ export default function ArtworkEditPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>작품 이미지</CardTitle>
+                <CardTitle>디자인 이미지</CardTitle>
                 <p className='text-sm text-gray-600'>
                   대표 이미지 1개(필수)와 추가 이미지 최대 3개까지 업로드할 수 있습니다.
                 </p>
@@ -1413,17 +1416,17 @@ export default function ArtworkEditPage() {
         confirmText='확인'
       />
 
-      {/* 작품 수정 성공 Dialog */}
+      {/* 디자인 수정 성공 Dialog */}
       <MessageDialog
         open={showSuccessDialog}
         onOpenChange={setShowSuccessDialog}
         title='수정 완료'
-        description='작품 정보가 성공적으로 수정되었습니다.'
+        description='디자인 정보가 성공적으로 수정되었습니다.'
         confirmText='확인'
         onConfirm={() => router.push(ROUTES.ADMIN_REVIEW)}
       />
 
-      {/* 작품 수정 실패 Dialog */}
+      {/* 디자인 수정 실패 Dialog */}
       <MessageDialog
         open={showErrorDialog}
         onOpenChange={setShowErrorDialog}

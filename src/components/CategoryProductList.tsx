@@ -37,7 +37,7 @@ export default function CategoryProductList({
           {categoryName || fallbackCategoryName}
         </h1>
         <p className='text-white'>
-          {loading ? '작품을 불러오는 중...' : `총 ${categoryCount}개의 작품이 있습니다.`}
+          {loading ? '디자인을 불러오는 중...' : `총 ${categoryCount}개의 디자인이 있습니다.`}
         </p>
       </div>
 
@@ -50,12 +50,12 @@ export default function CategoryProductList({
 
       {loading ? (
         <div className='flex min-h-96 items-center justify-center'>
-          <LoadingSpinner size='lg' message='작품을 불러오는 중입니다...' />
+          <LoadingSpinner size='lg' message='디자인을 불러오는 중입니다...' />
         </div>
       ) : error ? (
         <ErrorState message={error} onRetry={onRetry} showRetry={true} />
       ) : products.length === 0 ? (
-        <EmptyState title='등록된 작품이 없습니다' />
+        <EmptyState title='등록된 디자인이 없습니다' />
       ) : (
         <>
           <ProductGrid products={products} className='mb-8' />

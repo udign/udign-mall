@@ -89,7 +89,7 @@ const menuItems: MenuItem[] = [
     icon: <ShoppingBag className='h-4 w-4' />,
     subMenus: [
       {
-        label: '작품 관리',
+        label: '디자인 관리',
         href: ROUTES.ADMIN_REVIEW,
         icon: <Palette className='h-4 w-4' />,
       },
