@@ -245,13 +245,17 @@ export async function POST(request: NextRequest) {
         ca_skin_dir, ca_mobile_skin_dir, ca_skin, ca_mobile_skin,
         ca_img_width, ca_img_height, ca_mobile_img_width, ca_mobile_img_height,
         ca_list_mod, ca_list_row, ca_mobile_list_mod, ca_mobile_list_row,
-        ca_stock_qty, ca_explan_html, ca_cert_use, ca_adult_use, ca_nocoupon
+        ca_stock_qty, ca_explan_html, ca_cert_use, ca_adult_use, ca_nocoupon,
+        ca_head_html, ca_tail_html, ca_mobile_head_html, ca_mobile_tail_html,
+        ca_include_head, ca_include_tail, ca_mb_id, ca_sell_email
       ) VALUES (
         ?, ?, ?, ?,
         '', '', 'list.10.skin.php', 'list.10.skin.php',
         150, 150, 150, 150,
         3, 5, 3, 5,
-        99999, 1, 0, 0, 0
+        99999, 1, 0, 0, 0,
+        '', '', '', '',
+        '', '', '', ''
       )
     `,
       [newId, body.name.trim(), body.order || 0, body.isActive ? 1 : 0],
