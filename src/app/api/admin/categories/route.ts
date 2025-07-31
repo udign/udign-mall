@@ -152,14 +152,14 @@ export async function GET(request: NextRequest) {
       queryParams.push(filter.level * 2);
     }
 
-    // 카테고리 조회
+    // 카테고리 조회 (계층 구조 유지하면서 정렬)
     const rows = (await executeQuery(
       `
       SELECT ca_id, ca_name, ca_order, ca_use,
              NULL as created_at, NULL as updated_at
       FROM g5_shop_category 
       ${whereClause}
-      ORDER BY ca_order, ca_id
+      ORDER BY ca_id
     `,
       queryParams,
     )) as RowDataPacket[];

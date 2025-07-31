@@ -190,7 +190,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       SET ca_name = ?, ca_order = ?, ca_use = ?
       WHERE ca_id = ?
     `,
-      [body.name.trim(), body.order || existingCategory.order, body.isActive ? 1 : 0, categoryId],
+      [
+        body.name.trim(),
+        body.order !== undefined ? body.order : existingCategory.order,
+        body.isActive ? 1 : 0,
+        categoryId,
+      ],
     );
 
     await connection.commit();
@@ -199,7 +204,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const updatedCategory: Category = {
       ...existingCategory,
       name: body.name.trim(),
-      order: body.order || existingCategory.order,
+      order: body.order !== undefined ? body.order : existingCategory.order,
       isActive: body.isActive,
       updatedAt: new Date().toISOString(),
     };
