@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery, getConnection } from '@/lib/database';
-import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { RowDataPacket } from 'mysql2';
 import {
   Category,
   CategoryUpdateRequest,
@@ -185,7 +185,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     // 카테고리 업데이트 (동적 쿼리 생성)
     const updateFields: string[] = [];
-    const updateValues: any[] = [];
+    const updateValues: (string | number)[] = [];
 
     if (body.name !== undefined) {
       updateFields.push('ca_name = ?');

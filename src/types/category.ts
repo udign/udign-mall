@@ -17,7 +17,7 @@ export interface CategoryFormData {
   isActive: boolean;
 }
 
-export interface CategoryCreateRequest extends CategoryFormData {}
+export type CategoryCreateRequest = CategoryFormData;
 
 export interface CategoryUpdateRequest extends CategoryFormData {
   id: string;
@@ -61,7 +61,7 @@ export interface CategoryReorderRequest {
 }
 
 // API 응답 타입들
-export interface CategoryApiResponse<T = any> {
+export interface CategoryApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

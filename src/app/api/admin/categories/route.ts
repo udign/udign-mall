@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery, getConnection } from '@/lib/database';
-import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { RowDataPacket } from 'mysql2';
 import {
   Category,
   CategoryCreateRequest,
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 
     // 기본 쿼리
     let whereClause = 'WHERE 1=1';
-    const queryParams: any[] = [];
+    const queryParams: (string | number)[] = [];
 
     // 검색 조건 추가
     if (filter.search) {
