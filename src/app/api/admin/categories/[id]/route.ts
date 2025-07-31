@@ -45,9 +45,9 @@ async function findDescendants(categoryId: string): Promise<Category[]> {
 }
 
 // GET: 카테고리 상세 조회
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const categoryId = params.id;
+    const { id: categoryId } = await params;
 
     const rows = (await executeQuery(
       `
@@ -107,11 +107,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PUT: 카테고리 수정
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const connection = await getConnection();
 
   try {
-    const categoryId = params.id;
+    const { id: categoryId } = await params;
     const body: CategoryUpdateRequest = await request.json();
 
     // 카테고리 존재 확인
@@ -134,8 +134,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const existingCategory = dbRowToCategory(existingRows[0]);
 
-    // 유효성 검증
-    if (!body.name || body.name.trim().length < 2) {
+    // 유효성 검증 (이름이 제공된 경우에만)
+    if (body.name !== undefined && (!body.name || body.name.trim().length < 2)) {
       const response: CategoryUpdateApiResponse = {
         success: false,
         error: '카테고리명은 2글자 이상 입력해주세요.',
@@ -183,19 +183,38 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     await connection.beginTransaction();
 
-    // 카테고리 업데이트
+    // 카테고리 업데이트 (동적 쿼리 생성)
+    const updateFields: string[] = [];
+    const updateValues: any[] = [];
+
+    if (body.name !== undefined) {
+      updateFields.push('ca_name = ?');
+      updateValues.push(body.name.trim());
+    }
+
+    if (body.order !== undefined) {
+      updateFields.push('ca_order = ?');
+      updateValues.push(body.order);
+    }
+
+    if (body.isActive !== undefined) {
+      updateFields.push('ca_use = ?');
+      updateValues.push(body.isActive ? 1 : 0);
+    }
+
+    if (updateFields.length === 0) {
+      const response: CategoryUpdateApiResponse = {
+        success: false,
+        error: '업데이트할 필드가 없습니다.',
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+
+    updateValues.push(categoryId);
+
     await connection.execute(
-      `
-      UPDATE g5_shop_category 
-      SET ca_name = ?, ca_order = ?, ca_use = ?
-      WHERE ca_id = ?
-    `,
-      [
-        body.name.trim(),
-        body.order !== undefined ? body.order : existingCategory.order,
-        body.isActive ? 1 : 0,
-        categoryId,
-      ],
+      `UPDATE g5_shop_category SET ${updateFields.join(', ')} WHERE ca_id = ?`,
+      updateValues,
     );
 
     await connection.commit();
@@ -203,9 +222,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     // 업데이트된 카테고리 정보 반환
     const updatedCategory: Category = {
       ...existingCategory,
-      name: body.name.trim(),
+      name: body.name !== undefined ? body.name.trim() : existingCategory.name,
       order: body.order !== undefined ? body.order : existingCategory.order,
-      isActive: body.isActive,
+      isActive: body.isActive !== undefined ? body.isActive : existingCategory.isActive,
       updatedAt: new Date().toISOString(),
     };
 
@@ -232,11 +251,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE: 카테고리 삭제
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const connection = await getConnection();
 
   try {
-    const categoryId = params.id;
+    const { id: categoryId } = await params;
 
     // 카테고리 존재 확인
     const categoryRows = (await executeQuery(
