@@ -15,6 +15,7 @@ import { FiInbox, FiAlertCircle } from 'react-icons/fi';
 import { BsLightbulb } from 'react-icons/bs';
 import { ROUTES } from '@/lib/routes';
 import { Dictionary } from '@/lib/dictionaries';
+import { Separator } from '@/components/ui/primitives/separator';
 
 interface MyUdignData {
   products: ProductsByStatus;
@@ -687,8 +688,8 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
   ) : (
     <div className='min-h-screen'>
       <div className='px-4 py-8 sm:px-6 lg:px-8'>
-        <div className='mb-6 rounded-none border border-gray-100 bg-white p-6'>
-          <div className='mb-6 rounded-lg p-4 sm:p-6' style={{ backgroundColor: '#17244c' }}>
+        <div className='rounded-none p-6'>
+          <div className='border-white-100 mb-6 rounded-lg border bg-[#16234c] p-4 sm:p-6'>
             <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
               <div>
                 <h1 className='mb-1 text-xl font-bold text-white sm:mb-2 sm:text-2xl'>
@@ -706,11 +707,11 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
               </div>
             </div>
           </div>
-          <h2 className='mb-4 flex items-center text-lg font-semibold'>
+          <h2 className='mb-4 flex items-center text-lg font-semibold text-white'>
             <FiAlertCircle className='mr-2' />
             {dictionary.myUdign.preorderSystem}
           </h2>
-          <div className='mb-4 space-y-2 text-sm text-gray-600'>
+          <div className='space-y-2 text-sm text-white'>
             <p>
               • <strong>{dictionary.myUdign.systemDescription.artwork.split(':')[0]}</strong>:{' '}
               {dictionary.myUdign.systemDescription.artwork.split(':')[1]}
@@ -725,58 +726,63 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
             </p>
           </div>
 
-          <div className='mb-4 rounded-lg bg-gray-100 p-4'>
-            <p className='text-sm text-gray-700'>
-              <span className='flex items-center'>
-                <BsLightbulb className='mr-1' /> {dictionary.myUdign.reviewProcess.title}
-              </span>
-              <br />• <strong>{dictionary.myUdign.reviewProcess.auto.split(':')[0]}</strong>:{' '}
-              {dictionary.myUdign.reviewProcess.auto.split(':')[1]}
-              <br />• <strong>{dictionary.myUdign.reviewProcess.manual.split(':')[0]}</strong>:{' '}
-              {dictionary.myUdign.reviewProcess.manual.split(':')[1]}
-            </p>
+          <div className='mt-6 rounded-lg bg-[#3c1d5f] p-4 text-white'>
+            <div className='p-4'>
+              <p className='text-sm'>
+                <span className='flex items-center'>
+                  <BsLightbulb className='mr-1' /> {dictionary.myUdign.reviewProcess.title}
+                </span>
+                <br />• <strong>{dictionary.myUdign.reviewProcess.auto.split(':')[0]}</strong>:{' '}
+                {dictionary.myUdign.reviewProcess.auto.split(':')[1]}
+                <br />• <strong>
+                  {dictionary.myUdign.reviewProcess.manual.split(':')[0]}
+                </strong>: {dictionary.myUdign.reviewProcess.manual.split(':')[1]}
+              </p>
+            </div>
+
+            <div className='scrollbar-hide flex items-center justify-between overflow-x-auto px-4 pt-4 sm:px-6'>
+              {steps
+                .map((step, index) => [
+                  <div key={`step-${index}`} className='text-center'>
+                    <p className='min-w-20 text-xs font-medium whitespace-nowrap sm:min-w-18'>
+                      {step}
+                    </p>
+                  </div>,
+                  index < steps.length - 1 && (
+                    <div key={`arrow-${index}`} className='mx-1 sm:mx-2'>
+                      →
+                    </div>
+                  ),
+                ])
+                .flat()
+                .filter(Boolean)}
+            </div>
           </div>
 
-          <div className='scrollbar-hide flex items-center justify-between overflow-x-auto rounded-lg bg-gray-50 px-4 py-4 sm:px-6'>
-            {steps
-              .map((step, index) => [
-                <div key={`step-${index}`} className='text-center'>
-                  <p className='min-w-20 text-xs font-medium whitespace-nowrap text-gray-700 sm:min-w-18'>
-                    {step}
-                  </p>
-                </div>,
-                index < steps.length - 1 && (
-                  <div key={`arrow-${index}`} className='mx-1 text-gray-400 sm:mx-2'>
-                    →
-                  </div>
-                ),
-              ])
-              .flat()
-              .filter(Boolean)}
-          </div>
+          <Separator className='mt-8' />
         </div>
 
-        <div className='rounded-none border border-gray-100 bg-white p-6'>
-          <div className='mb-6 flex items-center'>
-            <h2 className='text-xl font-semibold'>{dictionary.myUdign.artworkStatus}</h2>
-          </div>
-
-          <div className='border-b border-gray-100'>
+        <div className='px-6 pb-6'>
+          <div className='bg-slate-900'>
             <nav className='scrollbar-hide flex overflow-x-auto'>
               {Object.entries(STATUS_GROUPS).map(([key, label]) => (
                 <button
                   key={key}
                   onClick={() => handleTabChange(key)}
-                  className={`relative flex min-w-40 flex-shrink-0 cursor-pointer items-center justify-center gap-2 px-4 pb-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 hover:text-gray-900 ${
-                    currentTab === key ? 'text-gray-900' : 'text-gray-500'
+                  className={`relative flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-4 text-sm font-medium whitespace-nowrap transition-colors duration-200 hover:text-white ${
+                    currentTab === key ? 'text-white' : 'text-gray-300'
                   }`}
                 >
                   {dictionary.myUdign.statusGroups[
                     key as keyof typeof dictionary.myUdign.statusGroups
                   ] || label}
-                  {counts[key] > 0 && <span className='text-gray-400'>{counts[key]}</span>}
+                  {counts[key] > 0 && (
+                    <span className={currentTab === key ? 'text-gray-200' : 'text-gray-400'}>
+                      {counts[key]}
+                    </span>
+                  )}
                   {currentTab === key && (
-                    <div className='absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-gray-900' />
+                    <div className='absolute right-0 bottom-0 left-0 h-0.5 bg-white' />
                   )}
                 </button>
               ))}
