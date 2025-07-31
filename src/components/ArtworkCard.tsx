@@ -3,13 +3,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { ArtworkStatus } from '@/types/artwork';
-import ProgressBar from '@/components/ProgressBar';
+
 import ReturnModal from '@/components/ReturnModal';
 import CancelOrderModal from '@/components/CancelOrderModal';
-import { Switch } from '@/components/ui/primitives/switch';
+// import { Switch } from '@/components/ui/primitives/switch';
 import { Button } from '@/components/ui/primitives/button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import MessageDialog from '@/components/ui/MessageDialog';
+// import MessageDialog from '@/components/ui/MessageDialog';
 import { ROUTES } from '@/lib/routes';
 import { Dictionary } from '@/lib/dictionaries';
 
@@ -30,6 +30,15 @@ interface ArtworkCardProps {
   isAdmin: boolean;
 }
 
+const stepItems = [
+  { step: 6, label: '수령완료', indent: 'ml-0' },
+  { step: 5, label: '배송진행', indent: 'ml-2' },
+  { step: 4, label: '상품제작', indent: 'ml-4' },
+  { step: 3, label: '주문확정', indent: 'ml-4' },
+  { step: 2, label: '구매진행', indent: 'ml-2' },
+  { step: 1, label: '제작검토', indent: 'ml-0' },
+];
+
 export default function ArtworkCard({
   artwork,
   dictionary,
@@ -37,20 +46,20 @@ export default function ArtworkCard({
   onOrderCancel,
   onPurchaseConfirm,
   onReturnSubmit,
-  onAdminToggle,
-  isAdmin,
+  // onAdminToggle,
+  // isAdmin,
 }: ArtworkCardProps) {
   const [showReturnModal, setShowReturnModal] = useState<boolean>(false);
   const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
-  const [isToggling, setIsToggling] = useState<boolean>(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
-  const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
-  const [confirmMessage, setConfirmMessage] = useState<string>('');
-  const [messageTitle, setMessageTitle] = useState<string>('');
-  const [messageContent, setMessageContent] = useState<string>('');
-  const [pendingToggleAction, setPendingToggleAction] = useState<(() => Promise<void>) | null>(
-    null,
-  );
+  // const [isToggling, setIsToggling] = useState<boolean>(false);
+  // const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
+  // const [showMessageDialog, setShowMessageDialog] = useState<boolean>(false);
+  // const [confirmMessage, setConfirmMessage] = useState<string>('');
+  // const [messageTitle, setMessageTitle] = useState<string>('');
+  // const [messageContent, setMessageContent] = useState<string>('');
+  // const [pendingToggleAction, setPendingToggleAction] = useState<(() => Promise<void>) | null>(
+  //   null,
+  // );
   const [showInterestConfirmDialog, setShowInterestConfirmDialog] = useState<boolean>(false);
   const [showPurchaseConfirmDialog, setShowPurchaseConfirmDialog] = useState<boolean>(false);
 
@@ -75,251 +84,325 @@ export default function ArtworkCard({
     onPurchaseConfirm(artwork.od_id!);
   };
 
-  const handleAdminToggle = async (checked: boolean) => {
-    // PHP 로직과 동일: checked=true면 심의종료('N'), false면 심의중('Y')
-    const newStatus = checked ? 'N' : 'Y';
-    const confirmMsg = checked
-      ? '해당 작품의 상태를 구매 진행 단계로 변경하시겠습니까?'
-      : '해당 작품의 상태를 제작 검토 단계로 변경하시겠습니까?';
+  // const handleAdminToggle = async (checked: boolean) => {
+  //   // PHP 로직과 동일: checked=true면 심의종료('N'), false면 심의중('Y')
+  //   const newStatus = checked ? 'N' : 'Y';
+  //   const confirmMsg = checked
+  //     ? '해당 작품의 상태를 구매 진행 단계로 변경하시겠습니까?'
+  //     : '해당 작품의 상태를 제작 검토 단계로 변경하시겠습니까?';
 
-    setConfirmMessage(confirmMsg);
-    setPendingToggleAction(() => async () => {
-      setIsToggling(true);
-      try {
-        await onAdminToggle!(artwork.it_id, newStatus);
-      } catch (error) {
-        console.error('관리자 토글 실패:', error);
-        setMessageTitle('오류 발생');
-        setMessageContent('서버 통신 중 오류가 발생했습니다.');
-        setShowMessageDialog(true);
-      } finally {
-        setIsToggling(false);
-      }
-    });
-    setShowConfirmDialog(true);
-  };
+  //   setConfirmMessage(confirmMsg);
+  //   setPendingToggleAction(() => async () => {
+  //     setIsToggling(true);
+  //     try {
+  //       await onAdminToggle!(artwork.it_id, newStatus);
+  //     } catch (error) {
+  //       console.error('관리자 토글 실패:', error);
+  //       setMessageTitle('오류 발생');
+  //       setMessageContent('서버 통신 중 오류가 발생했습니다.');
+  //       setShowMessageDialog(true);
+  //     } finally {
+  //       setIsToggling(false);
+  //     }
+  //   });
+  //   setShowConfirmDialog(true);
+  // };
 
-  const handleConfirmAction = async () => {
-    setShowConfirmDialog(false);
-    if (pendingToggleAction) {
-      await pendingToggleAction();
-      setPendingToggleAction(null);
+  // const handleConfirmAction = async () => {
+  //   setShowConfirmDialog(false);
+  //   if (pendingToggleAction) {
+  //     await pendingToggleAction();
+  //     setPendingToggleAction(null);
+  //   }
+  // };
+
+  // const handleCancelAction = () => {
+  //   setShowConfirmDialog(false);
+  //   setPendingToggleAction(null);
+  // };
+
+  // 단계별 로고 이미지 가져오기 함수
+  const getStatusLogos = (statusText: string, ctStatus?: string) => {
+    let progressCount = 0;
+
+    // ProgressBar와 동일한 로직으로 단계 계산
+    switch (ctStatus) {
+      case '주문':
+        progressCount = 2;
+        break;
+      case '입금':
+        progressCount = 3;
+        break;
+      case '준비':
+        progressCount = 4;
+        break;
+      case '배송':
+        progressCount = 5;
+        break;
+      case '완료':
+      case '구매확정':
+        progressCount = 6;
+        break;
+      default:
+        switch (statusText) {
+          case '심의중':
+            progressCount = 1;
+            break;
+          case '구매 진행':
+          case '결제대기':
+            progressCount = 2;
+            break;
+          case '결제완료':
+            progressCount = 3;
+            break;
+          case '상품 제작':
+            progressCount = 4;
+            break;
+          case '배송 진행':
+            progressCount = 5;
+            break;
+          case '수령 완료':
+            progressCount = 6;
+            break;
+          default:
+            progressCount = 1;
+            break;
+        }
+        break;
     }
+
+    return progressCount;
   };
 
-  const handleCancelAction = () => {
-    setShowConfirmDialog(false);
-    setPendingToggleAction(null);
-  };
+  const progressCount = getStatusLogos(artwork._status_text, artwork.ct_status);
 
   return (
     <>
       <div
-        className={`rounded-lg border border-gray-200 bg-white p-4 ${isClickable && 'cursor-pointer'}`}
+        className={`flex flex-col overflow-hidden border border-gray-200 bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.8)] ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
         onClick={isClickable ? () => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`) : undefined}
       >
-        <div className='relative'>
-          <div className='flex flex-col space-y-4 lg:flex-row lg:items-start lg:space-y-0 lg:space-x-6 lg:pr-32'>
-            <div className='flex-shrink-0'>
-              {artwork.it_img1 ? (
-                <Image
-                  src={artwork.it_img1}
-                  alt={artwork.it_name}
-                  width={96}
-                  height={96}
-                  className='h-20 w-20 rounded-lg object-cover sm:h-24 sm:w-24 lg:h-28 lg:w-28'
-                  priority={false}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent) {
-                      parent.innerHTML = `<div class="flex h-20 w-20 sm:h-24 sm:w-24 lg:h-28 lg:w-28 items-center justify-center bg-gray-200 rounded-lg"><span class="text-xs text-gray-400">${dictionary.myUdign.artwork.noImage}</span></div>`;
-                    }
-                  }}
+        {/* 상품 이미지 */}
+        <div className='relative aspect-square'>
+          {artwork.it_img1 ? (
+            <Image
+              src={artwork.it_img1}
+              alt={artwork.it_name}
+              fill
+              className='object-cover p-4'
+              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw'
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `<div class="flex h-full w-full items-center justify-center bg-gray-200"><span class="text-gray-400">${dictionary.myUdign.artwork.noImage}</span></div>`;
+                }
+              }}
+            />
+          ) : (
+            <div className='flex h-full w-full items-center justify-center bg-gray-200'>
+              <span className='text-gray-400'>{dictionary.myUdign.artwork.noImage}</span>
+            </div>
+          )}
+
+          {/* 좋아요 버튼 (컬렉션) - 우측 상단 */}
+          {!artwork._goalAttainment && artwork._status_text === '컬렉션' && (
+            <div className='absolute top-2 right-2'>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleInterestClick();
+                }}
+                variant='ghost'
+                className='h-8 w-8 rounded-full bg-white/80 p-0 transition-all duration-300 ease-out hover:scale-110 hover:bg-white'
+                size='icon'
+              >
+                {artwork.ir_id ? (
+                  <AiFillHeart className='text-red-500' size={18} />
+                ) : (
+                  <AiOutlineHeart size={18} />
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* 상품 정보 */}
+        <div className='p-4'>
+          <h3 className='mb-8 text-center text-base font-bold text-gray-900'>{artwork.it_name}</h3>
+
+          {/* 관리자 정보 */}
+          {/* {isAdmin && (
+            <div className='mb-3 flex flex-row items-center space-x-4'>
+              <div className='flex items-center text-sm text-gray-600'>
+                <AiFillHeart className='mr-1 text-red-500' size={16} />
+                <span>{artwork._iCount}</span>
+                {artwork.it_4 > 0 && <span className='text-gray-400'>/{artwork.it_4}</span>}
+              </div>
+
+              <div
+                className='flex items-center space-x-2 text-sm'
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Switch
+                  checked={artwork.it_10 === 'N'}
+                  onCheckedChange={handleAdminToggle}
+                  disabled={isToggling}
                 />
-              ) : (
-                <div className='flex h-20 w-20 items-center justify-center rounded-lg bg-gray-200 sm:h-24 sm:w-24 lg:h-28 lg:w-28'>
-                  <span className='text-xs text-gray-400'>
-                    {dictionary.myUdign.artwork.noImage}
-                  </span>
-                </div>
-              )}
+                <span className='text-gray-700'>
+                  {isToggling ? '처리중...' : artwork.it_10 === 'N' ? '구매 진행' : '제작 검토'}
+                </span>
+              </div>
             </div>
+          )} */}
 
-            <div className='min-w-0 flex-1'>
-              <h3 className='text-base font-semibold text-gray-900 sm:text-lg lg:text-xl'>
-                {artwork.it_name}
-              </h3>
-
-              {isAdmin && (
-                <div className='mt-2 flex flex-row items-center space-x-4'>
-                  <div className='flex items-center text-sm text-gray-600'>
-                    <AiFillHeart className='mr-1 text-red-500' size={16} />
-                    <span>{artwork._iCount}</span>
-                    {artwork.it_4 > 0 && <span className='text-gray-400'>/{artwork.it_4}</span>}
-                  </div>
-
-                  <div
-                    className='flex items-center space-x-2 text-sm'
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Switch
-                      checked={artwork.it_10 === 'N'}
-                      onCheckedChange={handleAdminToggle}
-                      disabled={isToggling}
-                    />
-                    <span className='text-gray-700'>
-                      {isToggling ? '처리중...' : artwork.it_10 === 'N' ? '구매 진행' : '제작 검토'}
-                    </span>
-                  </div>
+          {/* 단계별 로고와 액션 버튼 */}
+          {artwork._status_text !== '컬렉션' && (
+            <div className='flex items-center justify-between'>
+              {/* 현재 단계 로고와 단계 텍스트 */}
+              <div className='flex items-center'>
+                {/* 현재 단계 로고 이미지 */}
+                <div className='relative h-28 w-28 flex-shrink-0'>
+                  <Image
+                    src={`/images/로고${progressCount}.png`}
+                    alt={`단계 ${progressCount}`}
+                    fill
+                    className='object-contain'
+                    onError={(e) => {
+                      console.error(`로고${progressCount}.png 로드 실패`);
+                      const target = e.target as HTMLImageElement;
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div class="h-16 w-16 bg-gray-200 rounded flex items-center justify-center text-xs">${progressCount}</div>`;
+                      }
+                    }}
+                  />
                 </div>
-              )}
 
-              {artwork._status_text !== '컬렉션' && (
-                <div className='mt-3'>
-                  <ProgressBar statusText={artwork._status_text} ctStatus={artwork.ct_status} />
+                {/* 전체 단계 텍스트 리스트 - 타원 형태 */}
+                <div className='relative flex flex-col space-y-1 text-xs'>
+                  {stepItems.map(({ step, label, indent }) => (
+                    <div
+                      key={step}
+                      className={`${indent} ${
+                        step === progressCount ? 'font-semibold text-black' : 'text-gray-400'
+                      }`}
+                    >
+                      {label}
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
 
-          {/* 액션 버튼들 */}
-          <div className='mt-4 flex justify-end lg:absolute lg:top-1/2 lg:right-0 lg:mt-0 lg:-translate-y-1/2'>
-            <div className='flex space-x-2 overflow-x-auto pb-2 lg:flex-col lg:space-y-2 lg:space-x-0 lg:overflow-visible lg:pb-0'>
-              {/* 구매 진행 */}
-              {artwork._status_text === '구매 진행' && (
-                <Button
-                  onClick={() => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`)}
-                  variant='default'
-                  size='sm'
-                  className='whitespace-nowrap'
-                >
-                  구매하기
-                </Button>
-              )}
-
-              {/* 결제대기 */}
-              {artwork._status_text === '결제대기' && artwork.od_settle_case !== '무통장' && (
-                <Button
-                  onClick={() => router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`)}
-                  variant='default'
-                  size='sm'
-                  className='whitespace-nowrap'
-                >
-                  구매하기
-                </Button>
-              )}
-
-              {/* 구매취소 */}
-              {((artwork.od_settle_case === '무통장' && artwork._status_text === '결제대기') ||
-                artwork._status_text === '결제완료') && (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowCancelModal(true);
-                  }}
-                  variant='destructive'
-                  size='sm'
-                  className='whitespace-nowrap'
-                >
-                  구매취소
-                </Button>
-              )}
-
-              {/* 구매확정 & 교환/반품 */}
-              {(artwork._status_text === '수령 완료' || artwork._status_text === '완료') && (
-                <>
+              {/* 액션 버튼 */}
+              <div className='flex flex-col space-y-1'>
+                {/* 구매 진행 */}
+                {artwork._status_text === '구매 진행' && (
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handlePurchaseConfirm();
+                      router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`);
                     }}
                     variant='default'
                     size='sm'
                     className='whitespace-nowrap'
                   >
-                    구매확정
+                    구매하기
                   </Button>
+                )}
+
+                {/* 결제대기 */}
+                {artwork._status_text === '결제대기' && artwork.od_settle_case !== '무통장' && (
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowReturnModal(true);
+                      router.push(`${ROUTES.PRODUCT}/${artwork.it_id}`);
                     }}
                     variant='default'
                     size='sm'
                     className='whitespace-nowrap'
                   >
-                    교환/반품
+                    구매하기
                   </Button>
-                </>
-              )}
+                )}
 
-              {/* 상품문의 */}
-              {/* {(artwork._status_text === '상품 제작' || artwork._status_text === '제작중') && (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/product/${artwork.it_id}/qa`);
-                  }}
-                  variant='default'
-                  size='sm'
-                  className='whitespace-nowrap'
-                >
-                  상품문의
-                </Button>
-              )} */}
+                {/* 구매취소 */}
+                {((artwork.od_settle_case === '무통장' && artwork._status_text === '결제대기') ||
+                  artwork._status_text === '결제완료') && (
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowCancelModal(true);
+                    }}
+                    variant='destructive'
+                    size='sm'
+                    className='whitespace-nowrap'
+                  >
+                    구매취소
+                  </Button>
+                )}
 
-              {/* 배송조회 */}
-              {(artwork._status_text === '배송 진행' || artwork._status_text === '배송중') && (
-                <div className='flex-shrink-0'>
-                  {artwork.od_invoice && artwork.od_delivery_company ? (
+                {/* 구매확정 & 교환/반품 */}
+                {(artwork._status_text === '수령 완료' || artwork._status_text === '완료') && (
+                  <>
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
-                        // 배송조회 로직
+                        handlePurchaseConfirm();
                       }}
                       variant='default'
                       size='sm'
                       className='whitespace-nowrap'
                     >
-                      배송조회
+                      구매확정
                     </Button>
-                  ) : (
-                    <span className='rounded bg-gray-100 px-3 py-1 text-sm whitespace-nowrap text-gray-500'>
-                      운송장 등록 중
-                    </span>
-                  )}
-                </div>
-              )}
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowReturnModal(true);
+                      }}
+                      variant='default'
+                      size='sm'
+                      className='whitespace-nowrap'
+                    >
+                      교환/반품
+                    </Button>
+                  </>
+                )}
 
-              {/* 좋아요 버튼 */}
-              {!artwork._goalAttainment && artwork._status_text === '컬렉션' && (
-                <div className='flex flex-shrink-0 items-center space-x-2'>
-                  {artwork.orderNumber && (
-                    <span className='text-sm font-medium text-gray-600'>
-                      No. {artwork.orderNumber}
-                    </span>
-                  )}
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleInterestClick();
-                    }}
-                    variant='ghost'
-                    className='transition-transform duration-400 ease-out hover:scale-110 hover:bg-transparent'
-                    size='icon'
-                  >
-                    {artwork.ir_id ? (
-                      <AiFillHeart className='text-red-500' size={20} />
+                {/* 배송조회 */}
+                {(artwork._status_text === '배송 진행' || artwork._status_text === '배송중') && (
+                  <>
+                    {artwork.od_invoice && artwork.od_delivery_company ? (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // 배송조회 로직
+                        }}
+                        variant='default'
+                        size='sm'
+                        className='whitespace-nowrap'
+                      >
+                        배송조회
+                      </Button>
                     ) : (
-                      <AiOutlineHeart size={20} />
+                      <span className='rounded bg-gray-100 px-3 py-1 text-sm whitespace-nowrap text-gray-500'>
+                        운송장 등록 중
+                      </span>
                     )}
-                  </Button>
-                </div>
-              )}
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* 순번 표시 (컬렉션) */}
+          {!artwork._goalAttainment && artwork._status_text === '컬렉션' && artwork.orderNumber && (
+            <div className='mt-2'>
+              <span className='text-sm font-medium text-gray-600'>No. {artwork.orderNumber}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -342,22 +425,22 @@ export default function ArtworkCard({
       />
 
       {/* 확인 Dialog */}
-      <ConfirmDialog
+      {/* <ConfirmDialog
         open={showConfirmDialog}
         onOpenChange={setShowConfirmDialog}
         title='확인'
         description={confirmMessage}
         onConfirm={handleConfirmAction}
         onCancel={handleCancelAction}
-      />
+      /> */}
 
       {/* 메시지 Dialog */}
-      <MessageDialog
+      {/* <MessageDialog
         open={showMessageDialog}
         onOpenChange={setShowMessageDialog}
         title={messageTitle}
         description={messageContent}
-      />
+      /> */}
 
       {/* 관심상품 토글 확인 Dialog */}
       <ConfirmDialog

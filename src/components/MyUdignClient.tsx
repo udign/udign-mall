@@ -796,20 +796,22 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
                 <p className='text-gray-500'>{dictionary.myUdign.noArtworks}</p>
               </div>
             ) : (
-              <div className='space-y-4'>
-                {currentTabData.map((artwork) => (
-                  <ArtworkCard
-                    key={artwork.it_id}
-                    artwork={artwork}
-                    dictionary={dictionary}
-                    onInterestToggle={handleInterestToggle}
-                    onOrderCancel={handleOrderCancel}
-                    onPurchaseConfirm={handlePurchaseConfirm}
-                    onReturnSubmit={handleReturnSubmit}
-                    onAdminToggle={handleAdminToggle}
-                    isAdmin={user.mb_level >= 10}
-                  />
-                ))}
+              <>
+                <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+                  {currentTabData.map((artwork) => (
+                    <ArtworkCard
+                      key={artwork.it_id}
+                      artwork={artwork}
+                      dictionary={dictionary}
+                      onInterestToggle={handleInterestToggle}
+                      onOrderCancel={handleOrderCancel}
+                      onPurchaseConfirm={handlePurchaseConfirm}
+                      onReturnSubmit={handleReturnSubmit}
+                      onAdminToggle={handleAdminToggle}
+                      isAdmin={user.mb_level >= 10}
+                    />
+                  ))}
+                </div>
 
                 {tabStates[currentTab]?.hasMore && (
                   <div ref={observerRef} className='flex justify-center py-4'>
@@ -824,7 +826,7 @@ export default function MyUdignClient({ dictionary }: MyUdignClientProps) {
                     {dictionary.myUdign.allLoaded}
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>
