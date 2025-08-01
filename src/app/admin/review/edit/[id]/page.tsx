@@ -21,6 +21,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/primitives/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/primitives/dialog';
+import {
   Form,
   FormControl,
   FormField,
@@ -45,6 +52,17 @@ import MessageDialog from '@/components/ui/MessageDialog';
 import { ROUTES } from '@/lib/routes';
 
 type ArtworkFormData = z.infer<typeof artworkFormSchema>;
+
+interface UserInfo {
+  mb_id: string;
+  mb_name: string;
+  mb_email: string;
+  mb_hp?: string;
+  mb_level: number;
+  mb_datetime: string;
+  mb_today_login?: string;
+  mb_memo?: string;
+}
 
 interface OptionItem {
   id: string;
@@ -261,6 +279,11 @@ export default function ArtworkEditPage() {
 
   // Tab state
   const [activeTab, setActiveTab] = useState('home');
+
+  // User info modal states
+  const [showUserInfoModal, setShowUserInfoModal] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfoLoading, setUserInfoLoading] = useState(false);
 
   const params = useParams();
   const router = useRouter();
@@ -656,6 +679,40 @@ export default function ArtworkEditPage() {
   const handleTargetLikesChange = (value: number) => {
     setTargetLikes(value);
     form.setValue('it_4', value);
+  };
+
+  // 사용자 정보 가져오기 핸들러
+  const handleShowUserInfo = async () => {
+    if (!artwork?.it_1) {
+      setErrorMessage('사용자 정보를 찾을 수 없습니다.');
+      setShowErrorDialog(true);
+      return;
+    }
+
+    try {
+      setUserInfoLoading(true);
+      setShowUserInfoModal(true);
+
+      const response = await fetch(`/api/admin/users/${artwork.it_1}`);
+
+      if (!response.ok) {
+        throw new Error('사용자 정보를 불러올 수 없습니다.');
+      }
+
+      const userData = await response.json();
+      if (userData.success && userData.data) {
+        setUserInfo(userData.data);
+      } else {
+        throw new Error(userData.message || '사용자 정보를 불러올 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+      setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+      setShowErrorDialog(true);
+      setShowUserInfoModal(false);
+    } finally {
+      setUserInfoLoading(false);
+    }
   };
 
   const onSubmit = async (data: ArtworkFormData) => {
@@ -1139,12 +1196,25 @@ export default function ArtworkEditPage() {
                         />
                         <div className='space-y-2'>
                           <Label>디자이너</Label>
-                          <p className='text-sm font-medium text-gray-900'>
-                            {form.getValues('it_1') || '-'}
-                          </p>
-                          <p className='text-xs text-gray-500'>
-                            이 디자인을 등록한 디자이너입니다.
-                          </p>
+                          <div className='flex items-center gap-x-4'>
+                            <div>
+                              <p className='text-sm font-medium text-gray-900'>
+                                {form.getValues('it_1') || '-'}
+                              </p>
+                              <p className='text-xs text-gray-500'>
+                                이 디자인을 등록한 디자이너입니다.
+                              </p>
+                            </div>
+                            <Button
+                              type='button'
+                              variant='outline'
+                              size='sm'
+                              onClick={handleShowUserInfo}
+                              className='ml-3'
+                            >
+                              정보 보기
+                            </Button>
+                          </div>
                         </div>
                         <FormField
                           control={form.control}
@@ -1892,6 +1962,84 @@ export default function ArtworkEditPage() {
         description={errorMessage}
         confirmText='확인'
       />
+
+      {/* 사용자 정보 모달 */}
+      <Dialog open={showUserInfoModal} onOpenChange={setShowUserInfoModal}>
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>디자이너 정보</DialogTitle>
+            <DialogDescription>이 디자인을 등록한 디자이너의 상세 정보입니다.</DialogDescription>
+          </DialogHeader>
+
+          {userInfoLoading ? (
+            <div className='flex items-center justify-center py-8'>
+              <LoadingSpinner size='md' message='사용자 정보를 불러오는 중...' />
+            </div>
+          ) : userInfo ? (
+            <div className='space-y-4'>
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <Label className='text-sm font-medium text-gray-700'>회원ID</Label>
+                  <p className='text-sm text-gray-900'>{userInfo.mb_id || '-'}</p>
+                </div>
+                <div>
+                  <Label className='text-sm font-medium text-gray-700'>이름</Label>
+                  <p className='text-sm text-gray-900'>{userInfo.mb_name || '-'}</p>
+                </div>
+              </div>
+
+              <div>
+                <Label className='text-sm font-medium text-gray-700'>이메일</Label>
+                <p className='text-sm text-gray-900'>{userInfo.mb_email || '-'}</p>
+              </div>
+
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <Label className='text-sm font-medium text-gray-700'>연락처</Label>
+                  <p className='text-sm text-gray-900'>{userInfo.mb_hp || '-'}</p>
+                </div>
+                <div>
+                  <Label className='text-sm font-medium text-gray-700'>회원등급</Label>
+                  <p className='text-sm text-gray-900'>{userInfo.mb_level || '-'}</p>
+                </div>
+              </div>
+
+              <div>
+                <Label className='text-sm font-medium text-gray-700'>가입일</Label>
+                <p className='text-sm text-gray-900'>
+                  {userInfo.mb_datetime
+                    ? new Date(userInfo.mb_datetime).toLocaleDateString('ko-KR')
+                    : '-'}
+                </p>
+              </div>
+
+              <div>
+                <Label className='text-sm font-medium text-gray-700'>최근 로그인</Label>
+                <p className='text-sm text-gray-900'>
+                  {userInfo.mb_today_login
+                    ? new Date(userInfo.mb_today_login).toLocaleString('ko-KR')
+                    : '-'}
+                </p>
+              </div>
+
+              {userInfo.mb_memo && (
+                <div>
+                  <Label className='text-sm font-medium text-gray-700'>메모</Label>
+                  <p className='text-sm text-gray-900'>{userInfo.mb_memo}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className='py-8 text-center text-gray-500'>사용자 정보를 불러올 수 없습니다.</div>
+          )}
+
+          <div className='flex justify-end'>
+            <Button variant='outline' onClick={() => setShowUserInfoModal(false)}>
+              닫기
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
