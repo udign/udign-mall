@@ -26,7 +26,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
-import { ArtworkDetail, Category } from '@/types/artwork';
+import { ArtworkDetail } from '@/types/artwork';
+import { Category } from '@/types/category';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -304,7 +305,13 @@ export default function ArtworkEditPage() {
         }
 
         const artworkData = await artworkRes.json();
-        const categoriesData = categoriesRes.ok ? await categoriesRes.json() : [];
+
+        // 카테고리 API 응답 처리 수정
+        let categoriesData = [];
+        if (categoriesRes.ok) {
+          const response = await categoriesRes.json();
+          categoriesData = response.success ? response.data?.categories || [] : [];
+        }
 
         setArtwork(artworkData);
         setCategories(categoriesData);
@@ -568,10 +575,10 @@ export default function ArtworkEditPage() {
 
   const firstCategoryOptions = useMemo(() => {
     return categories
-      .filter((category) => category.ca_id.length === 2) // 1차 카테고리만
+      .filter((category) => category.id?.length === 2) // 1차 카테고리만
       .map((category) => (
-        <SelectItem key={category.ca_id} value={category.ca_id}>
-          {category.ca_name}
+        <SelectItem key={category.id} value={category.id}>
+          {category.name}
         </SelectItem>
       ));
   }, [categories]);
@@ -584,12 +591,12 @@ export default function ArtworkEditPage() {
     return categories
       .filter(
         (category) =>
-          category.ca_id.length === 4 && // 2차 카테고리만
-          category.ca_id.startsWith(parentId), // 선택된 1차 카테고리의 하위
+          category.id?.length === 4 && // 2차 카테고리만
+          category.id?.startsWith(parentId), // 선택된 1차 카테고리의 하위
       )
       .map((category) => (
-        <SelectItem key={category.ca_id} value={category.ca_id}>
-          {category.ca_name}
+        <SelectItem key={category.id} value={category.id}>
+          {category.name}
         </SelectItem>
       ));
   }, [categories, ca_id, ca_id2]);
@@ -602,12 +609,12 @@ export default function ArtworkEditPage() {
     return categories
       .filter(
         (category) =>
-          category.ca_id.length === 6 && // 3차 카테고리만
-          category.ca_id.startsWith(parentId), // 선택된 2차 카테고리의 하위
+          category.id?.length === 6 && // 3차 카테고리만
+          category.id?.startsWith(parentId), // 선택된 2차 카테고리의 하위
       )
       .map((category) => (
-        <SelectItem key={category.ca_id} value={category.ca_id}>
-          {category.ca_name}
+        <SelectItem key={category.id} value={category.id}>
+          {category.name}
         </SelectItem>
       ));
   }, [categories, ca_id2, ca_id3]);
