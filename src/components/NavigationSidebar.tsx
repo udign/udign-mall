@@ -42,10 +42,11 @@ interface NavigationSidebarProps {
 }
 
 export default function NavigationSidebar({ isOpen, onClose, dictionary }: NavigationSidebarProps) {
+  const [categoryMenuItems, setCategoryMenuItems] = useState<NavMenuItem[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
+
   const router = useRouter();
   const pathname = usePathname();
-  const [categoryMenuItems, setCategoryMenuItems] = useState<NavMenuItem[]>([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   const { user } = useAuth();
 
@@ -198,23 +199,6 @@ export default function NavigationSidebar({ isOpen, onClose, dictionary }: Navig
                                               {dictionary.sidebar.navigation.all}
                                             </Button>
                                             {subCategory.thirdCategories.map((thirdCategory) => {
-                                              // 디버깅: 렌더링 시점 데이터 확인
-                                              console.log(
-                                                `🎯 렌더링 중 - 3차 카테고리: ${thirdCategory.label} (ID: ${thirdCategory.id})`,
-                                              );
-                                              console.log(
-                                                `  - fourthCategories:`,
-                                                thirdCategory.fourthCategories,
-                                              );
-                                              console.log(
-                                                `  - fourthCategories 존재:`,
-                                                !!thirdCategory.fourthCategories,
-                                              );
-                                              console.log(
-                                                `  - fourthCategories 길이:`,
-                                                thirdCategory.fourthCategories?.length || 0,
-                                              );
-
                                               return (
                                                 <div key={thirdCategory.id}>
                                                   {thirdCategory.fourthCategories ? (

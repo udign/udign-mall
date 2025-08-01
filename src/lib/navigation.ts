@@ -45,12 +45,9 @@ export const fetchCategoriesForNavigation = async (): Promise<Category[]> => {
   }
 };
 
-// 카테고리 ID로 기본 라우트 경로 생성
-const getCategoryRoute = (categoryId: string): string => {
-  if (categoryId.startsWith('10')) return ROUTES.FASHION;
-  if (categoryId.startsWith('20')) return ROUTES.SHOES;
-  if (categoryId.startsWith('30')) return ROUTES.OTHERS;
-  return ROUTES.SHOP; // 기본값
+// 카테고리 ID로 기본 라우트 경로 생성 (통합 카테고리 페이지 사용)
+const getCategoryRoute = (): string => {
+  return ROUTES.CATEGORIES; // 모든 카테고리가 동일한 페이지 사용
 };
 
 // DB 카테고리를 네비게이션 메뉴 형태로 변환
@@ -64,6 +61,8 @@ export const convertCategoriesToNavMenuItems = (categories: Category[]): NavMenu
       (cat) => cat.level === 2 && cat.parentId === firstLevel.id && cat.isActive,
     );
 
+    const baseRoute = getCategoryRoute();
+
     const subCategories: SubCategory[] = secondLevelCategories.map((secondLevel) => {
       // 3단계 카테고리들 찾기 (써드 카테고리)
       const thirdLevelCategories = categories.filter(
@@ -76,45 +75,30 @@ export const convertCategoriesToNavMenuItems = (categories: Category[]): NavMenu
           (cat) => cat.level === 4 && cat.parentId === thirdLevel.id,
         );
 
-        // 디버깅: 각 3차 카테고리별 4차 카테고리 확인
-        console.log(`🔍 3차 카테고리: ${thirdLevel.name} (ID: ${thirdLevel.id})`);
-        console.log(`  - 전체 카테고리 개수: ${categories.length}`);
-        console.log(
-          `  - 4차 카테고리 후보:`,
-          categories.filter((cat) => cat.level === 4),
-        );
-        console.log(`  - parentId가 ${thirdLevel.id}인 4차 카테고리:`, fourthLevelCategories);
-        console.log(`  - 4차 카테고리 개수: ${fourthLevelCategories.length}`);
-
         const fourthCategories: FourthCategory[] = fourthLevelCategories.map((fourthLevel) => ({
           id: fourthLevel.id,
           label: fourthLevel.name,
-          href: `${getCategoryRoute(firstLevel.id)}?subcategory=${secondLevel.id}&thirdcategory=${thirdLevel.id}&fourthcategory=${fourthLevel.id}`,
+          href: `${baseRoute}?category=${firstLevel.id}&subcategory=${secondLevel.id}&thirdcategory=${thirdLevel.id}&fourthcategory=${fourthLevel.id}`,
         }));
 
-        const result = {
+        return {
           id: thirdLevel.id,
           label: thirdLevel.name,
-          href: `${getCategoryRoute(firstLevel.id)}?subcategory=${secondLevel.id}&thirdcategory=${thirdLevel.id}`,
+          href: `${baseRoute}?category=${firstLevel.id}&subcategory=${secondLevel.id}&thirdcategory=${thirdLevel.id}`,
           fourthCategories: fourthCategories.length > 0 ? fourthCategories : undefined,
         };
-
-        console.log(`  - 최종 결과:`, result);
-        console.log(`  - fourthCategories 존재 여부: ${!!result.fourthCategories}`);
-
-        return result;
       });
 
       return {
         id: secondLevel.id,
         label: secondLevel.name,
-        href: `${getCategoryRoute(firstLevel.id)}?subcategory=${secondLevel.id}`,
+        href: `${baseRoute}?category=${firstLevel.id}&subcategory=${secondLevel.id}`,
         thirdCategories: thirdCategories.length > 0 ? thirdCategories : undefined,
       };
     });
 
     return {
-      href: getCategoryRoute(firstLevel.id),
+      href: `${getCategoryRoute()}?category=${firstLevel.id}`,
       label: firstLevel.name,
       subCategories: subCategories.length > 0 ? subCategories : undefined,
     };

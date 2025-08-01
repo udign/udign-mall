@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Product, ProductListResponse } from '@/types/product';
+import { Category } from '@/types/category';
 import { PAGINATION_CONFIG } from '@/lib/constants';
 
 interface UseCategoryProductsProps {
@@ -34,8 +35,48 @@ export const useCategoryProducts = ({
   const searchParams = useSearchParams();
 
   const currentPage = parseInt(searchParams.get('page') || '1');
+  const categoryParam = searchParams.get('category');
   const subCategoryId = searchParams.get('subcategory');
   const thirdCategoryId = searchParams.get('thirdcategory');
+  const fourthCategoryId = searchParams.get('fourthcategory');
+
+  // 카테고리 breadcrumb 생성 함수
+  const generateCategoryBreadcrumb = useCallback(async (): Promise<string> => {
+    const categoryIds = [
+      categoryParam || categoryId,
+      subCategoryId,
+      thirdCategoryId,
+      fourthCategoryId,
+    ].filter(Boolean);
+
+    if (categoryIds.length === 0) {
+      return '모든 디자인';
+    }
+
+    try {
+      const response = await fetch('/api/admin/categories');
+      const data = await response.json();
+
+      if (!data.success || !data.data?.categories) {
+        return '알 수 없는 카테고리';
+      }
+
+      const categories = data.data.categories;
+      const categoryNames: string[] = [];
+
+      for (const catId of categoryIds) {
+        const category = categories.find((cat: Category) => cat.id === catId);
+        if (category) {
+          categoryNames.push(category.name);
+        }
+      }
+
+      return categoryNames.length > 0 ? categoryNames.join(' > ') : '알 수 없는 카테고리';
+    } catch (error) {
+      console.error('카테고리 breadcrumb 생성 실패:', error);
+      return '알 수 없는 카테고리';
+    }
+  }, [categoryParam, categoryId, subCategoryId, thirdCategoryId, fourthCategoryId]);
 
   const fetchProducts = useCallback(
     async (pageNum: number = currentPage) => {
@@ -44,11 +85,15 @@ export const useCategoryProducts = ({
         setError(null);
 
         // 카테고리별 디자인 필터링
-        const categoryParam = categoryId ? `&category=${categoryId}` : '';
+        // URL에서 온 category 파라미터 우선 사용, 없으면 props의 categoryId 사용
+        const effectiveCategoryId = categoryParam || categoryId;
+        const categoryQueryParam = effectiveCategoryId ? `&category=${effectiveCategoryId}` : '';
         const subCategoryParam = subCategoryId ? `&subcategory=${subCategoryId}` : '';
         const thirdCategoryParam = thirdCategoryId ? `&thirdcategory=${thirdCategoryId}` : '';
+        const fourthCategoryParam = fourthCategoryId ? `&fourthcategory=${fourthCategoryId}` : '';
+
         const response = await fetch(
-          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryParam}${subCategoryParam}${thirdCategoryParam}`,
+          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryQueryParam}${subCategoryParam}${thirdCategoryParam}${fourthCategoryParam}`,
         );
 
         if (!response.ok) {
@@ -60,78 +105,17 @@ export const useCategoryProducts = ({
         if (data.success) {
           setProducts(data.items);
           setTotalPages(data.pagination.totalPages);
-
-          // 카테고리명 설정
-          let displayName = '모든 디자인';
-          if (categoryId && data.categoryCounts[categoryId]) {
-            displayName = data.categoryCounts[categoryId].name;
-
-            // 서브카테고리가 있는 경우 카테고리명에 추가
-            if (subCategoryId) {
-              const subCategoryNames: Record<string, string> = {
-                '1010': 'men',
-                '1020': 'women',
-                '1030': 'common',
-                '1040': 'kids',
-                '2010': 'men',
-                '2020': 'women',
-                '3010': 'men',
-                '3020': 'women',
-              };
-              const subCategoryName = subCategoryNames[subCategoryId];
-              if (subCategoryName) {
-                displayName = `${displayName} > ${subCategoryName}`;
-
-                // 3차 카테고리가 있는 경우 추가
-                if (thirdCategoryId) {
-                  const thirdCategoryNames: Record<string, string> = {
-                    // Fashion
-                    '101010': 'top',
-                    '101020': 'bottom',
-                    '101030': 'outer',
-                    '101040': 'product',
-                    '101050': 'space',
-                    '102010': 'top',
-                    '102020': 'bottom',
-                    '102030': 'outer',
-                    '102040': 'product',
-                    '102050': 'space',
-                    '103010': 'top',
-                    '103020': 'bottom',
-                    // Shoes
-                    '201010': '운동화',
-                    '201020': '구두/스니커즈',
-                    '201030': '워커',
-                    '201040': '샌들/슬리퍼',
-                    '201050': '레인부츠',
-                    '202010': '운동화',
-                    '202020': '구두/스니커즈',
-                    '202030': '샌들/슬리퍼',
-                    '202040': '부츠',
-                    '202050': '레인부츠',
-                    // Others
-                    '301010': '상의',
-                    '301020': '하의',
-                    '301030': 'graphic',
-                    '301040': 'product',
-                    '301050': 'space',
-                    '302010': '상의',
-                    '302020': '하의',
-                    '302030': 'graphic',
-                    '302040': 'product',
-                    '302050': 'space',
-                  };
-                  const thirdCategoryName = thirdCategoryNames[thirdCategoryId];
-                  if (thirdCategoryName) {
-                    displayName = `${displayName} > ${thirdCategoryName}`;
-                  }
-                }
-              }
-            }
-          }
-
-          setCategoryName(displayName);
           setCategoryCount(data.pagination.totalCount);
+
+          // 카테고리 breadcrumb 설정
+          generateCategoryBreadcrumb()
+            .then((breadcrumb) => {
+              setCategoryName(breadcrumb);
+            })
+            .catch((error) => {
+              console.error('카테고리 breadcrumb 설정 실패:', error);
+              setCategoryName('알 수 없는 카테고리');
+            });
         } else {
           throw new Error('상품 데이터를 처리하는데 실패했습니다.');
         }
@@ -141,7 +125,15 @@ export const useCategoryProducts = ({
         setLoading(false);
       }
     },
-    [currentPage, categoryId, subCategoryId, thirdCategoryId],
+    [
+      currentPage,
+      categoryId,
+      categoryParam,
+      subCategoryId,
+      thirdCategoryId,
+      fourthCategoryId,
+      generateCategoryBreadcrumb,
+    ],
   );
 
   const refetch = useCallback(() => fetchProducts(currentPage), [fetchProducts, currentPage]);
@@ -152,11 +144,17 @@ export const useCategoryProducts = ({
       const params = new URLSearchParams();
       params.set('page', '1');
       // 기존 파라미터가 있으면 유지
+      if (categoryParam) {
+        params.set('category', categoryParam);
+      }
       if (subCategoryId) {
         params.set('subcategory', subCategoryId);
       }
       if (thirdCategoryId) {
         params.set('thirdcategory', thirdCategoryId);
+      }
+      if (fourthCategoryId) {
+        params.set('fourthcategory', fourthCategoryId);
       }
       router.replace(`${pathname}?${params.toString()}`);
     } else {
@@ -167,8 +165,10 @@ export const useCategoryProducts = ({
     searchParams,
     router,
     categoryId,
+    categoryParam,
     subCategoryId,
     thirdCategoryId,
+    fourthCategoryId,
     pathname,
     fetchProducts,
   ]);
