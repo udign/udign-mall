@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/primitives/input';
 import { Label } from '@/components/ui/primitives/label';
 import { Textarea } from '@/components/ui/primitives/textarea';
 import { Checkbox } from '@/components/ui/primitives/checkbox';
+import { Switch } from '@/components/ui/primitives/switch';
 import {
   Select,
   SelectContent,
@@ -28,8 +29,9 @@ import {
 } from '@/components/ui/primitives/form';
 import { ArtworkDetail } from '@/types/artwork';
 import { Category } from '@/types/category';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Heart } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -249,6 +251,12 @@ export default function ArtworkEditPage() {
   const [showLoadErrorDialog, setShowLoadErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Toggle states
+  const [approvalLoading, setApprovalLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [currentLikes, setCurrentLikes] = useState(0);
+  const [targetLikes, setTargetLikes] = useState(0);
+
   const params = useParams();
   const router = useRouter();
   const artworkId = params.id as string;
@@ -315,6 +323,10 @@ export default function ArtworkEditPage() {
 
         setArtwork(artworkData);
         setCategories(categoriesData);
+
+        // 좋아요 수 초기화
+        setCurrentLikes(artworkData._iCount || 0);
+        setTargetLikes(parseInt(artworkData.it_4) || 0);
 
         // 카테고리 정보 자동 보완
         const ca_id = artworkData.ca_id || '';
@@ -519,6 +531,106 @@ export default function ArtworkEditPage() {
     [imagePreview, artwork],
   );
 
+  // 승인/반려 토글 핸들러 (ReviewManagement와 동일한 API 사용)
+  const handleApprovalToggle = async () => {
+    if (!artwork) return;
+
+    try {
+      setApprovalLoading(true);
+      const currentValue = String(artwork.it_use);
+      const newVisibility = currentValue === '1' ? '0' : '1';
+
+      const response = await fetch('/api/admin/review/toggle-visibility', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          itemId: artworkId,
+          visibility: newVisibility,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '디자인 검수 상태 변경에 실패했습니다.');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 작품 정보 업데이트
+        setArtwork((prev) => (prev ? { ...prev, it_use: Number(newVisibility) } : null));
+      } else {
+        throw new Error(result.message || '승인 상태 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error toggling approval:', error);
+      setErrorMessage(
+        error instanceof Error ? error.message : '승인 상태 변경 중 오류가 발생했습니다.',
+      );
+      setShowErrorDialog(true);
+    } finally {
+      setApprovalLoading(false);
+    }
+  };
+
+  // 구매진행/제작검토 토글 핸들러 (ReviewManagement와 동일한 API 사용)
+  const handleStatusToggle = async () => {
+    if (!artwork) return;
+
+    try {
+      setStatusLoading(true);
+      // 현재 상태에 따라 액션 결정
+      const action = artwork.it_10 === 'N' ? 'review' : 'payment';
+
+      const response = await fetch('/api/admin/review/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          itemId: artworkId,
+          action: action,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '상태 변경에 실패했습니다.');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 작품 정보 업데이트
+        const newStatus = result.data.newStatus;
+        setArtwork((prev) => (prev ? { ...prev, it_10: newStatus } : null));
+      } else {
+        throw new Error(result.message || '상태 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      setErrorMessage(error instanceof Error ? error.message : '상태 변경 중 오류가 발생했습니다.');
+      setShowErrorDialog(true);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  // 작품 상세페이지로 이동
+  const handleViewArtwork = () => {
+    router.push(`${ROUTES.PRODUCT}/${artworkId}`);
+  };
+
+  // 목표 좋아요 수 변경 핸들러
+  const handleTargetLikesChange = (value: number) => {
+    setTargetLikes(value);
+    form.setValue('it_4', value);
+  };
+
   const onSubmit = async (data: ArtworkFormData) => {
     // 대표 이미지 필수 검증
     const hasMainImage = artwork?.it_img1 && !imagesToDelete.includes('it_img1');
@@ -640,6 +752,118 @@ export default function ArtworkEditPage() {
             <h1 className='text-2xl font-bold text-gray-900'>디자인 설정</h1>
           </div>
         </div>
+
+        {/* 작품 정보 상단 섹션 */}
+        <Card className='mb-6'>
+          <CardContent className='p-6'>
+            <div className='flex items-center space-x-6'>
+              {/* 승인/반려 토글 */}
+              <div className='flex flex-col items-center space-y-2'>
+                <div className='flex items-center space-x-2'>
+                  <Switch
+                    checked={Number(artwork?.it_use) === 1}
+                    onCheckedChange={handleApprovalToggle}
+                    disabled={approvalLoading}
+                    className='cursor-pointer'
+                  />
+                  <span className='text-sm text-gray-700'>
+                    {Number(artwork?.it_use) === 1 ? '승인' : '반려'}
+                  </span>
+                </div>
+                {approvalLoading && <span className='text-xs text-blue-600'>처리중...</span>}
+              </div>
+
+              {/* 작품 아이디 (클릭 가능) */}
+              <div className='flex flex-col items-center'>
+                <Button
+                  onClick={handleViewArtwork}
+                  variant='ghost'
+                  className='h-auto p-2 text-blue-600 hover:bg-blue-50 hover:text-blue-700'
+                >
+                  <div className='flex flex-col items-center space-y-1'>
+                    <div className='rounded-full bg-gray-100 px-3 py-1'>
+                      <span className='text-sm font-medium'>{artworkId}</span>
+                    </div>
+                    <span className='text-xs text-gray-500'>상세보기</span>
+                  </div>
+                </Button>
+              </div>
+
+              {/* 작품 메인 이미지 */}
+              <div className='relative h-20 w-20 flex-shrink-0'>
+                {artwork?.it_img1 ? (
+                  <Image
+                    src={artwork.it_img1}
+                    alt={artwork.it_name || '작품 이미지'}
+                    fill
+                    className='rounded-lg object-cover'
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML =
+                          '<div class="flex h-full w-full items-center justify-center rounded-lg bg-gray-200"><span class="text-xs text-gray-400">이미지<br/>없음</span></div>';
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className='flex h-full w-full items-center justify-center rounded-lg bg-gray-200'>
+                    <span className='text-xs text-gray-400'>
+                      이미지
+                      <br />
+                      없음
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* 작품명과 판매자 정보 */}
+              <div className='flex flex-col space-y-1'>
+                <h2 className='text-lg font-bold text-gray-900'>{artwork?.it_name || '-'}</h2>
+                <p className='text-sm text-gray-600'>판매자: {artwork?.it_1 || '-'}</p>
+              </div>
+
+              {/* 구매진행/제작검토 토글 */}
+              <div className='flex flex-col items-center space-y-2'>
+                <div className='flex items-center space-x-2'>
+                  <Switch
+                    checked={artwork?.it_10 === 'N'}
+                    onCheckedChange={handleStatusToggle}
+                    disabled={statusLoading}
+                    className='cursor-pointer'
+                  />
+                  <span className='text-sm text-gray-700'>
+                    {statusLoading
+                      ? '처리중...'
+                      : artwork?.it_10 === 'N'
+                        ? '구매 진행'
+                        : '제작 검토'}
+                  </span>
+                </div>
+              </div>
+
+              {/* 좋아요 수와 목표 좋아요 수 */}
+              <div className='flex items-center space-x-4'>
+                <div className='flex items-center space-x-2'>
+                  <Heart className='h-4 w-4 text-red-500' fill='currentColor' />
+                  <span className='text-sm font-medium'>{currentLikes}</span>
+                  <span className='text-sm text-gray-400'>/</span>
+                  <div className='flex items-center space-x-1'>
+                    <Input
+                      type='number'
+                      value={targetLikes}
+                      onChange={(e) => handleTargetLikesChange(parseInt(e.target.value) || 0)}
+                      className='h-8 w-16 text-center text-sm'
+                      min='0'
+                    />
+                    <span className='text-xs text-gray-500'>목표</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>

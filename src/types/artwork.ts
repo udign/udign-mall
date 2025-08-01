@@ -117,6 +117,8 @@ export interface ArtworkDetail extends ArtworkItem {
   it_2: string; // 작가명
   it_3: string; // 작품설명
   it_4: number; // 목표 좋아요 수
+  it_10: 'Y' | 'N'; // 관리자 심의 토글
+  _iCount?: number; // 현재 좋아요 수
   it_order: number; // 출력순서
   it_soldout: number; // 품절여부
   it_point: number; // 포인트
