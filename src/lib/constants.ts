@@ -30,13 +30,6 @@ export const PAGINATION_CONFIG = {
   MY_UDIGN_PAGE_SIZE: 10, // My UDIGN 페이지의 무한 스크롤 페이지 크기
 } as const;
 
-// 카테고리 ID 상수
-export const CATEGORY_IDS = {
-  FASHION: '10', // 패션 카테고리
-  SHOES: '20', // 신발 카테고리
-  OTHERS: '30', // 기타 카테고리
-} as const;
-
 // 회원 권한 레벨 상수
 export const MEMBER_LEVELS = {
   SUPER_ADMIN: 100, // 슈퍼 관리자 (모든 관리자 관리 가능)

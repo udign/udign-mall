@@ -21,7 +21,7 @@ import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import MessageDialog from '@/components/ui/MessageDialog';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { FiUpload, FiX, FiPlus } from 'react-icons/fi';
-import { CATEGORY_IDS } from '@/lib/constants';
+
 import { ROUTES } from '@/lib/routes';
 import { termsOfUpload } from '@/lib/terms-content';
 import { Dictionary } from '@/lib/dictionaries';
@@ -32,9 +32,9 @@ interface UploadedFile {
 }
 
 const getCategoriesWithDictionary = (dictionary: Dictionary) => [
-  { ca_id: CATEGORY_IDS.FASHION, ca_name: dictionary.shop.categories.fashion },
-  { ca_id: CATEGORY_IDS.SHOES, ca_name: dictionary.shop.categories.shoes },
-  { ca_id: CATEGORY_IDS.OTHERS, ca_name: dictionary.shop.categories.others },
+  { ca_id: '10', ca_name: dictionary.shop.categories.fashion },
+  { ca_id: '20', ca_name: dictionary.shop.categories.shoes },
+  { ca_id: '30', ca_name: dictionary.shop.categories.others },
 ];
 
 interface UploadPageClientProps {
@@ -373,8 +373,8 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
   return (
     <div className='min-h-screen px-6 py-8 sm:px-10'>
       <div>
-        <div className='mb-4 flex justify-end items-end gap-3'>
-          <span className='text-[#ec4ef3] text-[13px] font-medium tracking-wider'>
+        <div className='mb-4 flex items-end justify-end gap-3'>
+          <span className='text-[13px] font-medium tracking-wider text-[#ec4ef3]'>
             BE SURE YOUR DESIGN
           </span>
           <Image
@@ -383,13 +383,16 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
             width={120}
             height={40}
             className='brightness-0 saturate-100'
-            style={{ filter: 'brightness(0) saturate(100%) invert(69%) sepia(51%) saturate(1467%) hue-rotate(278deg) brightness(100%) contrast(91%)' }}
+            style={{
+              filter:
+                'brightness(0) saturate(100%) invert(69%) sepia(51%) saturate(1467%) hue-rotate(278deg) brightness(100%) contrast(91%)',
+            }}
           />
         </div>
         <Card className='mb-8 border-white bg-[#0e1731]'>
           <CardContent className='p-8'>
             <div className='space-y-6'>
-              <p className='text-white whitespace-pre-line'>
+              <p className='whitespace-pre-line text-white'>
                 {dictionary.upload.subtitle.split('7%').map((text, index) => {
                   if (index === 0) {
                     return (
@@ -456,7 +459,9 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                     <h4 className='font-semibold text-white'>
                       {dictionary.upload.guidelines.item6.title}
                     </h4>
-                    <p className='whitespace-pre-line'>{dictionary.upload.guidelines.item6.content}</p>
+                    <p className='whitespace-pre-line'>
+                      {dictionary.upload.guidelines.item6.content}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -485,7 +490,9 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                       onDrop={handleDropMain}
                       style={{
                         borderColor: isDraggingMain ? 'white' : 'white/30',
-                        backgroundColor: isDraggingMain ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                        backgroundColor: isDraggingMain
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'transparent',
                       }}
                     >
                       {mainImage ? (
@@ -515,20 +522,20 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                             <p className='mb-2 text-sm text-white/60'>
                               {dictionary.upload.form.dragDropHint}
                             </p>
-                                                          <Button
-                                type='button'
-                                variant='outline'
-                                className='border-white bg-[#0e1731] text-white hover:bg-white/10'
-                                onClick={() => {
-                                  if (!user) {
-                                    setShowLoginDialog(true);
-                                  } else {
-                                    mainImageRef.current?.click();
-                                  }
-                                }}
-                              >
-                                {dictionary.upload.form.selectMainImage}
-                              </Button>
+                            <Button
+                              type='button'
+                              variant='outline'
+                              className='border-white bg-[#0e1731] text-white hover:bg-white/10'
+                              onClick={() => {
+                                if (!user) {
+                                  setShowLoginDialog(true);
+                                } else {
+                                  mainImageRef.current?.click();
+                                }
+                              }}
+                            >
+                              {dictionary.upload.form.selectMainImage}
+                            </Button>
                             <p className='mt-3 text-sm whitespace-pre-line text-white/60'>
                               {dictionary.upload.form.imageSpecs}
                             </p>
@@ -558,8 +565,8 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                       )}
                     </Label>
 
-                                          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                                              {[0, 1, 2, 3].map((index) => (
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                      {[0, 1, 2, 3].map((index) => (
                         <div
                           key={index}
                           className='min-h-[140px] rounded-lg border-2 border-dashed border-white/30 p-4 text-center'
@@ -569,7 +576,10 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                           onDrop={(e) => handleDropAdditional(e, index)}
                           style={{
                             borderColor: isDraggingAdditional === index ? 'white' : 'white/30',
-                            backgroundColor: isDraggingAdditional === index ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                            backgroundColor:
+                              isDraggingAdditional === index
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'transparent',
                           }}
                         >
                           {additionalImages[index] ? (
@@ -645,15 +655,20 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                     </Label>
                     <Select
                       value={formData.category}
-                      onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, category: value }))
+                      }
                     >
-                      <SelectTrigger id='category' className='bg-white/5 border-white/30 text-white focus:border-[#ec4ef3] focus:ring-[#ec4ef3]/50'>
+                      <SelectTrigger
+                        id='category'
+                        className='border-white/30 bg-white/5 text-white focus:border-[#ec4ef3] focus:ring-[#ec4ef3]/50'
+                      >
                         <SelectValue placeholder={dictionary.upload.form.selectCategory} />
                       </SelectTrigger>
-                      <SelectContent className='bg-[#0e1731] border-white/30'>
+                      <SelectContent className='border-white/30 bg-[#0e1731]'>
                         {CATEGORIES.map((category) => (
-                          <SelectItem 
-                            key={category.ca_id} 
+                          <SelectItem
+                            key={category.ca_id}
                             value={category.ca_id}
                             className='text-white hover:bg-white/10 focus:bg-[#ec4ef3]/20 focus:text-white'
                           >
@@ -677,7 +692,7 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                         setFormData((prev) => ({ ...prev, artworkName: e.target.value }))
                       }
                       placeholder={dictionary.upload.form.artworkNamePlaceholder}
-                      className='bg-white/5 border-white/30 text-white placeholder:text-white/40 focus:border-[#ec4ef3] focus:ring-[#ec4ef3]/50 focus-visible:border-[#ec4ef3] focus-visible:ring-[#ec4ef3]/50'
+                      className='border-white/30 bg-white/5 text-white placeholder:text-white/40 focus:border-[#ec4ef3] focus:ring-[#ec4ef3]/50 focus-visible:border-[#ec4ef3] focus-visible:ring-[#ec4ef3]/50'
                       required
                     />
                   </div>
@@ -694,7 +709,7 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                         setFormData((prev) => ({ ...prev, description: e.target.value }))
                       }
                       placeholder={dictionary.upload.form.descriptionPlaceholder}
-                      className='min-h-32 bg-white/5 border-white/30 text-white placeholder:text-white/40 focus:border-[#ec4ef3] focus:ring-[#ec4ef3]/50 focus-visible:border-[#ec4ef3] focus-visible:ring-[#ec4ef3]/50'
+                      className='min-h-32 border-white/30 bg-white/5 text-white placeholder:text-white/40 focus:border-[#ec4ef3] focus:ring-[#ec4ef3]/50 focus-visible:border-[#ec4ef3] focus-visible:ring-[#ec4ef3]/50'
                     />
                   </div>
 
@@ -713,7 +728,7 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
                         onCheckedChange={(checked) =>
                           setFormData((prev) => ({ ...prev, agreeToTerms: checked as boolean }))
                         }
-                        className='data-[state=checked]:bg-[#ec4ef3] data-[state=checked]:border-[#ec4ef3] focus-visible:ring-[#ec4ef3]/50'
+                        className='focus-visible:ring-[#ec4ef3]/50 data-[state=checked]:border-[#ec4ef3] data-[state=checked]:bg-[#ec4ef3]'
                       />
                       <Label htmlFor='agreeToTerms' className='cursor-pointer text-sm text-white'>
                         {dictionary.upload.form.agreeToTerms}
@@ -726,7 +741,7 @@ export default function UploadPageClient({ dictionary }: UploadPageClientProps) 
               <Button
                 type='submit'
                 disabled={isUploading}
-                className='h-14 w-full text-lg bg-[#ec4ef3] hover:bg-[#d43de2] text-white'
+                className='h-14 w-full bg-[#ec4ef3] text-lg text-white hover:bg-[#d43de2]'
                 size='lg'
               >
                 {isUploading

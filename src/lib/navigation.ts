@@ -1,9 +1,17 @@
 import { ROUTES } from '@/lib/routes';
+import { Category } from '@/types/category';
+
+export interface FourthCategory {
+  id: string;
+  label: string;
+  href: string;
+}
 
 export interface ThirdCategory {
   id: string;
   label: string;
   href: string;
+  fourthCategories?: FourthCategory[];
 }
 
 export interface SubCategory {
@@ -20,217 +28,85 @@ export interface NavMenuItem {
   subCategories?: SubCategory[];
 }
 
-export const NAV_MENU_ITEMS: NavMenuItem[] = [
-  {
-    href: ROUTES.FASHION,
-    label: 'fashion',
-    subCategories: [
-      {
-        id: '1010',
-        label: 'men',
-        href: `${ROUTES.FASHION}?subcategory=1010`,
-        thirdCategories: [
-          {
-            id: '101010',
-            label: 'top',
-            href: `${ROUTES.FASHION}?subcategory=1010&thirdcategory=101010`,
-          },
-          {
-            id: '101020',
-            label: 'bottom',
-            href: `${ROUTES.FASHION}?subcategory=1010&thirdcategory=101020`,
-          },
-          {
-            id: '101030',
-            label: 'outer',
-            href: `${ROUTES.FASHION}?subcategory=1010&thirdcategory=101030`,
-          },
-          {
-            id: '101040',
-            label: 'product',
-            href: `${ROUTES.FASHION}?subcategory=1010&thirdcategory=101040`,
-          },
-          {
-            id: '101050',
-            label: 'space',
-            href: `${ROUTES.FASHION}?subcategory=1010&thirdcategory=101050`,
-          },
-        ],
-      },
-      {
-        id: '1020',
-        label: 'women',
-        href: `${ROUTES.FASHION}?subcategory=1020`,
-        thirdCategories: [
-          {
-            id: '102010',
-            label: 'top',
-            href: `${ROUTES.FASHION}?subcategory=1020&thirdcategory=102010`,
-          },
-          {
-            id: '102020',
-            label: 'bottom',
-            href: `${ROUTES.FASHION}?subcategory=1020&thirdcategory=102020`,
-          },
-          {
-            id: '102030',
-            label: 'outer',
-            href: `${ROUTES.FASHION}?subcategory=1020&thirdcategory=102030`,
-          },
-          {
-            id: '102040',
-            label: 'product',
-            href: `${ROUTES.FASHION}?subcategory=1020&thirdcategory=102040`,
-          },
-          {
-            id: '102050',
-            label: 'space',
-            href: `${ROUTES.FASHION}?subcategory=1020&thirdcategory=102050`,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    href: ROUTES.SHOES,
-    label: 'shoes',
-    subCategories: [
-      {
-        id: '2010',
-        label: 'men',
-        href: `${ROUTES.SHOES}?subcategory=2010`,
-        thirdCategories: [
-          {
-            id: '201010',
-            label: '운동화',
-            href: `${ROUTES.SHOES}?subcategory=2010&thirdcategory=201010`,
-          },
-          {
-            id: '201020',
-            label: '구두/스니커즈',
-            href: `${ROUTES.SHOES}?subcategory=2010&thirdcategory=201020`,
-          },
-          {
-            id: '201030',
-            label: '워커',
-            href: `${ROUTES.SHOES}?subcategory=2010&thirdcategory=201030`,
-          },
-          {
-            id: '201040',
-            label: '샌들/슬리퍼',
-            href: `${ROUTES.SHOES}?subcategory=2010&thirdcategory=201040`,
-          },
-          {
-            id: '201050',
-            label: '레인부츠',
-            href: `${ROUTES.SHOES}?subcategory=2010&thirdcategory=201050`,
-          },
-        ],
-      },
-      {
-        id: '2020',
-        label: 'women',
-        href: `${ROUTES.SHOES}?subcategory=2020`,
-        thirdCategories: [
-          {
-            id: '202010',
-            label: '운동화',
-            href: `${ROUTES.SHOES}?subcategory=2020&thirdcategory=202010`,
-          },
-          {
-            id: '202020',
-            label: '구두/스니커즈',
-            href: `${ROUTES.SHOES}?subcategory=2020&thirdcategory=202020`,
-          },
-          {
-            id: '202030',
-            label: '샌들/슬리퍼',
-            href: `${ROUTES.SHOES}?subcategory=2020&thirdcategory=202030`,
-          },
-          {
-            id: '202040',
-            label: '부츠',
-            href: `${ROUTES.SHOES}?subcategory=2020&thirdcategory=202040`,
-          },
-          {
-            id: '202050',
-            label: '레인부츠',
-            href: `${ROUTES.SHOES}?subcategory=2020&thirdcategory=202050`,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    href: ROUTES.OTHERS,
-    label: 'others',
-    subCategories: [
-      {
-        id: '3010',
-        label: 'men',
-        href: `${ROUTES.OTHERS}?subcategory=3010`,
-        thirdCategories: [
-          {
-            id: '301010',
-            label: '상의',
-            href: `${ROUTES.OTHERS}?subcategory=3010&thirdcategory=301010`,
-          },
-          {
-            id: '301020',
-            label: '하의',
-            href: `${ROUTES.OTHERS}?subcategory=3010&thirdcategory=301020`,
-          },
-          {
-            id: '301030',
-            label: 'graphic',
-            href: `${ROUTES.OTHERS}?subcategory=3010&thirdcategory=301030`,
-          },
-          {
-            id: '301040',
-            label: 'product',
-            href: `${ROUTES.OTHERS}?subcategory=3010&thirdcategory=301040`,
-          },
-          {
-            id: '301050',
-            label: 'space',
-            href: `${ROUTES.OTHERS}?subcategory=3010&thirdcategory=301050`,
-          },
-        ],
-      },
-      {
-        id: '3020',
-        label: 'women',
-        href: `${ROUTES.OTHERS}?subcategory=3020`,
-        thirdCategories: [
-          {
-            id: '302010',
-            label: '상의',
-            href: `${ROUTES.OTHERS}?subcategory=3020&thirdcategory=302010`,
-          },
-          {
-            id: '302020',
-            label: '하의',
-            href: `${ROUTES.OTHERS}?subcategory=3020&thirdcategory=302020`,
-          },
-          {
-            id: '302030',
-            label: 'graphic',
-            href: `${ROUTES.OTHERS}?subcategory=3020&thirdcategory=302030`,
-          },
-          {
-            id: '302040',
-            label: 'product',
-            href: `${ROUTES.OTHERS}?subcategory=3020&thirdcategory=302040`,
-          },
-          {
-            id: '302050',
-            label: 'space',
-            href: `${ROUTES.OTHERS}?subcategory=3020&thirdcategory=302050`,
-          },
-        ],
-      },
-    ],
-  },
+// DB에서 카테고리 목록 가져오기
+export const fetchCategoriesForNavigation = async (): Promise<Category[]> => {
+  try {
+    const response = await fetch('/api/admin/categories'); // isActive 필터 제거하여 모든 카테고리 가져오기
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || '카테고리 목록을 불러오는데 실패했습니다.');
+    }
+
+    return data.data?.categories || [];
+  } catch (error) {
+    console.error('네비게이션 카테고리 로드 실패:', error);
+    return [];
+  }
+};
+
+// 카테고리 ID로 기본 라우트 경로 생성 (통합 카테고리 페이지 사용)
+const getCategoryRoute = (): string => {
+  return ROUTES.CATEGORIES; // 모든 카테고리가 동일한 페이지 사용
+};
+
+// DB 카테고리를 네비게이션 메뉴 형태로 변환
+export const convertCategoriesToNavMenuItems = (categories: Category[]): NavMenuItem[] => {
+  // 1단계 카테고리들만 필터링 (메인 카테고리)
+  const firstLevelCategories = categories.filter((cat) => cat.level === 1 && cat.isActive);
+
+  return firstLevelCategories.map((firstLevel) => {
+    // 2단계 카테고리들 찾기 (서브 카테고리)
+    const secondLevelCategories = categories.filter(
+      (cat) => cat.level === 2 && cat.parentId === firstLevel.id && cat.isActive,
+    );
+
+    const baseRoute = getCategoryRoute();
+
+    const subCategories: SubCategory[] = secondLevelCategories.map((secondLevel) => {
+      // 3단계 카테고리들 찾기 (써드 카테고리)
+      const thirdLevelCategories = categories.filter(
+        (cat) => cat.level === 3 && cat.parentId === secondLevel.id && cat.isActive,
+      );
+
+      const thirdCategories: ThirdCategory[] = thirdLevelCategories.map((thirdLevel) => {
+        // 4단계 카테고리들 찾기 (포스 카테고리) - isActive 상태 무관하게 가져오기
+        const fourthLevelCategories = categories.filter(
+          (cat) => cat.level === 4 && cat.parentId === thirdLevel.id,
+        );
+
+        const fourthCategories: FourthCategory[] = fourthLevelCategories.map((fourthLevel) => ({
+          id: fourthLevel.id,
+          label: fourthLevel.name,
+          href: `${baseRoute}?ca_id=${firstLevel.id}&ca_id2=${secondLevel.id}&ca_id3=${thirdLevel.id}&ca_id4=${fourthLevel.id}`,
+        }));
+
+        return {
+          id: thirdLevel.id,
+          label: thirdLevel.name,
+          href: `${baseRoute}?ca_id=${firstLevel.id}&ca_id2=${secondLevel.id}&ca_id3=${thirdLevel.id}`,
+          fourthCategories: fourthCategories.length > 0 ? fourthCategories : undefined,
+        };
+      });
+
+      return {
+        id: secondLevel.id,
+        label: secondLevel.name,
+        href: `${baseRoute}?ca_id=${firstLevel.id}&ca_id2=${secondLevel.id}`,
+        thirdCategories: thirdCategories.length > 0 ? thirdCategories : undefined,
+      };
+    });
+
+    return {
+      href: `${getCategoryRoute()}?ca_id=${firstLevel.id}`,
+      label: firstLevel.name,
+      subCategories: subCategories.length > 0 ? subCategories : undefined,
+    };
+  });
+};
+
+// 고정 메뉴 항목들 (카테고리가 아닌 기능적 메뉴들)
+export const STATIC_NAV_MENU_ITEMS: NavMenuItem[] = [
   { href: ROUTES.UPLOAD, label: '디자인 업로드', requiresAuth: true },
   { href: ROUTES.GUIDE, label: '이용안내' },
 ];

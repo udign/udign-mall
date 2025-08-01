@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { CATEGORY_IDS } from '@/lib/constants';
+
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import LanguageSelectionDialog from '@/components/LanguageSelectionDialog';
 import ProductGrid from '@/components/ProductGrid';
@@ -106,9 +106,9 @@ export default function ShopClient({ dictionary }: ShopClientProps) {
 
   const categories = [
     { id: 'all', name: dictionary.shop.categories.all },
-    { id: CATEGORY_IDS.FASHION, name: dictionary.shop.categories.fashion },
-    { id: CATEGORY_IDS.SHOES, name: dictionary.shop.categories.shoes },
-    { id: CATEGORY_IDS.OTHERS, name: dictionary.shop.categories.others },
+    { id: '10', name: dictionary.shop.categories.fashion },
+    { id: '20', name: dictionary.shop.categories.shoes },
+    { id: '30', name: dictionary.shop.categories.others },
   ];
 
   return (
