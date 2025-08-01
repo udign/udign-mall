@@ -35,10 +35,10 @@ export const useCategoryProducts = ({
   const searchParams = useSearchParams();
 
   const currentPage = parseInt(searchParams.get('page') || '1');
-  const categoryParam = searchParams.get('category');
-  const subCategoryId = searchParams.get('subcategory');
-  const thirdCategoryId = searchParams.get('thirdcategory');
-  const fourthCategoryId = searchParams.get('fourthcategory');
+  const categoryParam = searchParams.get('ca_id');
+  const subCategoryId = searchParams.get('ca_id2');
+  const thirdCategoryId = searchParams.get('ca_id3');
+  const fourthCategoryId = searchParams.get('ca_id4');
 
   // 카테고리 breadcrumb 생성 함수
   const generateCategoryBreadcrumb = useCallback(async (): Promise<string> => {
@@ -85,15 +85,15 @@ export const useCategoryProducts = ({
         setError(null);
 
         // 카테고리별 디자인 필터링
-        // URL에서 온 category 파라미터 우선 사용, 없으면 props의 categoryId 사용
+        // URL에서 온 ca_id 파라미터 우선 사용, 없으면 props의 categoryId 사용
         const effectiveCategoryId = categoryParam || categoryId;
-        const categoryQueryParam = effectiveCategoryId ? `&category=${effectiveCategoryId}` : '';
-        const subCategoryParam = subCategoryId ? `&subcategory=${subCategoryId}` : '';
-        const thirdCategoryParam = thirdCategoryId ? `&thirdcategory=${thirdCategoryId}` : '';
-        const fourthCategoryParam = fourthCategoryId ? `&fourthcategory=${fourthCategoryId}` : '';
+        const categoryQueryParam = effectiveCategoryId ? `&ca_id=${effectiveCategoryId}` : '';
+        const subCategoryParam = subCategoryId ? `&ca_id2=${subCategoryId}` : '';
+        // DB에는 ca_id3까지만 있으므로 3차 카테고리까지만 필터링 (4차 카테고리는 3차로 대체)
+        const thirdCategoryParam = thirdCategoryId ? `&ca_id3=${thirdCategoryId}` : '';
 
         const response = await fetch(
-          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryQueryParam}${subCategoryParam}${thirdCategoryParam}${fourthCategoryParam}`,
+          `/api/products?page=${pageNum}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}${categoryQueryParam}${subCategoryParam}${thirdCategoryParam}`,
         );
 
         if (!response.ok) {
@@ -145,16 +145,16 @@ export const useCategoryProducts = ({
       params.set('page', '1');
       // 기존 파라미터가 있으면 유지
       if (categoryParam) {
-        params.set('category', categoryParam);
+        params.set('ca_id', categoryParam);
       }
       if (subCategoryId) {
-        params.set('subcategory', subCategoryId);
+        params.set('ca_id2', subCategoryId);
       }
       if (thirdCategoryId) {
-        params.set('thirdcategory', thirdCategoryId);
+        params.set('ca_id3', thirdCategoryId);
       }
       if (fourthCategoryId) {
-        params.set('fourthcategory', fourthCategoryId);
+        params.set('ca_id4', fourthCategoryId);
       }
       router.replace(`${pathname}?${params.toString()}`);
     } else {

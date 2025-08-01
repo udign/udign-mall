@@ -74,9 +74,9 @@ export const GET = async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
-    const categoryFilter = searchParams.get('category'); // 1차 카테고리 필터 파라미터
-    const subCategoryFilter = searchParams.get('subcategory'); // 2차 카테고리 필터 파라미터
-    const thirdCategoryFilter = searchParams.get('thirdcategory'); // 3차 카테고리 필터 파라미터 추가
+    const categoryFilter = searchParams.get('ca_id') || searchParams.get('category'); // 1차 카테고리 필터 파라미터 (호환성 유지)
+    const subCategoryFilter = searchParams.get('ca_id2') || searchParams.get('subcategory'); // 2차 카테고리 필터 파라미터 (호환성 유지)
+    const thirdCategoryFilter = searchParams.get('ca_id3') || searchParams.get('thirdcategory'); // 3차 카테고리 필터 파라미터 (호환성 유지)
     const offset = (page - 1) * limit;
 
     // 현재 로그인한 사용자 정보 가져오기

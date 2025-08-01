@@ -78,13 +78,13 @@ export const convertCategoriesToNavMenuItems = (categories: Category[]): NavMenu
         const fourthCategories: FourthCategory[] = fourthLevelCategories.map((fourthLevel) => ({
           id: fourthLevel.id,
           label: fourthLevel.name,
-          href: `${baseRoute}?category=${firstLevel.id}&subcategory=${secondLevel.id}&thirdcategory=${thirdLevel.id}&fourthcategory=${fourthLevel.id}`,
+          href: `${baseRoute}?ca_id=${firstLevel.id}&ca_id2=${secondLevel.id}&ca_id3=${thirdLevel.id}&ca_id4=${fourthLevel.id}`,
         }));
 
         return {
           id: thirdLevel.id,
           label: thirdLevel.name,
-          href: `${baseRoute}?category=${firstLevel.id}&subcategory=${secondLevel.id}&thirdcategory=${thirdLevel.id}`,
+          href: `${baseRoute}?ca_id=${firstLevel.id}&ca_id2=${secondLevel.id}&ca_id3=${thirdLevel.id}`,
           fourthCategories: fourthCategories.length > 0 ? fourthCategories : undefined,
         };
       });
@@ -92,13 +92,13 @@ export const convertCategoriesToNavMenuItems = (categories: Category[]): NavMenu
       return {
         id: secondLevel.id,
         label: secondLevel.name,
-        href: `${baseRoute}?category=${firstLevel.id}&subcategory=${secondLevel.id}`,
+        href: `${baseRoute}?ca_id=${firstLevel.id}&ca_id2=${secondLevel.id}`,
         thirdCategories: thirdCategories.length > 0 ? thirdCategories : undefined,
       };
     });
 
     return {
-      href: `${getCategoryRoute()}?category=${firstLevel.id}`,
+      href: `${getCategoryRoute()}?ca_id=${firstLevel.id}`,
       label: firstLevel.name,
       subCategories: subCategories.length > 0 ? subCategories : undefined,
     };
