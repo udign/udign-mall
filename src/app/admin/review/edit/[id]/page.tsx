@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/primitives/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/primitives/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
 import {
   Form,
@@ -227,6 +228,7 @@ const artworkFormSchema = z.object({
   ca_id: z.string().min(1, '기본분류를 선택해주세요.'),
   ca_id2: z.string(),
   ca_id3: z.string(),
+  ca_id4: z.string(),
   it_sc_type: z.number().min(0).max(4),
   it_sc_method: z.number().min(0).max(2),
   it_sc_price: z.number().min(0),
@@ -257,6 +259,9 @@ export default function ArtworkEditPage() {
   const [currentLikes, setCurrentLikes] = useState(0);
   const [targetLikes, setTargetLikes] = useState(0);
 
+  // Tab state
+  const [activeTab, setActiveTab] = useState('home');
+
   const params = useParams();
   const router = useRouter();
   const artworkId = params.id as string;
@@ -286,6 +291,7 @@ export default function ArtworkEditPage() {
       ca_id: '',
       ca_id2: '',
       ca_id3: '',
+      ca_id4: '',
       it_sc_type: 0,
       it_sc_method: 0,
       it_sc_price: 0,
@@ -294,9 +300,16 @@ export default function ArtworkEditPage() {
     },
   });
 
-  // 리렌더링 트리거 필드: 카테고리(ca_id, ca_id2, ca_id3), 포인트유형(it_point_type), 배송비유형(it_sc_type) 변경 시에만 리렌더링
-  const watchedFields = form.watch(['ca_id', 'ca_id2', 'ca_id3', 'it_point_type', 'it_sc_type']);
-  const [ca_id, ca_id2, ca_id3, it_point_type, it_sc_type] = watchedFields;
+  // 리렌더링 트리거 필드: 카테고리(ca_id, ca_id2, ca_id3, ca_id4), 포인트유형(it_point_type), 배송비유형(it_sc_type) 변경 시에만 리렌더링
+  const watchedFields = form.watch([
+    'ca_id',
+    'ca_id2',
+    'ca_id3',
+    'ca_id4',
+    'it_point_type',
+    'it_sc_type',
+  ]);
+  const [ca_id, ca_id2, ca_id3, ca_id4, it_point_type, it_sc_type] = watchedFields;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -332,15 +345,22 @@ export default function ArtworkEditPage() {
         const ca_id = artworkData.ca_id || '';
         const ca_id2 = artworkData.ca_id2 || '';
         const ca_id3 = artworkData.ca_id3 || '';
+        const ca_id4 = artworkData.ca_id4 || '';
 
         // 하위 카테고리가 있지만 상위 카테고리가 없는 경우 자동 보완
         let finalCaId = ca_id;
         let finalCaId2 = ca_id2;
-        const finalCaId3 = ca_id3;
+        let finalCaId3 = ca_id3;
+        const finalCaId4 = ca_id4;
+
+        // 4차 카테고리가 있지만 3차가 없는 경우
+        if (ca_id4 && !ca_id3 && ca_id4.length >= 6) {
+          finalCaId3 = ca_id4.substring(0, 6);
+        }
 
         // 3차 카테고리가 있지만 2차가 없는 경우
-        if (ca_id3 && !ca_id2 && ca_id3.length >= 4) {
-          finalCaId2 = ca_id3.substring(0, 4);
+        if ((finalCaId3 || ca_id3) && !ca_id2 && (finalCaId3 || ca_id3).length >= 4) {
+          finalCaId2 = (finalCaId3 || ca_id3).substring(0, 4);
         }
 
         // 2차 카테고리가 있지만 1차가 없는 경우
@@ -372,6 +392,7 @@ export default function ArtworkEditPage() {
           ca_id: finalCaId,
           ca_id2: finalCaId2,
           ca_id3: finalCaId3,
+          ca_id4: finalCaId4,
           it_sc_type: parseInt(artworkData.it_sc_type) || 0,
           it_sc_method: parseInt(artworkData.it_sc_method) || 0,
           it_sc_price: parseInt(artworkData.it_sc_price) || 0,
@@ -396,17 +417,23 @@ export default function ArtworkEditPage() {
 
   // 카테고리 변경 핸들러 (하위 카테고리 초기화 포함)
   const handleCategoryChange = useCallback(
-    (field: 'ca_id' | 'ca_id2' | 'ca_id3', value: string) => {
+    (field: 'ca_id' | 'ca_id2' | 'ca_id3' | 'ca_id4', value: string) => {
       form.setValue(field, value);
 
-      // 1차 카테고리 변경 시 2차, 3차 초기화
+      // 1차 카테고리 변경 시 2차, 3차, 4차 초기화
       if (field === 'ca_id') {
         form.setValue('ca_id2', '');
         form.setValue('ca_id3', '');
+        form.setValue('ca_id4', '');
       }
-      // 2차 카테고리 변경 시 3차 초기화
+      // 2차 카테고리 변경 시 3차, 4차 초기화
       else if (field === 'ca_id2') {
         form.setValue('ca_id3', '');
+        form.setValue('ca_id4', '');
+      }
+      // 3차 카테고리 변경 시 4차 초기화
+      else if (field === 'ca_id3') {
+        form.setValue('ca_id4', '');
       }
     },
     [form],
@@ -731,6 +758,24 @@ export default function ArtworkEditPage() {
       ));
   }, [categories, ca_id2, ca_id3]);
 
+  const fourthCategoryOptions = useMemo(() => {
+    // 3차 카테고리가 선택되어 있거나, 기존에 4차 카테고리가 있는 경우
+    const parentId = ca_id3 || (ca_id4 ? ca_id4.substring(0, 6) : '');
+    if (!parentId) return [];
+
+    return categories
+      .filter(
+        (category) =>
+          category.id?.length === 8 && // 4차 카테고리만
+          category.id?.startsWith(parentId), // 선택된 3차 카테고리의 하위
+      )
+      .map((category) => (
+        <SelectItem key={category.id} value={category.id}>
+          {category.name}
+        </SelectItem>
+      ));
+  }, [categories, ca_id3, ca_id4]);
+
   return loading ? (
     <div className='flex min-h-screen items-center justify-center'>
       <LoadingSpinner size='lg' message='디자인 정보를 불러오는 중...' />
@@ -755,8 +800,8 @@ export default function ArtworkEditPage() {
 
         {/* 작품 정보 상단 섹션 */}
         <Card className='mb-6'>
-          <CardContent className='p-6'>
-            <div className='flex items-center space-x-6'>
+          <CardContent>
+            <div className='flex items-center justify-between'>
               {/* 승인/반려 토글 */}
               <div className='flex flex-col items-center space-y-2'>
                 <div className='flex items-center space-x-2'>
@@ -854,7 +899,7 @@ export default function ArtworkEditPage() {
                       type='number'
                       value={targetLikes}
                       onChange={(e) => handleTargetLikesChange(parseInt(e.target.value) || 0)}
-                      className='h-8 w-16 text-center text-sm'
+                      className='h-8 w-20 text-center text-sm'
                       min='0'
                     />
                     <span className='text-xs text-gray-500'>목표</span>
@@ -865,779 +910,952 @@ export default function ArtworkEditPage() {
           </CardContent>
         </Card>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-            <Card>
-              <CardHeader>
-                <CardTitle>디자인분류</CardTitle>
-                <p className='text-sm text-gray-600'>
-                  1차 분류는 반드시 선택하셔야 합니다. 하나의 디자인에 최대 3개의 다른 분류를 지정할
-                  수 있습니다.
-                </p>
-                <p className='text-xs text-gray-500'>
-                  2차, 3차 분류는 선택사항이며, 1차 카테고리를 선택해야 2차, 3차 카테고리를 선택할
-                  수 있습니다.
-                </p>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='grid grid-cols-3 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='ca_id'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          1차 분류<span className='text-red-500'>*</span>
-                        </FormLabel>
-                        <Select
-                          value={field.value}
-                          onValueChange={(value) => handleCategoryChange('ca_id', value)}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder='1차 카테고리를 선택하세요' />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>{firstCategoryOptions}</SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='ca_id2'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>2차 분류</FormLabel>
-                        <Select
-                          value={field.value || 'none'}
-                          onValueChange={(value) =>
-                            handleCategoryChange('ca_id2', value === 'none' ? '' : value)
-                          }
-                          disabled={!ca_id && !ca_id2}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={
-                                  !ca_id && !ca_id2
-                                    ? '먼저 1차 분류를 선택해주세요'
-                                    : '2차 카테고리를 선택하세요'
-                                }
+        <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+          <TabsList className='grid w-full grid-cols-4'>
+            <TabsTrigger value='home'>Home</TabsTrigger>
+            <TabsTrigger value='product-detail'>Product detail</TabsTrigger>
+            <TabsTrigger value='detail'>Design detail</TabsTrigger>
+            <TabsTrigger value='option1'>Option detail</TabsTrigger>
+          </TabsList>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='mt-6 space-y-6'>
+              {/* Home Tab */}
+              <TabsContent value='home' className='space-y-6'>
+                <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+                  {/* 좌측: 이미지 섹션 */}
+                  <div className='space-y-4'>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>디자인 이미지</CardTitle>
+                        <p className='text-sm text-gray-600'>
+                          대표 이미지 1개(필수)와 추가 이미지 최대 3개까지 업로드할 수 있습니다.
+                        </p>
+                      </CardHeader>
+                      <CardContent className='space-y-4'>
+                        {/* 메인 이미지 미리보기 */}
+                        <div className='flex justify-center'>
+                          <div className='relative h-[365px] w-[365px]'>
+                            {artwork?.it_img1 ? (
+                              <Image
+                                src={artwork.it_img1}
+                                alt={artwork.it_name || '작품 이미지'}
+                                fill
+                                className='rounded-lg object-cover'
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    parent.innerHTML =
+                                      '<div class="flex h-full w-full items-center justify-center rounded-lg bg-gray-200"><span class="text-gray-400">이미지 없음</span></div>';
+                                  }
+                                }}
                               />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='none'>선택안함</SelectItem>
-                            {secondCategoryOptions}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='ca_id3'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>3차 분류</FormLabel>
-                        <Select
-                          value={field.value || 'none'}
-                          onValueChange={(value) =>
-                            handleCategoryChange('ca_id3', value === 'none' ? '' : value)
-                          }
-                          disabled={!ca_id2 && !ca_id3}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={
-                                  !ca_id && !ca_id2 && !ca_id3
-                                    ? '먼저 1차 분류를 선택해주세요'
-                                    : !ca_id2 && !ca_id3
-                                      ? '먼저 2차 분류를 선택해주세요'
-                                      : '3차 카테고리를 선택하세요'
-                                }
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='none'>선택안함</SelectItem>
-                            {thirdCategoryOptions}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+                            ) : (
+                              <div className='flex h-full w-full items-center justify-center rounded-lg bg-gray-200'>
+                                <span className='text-gray-400'>이미지 없음</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>기본정보</CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='grid grid-cols-3 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='it_name'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          디자인명<span className='text-red-500'>*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder='디자인명을 입력하세요' {...field} />
-                        </FormControl>
-                        <p className='text-xs text-gray-500'>
-                          고객에게 표시될 디자인의 제목을 입력하세요.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className='space-y-2'>
-                    <Label>디자인 코드</Label>
-                    <p className='text-sm font-medium text-gray-900'>{artworkId}</p>
-                    <p className='text-xs text-gray-500'>
-                      시스템에서 자동으로 생성된 디자인의 고유 식별번호입니다.
-                    </p>
+                        {/* 서브 이미지들 */}
+                        <div className='grid grid-cols-3 gap-2'>
+                          {[2, 3, 4].map((index) => {
+                            const imgKey = `it_img${index}` as keyof ArtworkDetail;
+                            const imageSrc = artwork?.[imgKey] as string;
+                            return (
+                              <div key={index} className='relative aspect-square'>
+                                {imageSrc ? (
+                                  <Image
+                                    src={imageSrc}
+                                    alt={`서브 이미지 ${index}`}
+                                    fill
+                                    className='rounded object-cover'
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML =
+                                          '<div class="flex h-full w-full items-center justify-center rounded bg-gray-200"><span class="text-xs text-gray-400">없음</span></div>';
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <div className='flex h-full w-full items-center justify-center rounded bg-gray-200'>
+                                    <span className='text-xs text-gray-400'>없음</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                  <div className='space-y-2'>
-                    <Label>판매자ID</Label>
-                    <p className='text-sm font-medium text-gray-900'>
-                      {form.getValues('it_1') || '-'}
-                    </p>
-                    <p className='text-xs text-gray-500'>이 디자인을 등록한 판매자의 ID입니다.</p>
-                  </div>
-                </div>
 
-                <div className='grid grid-cols-2 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='it_4'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>목표 좋아요 수</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            min='0'
-                            placeholder='목표 좋아요 수'
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <p className='text-xs text-gray-500'>
-                          디자인의 목표 좋아요 수를 설정하세요.
+                  {/* 우측: 기본 정보 섹션 */}
+                  <div className='space-y-4'>
+                    {/* 카테고리 선택 */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>카테고리</CardTitle>
+                        <p className='text-sm text-gray-600'>
+                          1차 분류는 반드시 선택하셔야 합니다. 최대 4차까지 선택 가능합니다.
                         </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_order'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>출력순서</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            placeholder='숫자가 작을수록 상위에 출력'
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      </CardHeader>
+                      <CardContent className='space-y-4'>
+                        <div className='grid grid-cols-2 gap-4'>
+                          <FormField
+                            control={form.control}
+                            name='ca_id'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  1차 분류<span className='text-red-500'>*</span>
+                                </FormLabel>
+                                <Select
+                                  value={field.value}
+                                  onValueChange={(value) => handleCategoryChange('ca_id', value)}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder='1차 선택' />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>{firstCategoryOptions}</SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
-                        </FormControl>
-                        <p className='text-xs text-gray-500'>
-                          디자인 목록에서의 정렬 순서를 설정합니다. 숫자가 작을수록 상위에
-                          표시됩니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          <FormField
+                            control={form.control}
+                            name='ca_id2'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>2차 분류</FormLabel>
+                                <Select
+                                  value={field.value || 'none'}
+                                  onValueChange={(value) =>
+                                    handleCategoryChange('ca_id2', value === 'none' ? '' : value)
+                                  }
+                                  disabled={!ca_id && !ca_id2}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder='2차 선택' />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value='none'>선택안함</SelectItem>
+                                    {secondCategoryOptions}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='ca_id3'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>3차 분류</FormLabel>
+                                <Select
+                                  value={field.value || 'none'}
+                                  onValueChange={(value) =>
+                                    handleCategoryChange('ca_id3', value === 'none' ? '' : value)
+                                  }
+                                  disabled={!ca_id2 && !ca_id3}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder='3차 선택' />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value='none'>선택안함</SelectItem>
+                                    {thirdCategoryOptions}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='ca_id4'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>4차 분류</FormLabel>
+                                <Select
+                                  value={field.value || 'none'}
+                                  onValueChange={(value) =>
+                                    handleCategoryChange('ca_id4', value === 'none' ? '' : value)
+                                  }
+                                  disabled={!ca_id3 && !ca_id4}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder='4차 선택' />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value='none'>선택안함</SelectItem>
+                                    {fourthCategoryOptions}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
 
-                <FormField
-                  control={form.control}
-                  name='it_3'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>디자인설명</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder='디자인에 대한 상세 설명을 입력하세요'
-                          rows={4}
-                          {...field}
+                    {/* 기본 정보 */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>기본 정보</CardTitle>
+                      </CardHeader>
+                      <CardContent className='space-y-4'>
+                        <FormField
+                          control={form.control}
+                          name='it_name'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                디자인명<span className='text-red-500'>*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder='디자인명을 입력하세요' {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <p className='text-xs text-gray-500'>
-                        고객에게 표시될 디자인의 상세 설명을 입력하세요.
-                      </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className='grid grid-cols-3 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='it_sell_email'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>판매자 이메일</FormLabel>
-                        <FormControl>
-                          <Input type='email' placeholder='판매자 이메일' {...field} />
-                        </FormControl>
-                        <p className='text-xs text-gray-500'>판매자의 이메일 주소를 입력하세요.</p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_use'
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className='flex items-center space-x-2 pt-6'>
-                          <Checkbox
-                            checked={field.value === 1}
-                            onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
-                          />
-                          <FormLabel>판매가능</FormLabel>
+                        <div className='space-y-2'>
+                          <Label>디자이너</Label>
+                          <p className='text-sm font-medium text-gray-900'>
+                            {form.getValues('it_1') || '-'}
+                          </p>
+                          <p className='text-xs text-gray-500'>
+                            이 디자인을 등록한 디자이너입니다.
+                          </p>
                         </div>
-                        <p className='text-xs text-gray-500'>
-                          체크 해제 시 고객이 구매할 수 없습니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_nocoupon'
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className='flex items-center space-x-2 pt-6'>
-                          <Checkbox
-                            checked={field.value === 1}
-                            onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
-                          />
-                          <FormLabel>쿠폰적용안함</FormLabel>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          체크 시 할인쿠폰을 사용할 수 없습니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>가격 및 재고</CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='grid grid-cols-3 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='it_price'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>판매가격</FormLabel>
-                        <div className='flex items-center space-x-2'>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              min='0'
-                              placeholder='0'
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <span className='text-sm text-gray-500'>원</span>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          고객에게 판매할 가격을 원 단위로 입력하세요.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_point_type'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>포인트 유형</FormLabel>
-                        <Select
-                          value={field.value.toString()}
-                          onValueChange={(value) => field.onChange(parseInt(value))}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='0'>설정금액</SelectItem>
-                            <SelectItem value='1'>판매가기준 설정비율</SelectItem>
-                            <SelectItem value='2'>구매가기준 설정비율</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className='text-xs text-gray-500'>
-                          고객이 디자인 구매 시 받을 포인트의 계산 방식을 선택하세요.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_point'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>포인트</FormLabel>
-                        <div className='flex items-center space-x-2'>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              min='0'
-                              placeholder='0'
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <span className='text-sm text-gray-500'>
-                            {it_point_type > 0 ? '%' : '점'}
-                          </span>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          {it_point_type === 0
-                            ? '고정 포인트 금액을 입력하세요.'
-                            : '포인트 적립 비율을 퍼센트로 입력하세요.'}
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        <FormField
+                          control={form.control}
+                          name='it_3'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>디자인 설명</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='디자인에 대한 상세 설명을 입력하세요'
+                                  rows={4}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
 
-                <div className='grid grid-cols-4 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='it_stock_qty'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>재고수량</FormLabel>
-                        <div className='flex items-center space-x-2'>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              min='0'
-                              placeholder='0'
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <span className='text-sm text-gray-500'>개</span>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          판매 가능한 디자인의 재고 수량을 입력하세요. 0으로 설정 시 품절로
-                          표시됩니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_noti_qty'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>재고 통보수량</FormLabel>
-                        <div className='flex items-center space-x-2'>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              min='0'
-                              placeholder='0'
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <span className='text-sm text-gray-500'>개</span>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          재고가 이 수량 이하로 떨어지면 재고 부족 알림을 표시합니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_soldout'
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className='flex items-center space-x-2 pt-6'>
-                          <Checkbox
-                            checked={field.value === 1}
-                            onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
-                          />
-                          <FormLabel>품절</FormLabel>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          체크 시 품절 상태로 표시되어 구매할 수 없습니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_stock_sms'
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className='flex items-center space-x-2 pt-6'>
-                          <Checkbox
-                            checked={field.value === 1}
-                            onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
-                          />
-                          <FormLabel>재입고 SMS</FormLabel>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          체크 시 재입고 알림 기능을 활성화합니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                {/* 작품 이미지 갤러리 */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>디자인 이미지</CardTitle>
+                  </CardHeader>
+                  <CardContent className='space-y-6'>
+                    {[1, 2, 3, 4].map((imageIndex) => {
+                      const imgKey = `it_img${imageIndex}` as keyof ArtworkDetail;
+                      const imageSrc = artwork?.[imgKey] as string;
 
-                <div className='grid grid-cols-3 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='it_buy_min_qty'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>최소구매수량</FormLabel>
-                        <div className='flex items-center space-x-2'>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              min='0'
-                              placeholder='0'
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <span className='text-sm text-gray-500'>개</span>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          디자인 구매 시 최소 구매 수량을 설정합니다. (0은 제한 없음)
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_buy_max_qty'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>최대구매수량</FormLabel>
-                        <div className='flex items-center space-x-2'>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              min='0'
-                              placeholder='0'
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <span className='text-sm text-gray-500'>개</span>
-                        </div>
-                        <p className='text-xs text-gray-500'>
-                          디자인 구매 시 최대 구매 수량을 설정합니다. (0은 제한 없음)
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_notax'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>과세 유형</FormLabel>
-                        <Select
-                          value={field.value.toString()}
-                          onValueChange={(value) => field.onChange(parseInt(value))}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='0'>과세</SelectItem>
-                            <SelectItem value='1'>비과세</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className='text-xs text-gray-500'>
-                          디자인의 과세유형(과세, 비과세)을 설정합니다.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+                      if (!imageSrc) return null;
 
-            <Card>
-              <CardHeader>
-                <CardTitle>배송비</CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='grid grid-cols-2 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='it_sc_type'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>배송비 유형</FormLabel>
-                        <Select
-                          value={field.value.toString()}
-                          onValueChange={(value) => field.onChange(parseInt(value))}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='0'>쇼핑몰 기본설정 사용</SelectItem>
-                            <SelectItem value='1'>무료배송</SelectItem>
-                            <SelectItem value='2'>조건부 무료배송</SelectItem>
-                            <SelectItem value='3'>유료배송</SelectItem>
-                            <SelectItem value='4'>수량별 부과</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className='text-xs text-gray-500'>
-                          이 디자인의 배송비 계산 방식을 선택하세요.
-                        </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='it_sc_method'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>배송비 결제</FormLabel>
-                        <Select
-                          value={field.value.toString()}
-                          onValueChange={(value) => field.onChange(parseInt(value))}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='0'>선불</SelectItem>
-                            <SelectItem value='1'>착불</SelectItem>
-                            <SelectItem value='2'>사용자선택</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className='text-xs text-gray-500'>배송비 결제 방식을 선택하세요.</p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      return (
+                        <div key={imageIndex} className='space-y-2'>
+                          <h4 className='text-sm font-medium text-gray-700'>
+                            {imageIndex === 1 ? '대표 이미지' : `추가 이미지 ${imageIndex - 1}`}
+                          </h4>
+                          <div className='relative w-full'>
+                            <div className='relative mx-auto w-full max-w-2xl'>
+                              <Image
+                                src={imageSrc}
+                                alt={`${artwork?.it_name || '작품'} - ${imageIndex === 1 ? '대표 이미지' : `이미지 ${imageIndex}`}`}
+                                width={800}
+                                height={600}
+                                className='w-full rounded-lg border object-contain'
+                                style={{ aspectRatio: '4/3' }}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    parent.innerHTML =
+                                      '<div class="flex h-60 w-full items-center justify-center rounded-lg bg-gray-100 border"><span class="text-gray-400">이미지를 불러올 수 없습니다</span></div>';
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
 
-                {it_sc_type > 1 && (
-                  <div className='grid grid-cols-2 gap-4'>
-                    <FormField
-                      control={form.control}
-                      name='it_sc_price'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>기본배송비</FormLabel>
-                          <div className='flex items-center space-x-2'>
+                    {!artwork?.it_img1 && (
+                      <div className='py-12 text-center'>
+                        <div className='mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100'>
+                          <svg
+                            className='h-8 w-8 text-gray-400'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+                            />
+                          </svg>
+                        </div>
+                        <p className='text-gray-500'>등록된 이미지가 없습니다.</p>
+                        <p className='mt-1 text-sm text-gray-400'>
+                          Design detail 탭에서 이미지를 업로드해주세요.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Product detail Tab */}
+              <TabsContent value='product-detail' className='space-y-6'>
+                {/* 상세 정보 */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>상세 정보</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className='grid grid-cols-4 gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='it_order'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>출력순서</FormLabel>
                             <FormControl>
                               <Input
                                 type='number'
-                                min='0'
-                                placeholder='0'
+                                placeholder='숫자가 작을수록 상위에 출력'
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                               />
                             </FormControl>
-                            <span className='text-sm text-gray-500'>원</span>
-                          </div>
-                          <p className='text-xs text-gray-500'>
-                            기본 배송비 금액을 원 단위로 입력하세요.
-                          </p>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    {it_sc_type === 2 && (
-                      <FormField
-                        control={form.control}
-                        name='it_sc_minimum'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>무료배송 최소금액</FormLabel>
-                            <div className='flex items-center space-x-2'>
-                              <FormControl>
-                                <Input
-                                  type='number'
-                                  min='0'
-                                  placeholder='0'
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                />
-                              </FormControl>
-                              <span className='text-sm text-gray-500'>원 이상</span>
-                            </div>
                             <p className='text-xs text-gray-500'>
-                              이 금액 이상 주문 시 배송비가 무료가 됩니다.
+                              디자인 목록에서의 정렬 순서를 설정합니다. 숫자가 작을수록 상위에
+                              표시됩니다.
                             </p>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    )}
-                    {it_sc_type === 4 && (
                       <FormField
                         control={form.control}
-                        name='it_sc_qty'
+                        name='it_sell_email'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>수량별 배송비</FormLabel>
-                            <div className='flex items-center space-x-2'>
-                              <FormControl>
-                                <Input
-                                  type='number'
-                                  min='0'
-                                  placeholder='0'
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                />
-                              </FormControl>
-                              <span className='text-sm text-gray-500'>개마다</span>
-                            </div>
+                            <FormLabel>판매자 이메일</FormLabel>
+                            <FormControl>
+                              <Input type='email' placeholder='판매자 이메일' {...field} />
+                            </FormControl>
                             <p className='text-xs text-gray-500'>
-                              설정한 수량마다 기본배송비가 추가로 부과됩니다.
+                              판매자의 이메일 주소를 입력하세요.
                             </p>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      <FormField
+                        control={form.control}
+                        name='it_use'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className='text-sm font-medium text-gray-700'>
+                              판매가능
+                            </FormLabel>
+                            <div className='flex items-center space-x-2 pt-2'>
+                              <Checkbox
+                                checked={field.value === 1}
+                                onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
+                              />
+                              <span className='text-sm text-gray-600'>
+                                {field.value === 1 ? '판매 가능' : '판매 불가'}
+                              </span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              체크 해제 시 고객이 구매할 수 없습니다.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_nocoupon'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className='text-sm font-medium text-gray-700'>
+                              쿠폰적용
+                            </FormLabel>
+                            <div className='flex items-center space-x-2 pt-2'>
+                              <Checkbox
+                                checked={field.value === 1}
+                                onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
+                              />
+                              <span className='text-sm text-gray-600'>
+                                {field.value === 1 ? '쿠폰 적용 안함' : '쿠폰 적용'}
+                              </span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              체크 시 할인쿠폰을 사용할 수 없습니다.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>옵션 설정</CardTitle>
-                <div className='flex items-center justify-between'>
-                  <div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>가격 및 재고</CardTitle>
+                  </CardHeader>
+                  <CardContent className='space-y-4'>
+                    <div className='grid grid-cols-3 gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='it_price'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>판매가격</FormLabel>
+                            <div className='flex items-center space-x-2'>
+                              <FormControl>
+                                <Input
+                                  type='number'
+                                  min='0'
+                                  placeholder='0'
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <span className='text-sm text-gray-500'>원</span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              고객에게 판매할 가격을 원 단위로 입력하세요.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_point_type'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>포인트 유형</FormLabel>
+                            <Select
+                              value={field.value.toString()}
+                              onValueChange={(value) => field.onChange(parseInt(value))}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value='0'>설정금액</SelectItem>
+                                <SelectItem value='1'>판매가기준 설정비율</SelectItem>
+                                <SelectItem value='2'>구매가기준 설정비율</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className='text-xs text-gray-500'>
+                              고객이 디자인 구매 시 받을 포인트의 계산 방식을 선택하세요.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_point'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>포인트</FormLabel>
+                            <div className='flex items-center space-x-2'>
+                              <FormControl>
+                                <Input
+                                  type='number'
+                                  min='0'
+                                  placeholder='0'
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <span className='text-sm text-gray-500'>
+                                {it_point_type > 0 ? '%' : '점'}
+                              </span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              {it_point_type === 0
+                                ? '고정 포인트 금액을 입력하세요.'
+                                : '포인트 적립 비율을 퍼센트로 입력하세요.'}
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className='grid grid-cols-4 gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='it_stock_qty'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>재고수량</FormLabel>
+                            <div className='flex items-center space-x-2'>
+                              <FormControl>
+                                <Input
+                                  type='number'
+                                  min='0'
+                                  placeholder='0'
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <span className='text-sm text-gray-500'>개</span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              판매 가능한 디자인의 재고 수량을 입력하세요. 0으로 설정 시 품절로
+                              표시됩니다.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_noti_qty'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>재고 통보수량</FormLabel>
+                            <div className='flex items-center space-x-2'>
+                              <FormControl>
+                                <Input
+                                  type='number'
+                                  min='0'
+                                  placeholder='0'
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <span className='text-sm text-gray-500'>개</span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              재고가 이 수량 이하로 떨어지면 재고 부족 알림을 표시합니다.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_soldout'
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className='flex items-center space-x-2'>
+                              <Checkbox
+                                checked={field.value === 1}
+                                onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
+                              />
+                              <FormLabel>품절</FormLabel>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              체크 시 품절 상태로 표시되어 구매할 수 없습니다.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_stock_sms'
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className='flex items-center space-x-2'>
+                              <Checkbox
+                                checked={field.value === 1}
+                                onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)}
+                              />
+                              <FormLabel>재입고 SMS</FormLabel>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              체크 시 재입고 알림 기능을 활성화합니다.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className='grid grid-cols-3 gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='it_buy_min_qty'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>최소구매수량</FormLabel>
+                            <div className='flex items-center space-x-2'>
+                              <FormControl>
+                                <Input
+                                  type='number'
+                                  min='0'
+                                  placeholder='0'
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <span className='text-sm text-gray-500'>개</span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              디자인 구매 시 최소 구매 수량을 설정합니다. (0은 제한 없음)
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_buy_max_qty'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>최대구매수량</FormLabel>
+                            <div className='flex items-center space-x-2'>
+                              <FormControl>
+                                <Input
+                                  type='number'
+                                  min='0'
+                                  placeholder='0'
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <span className='text-sm text-gray-500'>개</span>
+                            </div>
+                            <p className='text-xs text-gray-500'>
+                              디자인 구매 시 최대 구매 수량을 설정합니다. (0은 제한 없음)
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_notax'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>과세 유형</FormLabel>
+                            <Select
+                              value={field.value.toString()}
+                              onValueChange={(value) => field.onChange(parseInt(value))}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value='0'>과세</SelectItem>
+                                <SelectItem value='1'>비과세</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className='text-xs text-gray-500'>
+                              디자인의 과세유형(과세, 비과세)을 설정합니다.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>배송비</CardTitle>
+                  </CardHeader>
+                  <CardContent className='space-y-4'>
+                    <div className='grid grid-cols-2 gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='it_sc_type'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>배송비 유형</FormLabel>
+                            <Select
+                              value={field.value.toString()}
+                              onValueChange={(value) => field.onChange(parseInt(value))}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value='0'>쇼핑몰 기본설정 사용</SelectItem>
+                                <SelectItem value='1'>무료배송</SelectItem>
+                                <SelectItem value='2'>조건부 무료배송</SelectItem>
+                                <SelectItem value='3'>유료배송</SelectItem>
+                                <SelectItem value='4'>수량별 부과</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className='text-xs text-gray-500'>
+                              이 디자인의 배송비 계산 방식을 선택하세요.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='it_sc_method'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>배송비 결제</FormLabel>
+                            <Select
+                              value={field.value.toString()}
+                              onValueChange={(value) => field.onChange(parseInt(value))}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value='0'>선불</SelectItem>
+                                <SelectItem value='1'>착불</SelectItem>
+                                <SelectItem value='2'>사용자선택</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className='text-xs text-gray-500'>배송비 결제 방식을 선택하세요.</p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {it_sc_type > 1 && (
+                      <div className='grid grid-cols-2 gap-4'>
+                        <FormField
+                          control={form.control}
+                          name='it_sc_price'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>기본배송비</FormLabel>
+                              <div className='flex items-center space-x-2'>
+                                <FormControl>
+                                  <Input
+                                    type='number'
+                                    min='0'
+                                    placeholder='0'
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                  />
+                                </FormControl>
+                                <span className='text-sm text-gray-500'>원</span>
+                              </div>
+                              <p className='text-xs text-gray-500'>
+                                기본 배송비 금액을 원 단위로 입력하세요.
+                              </p>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        {it_sc_type === 2 && (
+                          <FormField
+                            control={form.control}
+                            name='it_sc_minimum'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>무료배송 최소금액</FormLabel>
+                                <div className='flex items-center space-x-2'>
+                                  <FormControl>
+                                    <Input
+                                      type='number'
+                                      min='0'
+                                      placeholder='0'
+                                      {...field}
+                                      onChange={(e) =>
+                                        field.onChange(parseInt(e.target.value) || 0)
+                                      }
+                                    />
+                                  </FormControl>
+                                  <span className='text-sm text-gray-500'>원 이상</span>
+                                </div>
+                                <p className='text-xs text-gray-500'>
+                                  이 금액 이상 주문 시 배송비가 무료가 됩니다.
+                                </p>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                        {it_sc_type === 4 && (
+                          <FormField
+                            control={form.control}
+                            name='it_sc_qty'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>수량별 배송비</FormLabel>
+                                <div className='flex items-center space-x-2'>
+                                  <FormControl>
+                                    <Input
+                                      type='number'
+                                      min='0'
+                                      placeholder='0'
+                                      {...field}
+                                      onChange={(e) =>
+                                        field.onChange(parseInt(e.target.value) || 0)
+                                      }
+                                    />
+                                  </FormControl>
+                                  <span className='text-sm text-gray-500'>개마다</span>
+                                </div>
+                                <p className='text-xs text-gray-500'>
+                                  설정한 수량마다 기본배송비가 추가로 부과됩니다.
+                                </p>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Design detail Tab */}
+              <TabsContent value='detail' className='space-y-6'>
+                {/* 작품 이미지 관리 */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>작품 이미지 관리</CardTitle>
                     <p className='text-sm text-gray-600'>
-                      디자인에 옵션을 추가하여 다양한 선택사항을 제공할 수 있습니다.
+                      이미지를 업로드하거나 삭제할 수 있습니다. 권장 크기: 800x800px 이상
                     </p>
-                    <p className='text-xs text-gray-500'>
-                      옵션명별로 여러 옵션값을 설정할 수 있습니다. (예: 사이즈 → S, M, L)
-                    </p>
-                  </div>
-                  <Button type='button' onClick={addOptionGroup} size='sm'>
-                    <Plus className='mr-2 h-4 w-4' />
-                    옵션 그룹 추가
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {optionGroups.length === 0 ? (
-                  <div className='py-8 text-center text-gray-500'>
-                    옵션이 없습니다. 위의 &ldquo;옵션 그룹 추가&rdquo; 버튼을 클릭하여 옵션을
-                    추가해보세요.
-                  </div>
-                ) : (
-                  <div className='space-y-6'>
-                    {optionGroups.map((group, groupIndex) => (
-                      <OptionGroupComponent
-                        key={group.id}
-                        group={group}
-                        groupIndex={groupIndex}
-                        onRemoveGroup={removeOptionGroup}
-                        onUpdateGroupName={updateOptionGroupName}
-                        onAddOptionItem={addOptionItem}
-                        onRemoveOptionItem={removeOptionItem}
-                        onUpdateOptionItem={updateOptionItem}
+                  </CardHeader>
+                  <CardContent className='space-y-4'>
+                    {ARTWORK_IMAGE_INDICES.map((imageIndex) => (
+                      <ArtworkImageUploadItem
+                        key={imageIndex}
+                        imageIndex={imageIndex}
+                        artwork={artwork}
+                        imageFiles={imageFiles}
+                        imagesToDelete={imagesToDelete}
+                        onImageUpload={handleImageUpload}
+                        onImageDelete={handleImageDelete}
+                        getImageSrc={getImageSrc}
                       />
                     ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>디자인 이미지</CardTitle>
-                <p className='text-sm text-gray-600'>
-                  대표 이미지 1개(필수)와 추가 이미지 최대 3개까지 업로드할 수 있습니다.
-                </p>
-                <p className='text-xs text-gray-500'>
-                  권장 이미지 크기: 800x800px 이상, PNG, JPG, JPEG 형식 지원, 각 파일 최대 5MB
-                </p>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                {ARTWORK_IMAGE_INDICES.map((imageIndex) => (
-                  <ArtworkImageUploadItem
-                    key={imageIndex}
-                    imageIndex={imageIndex}
-                    artwork={artwork}
-                    imageFiles={imageFiles}
-                    imagesToDelete={imagesToDelete}
-                    onImageUpload={handleImageUpload}
-                    onImageDelete={handleImageDelete}
-                    getImageSrc={getImageSrc}
-                  />
-                ))}
-              </CardContent>
-            </Card>
+              {/* Option Tabs */}
+              <TabsContent value='option1' className='space-y-6'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>옵션 설정</CardTitle>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-sm text-gray-600'>
+                          디자인에 옵션을 추가하여 다양한 선택사항을 제공할 수 있습니다.
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          옵션명별로 여러 옵션값을 설정할 수 있습니다. (예: 사이즈 → S, M, L)
+                        </p>
+                      </div>
+                      <Button type='button' onClick={addOptionGroup} size='sm'>
+                        <Plus className='mr-2 h-4 w-4' />
+                        옵션 그룹 추가
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {optionGroups.length === 0 ? (
+                      <div className='py-8 text-center text-gray-500'>
+                        옵션이 없습니다. 위의 &ldquo;옵션 그룹 추가&rdquo; 버튼을 클릭하여 옵션을
+                        추가해보세요.
+                      </div>
+                    ) : (
+                      <div className='space-y-6'>
+                        {optionGroups.map((group, groupIndex) => (
+                          <OptionGroupComponent
+                            key={group.id}
+                            group={group}
+                            groupIndex={groupIndex}
+                            onRemoveGroup={removeOptionGroup}
+                            onUpdateGroupName={updateOptionGroupName}
+                            onAddOptionItem={addOptionItem}
+                            onRemoveOptionItem={removeOptionItem}
+                            onUpdateOptionItem={updateOptionItem}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <div className='flex justify-end space-x-3'>
-              <Link href={ROUTES.ADMIN_REVIEW}>
-                <Button type='button' variant='outline'>
-                  취소
+              <TabsContent value='option2' className='space-y-6'>
+                <div className='py-8 text-center text-gray-500'>
+                  2번째 옵션 리스트는 준비 중입니다.
+                </div>
+              </TabsContent>
+
+              <TabsContent value='option3' className='space-y-6'>
+                <div className='py-8 text-center text-gray-500'>
+                  3번째 옵션 리스트는 준비 중입니다.
+                </div>
+              </TabsContent>
+
+              <div className='flex justify-end space-x-3'>
+                <Link href={ROUTES.ADMIN_REVIEW}>
+                  <Button type='button' variant='outline'>
+                    취소
+                  </Button>
+                </Link>
+                <Button type='submit' disabled={saving}>
+                  {saving ? '저장 중' : '저장'}
                 </Button>
-              </Link>
-              <Button type='submit' disabled={saving}>
-                {saving ? '저장 중' : '저장'}
-              </Button>
-            </div>
-          </form>
-        </Form>
+              </div>
+            </form>
+          </Form>
+        </Tabs>
       </div>
 
+      {/* Dialogs */}
       {/* 대표 이미지 필수 Dialog */}
       <MessageDialog
         open={showRequiredImageDialog}
