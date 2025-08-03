@@ -198,7 +198,7 @@ export function ReviewTableRow({
                 variant='outline'
                 size='sm'
                 className='border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
-                title='작품 설정'
+                title='디자인 설정'
               >
                 설정
               </Button>

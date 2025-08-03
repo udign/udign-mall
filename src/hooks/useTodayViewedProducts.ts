@@ -20,7 +20,7 @@ export const useTodayViewedProducts = () => {
   const [viewedProducts, setViewedProducts] = useState<TodayViewedProduct[]>([]);
   const [isLoadingTodayViewed, setIsLoadingTodayViewed] = useState<boolean>(true);
 
-  // 로컬스토리지에서 오늘 본 작품 불러오기
+  // 로컬스토리지에서 오늘 본 디자인 불러오기
   const loadViewedProducts = useCallback(() => {
     try {
       if (isBrowser) {
@@ -63,7 +63,7 @@ export const useTodayViewedProducts = () => {
     };
   }, [loadViewedProducts]);
 
-  // 오늘 본 작품 리스트 갱신
+  // 오늘 본 디자인 리스트 갱신
   const saveViewedProducts = useCallback((products: TodayViewedProduct[]) => {
     try {
       if (isBrowser) {
@@ -78,7 +78,7 @@ export const useTodayViewedProducts = () => {
     }
   }, []);
 
-  // 작품을 오늘 본 작품 리스트에 추가
+  // 디자인을 오늘 본 디자인 리스트에 추가
   const addViewedProduct = useCallback(
     (product: Product) => {
       const newViewedProduct: TodayViewedProduct = {
@@ -91,7 +91,7 @@ export const useTodayViewedProducts = () => {
       };
 
       setViewedProducts((prev) => {
-        // 기존에 본 작품이면 제거하고 맨 앞에 추가
+        // 기존에 본 디자인이면 제거하고 맨 앞에 추가
         const filtered = prev.filter((item) => item.it_id !== product.it_id);
         const updated = [newViewedProduct, ...filtered];
         // 최대 개수 제한
@@ -104,7 +104,7 @@ export const useTodayViewedProducts = () => {
     [saveViewedProducts],
   );
 
-  // 특정 작품을 목록에서 제거
+  // 특정 디자인을 목록에서 제거
   const removeViewedProduct = useCallback(
     (productId: string) => {
       setViewedProducts((prev) => {
@@ -116,7 +116,7 @@ export const useTodayViewedProducts = () => {
     [saveViewedProducts],
   );
 
-  // 모든 본 작품 리스트 지우기
+  // 모든 본 디자인 리스트 지우기
   const clearViewedProducts = useCallback(() => {
     setViewedProducts([]);
     if (isBrowser) {

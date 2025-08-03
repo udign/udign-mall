@@ -14,9 +14,9 @@ import { ROUTES } from '@/lib/routes';
 import { ReviewTableRow } from '@/components/ReviewTableRow';
 
 const tableHeaders = [
-  '작품 ID',
+  '디자인 ID',
   '이미지',
-  '작품명',
+  '디자인명',
   '판매가격',
   '재고',
   '옵션',
@@ -147,7 +147,7 @@ function ReviewManagement() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || '작품 상태 변경에 실패했습니다.');
+        throw new Error(errorData.error || '디자인 상태 변경에 실패했습니다.');
       }
 
       const result = await response.json();
@@ -203,11 +203,11 @@ function ReviewManagement() {
         });
       }
     } catch (error) {
-      console.error('작품 상태 변경 실패:', error);
+      console.error('디자인 상태 변경 실패:', error);
       setMessageDialog({
         open: true,
         title: '상태 변경 실패',
-        description: error instanceof Error ? error.message : '작품 상태 변경에 실패했습니다.',
+        description: error instanceof Error ? error.message : '디자인 상태 변경에 실패했습니다.',
       });
     } finally {
       setActionLoading(null);
@@ -301,9 +301,9 @@ function ReviewManagement() {
       <div className='space-y-4'>
         <div className='flex items-center justify-between'>
           <div>
-            <h1 className='text-2xl font-bold text-gray-900'>작품 관리</h1>
+            <h1 className='text-2xl font-bold text-gray-900'>디자인 관리</h1>
             <p className='mt-1 text-gray-600'>
-              모든 작품의 상태를 확인하고 구매 진행/제작 검토 처리를 할 수 있습니다.
+              모든 디자인의 상태를 확인하고 구매 진행/제작 검토 처리를 할 수 있습니다.
             </p>
           </div>
         </div>
@@ -316,7 +316,7 @@ function ReviewManagement() {
                   <Database className='h-6 w-6 text-blue-600' />
                 </div>
                 <div className='ml-4'>
-                  <p className='text-sm font-medium text-gray-600'>전체 작품</p>
+                  <p className='text-sm font-medium text-gray-600'>전체 디자인</p>
                   <p className='text-3xl font-bold text-blue-600'>{stats?.allItems || 0}</p>
                 </div>
               </div>
@@ -383,9 +383,9 @@ function ReviewManagement() {
         <div className='rounded-lg bg-white'>
           <div>
             <div className='mb-4 flex items-center justify-between'>
-              <h3 className='text-lg font-semibold text-gray-900'>전체 작품 목록</h3>
+              <h3 className='text-lg font-semibold text-gray-900'>전체 디자인 목록</h3>
               <p className='text-sm text-gray-600'>
-                총 {totalItems}개 작품 (페이지 {currentPage}/{totalPages})
+                총 {totalItems}개 디자인 (페이지 {currentPage}/{totalPages})
               </p>
             </div>
 
@@ -394,7 +394,7 @@ function ReviewManagement() {
                 <LoadingSpinner size='md' message='로딩 중...' />
               </div>
             ) : items.length === 0 ? (
-              <div className='py-8 text-center text-gray-500'>등록된 작품이 없습니다.</div>
+              <div className='py-8 text-center text-gray-500'>등록된 디자인이 없습니다.</div>
             ) : (
               <>
                 <div className='overflow-x-auto'>
@@ -445,7 +445,7 @@ function ReviewManagement() {
         open={confirmDialog.open}
         onOpenChange={(open) => setConfirmDialog((prev) => ({ ...prev, open }))}
         title={`${confirmDialog.action === 'payment' ? '구매 진행' : '제작 검토'} 확인`}
-        description={`"${confirmDialog.itemName}" 작품을 ${
+        description={`"${confirmDialog.itemName}" 디자인을 ${
           confirmDialog.action === 'payment' ? '구매 진행' : '제작 검토'
         } 상태로 변경하시겠습니까?`}
         confirmText={confirmDialog.action === 'payment' ? '구매 진행' : '제작 검토'}

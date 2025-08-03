@@ -583,7 +583,10 @@
     "productSelector": {
       "title": "选择要举报版权的产品",
       "loadingProducts": "正在加载产品...",
-      "noProducts": "没有产品。",
+      "noProducts": "暂无产品。",
+      "noSearchResults": "未找到搜索结果。",
+      "searchPlaceholder": "按产品名称搜索",
+      "searchButton": "搜索",
       "categories": {
         "all": "全部",
         "fashion": "Fashion",
@@ -771,14 +774,11 @@
     }
   },
   "upload": {
-    "title": "等待您的珍贵作品",
-    "subtitle": "非常感谢设计师们分享创意设计。",
-    "checkBeforeUpload": "设计上传前请仔细确认以下事项。",
-    "requiredCheck": "上传前必须确认事项",
+    "subtitle": "非常感谢设计师们分享创意设计。\n填满所有❤️的设计将制作成商品，相应设计商品销售额的7%将支付给您。\n\n设计上传前请仔细确认以下事项。",
     "guidelines": {
       "item1": {
         "title": "1. 必须填写项目",
-        "content": "作品注册时请完整填写提供的所有输入栏。"
+        "content": "设计注册时请完整填写提供的所有输入栏。"
       },
       "item2": {
         "title": "2. 图片上传构成",
@@ -795,27 +795,32 @@
       "item5": {
         "title": "5. 管理员批准后展示",
         "content": "注册的作品经内部审核后展示。（工作日基准2-3天所需）"
+      },
+      "item6": {
+        "title": "6. 使用条款遵守",
+        "content": "设计注册前，请务必确认相关使用条款后再注册。\n不遵守条款时，相应设计可能被驳回或删除。"
       }
     },
     "form": {
       "mainImage": "代表图片",
       "additionalImages": "追加图片",
-      "category": "作品类别",
-      "artworkName": "作品名",
-      "description": "作品说明",
+      "category": "设计类别",
+      "artworkName": "设计名",
+      "description": "设计说明",
       "terms": "条款/指导事项",
       "required": "*",
       "selectMainImage": "代表图片选择",
-      "selectCategory": "请选择作品类别。",
-      "artworkNamePlaceholder": "作品名",
-      "descriptionPlaceholder": "请输入关于作品的详细说明。",
+      "selectCategory": "请选择设计类别。",
+      "artworkNamePlaceholder": "设计名",
+      "descriptionPlaceholder": "请输入关于设计的详细说明。",
       "agreeToTerms": "同意条款/指导事项内容。",
       "uploadButton": "上传",
       "uploading": "上传中...",
-      "imageSpecs": "推荐尺寸：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG",
-      "additionalImageSpecs": "推荐尺寸：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG\n最多可选择3张。",
-      "additionalImageCount": "追加图片（{{count}}/3张）",
-      "imageNumber": "图片{{number}}"
+      "imageSpecs": "推荐尺寸：1200 x 1200以上\n容量：5MB以下\nPNG、JPG、JPEG",
+      "additionalImageSpecs": "推荐尺寸：1200 x 1200以上\n容量：5MB以下\nPNG、JPG、JPEG\n最多可选择4张。",
+      "additionalImageCount": "追加图片（{{count}}/4张）",
+      "imageNumber": "图片{{number}}",
+      "dragDropHint": "拖放文件或点击上传"
     },
     "messages": {
       "fileSizeExceeded": "文件容量超过",
@@ -826,10 +831,10 @@
       "mainImageRequiredDesc": "请选择代表图片。",
       "categoryRequired": "类别必须",
       "categoryRequiredDesc": "请选择类别。",
-      "artworkNameRequired": "作品名必须",
-      "artworkNameRequiredDesc": "请输入作品名。",
-      "descriptionRequired": "作品说明必须",
-      "descriptionRequiredDesc": "请输入作品说明。",
+      "artworkNameRequired": "设计名必须",
+      "artworkNameRequiredDesc": "请输入设计名。",
+      "descriptionRequired": "设计说明必须",
+      "descriptionRequiredDesc": "请输入设计说明。",
       "termsRequired": "条款同意必须",
       "termsRequiredDesc": "请同意条款。",
       "uploadSuccess": "上传完成",

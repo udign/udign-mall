@@ -154,7 +154,7 @@
     "progressInfo": "유다인의 모든 진행상황은 MY UDIGN 에서 확인하실 수 있습니다.",
     "myUdign": "MY UDIGN",
     "steps": {
-      "designLike": "디자인 좋아요",
+      "designLike": "좋아요",
       "productionReview": "제작 검토",
       "purchaseProgress": "구매진행",
       "orderConfirmation": "주문확정",
@@ -240,7 +240,7 @@
       "email": "E-MAIL"
     },
     "contact": {
-      "title": "Contact Us",
+      "title": "contact Us",
       "phone": "1577-4215",
       "operatingHours": "운영시간 : 평일 09:00 ~ 17:00",
       "lunchTime": "점심시간 : 평일 12:00 ~ 13:00",
@@ -413,12 +413,12 @@
       "product": "상품: 실제 제작된 작품 (좋아요한 회원만 구매 가능)"
     },
     "reviewProcess": {
-      "title": "심의 진행 방식:",
-      "auto": "자동 심의: 목표 좋아요 인원 달성 시 자동으로 심의 단계 진행",
-      "manual": "수동 심의: 관리자가 설정한 기간 후 심의 단계 진행"
+      "title": "제작검토 진행 방식:",
+      "auto": "자동 검토(기본): 목표 좋아요 인원 달성 시 자동으로 검토 단계 진행",
+      "manual": "수동 검토: 목표가 미달되었으나 관리자 판단에 의한 수동으로 검토 단계 진행"
     },
     "steps": {
-      "collection": "디자인 좋아요",
+      "collection": "좋아요",
       "review": "제작 검토",
       "payment": "구매 진행",
       "paymentWaiting": "결제대기",
@@ -429,7 +429,7 @@
     },
     "statusGroups": {
       "all": "전체",
-      "collection": "디자인 좋아요",
+      "collection": "좋아요",
       "review": "제작 검토",
       "payment": "구매 진행",
       "paymentCompleted": "주문 확정",
@@ -582,6 +582,9 @@
       "title": "저작권 신고할 제품 선택",
       "loadingProducts": "제품을 불러오는 중...",
       "noProducts": "제품이 없습니다.",
+      "noSearchResults": "검색 결과가 없습니다.",
+      "searchPlaceholder": "제품명으로 검색",
+      "searchButton": "검색",
       "categories": {
         "all": "전체",
         "fashion": "Fashion",
@@ -769,14 +772,11 @@
     }
   },
   "upload": {
-    "title": "여러분의 소중한 작품을 기다립니다",
-    "subtitle": "디자이너 여러분의 창의적인 디자인을 공유해 주셔서 진심으로 감사드립니다.",
-    "checkBeforeUpload": "디자인 업로드 전 아래의 사항을 꼼꼼히 확인해주시기 바랍니다.",
-    "requiredCheck": "업로드 전 필수 확인사항",
+    "subtitle": "디자이너 여러분의 창의적인 디자인을 공유해 주셔서 진심으로 감사드립니다.\n❤️ 를 모두 채운 디자인은 상품으로 완성되며, 해당 디자인 상품에 대해 판매액의 7%가 지급됩니다.\n\n디자인 업로드 전 아래의 사항을 꼼꼼히 확인해 주시기 바랍니다.",
     "guidelines": {
       "item1": {
         "title": "1. 필수 작성 항목 기재",
-        "content": "작품 등록 시 제공되는 모든 입력란을 빠짐없이 작성해 주시기 바랍니다."
+        "content": "디자인 등록 시 제공되는 모든 입력란을 빠짐없이 작성해주시기 바랍니다."
       },
       "item2": {
         "title": "2. 이미지 업로드 구성",
@@ -793,27 +793,32 @@
       "item5": {
         "title": "5. 관리자 승인 후 노출",
         "content": "등록된 작품은 내부 검토 후 노출됩니다. (영업일 기준 2~3일 소요)"
+      },
+      "item6": {
+        "title": "6. 이용약관 준수",
+        "content": "디자인 등록 전, 관련 이용약관을 반드시 확인하신 후 등록하시기를 바랍니다.\n약관 미준수 시, 해당 디자인은 반려 또는 삭제될 수 있습니다."
       }
     },
     "form": {
       "mainImage": "대표 이미지",
       "additionalImages": "추가 이미지",
-      "category": "작품 카테고리",
-      "artworkName": "작품명",
-      "description": "작품설명",
+      "category": "디자인 카테고리",
+      "artworkName": "디자인명",
+      "description": "디자인설명",
       "terms": "약관/안내사항",
       "required": "*",
       "selectMainImage": "대표 이미지 선택",
-      "selectCategory": "작품 카테고리를 선택해주세요.",
-      "artworkNamePlaceholder": "작품명",
-      "descriptionPlaceholder": "작품에 대한 상세한 설명을 입력해주세요.",
+      "selectCategory": "디자인 카테고리를 선택해주세요.",
+      "artworkNamePlaceholder": "디자인명",
+      "descriptionPlaceholder": "디자인에 대한 상세한 설명을 입력해주세요.",
       "agreeToTerms": "약관/안내사항의 내용에 동의합니다.",
       "uploadButton": "업로드하기",
       "uploading": "업로드 중...",
-      "imageSpecs": "권장 크기: 800 x 800 이상\n용량: 5MB 이하\nPNG, JPG, JPEG",
-      "additionalImageSpecs": "권장 크기: 800 x 800 이상\n용량: 5MB 이하\nPNG, JPG, JPEG\n최대 3장까지 선택 가능합니다.",
-      "additionalImageCount": "추가 이미지 ({{count}}/3개)",
-      "imageNumber": "이미지 {{number}}"
+      "imageSpecs": "권장 크기: 1200 x 1200 이상\n용량: 5MB 이하\nPNG, JPG, JPEG",
+      "additionalImageSpecs": "권장 크기: 1200 x 1200 이상\n용량: 5MB 이하\nPNG, JPG, JPEG\n최대 4장까지 선택 가능합니다.",
+      "additionalImageCount": "추가 이미지 ({{count}}/4개)",
+      "imageNumber": "이미지 {{number}}",
+      "dragDropHint": "파일을 드래그앤드롭하거나 클릭하여 업로드"
     },
     "messages": {
       "fileSizeExceeded": "파일 용량 초과",
@@ -824,10 +829,10 @@
       "mainImageRequiredDesc": "대표 이미지를 선택해주세요.",
       "categoryRequired": "카테고리 필수",
       "categoryRequiredDesc": "카테고리를 선택해주세요.",
-      "artworkNameRequired": "작품명 필수",
-      "artworkNameRequiredDesc": "작품명을 입력해주세요.",
-      "descriptionRequired": "작품설명 필수",
-      "descriptionRequiredDesc": "작품설명을 입력해주세요.",
+      "artworkNameRequired": "디자인명 필수",
+      "artworkNameRequiredDesc": "디자인명을 입력해주세요.",
+      "descriptionRequired": "디자인설명 필수",
+      "descriptionRequiredDesc": "디자인설명을 입력해주세요.",
       "termsRequired": "약관 동의 필수",
       "termsRequiredDesc": "약관에 동의해주세요.",
       "uploadSuccess": "업로드 완료",

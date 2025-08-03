@@ -27,7 +27,7 @@ export const POST = async (request: NextRequest) => {
 
     // 추가 이미지들 수집
     const additionalImages: File[] = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       const additionalImage = formData.get(`additionalImage${i}`) as File;
       if (additionalImage && additionalImage.size > 0) {
         additionalImages.push(additionalImage);
@@ -45,9 +45,9 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // 카테고리 검증
-    const validCategories = ['10', '20', '30'];
-    if (!validCategories.includes(category)) {
+    // 카테고리 검증 - depth에 따라 2, 4, 6, 8자리 허용
+    const categoryLength = category.length;
+    if (![2, 4, 6, 8].includes(categoryLength)) {
       return NextResponse.json(
         {
           success: false,
@@ -140,7 +140,7 @@ export const POST = async (request: NextRequest) => {
       const insertQuery = `
         INSERT INTO g5_shop_item (
           it_id, ca_id, it_name, it_basic, it_explan, it_explan2, it_mobile_explan, 
-          it_img1, it_img2, it_img3, it_img4,
+          it_img1, it_img2, it_img3, it_img4, it_img5,
           it_price, it_cust_price, it_use, it_soldout, it_stock_qty, it_buy_min_qty, it_buy_max_qty,
           it_sc_type, it_sc_method, it_sc_price, it_sc_minimum, it_sc_qty, it_noti_qty,
           it_type1, it_type2, it_type3, it_type4, it_type5, it_notax, it_nocoupon, it_tel_inq,
@@ -150,7 +150,7 @@ export const POST = async (request: NextRequest) => {
           it_1, it_2, it_3, it_4, it_order
         ) VALUES (
           ?, ?, ?, ?, ?, ?, ?,
-          ?, ?, ?, ?,
+          ?, ?, ?, ?, ?,
           0, 0, 0, 0, ?, ?, ?,
           ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?, ?,
@@ -173,6 +173,7 @@ export const POST = async (request: NextRequest) => {
         additionalImageBlobs[0] || '', // 추가 이미지 1
         additionalImageBlobs[1] || '', // 추가 이미지 2
         additionalImageBlobs[2] || '', // 추가 이미지 3
+        additionalImageBlobs[3] || '', // 추가 이미지 4
         // 재고 및 구매 설정 (기존 작품들과 동일)
         99999, // it_stock_qty: 재고 수량
         1, // it_buy_min_qty: 최소 구매 수량

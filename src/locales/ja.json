@@ -580,9 +580,12 @@
     "title": "著作権侵害申告",
     "loadingMessage": "読み込み中...",
     "productSelector": {
-      "title": "著作権申告する製品選択",
-      "loadingProducts": "製品を読み込み中...",
+      "title": "著作権申告する製品を選択",
+      "loadingProducts": "製品を読み込んでいます...",
       "noProducts": "製品がありません。",
+      "noSearchResults": "検索結果がありません。",
+      "searchPlaceholder": "製品名で検索",
+      "searchButton": "検索",
       "categories": {
         "all": "全体",
         "fashion": "Fashion",
@@ -770,14 +773,11 @@
     }
   },
   "upload": {
-    "title": "皆様の大切な作品をお待ちしています",
-    "subtitle": "デザイナーの皆様の創意的なデザインを共有していただき、心から感謝いたします。",
-    "checkBeforeUpload": "デザインアップロード前に下記事項を詳しくご確認ください。",
-    "requiredCheck": "アップロード前必須確認事項",
+    "subtitle": "デザイナーの皆様の創意的なデザインを共有していただき、心から感謝いたします。\nすべての❤️を満たしたデザインは商品として完成され、該当デザイン商品に対して販売額の7％が支給されます。\n\nデザインアップロード前に下記事項を詳しくご確認ください。",
     "guidelines": {
       "item1": {
         "title": "1. 必須作成項目記載",
-        "content": "作品登録時に提供されるすべての入力欄を漏れなく作成してください。"
+        "content": "デザイン登録時に提供されるすべての入力欄を漏れなく作成してください。"
       },
       "item2": {
         "title": "2. 画像アップロード構成",
@@ -794,27 +794,32 @@
       "item5": {
         "title": "5. 管理者承認後露出",
         "content": "登録された作品は内部検討後に露出されます。（営業日基準2～3日所要）"
+      },
+      "item6": {
+        "title": "6. 利用約款遵守",
+        "content": "デザイン登録前、関連利用約款を必ず確認した後、登録してください。\n約款未遵守時、該当デザインは差し戻しまたは削除される可能性があります。"
       }
     },
     "form": {
       "mainImage": "代表画像",
       "additionalImages": "追加画像",
-      "category": "作品カテゴリ",
-      "artworkName": "作品名",
-      "description": "作品説明",
+      "category": "デザインカテゴリ",
+      "artworkName": "デザイン名",
+      "description": "デザイン説明",
       "terms": "約款・案内事項",
       "required": "*",
       "selectMainImage": "代表画像選択",
-      "selectCategory": "作品カテゴリを選択してください。",
-      "artworkNamePlaceholder": "作品名",
-      "descriptionPlaceholder": "作品に関する詳細な説明を入力してください。",
+      "selectCategory": "デザインカテゴリを選択してください。",
+      "artworkNamePlaceholder": "デザイン名",
+      "descriptionPlaceholder": "デザインに関する詳細な説明を入力してください。",
       "agreeToTerms": "約款・案内事項の内容に同意します。",
       "uploadButton": "アップロードする",
       "uploading": "アップロード中...",
-      "imageSpecs": "推奨サイズ：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG",
-      "additionalImageSpecs": "推奨サイズ：800 x 800以上\n容量：5MB以下\nPNG、JPG、JPEG\n最大3枚まで選択可能です。",
-      "additionalImageCount": "追加画像（{{count}}/3個）",
-      "imageNumber": "画像{{number}}"
+      "imageSpecs": "推奨サイズ：1200 x 1200以上\n容量：5MB以下\nPNG、JPG、JPEG",
+      "additionalImageSpecs": "推奨サイズ：1200 x 1200以上\n容量：5MB以下\nPNG、JPG、JPEG\n最大4枚まで選択可能です。",
+      "additionalImageCount": "追加画像（{{count}}/4個）",
+      "imageNumber": "画像{{number}}",
+      "dragDropHint": "ファイルをドラッグ＆ドロップまたはクリックしてアップロード"
     },
     "messages": {
       "fileSizeExceeded": "ファイル容量超過",
@@ -825,10 +830,10 @@
       "mainImageRequiredDesc": "代表画像を選択してください。",
       "categoryRequired": "カテゴリ必須",
       "categoryRequiredDesc": "カテゴリを選択してください。",
-      "artworkNameRequired": "作品名必須",
-      "artworkNameRequiredDesc": "作品名を入力してください。",
-      "descriptionRequired": "作品説明必須",
-      "descriptionRequiredDesc": "作品説明を入力してください。",
+      "artworkNameRequired": "デザイン名必須",
+      "artworkNameRequiredDesc": "デザイン名を入力してください。",
+      "descriptionRequired": "デザイン説明必須",
+      "descriptionRequiredDesc": "デザイン説明を入力してください。",
       "termsRequired": "約款同意必須",
       "termsRequiredDesc": "約款に同意してください。",
       "uploadSuccess": "アップロード完了",

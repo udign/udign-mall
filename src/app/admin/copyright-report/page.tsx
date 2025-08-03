@@ -2,20 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
+import { Card } from '@/components/ui/primitives/card';
 import { Button } from '@/components/ui/primitives/button';
 import { Input } from '@/components/ui/primitives/input';
-import { Card } from '@/components/ui/primitives/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/primitives/dialog';
 import LoadingState from '@/components/states/LoadingState';
 import EmptyState from '@/components/states/EmptyState';
 import CommonPagination from '@/components/CommonPagination';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/primitives/dialog';
 import { getImageUrl } from '@/lib/utils';
-import { ROUTES } from '@/lib/routes';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ExternalLink, FileText, Search } from 'lucide-react';
+import { FileText, Search, Eye } from 'lucide-react';
 
 interface CopyrightReport {
   id: number;
@@ -99,7 +97,7 @@ export default function CopyrightReportPage() {
     fetchReports(page);
   };
 
-  const handleViewFiles = (report: CopyrightReport) => {
+  const openModal = (report: CopyrightReport) => {
     setSelectedReport(report);
     setIsModalOpen(true);
   };
@@ -173,9 +171,7 @@ export default function CopyrightReportPage() {
                 <tr className='border-b bg-gray-50'>
                   <th className='p-3 text-left font-medium'>No</th>
                   <th className='p-3 text-left font-medium'>신고일시</th>
-                  <th className='p-3 text-left font-medium'>신고자</th>
                   <th className='p-3 text-left font-medium'>제품명</th>
-                  <th className='p-3 text-left font-medium'>제작자</th>
                   <th className='p-3 text-left font-medium'>신고내용</th>
                   <th className='p-3 text-center font-medium'>파일</th>
                 </tr>
@@ -183,53 +179,38 @@ export default function CopyrightReportPage() {
               <tbody>
                 {reports.map((report, index) => (
                   <tr key={report.id} className='border-b hover:bg-gray-50'>
-                    <td className='p-3'>{(pagination.page - 1) * pagination.limit + index + 1}</td>
-                    <td className='p-3 text-sm'>{formatDate(report.reported_at)}</td>
-                    <td className='p-3'>
-                      <div>
-                        <div className='font-medium'>{report.reporter_name}</div>
-                        <div className='text-xs text-gray-500'>{report.reporter_id}</div>
-                      </div>
+                    <td className='p-3 text-sm'>{index + 1}</td>
+                    <td className='p-3 text-sm whitespace-nowrap'>
+                      {formatDate(report.reported_at)}
                     </td>
                     <td className='p-3'>
-                      <Link
-                        href={`${ROUTES.PRODUCT}/${report.product_id}`}
-                        target='_blank'
-                        className='flex items-center gap-2 hover:text-blue-600'
-                      >
+                      <div className='flex items-center gap-2'>
                         {report.product_image && (
-                          <Image
-                            src={getImageUrl(report.product_image) || '/images/logo.png'}
-                            alt={report.product_name}
-                            width={40}
-                            height={40}
-                            className='rounded object-cover'
-                          />
+                          <div className='relative h-10 w-10 flex-shrink-0'>
+                            <Image
+                              src={getImageUrl(report.product_image) || '/images/logo.png'}
+                              alt={report.product_name}
+                              fill
+                              className='rounded object-cover'
+                            />
+                          </div>
                         )}
-                        <span className='underline'>{report.product_name}</span>
-                        <ExternalLink className='h-3 w-3' />
-                      </Link>
-                    </td>
-                    <td className='p-3'>
-                      <div>
-                        <div className='font-medium'>{report.creator_name}</div>
-                        <div className='text-xs text-gray-500'>{report.creator_id}</div>
+                        <span className='text-sm font-medium'>
+                          {truncateText(report.product_name, 30)}
+                        </span>
                       </div>
                     </td>
-                    <td className='p-3 max-w-xs'>
-                      <p className='text-sm'>{truncateText(report.content)}</p>
+                    <td className='p-3 text-sm'>
+                      {truncateText(report.content)}
                     </td>
                     <td className='p-3 text-center'>
-                      {report.evidence_urls.length > 0 && (
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          onClick={() => handleViewFiles(report)}
-                        >
-                          <FileText className='h-4 w-4 mr-1' />
-                          보기 ({report.evidence_urls.length})
-                        </Button>
-                      )}
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => openModal(report)}
+                      >
+                        <Eye className='h-4 w-4' />
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -283,7 +264,7 @@ export default function CopyrightReportPage() {
                               증거파일 {index + 1} (PDF)
                             </a>
                           ) : (
-                            <Link
+                            <a
                               href={url}
                               target='_blank'
                               rel='noopener noreferrer'
@@ -296,7 +277,7 @@ export default function CopyrightReportPage() {
                                 height={150}
                                 className='max-w-full h-auto rounded cursor-pointer hover:opacity-90'
                               />
-                            </Link>
+                            </a>
                           )}
                         </div>
                       );

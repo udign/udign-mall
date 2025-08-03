@@ -19,14 +19,25 @@ export async function GET(request: NextRequest) {
     // 쿼리 파라미터 파싱
     const searchParams = request.nextUrl.searchParams;
     const ca_id = searchParams.get('ca_id') || '';
+    const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     const offset = (page - 1) * limit;
 
     // 카테고리 조건
     let categoryCondition = '';
+    const params: (string | number)[] = [];
+    
     if (ca_id) {
       categoryCondition = 'AND i.ca_id = ?';
+      params.push(ca_id);
+    }
+
+    // 검색 조건
+    let searchCondition = '';
+    if (search) {
+      searchCondition = 'AND i.it_name LIKE ?';
+      params.push(`%${search}%`);
     }
 
     // 전체 개수 조회
@@ -36,9 +47,9 @@ export async function GET(request: NextRequest) {
       LEFT JOIN g5_shop_category c ON i.ca_id = c.ca_id
       WHERE i.it_use = 1
       ${categoryCondition}
+      ${searchCondition}
     `;
-    const countParams = ca_id ? [ca_id] : [];
-    const countResult = await executeQuery(countQuery, countParams) as Array<{ total: number }>;
+    const countResult = await executeQuery(countQuery, params) as Array<{ total: number }>;
     const totalCount = countResult[0]?.total || 0;
 
     // 제품 목록 조회
@@ -56,11 +67,12 @@ export async function GET(request: NextRequest) {
       LEFT JOIN g5_shop_category c ON i.ca_id = c.ca_id
       WHERE i.it_use = 1
       ${categoryCondition}
+      ${searchCondition}
       ORDER BY i.it_time DESC
       LIMIT ? OFFSET ?
     `;
-    const params = ca_id ? [ca_id, limit, offset] : [limit, offset];
-    const products = await executeQuery(query, params) as Array<{
+    const queryParams = [...params, limit, offset];
+    const products = await executeQuery(query, queryParams) as Array<{
       it_id: string;
       it_name: string;
       it_img1: string | null;
@@ -83,7 +95,7 @@ export async function GET(request: NextRequest) {
         ca_id: product.ca_id,
         ca_name: product.ca_name || '미분류',
         creator_id: product.creator_id || '',
-        creator_name: product.creator_name || '알 수 없음',
+        creator_name: product.creator_name || '',
       })),
       pagination: {
         page,

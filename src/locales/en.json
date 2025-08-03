@@ -194,9 +194,12 @@
     "title": "Copyright Infringement Report",
     "loadingMessage": "Loading...",
     "productSelector": {
-      "title": "Select Product to Report",
+      "title": "Select Product for Copyright Report",
       "loadingProducts": "Loading products...",
       "noProducts": "No products available.",
+      "noSearchResults": "No search results found.",
+      "searchPlaceholder": "Search by product name",
+      "searchButton": "Search",
       "categories": {
         "all": "All",
         "fashion": "Fashion",
@@ -769,14 +772,11 @@
     }
   },
   "upload": {
-    "title": "We are waiting for your precious works",
-    "subtitle": "Thank you sincerely for sharing your creative designs, designers.",
-    "checkBeforeUpload": "Please carefully check the following before uploading your design.",
-    "requiredCheck": "Required items to check before upload",
+    "subtitle": "Thank you sincerely for sharing your creative designs, designers.\nDesigns that have filled all ❤️ will be made into products, and 7% of the sales amount will be paid for those design products.\n\nPlease carefully check the following before uploading your design.",
     "guidelines": {
       "item1": {
         "title": "1. Fill in all required fields",
-        "content": "Please fill in all input fields provided when registering your artwork."
+        "content": "Please fill in all input fields provided when registering your design."
       },
       "item2": {
         "title": "2. Image upload composition",
@@ -793,27 +793,32 @@
       "item5": {
         "title": "5. Display after admin approval",
         "content": "Registered works will be displayed after internal review. (2-3 business days required)"
+      },
+      "item6": {
+        "title": "6. Terms of Use Compliance",
+        "content": "Please make sure to check the relevant terms of use before registering your design.\nNon-compliance with the terms may result in your design being rejected or deleted."
       }
     },
     "form": {
       "mainImage": "Main Image",
       "additionalImages": "Additional Images",
-      "category": "Artwork Category",
-      "artworkName": "Artwork Name",
-      "description": "Artwork Description",
+      "category": "Design Category",
+      "artworkName": "Design Name",
+      "description": "Design Description",
       "terms": "Terms/Guidelines",
       "required": "*",
       "selectMainImage": "Select Main Image",
-      "selectCategory": "Please select an artwork category.",
-      "artworkNamePlaceholder": "Artwork Name",
-      "descriptionPlaceholder": "Please enter a detailed description of your artwork.",
+      "selectCategory": "Please select a design category.",
+      "artworkNamePlaceholder": "Design Name",
+      "descriptionPlaceholder": "Please enter a detailed description of your design.",
       "agreeToTerms": "I agree to the terms and guidelines.",
       "uploadButton": "Upload",
       "uploading": "Uploading...",
-      "imageSpecs": "Recommended size: 800 x 800 or higher\nSize: 5MB or less\nPNG, JPG, JPEG",
-      "additionalImageSpecs": "Recommended size: 800 x 800 or higher\nSize: 5MB or less\nPNG, JPG, JPEG\nUp to 3 images can be selected.",
-      "additionalImageCount": "Additional Images ({{count}}/3)",
-      "imageNumber": "Image {{number}}"
+      "imageSpecs": "Recommended size: 1200 x 1200 or higher\nSize: 5MB or less\nPNG, JPG, JPEG",
+      "additionalImageSpecs": "Recommended size: 1200 x 1200 or higher\nSize: 5MB or less\nPNG, JPG, JPEG\nUp to 4 images can be selected.",
+      "additionalImageCount": "Additional Images ({{count}}/4)",
+      "imageNumber": "Image {{number}}",
+      "dragDropHint": "Drag and drop files or click to upload"
     },
     "messages": {
       "fileSizeExceeded": "File Size Exceeded",
@@ -824,10 +829,10 @@
       "mainImageRequiredDesc": "Please select a main image.",
       "categoryRequired": "Category Required",
       "categoryRequiredDesc": "Please select a category.",
-      "artworkNameRequired": "Artwork Name Required",
-      "artworkNameRequiredDesc": "Please enter an artwork name.",
-      "descriptionRequired": "Description Required",
-      "descriptionRequiredDesc": "Please enter an artwork description.",
+      "artworkNameRequired": "Design Name Required",
+      "artworkNameRequiredDesc": "Please enter a design name.",
+      "descriptionRequired": "Design Description Required",
+      "descriptionRequiredDesc": "Please enter a design description.",
       "termsRequired": "Terms Agreement Required",
       "termsRequiredDesc": "Please agree to the terms.",
       "uploadSuccess": "Upload Completed",

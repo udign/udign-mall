@@ -21,6 +21,9 @@ export const ROUTES = {
   ADMIN_MAIL_TEST: '/admin/mail-test',
   ADMIN_SMS_CONFIG: '/admin/sms/config',
   ADMIN_SMS_TEST: '/admin/sms/test',
+  ADMIN_CATEGORY: '/admin/category',
+  ADMIN_CATEGORY_CREATE: '/admin/category/create',
+  ADMIN_CATEGORY_EDIT: '/admin/category/edit',
 
   // 인증 관련
   LOGIN: '/shop/login',
@@ -30,9 +33,7 @@ export const ROUTES = {
   RESET_PASSWORD: '/shop/reset-password',
 
   // 카테고리 페이지
-  FASHION: '/shop/fashion',
-  SHOES: '/shop/shoes',
-  OTHERS: '/shop/others',
+  CATEGORIES: '/shop/categories',
 
   // 상품 상세 페이지
   PRODUCT: '/shop/product',

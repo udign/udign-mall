@@ -106,11 +106,11 @@ export default function PopularProducts({ excludeProductId, dictionary }: Popula
 
           setProducts(formattedProducts);
         } else {
-          setError(data.error || '인기 작품을 불러오는데 실패했습니다.');
+          setError(data.error || '인기 디자인을 불러오는데 실패했습니다.');
         }
       } catch (err) {
         setError('서버 오류가 발생했습니다.');
-        console.error('인기 작품 조회 오류:', err);
+        console.error('인기 디자인 조회 오류:', err);
       } finally {
         setLoading(false);
       }
@@ -121,7 +121,7 @@ export default function PopularProducts({ excludeProductId, dictionary }: Popula
 
   return loading ? (
     <div className='mt-12 border-t border-gray-200 pt-8'>
-      <h2 className='mb-6 text-xl font-bold text-gray-900'>
+      <h2 className='mb-6 text-xl font-bold text-white'>
         {dictionary.productDetail.popularProducts.title}
       </h2>
       <div className='grid grid-cols-2 gap-6 md:grid-cols-4'>
@@ -137,7 +137,7 @@ export default function PopularProducts({ excludeProductId, dictionary }: Popula
     </div>
   ) : error || products.length === 0 ? null : (
     <div className='mt-12 border-t border-gray-200 pt-8'>
-      <h2 className='mb-6 text-xl font-bold text-gray-900'>
+      <h2 className='mb-6 text-xl font-bold text-white'>
         {dictionary.productDetail.popularProducts.title}
       </h2>
       <ProductGrid products={products} className='grid-cols-2 md:grid-cols-4' />

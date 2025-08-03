@@ -9,7 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import LoginRequiredDialog from '@/components/LoginRequiredDialog';
 import { ROUTES } from '@/lib/routes';
 import { shouldBlurProduct, getProductStatus } from '@/lib/artwork-helpers';
-import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon, Share2Icon } from 'lucide-react';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { Progress } from '@/components/ui/primitives/progress';
 import { Button } from '@/components/ui/primitives/button';
@@ -155,8 +155,8 @@ function Thumbnail({
 
   return (
     <div
-      className={`aspect-square h-16 w-16 shrink-0 cursor-pointer overflow-hidden rounded-lg border sm:h-20 sm:w-20 ${
-        isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'
+      className={`aspect-square h-16 w-16 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 sm:h-20 sm:w-20 ${
+        isSelected ? 'border-[#ec4ef3]' : 'border-gray-200'
       }`}
       onClick={() => onClick(image)}
     >
@@ -195,6 +195,9 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
   const [showMagnifierModal, setShowMagnifierModal] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{ [groupName: string]: ItemOption }>({});
   const [showSizeGuide, setShowSizeGuide] = useState<boolean>(false);
+  const [isSharing, setIsSharing] = useState<boolean>(false);
+  const [showShareDialog, setShowShareDialog] = useState<boolean>(false);
+  const [shareMessage, setShareMessage] = useState<string>('');
 
   const params = useParams();
   const router = useRouter();
@@ -392,6 +395,22 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
     setQuantity((prev) => Math.max(1, prev - 1));
   };
 
+  const handleShare = async () => {
+    setIsSharing(true);
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareMessage('URL이 클립보드에 복사되었습니다.');
+      setShowShareDialog(true);
+    } catch (error) {
+      console.error('URL 복사 실패:', error);
+      setShareMessage('URL 복사에 실패했습니다.');
+      setShowShareDialog(true);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   // 옵션을 그룹별로 분리하는 함수
   const getGroupedOptions = () => {
     if (!product?.options) return {};
@@ -469,9 +488,9 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
   ) : !product ? (
     <NotFoundState title={dictionary.productDetail.notFound} />
   ) : (
-    <div className='bg-white'>
+    <div>
       <div className='mx-auto my-8 max-w-6xl px-6 py-8 sm:px-10'>
-        {/* 블러 처리 대상 작품 - 좋아요를 누르지 않은 사용자에게만 달성 UI 표시 */}
+        {/* 블러 처리 대상 디자인 - 좋아요를 누르지 않은 사용자에게만 달성 UI 표시 */}
         {shouldBlurProduct(
           {
             current_likes: product.current_likes,
@@ -482,7 +501,7 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
           product.is_liked,
         ) ? (
           <div className='text-center'>
-            <h1 className='mb-8 text-3xl font-bold text-gray-900'>{product.it_name}</h1>
+            <h1 className='mb-8 text-3xl font-bold text-white'>{product.it_name}</h1>
             <div className='relative mx-auto max-w-md'>
               <div className='aspect-square overflow-hidden rounded-lg'>
                 <MainImage
@@ -510,11 +529,11 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     <Button
                       variant='outline'
                       onClick={() => router.push(`${ROUTES.PRODUCT}/${prevProduct.it_id}`)}
-                      className='group flex items-center gap-1 px-5 py-3'
+                      className='group flex items-center gap-1 border-white bg-transparent px-5 py-3 text-white hover:bg-transparent'
                     >
-                      <ChevronLeftIcon className='h-5 w-5 text-gray-400 transition-colors group-hover:text-gray-600' />
+                      <ChevronLeftIcon className='h-5 w-5 text-white transition-colors' />
                       <div className='text-left'>
-                        <div className='max-w-32 truncate text-sm text-gray-900'>
+                        <div className='max-w-32 truncate text-sm text-white'>
                           {dictionary.productDetail.navigation.previous}
                         </div>
                       </div>
@@ -523,11 +542,11 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     <Button
                       variant='outline'
                       disabled
-                      className='flex items-center gap-1 px-5 py-3'
+                      className='flex items-center gap-1 border-white bg-transparent px-5 py-3'
                     >
-                      <ChevronLeftIcon className='h-5 w-5 text-gray-300' />
+                      <ChevronLeftIcon className='h-5 w-5 text-white/60' />
                       <div className='text-left'>
-                        <div className='text-sm text-gray-400'>
+                        <div className='text-sm text-white/60'>
                           {dictionary.productDetail.navigation.noPrevious}
                         </div>
                       </div>
@@ -539,27 +558,27 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     <Button
                       variant='outline'
                       onClick={() => router.push(`${ROUTES.PRODUCT}/${nextProduct.it_id}`)}
-                      className='group flex items-center gap-1 px-5 py-3'
+                      className='group flex items-center gap-1 border-white bg-transparent px-5 py-3 text-white hover:bg-transparent'
                     >
                       <div className='text-right'>
-                        <div className='max-w-32 truncate text-sm text-gray-900'>
+                        <div className='max-w-32 truncate text-sm text-white'>
                           {dictionary.productDetail.navigation.next}
                         </div>
                       </div>
-                      <ChevronRightIcon className='h-5 w-5 text-gray-400 transition-colors group-hover:text-gray-600' />
+                      <ChevronRightIcon className='h-5 w-5 text-white transition-colors' />
                     </Button>
                   ) : (
                     <Button
                       variant='outline'
                       disabled
-                      className='flex items-center gap-1 px-5 py-3'
+                      className='flex items-center gap-1 border-white bg-transparent px-5 py-3'
                     >
                       <div className='text-right'>
-                        <div className='text-sm text-gray-400'>
+                        <div className='text-sm text-white/60'>
                           {dictionary.productDetail.navigation.noNext}
                         </div>
                       </div>
-                      <ChevronRightIcon className='h-5 w-5 text-gray-300' />
+                      <ChevronRightIcon className='h-5 w-5 text-white/60' />
                     </Button>
                   )}
                 </div>
@@ -631,49 +650,64 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
               </div>
 
               <div className='relative lg:w-1/2'>
-                <Button
-                  onClick={handleLikeToggle}
-                  variant='ghost'
-                  size='icon'
-                  disabled={
-                    likingInProgress || product.is_under_review || product.can_purchase || !user
-                  }
-                  className='absolute top-0 right-0 z-10 h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
-                >
-                  {likingInProgress ? (
-                    <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
-                  ) : product.is_liked ? (
-                    <AiFillHeart className='text-red-500' />
-                  ) : (
-                    <AiOutlineHeart />
-                  )}
-                </Button>
+                <div className='absolute top-0 right-0 z-10 flex gap-2'>
+                  <Button
+                    onClick={handleShare}
+                    variant='ghost'
+                    size='icon'
+                    disabled={isSharing}
+                    className='h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent'
+                  >
+                    {isSharing ? (
+                      <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+                    ) : (
+                      <Share2Icon className='h-4 w-4 text-white' />
+                    )}
+                  </Button>
+                  <Button
+                    onClick={handleLikeToggle}
+                    variant='ghost'
+                    size='icon'
+                    disabled={
+                      likingInProgress || product.is_under_review || product.can_purchase || !user
+                    }
+                    className='h-8 w-8 rounded-full p-1 text-lg backdrop-blur-sm transition-all duration-300 ease-out hover:scale-110 hover:bg-transparent disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50'
+                  >
+                    {likingInProgress ? (
+                      <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600' />
+                    ) : product.is_liked ? (
+                      <AiFillHeart className='text-red-500' />
+                    ) : (
+                      <AiOutlineHeart className='text-white' />
+                    )}
+                  </Button>
+                </div>
 
-                <h1 className='mb-6 pr-12 text-2xl font-bold text-gray-900'>{product.it_name}</h1>
+                <h1 className='mb-6 pr-12 text-2xl font-bold text-white'>{product.it_name}</h1>
 
                 {/* 구매 가능한 상품 - 구매 전용 정보 표시 */}
                 {product.can_purchase ? (
                   <div className='space-y-6'>
-                    <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                      <h3 className='mb-3 text-lg font-semibold text-gray-900'>
+                    <div className='rounded-lg border border-white/20 bg-white/5 p-4'>
+                      <h3 className='mb-3 text-lg font-semibold text-white'>
                         {dictionary.productDetail.price.title}
                       </h3>
                       <div className='space-y-2'>
                         {product.it_cust_price > 0 && (
                           <div className='flex items-center justify-between'>
-                            <span className='text-sm text-gray-600'>
+                            <span className='text-sm text-white/80'>
                               {dictionary.productDetail.price.originalPrice}
                             </span>
-                            <span className='text-sm text-gray-500 line-through'>
+                            <span className='text-sm text-white/60 line-through'>
                               {product.it_cust_price.toLocaleString()}원
                             </span>
                           </div>
                         )}
                         <div className='flex items-center justify-between'>
-                          <span className='text-base font-medium text-gray-900'>
+                          <span className='text-base font-medium text-white'>
                             {dictionary.productDetail.price.salePrice}
                           </span>
-                          <span className='text-primary text-xl font-bold'>
+                          <span className='text-xl font-bold text-white'>
                             {product.it_price.toLocaleString()}원
                           </span>
                         </div>
@@ -682,14 +716,14 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
 
                     {/* 상품 옵션 선택 */}
                     {product.options && product.options.length > 0 && (
-                      <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                        <h3 className='mb-3 text-lg font-semibold text-gray-900'>
+                      <div className='rounded-lg border border-white/20 bg-white/5 p-4'>
+                        <h3 className='mb-3 text-lg font-semibold text-white'>
                           {dictionary.productDetail.options.title}
                         </h3>
                         <div className='space-y-4'>
                           {Object.entries(getGroupedOptions()).map(([groupName, options]) => (
                             <div key={groupName} className='flex flex-col gap-2'>
-                              <label className='text-sm font-medium text-gray-700'>
+                              <label className='text-sm font-medium text-white/90'>
                                 {groupName}
                               </label>
                               <Select
@@ -718,11 +752,11 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                                           <span>{optionValue}</span>
                                           <div className='ml-4 text-right'>
                                             {option.io_price > 0 && (
-                                              <span className='text-sm text-blue-600'>
+                                              <span className='text-sm text-blue-400'>
                                                 +{option.io_price.toLocaleString()}원
                                               </span>
                                             )}
-                                            <div className='text-xs text-gray-500'>
+                                            <div className='text-xs text-white/60'>
                                               {dictionary.productDetail.options.stock.replace(
                                                 '{{count}}',
                                                 option.io_stock_qty.toString(),
@@ -740,8 +774,8 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
 
                           {/* 선택된 옵션들 요약 */}
                           {Object.keys(selectedOptions).length > 0 && (
-                            <div className='mt-3 rounded border bg-white p-3'>
-                              <h4 className='mb-2 text-sm font-medium text-gray-900'>
+                            <div className='mt-3 rounded border border-white/20 bg-white/10 p-3'>
+                              <h4 className='mb-2 text-sm font-medium text-white'>
                                 {dictionary.productDetail.options.selectedOptions}
                               </h4>
                               <div className='space-y-1'>
@@ -753,12 +787,12 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                                       key={groupName}
                                       className='flex items-center justify-between text-sm'
                                     >
-                                      <span className='text-gray-600'>
+                                      <span className='text-white/80'>
                                         {groupName}:{' '}
-                                        <span className='text-gray-900'>{optionValue}</span>
+                                        <span className='text-white'>{optionValue}</span>
                                       </span>
                                       {option.io_price > 0 && (
-                                        <span className='font-medium text-blue-600'>
+                                        <span className='font-medium text-white'>
                                           +{option.io_price.toLocaleString()}원
                                         </span>
                                       )}
@@ -772,12 +806,12 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                       </div>
                     )}
 
-                    <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                      <h3 className='mb-3 text-lg font-semibold text-gray-900'>
+                    <div className='rounded-lg border border-white/20 bg-white/5 p-4'>
+                      <h3 className='mb-3 text-lg font-semibold text-white'>
                         {dictionary.productDetail.quantity.title}
                       </h3>
                       <div className='flex items-center justify-between'>
-                        <span className='text-sm text-gray-600'>
+                        <span className='text-sm text-white/80'>
                           {dictionary.productDetail.quantity.label}
                         </span>
                         <div className='flex items-center gap-2'>
@@ -789,7 +823,9 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                           >
                             -
                           </Button>
-                          <span className='w-12 text-center font-medium'>{quantity}</span>
+                          <span className='w-12 text-center font-medium text-white'>
+                            {quantity}
+                          </span>
                           <Button
                             variant='outline'
                             size='icon'
@@ -802,22 +838,22 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                       </div>
                     </div>
 
-                    <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                    <div className='rounded-lg border border-white/20 bg-white/5 p-4'>
                       <div className='space-y-2'>
                         <div className='flex items-center justify-between'>
-                          <span className='text-sm text-gray-600'>
+                          <span className='text-sm text-white/80'>
                             {dictionary.productDetail.price.basePrice}
                           </span>
-                          <span className='text-sm text-gray-900'>
+                          <span className='text-sm text-white'>
                             {product.it_price.toLocaleString()}원
                           </span>
                         </div>
                         {Object.values(selectedOptions).some((option) => option.io_price > 0) && (
                           <div className='flex items-center justify-between'>
-                            <span className='text-sm text-gray-600'>
+                            <span className='text-sm text-white/80'>
                               {dictionary.productDetail.price.optionPrice}
                             </span>
-                            <span className='text-sm text-blue-600'>
+                            <span className='text-sm text-white'>
                               +
                               {Object.values(selectedOptions)
                                 .reduce((sum, option) => sum + option.io_price, 0)
@@ -827,17 +863,17 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                           </div>
                         )}
                         <div className='flex items-center justify-between'>
-                          <span className='text-sm text-gray-600'>
+                          <span className='text-sm text-white/80'>
                             {dictionary.productDetail.price.quantity}
                           </span>
-                          <span className='text-sm text-gray-900'>×{quantity}</span>
+                          <span className='text-sm text-white'>×{quantity}</span>
                         </div>
-                        <hr className='my-2' />
+                        <hr className='my-2 border-white/20' />
                         <div className='flex items-center justify-between'>
-                          <span className='text-lg font-semibold text-gray-900'>
+                          <span className='text-lg font-semibold text-white'>
                             {dictionary.productDetail.price.totalPrice}
                           </span>
-                          <span className='text-primary text-xl font-bold'>
+                          <span className='text-xl font-bold text-white'>
                             {getTotalPrice().toLocaleString()}원
                           </span>
                         </div>
@@ -849,14 +885,14 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                         variant='ghost'
                         size='sm'
                         onClick={() => setShowSizeGuide(true)}
-                        className='text-gray-600 underline hover:text-gray-900'
+                        className='text-white/80 underline hover:text-white'
                       >
                         {dictionary.productDetail.purchase.sizeGuide}
                       </Button>
                     </div>
 
                     <Button
-                      className='bg-primary hover:bg-primary/90 w-full text-white'
+                      className='w-full bg-[#ec4ef3] text-white hover:bg-[#d43de2]'
                       size='lg'
                       disabled={product.options.length > 0 && !isAllOptionsSelected()}
                       onClick={() => {
@@ -876,36 +912,36 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     </Button>
 
                     {product.options.length > 0 && !isAllOptionsSelected() && (
-                      <div className='rounded-lg border border-orange-200 bg-orange-50 p-3'>
-                        <p className='text-sm text-orange-800'>
+                      <div className='rounded-lg border border-white/20 bg-white/5 p-3'>
+                        <p className='text-sm text-white'>
                           {dictionary.productDetail.options.allOptionsRequired}
                         </p>
                       </div>
                     )}
 
-                    <div className='rounded-lg border border-green-200 bg-green-50 p-4'>
-                      <p className='font-medium text-green-800'>
+                    <div className='rounded-lg border border-white/20 bg-white/5 p-4'>
+                      <p className='font-medium text-white'>
                         {dictionary.productDetail.status.reviewCompleted}
                       </p>
-                      <p className='mt-1 text-sm text-green-600'>
+                      <p className='mt-1 text-sm text-white/80'>
                         {dictionary.productDetail.status.purchaseAvailable}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  /* 구매 불가능한 상품 - 작품 정보 및 진행 상황 표시 */
+                  /* 구매 불가능한 상품 - 디자인 정보 및 진행 상황 표시 */
                   <div className='space-y-6'>
                     <div className='flex gap-6'>
                       <div className='flex-1'>
-                        <h2 className='mb-4 text-lg font-semibold text-gray-900'>
+                        <h2 className='mb-4 text-lg font-semibold text-white'>
                           {dictionary.productDetail.description.title}
                         </h2>
-                        <div className='space-y-2 leading-relaxed text-gray-700'>
+                        <div className='space-y-2 leading-relaxed text-white/90'>
                           {product.description && <p>{product.description}</p>}
                           {product.creator_name && (
-                            <p className='text-sm text-gray-600'>
+                            <p className='text-sm text-white/80'>
                               {dictionary.productDetail.description.designer}{' '}
-                              <span className='font-medium'>{product.creator_name}</span>
+                              <span className='font-medium text-white'>{product.creator_name}</span>
                             </p>
                           )}
                         </div>
@@ -916,7 +952,7 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                           <div className='absolute top-1/2 left-1/2 h-3 w-40 origin-center -translate-x-1/2 -translate-y-1/2 -rotate-90 transform'>
                             <Progress
                               value={Math.min((product.current_likes / product.it_4) * 100, 100)}
-                              className='h-3 w-40 bg-gray-100'
+                              className='h-3 w-40 bg-white/20'
                             />
                           </div>
                         </div>
@@ -925,11 +961,11 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
 
                     <div>
                       {product.is_under_review ? (
-                        <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
-                          <p className='font-medium text-yellow-800'>
+                        <div className='rounded-lg border border-white/20 bg-white/5 p-4'>
+                          <p className='font-medium text-white'>
                             {dictionary.productDetail.status.reviewInProgress}
                           </p>
-                          <p className='mt-1 text-sm text-yellow-600'>
+                          <p className='mt-1 text-sm text-white/80'>
                             {product.it_9 === 'Y'
                               ? dictionary.productDetail.status.manualReview +
                                 ' (' +
@@ -940,16 +976,16 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                                 ')'
                               : dictionary.productDetail.status.autoReview}
                           </p>
-                          <p className='mt-1 text-sm text-yellow-600'>
+                          <p className='mt-1 text-sm text-white/80'>
                             {dictionary.productDetail.status.reviewInProgressDesc}
                           </p>
                         </div>
                       ) : (
-                        <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
-                          <p className='font-medium text-blue-800'>
+                        <div className='rounded-lg border border-white/80 p-4'>
+                          <p className='font-medium text-white'>
                             {dictionary.productDetail.status.collectingLikes}
                           </p>
-                          <p className='mt-1 text-sm text-blue-600'>
+                          <p className='mt-1 text-sm text-white/80'>
                             {dictionary.productDetail.status.collectingLikesDesc.replace(
                               '{{type}}',
                               product.it_9 === 'Y' ? '수동' : '자동',
@@ -970,11 +1006,11 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     <Button
                       variant='outline'
                       onClick={() => router.push(`${ROUTES.PRODUCT}/${prevProduct.it_id}`)}
-                      className='group flex items-center gap-1 px-5 py-3'
+                      className='group flex items-center gap-1 border-white bg-transparent px-5 py-3 text-white hover:bg-transparent'
                     >
-                      <ChevronLeftIcon className='h-5 w-5 text-gray-400 transition-colors group-hover:text-gray-600' />
+                      <ChevronLeftIcon className='h-5 w-5 text-white transition-colors' />
                       <div className='text-left'>
-                        <div className='max-w-32 truncate text-sm text-gray-900'>
+                        <div className='max-w-32 truncate text-sm text-white'>
                           {dictionary.productDetail.navigation.previous}
                         </div>
                       </div>
@@ -983,11 +1019,11 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     <Button
                       variant='outline'
                       disabled
-                      className='flex items-center gap-1 px-5 py-3'
+                      className='flex items-center gap-1 border-white bg-transparent px-5 py-3'
                     >
-                      <ChevronLeftIcon className='h-5 w-5 text-gray-300' />
+                      <ChevronLeftIcon className='h-5 w-5 text-white/60' />
                       <div className='text-left'>
-                        <div className='text-sm text-gray-400'>
+                        <div className='text-sm text-white/60'>
                           {dictionary.productDetail.navigation.noPrevious}
                         </div>
                       </div>
@@ -999,27 +1035,27 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
                     <Button
                       variant='outline'
                       onClick={() => router.push(`${ROUTES.PRODUCT}/${nextProduct.it_id}`)}
-                      className='group flex items-center gap-1 px-5 py-3'
+                      className='group flex items-center gap-1 border-white bg-transparent px-5 py-3 text-white hover:bg-transparent'
                     >
                       <div className='text-right'>
-                        <div className='max-w-32 truncate text-sm text-gray-900'>
+                        <div className='max-w-32 truncate text-sm text-white'>
                           {dictionary.productDetail.navigation.next}
                         </div>
                       </div>
-                      <ChevronRightIcon className='h-5 w-5 text-gray-400 transition-colors group-hover:text-gray-600' />
+                      <ChevronRightIcon className='h-5 w-5 text-white transition-colors' />
                     </Button>
                   ) : (
                     <Button
                       variant='outline'
                       disabled
-                      className='flex items-center gap-1 px-5 py-3'
+                      className='flex items-center gap-1 border-white bg-transparent px-5 py-3'
                     >
                       <div className='text-right'>
-                        <div className='text-sm text-gray-400'>
+                        <div className='text-sm text-white/60'>
                           {dictionary.productDetail.navigation.noNext}
                         </div>
                       </div>
-                      <ChevronRightIcon className='h-5 w-5 text-gray-300' />
+                      <ChevronRightIcon className='h-5 w-5 text-white/60' />
                     </Button>
                   )}
                 </div>
@@ -1027,18 +1063,18 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
             </div>
 
             {product.it_info && (
-              <div className='mt-12 border-t border-gray-200 pt-8'>
-                <h2 className='mb-4 text-xl font-bold text-gray-900'>
+              <div className='mt-12 border-t border-white/20 pt-8'>
+                <h2 className='mb-4 text-xl font-bold text-white'>
                   {dictionary.productDetail.description.productDetailInfo}
                 </h2>
                 <div
-                  className='prose max-w-none text-gray-700'
+                  className='prose prose-headings:text-white prose-strong:text-white prose-a:text-white max-w-none text-white/90'
                   dangerouslySetInnerHTML={{ __html: product.it_info }}
                 />
               </div>
             )}
 
-            {/* 구매 불가능한 상품일 때만 인기 작품 표시 */}
+            {/* 구매 불가능한 상품일 때만 인기 디자인 표시 */}
             {!product.can_purchase && (
               <PopularProducts excludeProductId={product.it_id} dictionary={dictionary} />
             )}
@@ -1081,6 +1117,16 @@ export default function ProductDetailClient({ dictionary }: ProductDetailClientP
       <SizeGuideDialog
         open={showSizeGuide}
         onOpenChange={setShowSizeGuide}
+        dictionary={dictionary}
+      />
+
+      {/* 공유 메시지 다이얼로그 */}
+      <MessageDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        title='공유'
+        description={shareMessage}
+        confirmText='확인'
         dictionary={dictionary}
       />
     </div>
