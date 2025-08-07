@@ -31,10 +31,13 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     const body = await request.json();
     const { status }: { status: OrderStatus } = body;
 
-    // 상태 값 검증 - '준비'(상품제작) 또는 '배송'(배송진행)만 허용
-    if (!['준비', '배송'].includes(status)) {
+    // 상태 값 검증 - '입금', '준비'(상품제작) 또는 '배송'(배송진행)만 허용
+    if (!['입금', '준비', '배송'].includes(status)) {
       return NextResponse.json(
-        { success: false, message: '지원하지 않는 상태값입니다. 준비 또는 배송만 가능합니다.' },
+        {
+          success: false,
+          message: '지원하지 않는 상태값입니다. 입금, 준비 또는 배송만 가능합니다.',
+        },
         { status: 400 },
       );
     }
@@ -82,10 +85,12 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
 
     // 현재 상태가 이미 변경하려는 상태와 같은지 확인
     if (currentStatus === status) {
+      const statusText =
+        status === '입금' ? '결제완료' : status === '준비' ? '상품제작' : '배송진행';
       return NextResponse.json(
         {
           success: false,
-          message: `이미 ${status === '준비' ? '상품제작' : '배송진행'} 상태입니다.`,
+          message: `이미 ${statusText} 상태입니다.`,
         },
         { status: 400 },
       );
@@ -126,6 +131,7 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
             companyName: smsSettings.de_admin_company_name,
           });
         }
+        // '입금' 상태로 변경 시에는 별도 SMS 발송하지 않음
 
         // SMS 발송 처리 완료
       } catch (smsError) {
@@ -136,11 +142,12 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     // SMS 발송은 비동기적으로 처리 (API 응답 속도 향상)
     sendSMSAsync();
 
-    const statusText = status === '준비' ? '상품 제작' : '배송 진행';
+    const statusText =
+      status === '입금' ? '결제 완료' : status === '준비' ? '상품 제작' : '배송 진행';
 
     return NextResponse.json({
       success: true,
-      message: `주문 상태가 ${statusText}로 변경되었습니다.${order.od_hp ? ' SMS가 발송됩니다.' : ''}`,
+      message: `주문 상태가 ${statusText}로 변경되었습니다.${order.od_hp && status !== '입금' ? ' SMS가 발송됩니다.' : ''}`,
       data: {
         orderId,
         newStatus: status,

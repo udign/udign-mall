@@ -46,26 +46,37 @@ interface ApiResponse {
 }
 
 const getPaymentMethodDisplay = (settle_case: string): string => {
-  switch (settle_case) {
-    case 'card':
-      return '신용카드';
-    case 'bank':
-      return '무통장입금';
-    case 'phone':
-      return '휴대폰';
-    case 'samsung':
-      return '삼성페이';
-    case 'kakao':
-      return '카카오페이';
-    case 'payco':
-      return '페이코';
-    case 'naverpay':
-      return '네이버페이';
-    case 'tosspay':
-      return '토스페이';
-    default:
-      return settle_case || '-';
+  if (!settle_case) return '-';
+
+  const method = settle_case.toLowerCase();
+
+  // 카드 관련 결제수단들은 모두 "신용카드"로 통일
+  if (
+    method.includes('card') ||
+    method === 'toss' ||
+    method === 'tosspay' ||
+    method === 'kakao' ||
+    method === 'kakaopay' ||
+    method === 'samsung' ||
+    method === 'payco' ||
+    method === 'naverpay' ||
+    method === 'naver'
+  ) {
+    return '신용카드';
   }
+
+  // 계좌이체/무통장입금 관련 결제수단들은 모두 "무통장입금"으로 통일
+  if (
+    method.includes('bank') ||
+    method.includes('transfer') ||
+    method.includes('virtual') ||
+    method.includes('account')
+  ) {
+    return '무통장입금';
+  }
+
+  // 기타 모든 결제수단은 신용카드로 분류
+  return '신용카드';
 };
 
 export default function OrderListPage() {
@@ -132,7 +143,7 @@ export default function OrderListPage() {
     }
   };
 
-  const handleOrderStatusChange = async (orderId: string, newStatus: '준비' | '배송') => {
+  const handleOrderStatusChange = async (orderId: string, newStatus: '입금' | '준비' | '배송') => {
     try {
       setStatusLoading(orderId);
 
@@ -267,10 +278,16 @@ export default function OrderListPage() {
                       주문상태
                     </th>
                     <th className='px-4 py-3 text-right text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
-                      주문금액
+                      <div>주문금액</div>
+                      <div className='mt-0.5 text-xs font-normal text-gray-400 normal-case'>
+                        (장바구니 총액)
+                      </div>
                     </th>
                     <th className='px-4 py-3 text-right text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
-                      실결제금액
+                      <div>실결제금액</div>
+                      <div className='mt-0.5 text-xs font-normal text-gray-400 normal-case'>
+                        (최종 결제액)
+                      </div>
                     </th>
                     <th className='px-4 py-3 text-left text-xs font-medium tracking-wider whitespace-nowrap text-gray-500 uppercase'>
                       결제수단
@@ -362,7 +379,7 @@ export default function OrderListPage() {
                             <LoadingSpinner size='sm' className='mb-0' />
                             <span className='ml-2 text-sm text-gray-600'>변경 중...</span>
                           </div>
-                        ) : ['입금', '준비'].includes(order.od_status as string) ? (
+                        ) : ['주문', '입금', '준비'].includes(order.od_status as string) ? (
                           <div className='flex justify-center'>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -370,11 +387,13 @@ export default function OrderListPage() {
                                   variant='outline'
                                   size='sm'
                                   className={`h-8 rounded-full border px-3 text-sm font-medium ${
-                                    order.od_status === '입금'
-                                      ? 'border-green-200 bg-green-100 text-green-800'
-                                      : (order.od_status as string) === '준비'
-                                        ? 'border-yellow-200 bg-yellow-100 text-yellow-800'
-                                        : 'border-gray-200 bg-gray-100 text-gray-800'
+                                    order.od_status === '주문'
+                                      ? 'border-gray-200 bg-gray-100 text-gray-800'
+                                      : order.od_status === '입금'
+                                        ? 'border-green-200 bg-green-100 text-green-800'
+                                        : (order.od_status as string) === '준비'
+                                          ? 'border-yellow-200 bg-yellow-100 text-yellow-800'
+                                          : 'border-gray-200 bg-gray-100 text-gray-800'
                                   }`}
                                   disabled={statusLoading !== null}
                                 >
@@ -383,6 +402,28 @@ export default function OrderListPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='end'>
+                                {order.od_status === '주문' && (
+                                  <>
+                                    <DropdownMenuItem
+                                      onClick={() => handleOrderStatusChange(order.od_id, '입금')}
+                                      disabled={statusLoading !== null}
+                                    >
+                                      <span className='text-green-600'>결제완료</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleOrderStatusChange(order.od_id, '준비')}
+                                      disabled={statusLoading !== null}
+                                    >
+                                      <span className='text-yellow-600'>상품제작</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleOrderStatusChange(order.od_id, '배송')}
+                                      disabled={statusLoading !== null}
+                                    >
+                                      <span className='text-blue-600'>배송진행</span>
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
                                 {order.od_status === '입금' && (
                                   <>
                                     <DropdownMenuItem

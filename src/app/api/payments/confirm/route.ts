@@ -65,8 +65,8 @@ export async function POST(request: NextRequest) {
 
       // 주문 테이블 업데이트
       await connection.execute(
-        'UPDATE g5_shop_order SET od_status = ?, od_settle_case = ?, od_receipt_time = NOW() WHERE od_tno = ?',
-        ['입금', paymentData.method, orderId],
+        'UPDATE g5_shop_order SET od_status = ?, od_settle_case = ?, od_receipt_price = ?, od_receipt_time = NOW() WHERE od_tno = ?',
+        ['입금', paymentData.method, amount, orderId],
       );
 
       // 장바구니 상태 업데이트 (주문 ID로 매칭)
