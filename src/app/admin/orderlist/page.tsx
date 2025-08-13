@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,10 +15,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/primitives/dropdown-menu';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Edit2, Check, X } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/primitives/select';
+import { Input } from '@/components/ui/primitives/input';
 import { OrderListItem } from '@/app/api/admin/order-list/route';
 import { ROUTES } from '@/lib/routes';
 import { formatOrderId, formatDateOnly } from '@/lib/utils';
+import Link from 'next/link';
 import MessageDialog from '@/components/ui/MessageDialog';
 
 interface OrderListData {
@@ -79,6 +88,25 @@ const getPaymentMethodDisplay = (settle_case: string): string => {
   return '신용카드';
 };
 
+// 배송회사 목록
+const DELIVERY_COMPANIES = [
+  'CJ대한통운',
+  '한진택배',
+  '롯데택배',
+  '우체국택배',
+  '로젠택배',
+  'CU편의점택배',
+  'GS편의점택배',
+  '경동택배',
+  '대신택배',
+  '일양로지스',
+  '합동택배',
+  'DHL',
+  'FedEx',
+  'UPS',
+  '기타',
+];
+
 export default function OrderListPage() {
   const [orderData, setOrderData] = useState<OrderListData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -93,6 +121,12 @@ export default function OrderListPage() {
     title: '',
     description: '',
   });
+  const [editingDelivery, setEditingDelivery] = useState<string | null>(null);
+  const [deliveryData, setDeliveryData] = useState<{
+    company: string;
+    invoice: string;
+  }>({ company: '', invoice: '' });
+  const [deliveryLoading, setDeliveryLoading] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -143,7 +177,94 @@ export default function OrderListPage() {
     }
   };
 
-  const handleOrderStatusChange = async (orderId: string, newStatus: '입금' | '준비' | '배송') => {
+  const handleDeliveryEdit = (orderId: string, currentCompany: string, currentInvoice: string) => {
+    setEditingDelivery(orderId);
+    setDeliveryData({
+      company: currentCompany || '',
+      invoice: currentInvoice || '',
+    });
+  };
+
+  const handleDeliveryCancel = () => {
+    setEditingDelivery(null);
+    setDeliveryData({ company: '', invoice: '' });
+  };
+
+  const handleDeliverySave = async (orderId: string) => {
+    if (!deliveryData.company || !deliveryData.invoice) {
+      setMessageDialog({
+        open: true,
+        title: '입력 오류',
+        description: '배송회사와 송장번호를 모두 입력해주세요.',
+      });
+      return;
+    }
+
+    try {
+      setDeliveryLoading(orderId);
+
+      const response = await fetch(`/api/admin/orders/${orderId}/delivery`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          deliveryCompany: deliveryData.company,
+          invoice: deliveryData.invoice,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '배송 정보 등록에 실패했습니다.');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 로컬 상태 업데이트
+        setOrderData((prev) => {
+          if (!prev) return prev;
+
+          return {
+            ...prev,
+            orders: prev.orders.map((order) =>
+              order.od_id === orderId
+                ? {
+                    ...order,
+                    od_delivery_company: deliveryData.company,
+                    od_invoice: deliveryData.invoice,
+                    od_status: result.data.statusChanged ? '배송' : order.od_status,
+                  }
+                : order,
+            ),
+          };
+        });
+
+        setEditingDelivery(null);
+        setDeliveryData({ company: '', invoice: '' });
+
+        setMessageDialog({
+          open: true,
+          title: '배송 정보 등록',
+          description: result.message,
+        });
+      } else {
+        throw new Error(result.message || '배송 정보 등록에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('배송 정보 등록 오류:', error);
+      setMessageDialog({
+        open: true,
+        title: '배송 정보 등록 실패',
+        description: error instanceof Error ? error.message : '배송 정보 등록에 실패했습니다.',
+      });
+    } finally {
+      setDeliveryLoading(null);
+    }
+  };
+
+  const handleOrderStatusChange = async (orderId: string, newStatus: '입금' | '준비' | '배송' | '완료') => {
     try {
       setStatusLoading(orderId);
 
@@ -336,9 +457,12 @@ export default function OrderListPage() {
                       </td>
                       <td className='px-4 py-4 whitespace-nowrap'>
                         <div className='text-sm'>
-                          <div className='font-medium text-blue-600'>
+                          <Link 
+                            href={`/admin/orders/${order.od_id}`}
+                            className='font-medium text-blue-600 hover:text-blue-800 hover:underline'
+                          >
                             {formatOrderId(order.od_id)}
-                          </div>
+                          </Link>
                           <div className='text-xs text-gray-500'>
                             {formatDateOnly(order.od_time)}
                           </div>
@@ -379,7 +503,7 @@ export default function OrderListPage() {
                             <LoadingSpinner size='sm' className='mb-0' />
                             <span className='ml-2 text-sm text-gray-600'>변경 중...</span>
                           </div>
-                        ) : ['주문', '입금', '준비'].includes(order.od_status as string) ? (
+                        ) : ['주문', '입금', '준비', '배송'].includes(order.od_status as string) ? (
                           <div className='flex justify-center'>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -448,6 +572,14 @@ export default function OrderListPage() {
                                     <span className='text-blue-600'>배송진행</span>
                                   </DropdownMenuItem>
                                 )}
+                                {order.od_status === '배송' && (
+                                  <DropdownMenuItem
+                                    onClick={() => handleOrderStatusChange(order.od_id, '완료')}
+                                    disabled={statusLoading !== null}
+                                  >
+                                    <span className='text-green-600'>배송완료</span>
+                                  </DropdownMenuItem>
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
@@ -490,12 +622,89 @@ export default function OrderListPage() {
                         )}
                       </td>
                       <td className='px-4 py-4 whitespace-nowrap'>
-                        <div className='text-sm text-gray-900'>{order.od_invoice || '-'}</div>
+                        {editingDelivery === order.od_id ? (
+                          <div className='flex items-center space-x-2'>
+                            <Input
+                              type='text'
+                              value={deliveryData.invoice}
+                              onChange={(e) =>
+                                setDeliveryData((prev) => ({ ...prev, invoice: e.target.value }))
+                              }
+                              placeholder='송장번호'
+                              className='w-32 h-8 text-sm'
+                              disabled={deliveryLoading === order.od_id}
+                            />
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              onClick={() => handleDeliverySave(order.od_id)}
+                              disabled={deliveryLoading === order.od_id}
+                              className='h-8 w-8 p-0'
+                            >
+                              {deliveryLoading === order.od_id ? (
+                                <LoadingSpinner size='sm' className='h-4 w-4' />
+                              ) : (
+                                <Check className='h-4 w-4 text-green-600' />
+                              )}
+                            </Button>
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              onClick={handleDeliveryCancel}
+                              disabled={deliveryLoading === order.od_id}
+                              className='h-8 w-8 p-0'
+                            >
+                              <X className='h-4 w-4 text-red-600' />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className='flex items-center space-x-2'>
+                            <span className='text-sm text-gray-900'>{order.od_invoice || '-'}</span>
+                            {['주문', '입금', '준비', '배송'].includes(order.od_status as string) && (
+                              <Button
+                                size='sm'
+                                variant='ghost'
+                                onClick={() =>
+                                  handleDeliveryEdit(
+                                    order.od_id,
+                                    order.od_delivery_company,
+                                    order.od_invoice,
+                                  )
+                                }
+                                disabled={statusLoading !== null || deliveryLoading !== null}
+                                className='h-6 w-6 p-0'
+                              >
+                                <Edit2 className='h-3 w-3' />
+                              </Button>
+                            )}
+                          </div>
+                        )}
                       </td>
                       <td className='px-4 py-4 whitespace-nowrap'>
-                        <div className='text-sm text-gray-900'>
-                          {order.od_delivery_company || '-'}
-                        </div>
+                        {editingDelivery === order.od_id ? (
+                          <Select
+                            value={deliveryData.company}
+                            onValueChange={(value) =>
+                              setDeliveryData((prev) => ({ ...prev, company: value }))
+                            }
+                            disabled={deliveryLoading === order.od_id}
+                          >
+                            <SelectTrigger className='w-32 h-8 text-sm'>
+                              <SelectValue placeholder='배송회사 선택' />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {DELIVERY_COMPANIES.map((company) => (
+                                <SelectItem key={company} value={company}>
+                                  {company}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className='text-sm text-gray-900'>
+                            {order.od_delivery_company || '-'}
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}

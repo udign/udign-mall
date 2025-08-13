@@ -31,12 +31,12 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     const body = await request.json();
     const { status }: { status: OrderStatus } = body;
 
-    // 상태 값 검증 - '입금', '준비'(상품제작) 또는 '배송'(배송진행)만 허용
-    if (!['입금', '준비', '배송'].includes(status)) {
+    // 상태 값 검증 - '입금', '준비'(상품제작), '배송'(배송진행) 또는 '완료'
+    if (!['입금', '준비', '배송', '완료'].includes(status)) {
       return NextResponse.json(
         {
           success: false,
-          message: '지원하지 않는 상태값입니다. 입금, 준비 또는 배송만 가능합니다.',
+          message: '지원하지 않는 상태값입니다. 입금, 준비, 배송 또는 완료만 가능합니다.',
         },
         { status: 400 },
       );
@@ -86,7 +86,9 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     // 현재 상태가 이미 변경하려는 상태와 같은지 확인
     if (currentStatus === status) {
       const statusText =
-        status === '입금' ? '결제완료' : status === '준비' ? '상품제작' : '배송진행';
+        status === '입금' ? '결제완료' : 
+        status === '준비' ? '상품제작' : 
+        status === '배송' ? '배송진행' : '배송완료';
       return NextResponse.json(
         {
           success: false,
@@ -94,6 +96,30 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
         },
         { status: 400 },
       );
+    }
+
+    // 완료 상태로 변경 시 배송 정보 확인
+    if (status === '완료') {
+      // 송장번호가 없으면 완료 처리 불가
+      const deliveryQuery = `
+        SELECT od_invoice, od_delivery_company 
+        FROM g5_shop_order 
+        WHERE od_id = ?
+      `;
+      const deliveryResult = (await executeQuery(deliveryQuery, [order.od_id])) as {
+        od_invoice: string;
+        od_delivery_company: string;
+      }[];
+
+      if (deliveryResult.length === 0 || !deliveryResult[0].od_invoice) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: '송장번호가 없으면 배송완료 처리할 수 없습니다. 먼저 송장번호를 입력해주세요.',
+          },
+          { status: 400 },
+        );
+      }
     }
 
     // 주문과 장바구니 상태 업데이트
@@ -130,6 +156,9 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
             orderId: orderId,
             companyName: smsSettings.de_admin_company_name,
           });
+        } else if (status === '완료') {
+          // 배송완료 SMS 발송 (필요 시 추가 구현)
+          // 현재는 배송완료 SMS는 발송하지 않음
         }
         // '입금' 상태로 변경 시에는 별도 SMS 발송하지 않음
 
@@ -143,11 +172,13 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
     sendSMSAsync();
 
     const statusText =
-      status === '입금' ? '결제 완료' : status === '준비' ? '상품 제작' : '배송 진행';
+      status === '입금' ? '결제 완료' : 
+      status === '준비' ? '상품 제작' : 
+      status === '배송' ? '배송 진행' : '배송 완료';
 
     return NextResponse.json({
       success: true,
-      message: `주문 상태가 ${statusText}로 변경되었습니다.${order.od_hp && status !== '입금' ? ' SMS가 발송됩니다.' : ''}`,
+      message: `주문 상태가 ${statusText}로 변경되었습니다.${order.od_hp && status !== '입금' && status !== '완료' ? ' SMS가 발송됩니다.' : ''}`,
       data: {
         orderId,
         newStatus: status,

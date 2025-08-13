@@ -39,6 +39,28 @@ const stepItems = [
   { step: 1, label: '제작검토', indent: 'ml-0' },
 ];
 
+// 택배사별 배송조회 URL 생성 함수
+function getTrackingUrl(company: string, invoice: string): string {
+  const trackingUrls: Record<string, string> = {
+    'CJ대한통운': `https://www.cjlogistics.com/ko/tool/parcel/tracking?gnbInvcNo=${invoice}`,
+    '한진택배': `https://www.hanjin.com/kor/CMS/DeliveryMgr/WaybillResult.do?mCode=MN038&schLang=KR&wblnumText2=${invoice}`,
+    '롯데택배': `https://www.lotteglogis.com/home/reservation/tracking/linkView?InvNo=${invoice}`,
+    '우체국택배': `https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=${invoice}`,
+    '로젠택배': `https://www.logen.co.kr/mobile/reservation/tracking/index?InvNo=${invoice}`,
+    'CU편의점택배': `https://www.cupost.co.kr/postbox/delivery/localResult.cupost?invoice_no=${invoice}`,
+    'GS편의점택배': `https://www.cvsnet.co.kr/invoice/tracking.do?invoice_no=${invoice}`,
+    '경동택배': `https://kdexp.com/service/delivery/delivery.do?barcode=${invoice}`,
+    '대신택배': `https://www.ds3211.co.kr/freight/internalFreightSearch.ht?billno=${invoice}`,
+    '일양로지스': `https://www.ilyanglogis.com/functionality/card_form_waybill.asp?hawb_no=${invoice}`,
+    '합동택배': `https://hdexp.co.kr/delivery_tracking.hd?barcode_num=${invoice}`,
+    'DHL': `https://www.dhl.com/kr-ko/home/tracking/tracking-express.html?submit=1&tracking-id=${invoice}`,
+    'FedEx': `https://www.fedex.com/fedextrack/?trknbr=${invoice}`,
+    'UPS': `https://www.ups.com/track?loc=ko_KR&tracknum=${invoice}`,
+  };
+
+  return trackingUrls[company] || '';
+}
+
 export default function ArtworkCard({
   artwork,
   dictionary,
@@ -375,17 +397,29 @@ export default function ArtworkCard({
                 {(artwork._status_text === '배송 진행' || artwork._status_text === '배송중') && (
                   <>
                     {artwork.od_invoice && artwork.od_delivery_company ? (
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // 배송조회 로직
-                        }}
-                        variant='default'
-                        size='sm'
-                        className='whitespace-nowrap'
-                      >
-                        배송조회
-                      </Button>
+                      <div className='flex flex-col gap-1'>
+                        <div className='text-xs text-gray-600'>
+                          {artwork.od_delivery_company}
+                        </div>
+                        <div className='text-xs font-medium'>
+                          {artwork.od_invoice}
+                        </div>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // 배송조회 링크 - 택배사별 추적 URL
+                            const trackingUrl = getTrackingUrl(artwork.od_delivery_company, artwork.od_invoice);
+                            if (trackingUrl) {
+                              window.open(trackingUrl, '_blank');
+                            }
+                          }}
+                          variant='default'
+                          size='sm'
+                          className='whitespace-nowrap'
+                        >
+                          배송조회
+                        </Button>
+                      </div>
                     ) : (
                       <span className='rounded bg-gray-100 px-3 py-1 text-sm whitespace-nowrap text-gray-500'>
                         운송장 등록 중
