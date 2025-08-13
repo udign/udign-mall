@@ -146,7 +146,7 @@ export default function OrderDetailPage({ params }: PageProps) {
     }
 
     fetchOrderDetail();
-  }, [user, authLoading, router, orderId]);
+  }, [user, authLoading, router, orderId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchOrderDetail = async () => {
     try {
@@ -302,8 +302,6 @@ export default function OrderDetailPage({ params }: PageProps) {
       </div>
     );
   }
-
-  const totalAmount = order.od_cart_price + order.od_send_cost + order.od_send_cost2;
 
   return (
     <div className="container mx-auto p-6">

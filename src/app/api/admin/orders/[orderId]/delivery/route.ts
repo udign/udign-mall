@@ -11,7 +11,7 @@ interface RouteParams {
 }
 
 // 배송회사 목록 (PHP 시스템과 동일)
-export const DELIVERY_COMPANIES = [
+const DELIVERY_COMPANIES = [
   'CJ대한통운',
   '한진택배',
   '롯데택배',

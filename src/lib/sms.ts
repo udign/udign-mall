@@ -677,13 +677,23 @@ export const sendShippingProgressSMS = async (orderData: {
   phone: string;
   orderId: string;
   companyName?: string;
+  deliveryCompany?: string;
+  invoice?: string;
 }): Promise<{ success: boolean; message: string }> => {
   try {
-    const template = SMS_DEFAULT_TEMPLATES.SHIPPING_PROGRESS;
+    let template = SMS_DEFAULT_TEMPLATES.SHIPPING_PROGRESS;
+    
+    // 배송회사와 송장번호가 있으면 추가
+    if (orderData.deliveryCompany && orderData.invoice) {
+      template += `\n택배사: {deliveryCompany}\n송장번호: {invoice}`;
+    }
+    
     const message = replaceTemplateVariables(template, {
       이름: orderData.name,
       주문번호: orderData.orderId,
       회사명: orderData.companyName || 'UDIGN',
+      deliveryCompany: orderData.deliveryCompany || '',
+      invoice: orderData.invoice || '',
     });
 
     return await sendSMS(orderData.phone, message);

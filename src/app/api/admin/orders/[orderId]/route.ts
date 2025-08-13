@@ -32,7 +32,50 @@ export const GET = async (request: NextRequest, { params }: RouteParams) => {
       LIMIT 1
     `;
 
-    const orderResult = (await executeQuery(orderQuery, [orderId, orderId])) as any[];
+    const orderResult = await executeQuery(orderQuery, [orderId, orderId]) as Array<{
+      od_id: string;
+      od_tno: string;
+      od_time: string;
+      od_status: string;
+      od_settle_case: string;
+      od_test: number;
+      od_mobile: number;
+      od_pg: string;
+      od_name: string;
+      od_email: string;
+      od_tel: string;
+      od_hp: string;
+      od_zip: string;
+      od_addr1: string;
+      od_addr2: string;
+      od_addr3: string;
+      od_b_name: string;
+      od_b_tel: string;
+      od_b_hp: string;
+      od_b_zip: string;
+      od_b_addr1: string;
+      od_b_addr2: string;
+      od_b_addr3: string;
+      od_delivery_company: string;
+      od_invoice: string;
+      od_invoice_time: string;
+      od_memo: string;
+      od_shop_memo: string;
+      od_cart_price: number;
+      od_send_cost: number;
+      od_send_cost2: number;
+      od_receipt_price: number;
+      od_receipt_point: number;
+      od_refund_price: number;
+      od_cancel_price: number;
+      od_coupon: number;
+      od_misu: number;
+      mb_id: string;
+      mb_name: string;
+      mb_email: string;
+      member_email: string;
+      member_hp: string;
+    }>;
 
     if (orderResult.length === 0) {
       return NextResponse.json(
@@ -57,7 +100,22 @@ export const GET = async (request: NextRequest, { params }: RouteParams) => {
       ORDER BY c.ct_id
     `;
 
-    const itemsResult = (await executeQuery(itemsQuery, [actualOrderId])) as any[];
+    const itemsResult = await executeQuery(itemsQuery, [actualOrderId]) as Array<{
+      it_id: string;
+      it_name: string;
+      ct_option: string;
+      ct_qty: number;
+      ct_price: number;
+      ct_point: number;
+      ct_status: string;
+      io_price: number;
+      io_id: string;
+      io_type: number;
+      cp_price: number;
+      it_img1: string;
+      it_img2: string;
+      it_img3: string;
+    }>;
 
     // 이미지 URL 처리
     const items = itemsResult.map(item => ({

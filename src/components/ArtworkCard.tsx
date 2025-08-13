@@ -408,7 +408,7 @@ export default function ArtworkCard({
                           onClick={(e) => {
                             e.stopPropagation();
                             // 배송조회 링크 - 택배사별 추적 URL
-                            const trackingUrl = getTrackingUrl(artwork.od_delivery_company, artwork.od_invoice);
+                            const trackingUrl = getTrackingUrl(artwork.od_delivery_company || '', artwork.od_invoice || '');
                             if (trackingUrl) {
                               window.open(trackingUrl, '_blank');
                             }
