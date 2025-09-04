@@ -1,9 +1,8 @@
 {
-  "redirects": [
+  "rewrites": [
     {
-      "source": "/:path*.php(.*)",
-      "destination": "/shop",
-      "permanent": true
+      "source": "/:path*.php",
+      "destination": "/shop"
     }
   ]
 }
