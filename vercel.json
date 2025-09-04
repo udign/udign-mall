@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*.php",
+      "destination": "/shop",
+      "permanent": true
+    }
+  ]
+}
