@@ -44,3 +44,10 @@ next-env.d.ts
 .cursor
 bg_progress
 docs
+
+# internal dev files
+CLAUDE.md
+/dbconfig
+
+# client handover docs
+/manager
