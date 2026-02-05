@@ -5,12 +5,14 @@ import PopupDisplay from '@/components/PopupDisplay';
 import { Locale } from '../../../../i18n.config';
 import { getDictionary } from '@/lib/dictionaries';
 
-interface UserLayoutProps {
-  children: ReactNode;
-  params: Promise<{ lang: Locale }>;
+interface CategoryLayoutProps {
+  children: React.ReactNode;
+  params: Promise<{
+    lang: "ko" | "en" | "ja" | "zh";
+  }>;
 }
 
-export default async function UserLayout({ children, params }: UserLayoutProps) {
+export default async function CategoryLayout({ children, params }: CategoryLayoutProps) {
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
