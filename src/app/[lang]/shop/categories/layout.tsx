@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { } from 'react';
 import FloatingUploadButton from '@/components/FloatingUploadButton';
 import { getDictionary } from '@/lib/dictionaries';
 
