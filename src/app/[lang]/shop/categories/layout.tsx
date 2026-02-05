@@ -4,8 +4,10 @@ import { Locale } from '../../../../../i18n.config';
 import { getDictionary } from '@/lib/dictionaries';
 
 interface CategoryLayoutProps {
-  children: ReactNode;
-  params: Promise<{ lang: Locale }>;
+  children: React.ReactNode;
+  params: Promise<{
+    lang: "ko" | "en" | "ja" | "zh";
+  }>;
 }
 
 export default async function CategoryLayout({ children, params }: CategoryLayoutProps) {
