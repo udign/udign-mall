@@ -1,7 +1,7 @@
 import React from 'react';
 import FloatingUploadButton from '@/components/FloatingUploadButton';
 import { getDictionary } from '@/lib/dictionaries';
-import { Locale } from "@/types/locale";
+import { Locale } from "../../../../i18n.config";
 
 interface CategoryLayoutProps {
   children: React.ReactNode;
