@@ -1,12 +1,12 @@
 import React from 'react';
 import FloatingUploadButton from '@/components/FloatingUploadButton';
 import { getDictionary } from '@/lib/dictionaries';
-import { Locale } from "../../../../i18n.config";
+type Locale = "en" | "ja" | "ko" | "zh";
 
 interface CategoryLayoutProps {
   children: React.ReactNode;
   params: Promise<{
-    lang: Locale;
+    lang: string
   }>;
 }
 
