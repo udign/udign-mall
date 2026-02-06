@@ -1,16 +1,17 @@
 import React from 'react';
 import FloatingUploadButton from '@/components/FloatingUploadButton';
 import { getDictionary } from '@/lib/dictionaries';
+import { Locale } from "@/types/locale";
 
 interface CategoryLayoutProps {
   children: React.ReactNode;
-  params: {
-    lang: string;
-  };
+  params: Promise<{
+    lang: Locale;
+  }>;
 }
 
 export default async function CategoryLayout({ children, params }: CategoryLayoutProps) {
-  const { lang } = params;
+  const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
   return (
