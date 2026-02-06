@@ -12,7 +12,7 @@ interface CategoryLayoutProps {
 
 export default async function CategoryLayout({ children, params }: CategoryLayoutProps) {
   const { lang } = await params;
-  const dictionary = await getDictionary(lang);
+  const dictionary = await getDictionary(lang as Locale);
 
   return (
     <>
