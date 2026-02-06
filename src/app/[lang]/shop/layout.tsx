@@ -7,9 +7,7 @@ import { Locale } from "../../../../i18n.config";
 
 interface CategoryLayoutProps {
   children: React.ReactNode;
-  params: Promise<{
-    lang: Locale;
-  }>;
+  params: Promise<any>;
 }
 
 export default async function CategoryLayout({ children, params }: CategoryLayoutProps) {
