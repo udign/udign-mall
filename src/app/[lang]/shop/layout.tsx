@@ -3,11 +3,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PopupDisplay from '@/components/PopupDisplay';
 import { getDictionary } from '@/lib/dictionaries';
+import { Locale } from "@/types/locale";
 
 interface CategoryLayoutProps {
   children: React.ReactNode;
   params: Promise<{
-    lang: "ko" | "en" | "ja" | "zh";
+    lang: Locale;
   }>;
 }
 
