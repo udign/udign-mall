@@ -4,13 +4,13 @@ import { getDictionary } from '@/lib/dictionaries';
 
 interface CategoryLayoutProps {
   children: React.ReactNode;
-  params: Promise<{
-    lang: "ko" | "en" | "ja" | "zh";
-  }>;
+  params: {
+    lang: string;
+  };
 }
 
 export default async function CategoryLayout({ children, params }: CategoryLayoutProps) {
-  const { lang } = await params;
+  const { lang } = params;
   const dictionary = await getDictionary(lang);
 
   return (
