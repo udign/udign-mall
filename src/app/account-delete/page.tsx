@@ -23,9 +23,9 @@ export default function AccountDeletePage() {
       </h2>
 
       <ul style={{ marginBottom: '24px', paddingLeft: '20px' }}>
-        <li>계정 정보</li>
-        <li>로그인 기록</li>
-        <li>서비스 이용 기록</li>
+        <li> - 계정 정보</li>
+        <li> - 로그인 기록</li>
+        <li> - 서비스 이용 기록</li>
       </ul>
 
       <h2 style={{ marginTop: '32px', marginBottom: '12px' }}>
@@ -45,3 +45,4 @@ export default function AccountDeletePage() {
       </p>
     </main>
   );
+}
