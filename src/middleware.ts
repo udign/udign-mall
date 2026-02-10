@@ -48,7 +48,9 @@ export function middleware(request: NextRequest) {
   ) {
     return;
   }
-
+  if (pathname.startsWith('/account-delete')) {
+  return NextResponse.next();
+}
   const pathnameHasLocale = i18n.locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
