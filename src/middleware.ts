@@ -37,6 +37,10 @@ function getLocale(request: NextRequest): string {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const PUBLIC_PATHS = ['/account-delete', '/privacy', '/terms'];
+  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+    return NextResponse.next();
+  }
   // API 라우트, 정적 파일, admin 경로는 제외
   if (
     pathname.startsWith('/api') ||
@@ -46,16 +50,13 @@ export function middleware(request: NextRequest) {
     pathname === '/robots.txt' ||
     pathname.includes('.')
   ) {
-    return;
+    return NextResponse.next();
   }
-  if (pathname.startsWith('/account-delete')) {
-  return NextResponse.next();
-}
+
   const pathnameHasLocale = i18n.locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
-
-  if (pathnameHasLocale) return;
+  if (pathnameHasLocale) return NextResponse.next();
 
   const locale = getLocale(request);
   request.nextUrl.pathname = `/${locale}${pathname}`;
